@@ -24,7 +24,9 @@
 
         <div class="edits">
           <div>
-            <button @click="undoCanvas">Undo</button>
+            <button @click="undoCanvas" :disabled="state.history <= 0">
+              Undo
+            </button>
             <button @click="redoCanvas">Redo</button>
           </div>
           <button @click="clearCanvas">Clear</button>
@@ -163,7 +165,7 @@ export default {
 
     let state = reactive({
       canvas: null,
-      history: [],
+      history: 0,
       drawing: [],
       currentPath: [],
       mouse: {
@@ -255,6 +257,7 @@ export default {
     const onMouseUp = () => {
       state.mouse.isDrawing = false;
       state.drawing.push(state.currentPath);
+      state.history++; // increment history
       state.currentPath = [];
     };
 
@@ -280,7 +283,13 @@ export default {
     };
 
     const undoCanvas = () => {
-      console.log("undo");
+      if (state.history >= 0) {
+        state.history--;
+        let newDrawing = state.drawing;
+        newDrawing.length = state.history;
+        clearCanvas();
+        makeDrawing(newDrawing);
+      }
     };
 
     const redoCanvas = () => {
@@ -302,6 +311,7 @@ export default {
       incrementSize,
       setColor,
       addColor,
+      history,
       undoCanvas,
       redoCanvas,
       clearCanvas,
