@@ -6,6 +6,7 @@
     "build": "vite build"
   },
   "dependencies": {
+    "firebase": "^7.15.5",
     "vue": "^3.0.0-beta.15",
     "vue-swatches": "^2.1.0"
   },
