@@ -121,6 +121,7 @@
 <script>
 import { onMounted, reactive, onBeforeUnmount } from "vue";
 import { db } from "../../firebase";
+import drawing from "../assets/drawing.json";
 
 export default {
   name: "DrawingBoard",
@@ -138,6 +139,7 @@ export default {
     });
 
     const handleShortcuts = (e) => {
+      // console.log(e);
       if (!isNaN(e.key)) {
         state.mouse.palette.current = state.mouse.palette.colors[e.key - 1];
       }
@@ -146,6 +148,7 @@ export default {
         case 68: // "d"
           toggleMode();
           break;
+        case 67: // "c" OR
         case 8: // "backspace"
           clearCanvas();
           break;
@@ -160,6 +163,9 @@ export default {
 
     let state = reactive({
       canvas: null,
+      history: [],
+      drawing: [],
+      currentPath: [],
       mouse: {
         x: 0,
         y: 0,
@@ -192,14 +198,14 @@ export default {
         : (state.mouse.mode = "draw");
     };
 
-    const drawPath = (x1, y1, x2, y2) => {
+    const drawPath = ({ x1, y1, x2, y2, color, size, mode }) => {
       let ctx = state.canvas;
       ctx.lineCap = "round";
       ctx.lineJoin = "round";
-      ctx.strokeStyle = state.mouse.palette.current;
-      ctx.lineWidth = state.mouse.size.current;
+      ctx.strokeStyle = color;
+      ctx.lineWidth = size;
 
-      if (state.mouse.mode === "erase") {
+      if (mode === "erase") {
         ctx.globalCompositeOperation = "destination-out";
       }
 
@@ -209,14 +215,32 @@ export default {
       ctx.stroke();
       ctx.closePath();
 
-      if (state.mouse.mode === "erase") {
+      if (mode === "erase") {
         ctx.globalCompositeOperation = "source-over";
       }
     };
 
+    const makeDrawing = (drawing) => {
+      drawing.forEach((path) => {
+        path.forEach((pointData) => {
+          drawPath(pointData);
+        });
+      });
+    };
+
     const onMouseMove = (e) => {
       if (state.mouse.isDrawing) {
-        drawPath(state.mouse.x, state.mouse.y, e.offsetX, e.offsetY);
+        let pointData = {
+          x1: state.mouse.x,
+          y1: state.mouse.y,
+          x2: e.offsetX,
+          y2: e.offsetY,
+          color: state.mouse.palette.current,
+          size: state.mouse.size.current,
+          mode: state.mouse.mode,
+        };
+        state.currentPath.push(pointData); // log path
+        drawPath(pointData); // draw path
         state.mouse.x = e.offsetX;
         state.mouse.y = e.offsetY;
       }
@@ -230,6 +254,8 @@ export default {
 
     const onMouseUp = () => {
       state.mouse.isDrawing = false;
+      state.drawing.push(state.currentPath);
+      state.currentPath = [];
     };
 
     const decrementSize = () =>
