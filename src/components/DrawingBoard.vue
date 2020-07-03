@@ -64,7 +64,9 @@
       @mousedown="onMouseDown"
       @mouseup="onMouseUp"
     />
-    <div style="display: flex; justify-content: space-between;">
+    <div
+      style="display: flex; justify-content: space-between; flex-wrap: wrap;"
+    >
       <div>
         <h2>history</h2>
         <pre>currentStep: {{ state.history.step }}</pre>
@@ -74,6 +76,15 @@
         <h2>drawing</h2>
         <pre>length: {{ state.drawing.length }}</pre>
       </div>
+      <div class="log" style="width: 100%;">
+        <h2>log</h2>
+        <pre
+          v-for="(path, i) in state.history.drawing"
+          :key="i"
+          style="text-align: left;"
+          :class="{ active: i + 1 === state.history.step }"
+        ><strong>{{i + 1}}</strong>{{ path }}</pre>
+      </div>
     </div>
   </div>
 </template>
@@ -81,6 +92,30 @@
 <style lang="scss" scoped>
 #drawingBoard {
   border: 1px solid gray;
+}
+
+.log strong {
+  margin-right: 1rem;
+}
+
+.log pre {
+  height: 1.5rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: flex;
+  align-items: center;
+  padding-left: 1rem;
+  margin: 0;
+  border: 2px solid transparent;
+}
+
+.log pre.active {
+  border: 2px solid goldenrod;
+}
+
+.log pre:nth-child(odd) {
+  background: #eee;
 }
 
 .container {
@@ -94,6 +129,15 @@
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
+
+  :not(.palette) button,
+  :not(.palette) span {
+    margin-right: 1rem;
+  }
+
+  > div > button:last-child {
+    margin-right: 0;
+  }
 }
 
 .brush,
@@ -104,6 +148,7 @@
 .palette {
   display: flex;
   width: 100%;
+  margin-top: 1rem;
 
   &.erasing {
     opacity: 0.5;
@@ -240,9 +285,11 @@ export default {
 
     const makeDrawing = (drawing) => {
       drawing.forEach((path) => {
-        path.forEach((pointData) => {
-          drawPath(pointData);
-        });
+        if (Array.isArray(path)) {
+          path.forEach((pointData) => {
+            drawPath(pointData);
+          });
+        } else clearCanvas();
       });
     };
 
@@ -273,8 +320,15 @@ export default {
     const onMouseUp = () => {
       state.mouse.isDrawing = false;
       state.drawing.push(state.currentPath); // log path
+
+      if (state.history.step < state.history.drawing.length) {
+        const dif = state.history.drawing.length - state.history.step;
+        state.history.drawing.length = state.history.drawing.length - dif; // log path
+      }
+
       state.history.drawing.push(state.currentPath); // log path
       state.history.step++; // increment history
+
       state.currentPath = []; // clear currentPath
     };
 
@@ -319,7 +373,11 @@ export default {
       }
     };
 
-    const clearCanvas = () => {
+    const clearCanvas = (e) => {
+      if (e) {
+        state.history.step++;
+        state.history.drawing.push("clear");
+      }
       let ctx = state.canvas;
       ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
     };
