@@ -30,12 +30,15 @@
           <button @click="clearCanvas">Clear</button>
         </div>
 
-        <div class="palette">
+        <div
+          class="palette"
+          :class="state.mouse.mode === 'erase' ? 'erasing' : null"
+        >
           <button
             v-for="(color, index) in state.mouse.palette.colors"
             :key="index"
             class="swatch"
-            :class="color === state.mouse.palette.color ? 'active' : null"
+            :class="color === state.mouse.palette.current ? 'active' : null"
             :style="{ backgroundColor: color }"
             @click="setColor(color)"
           ></button>
@@ -86,7 +89,16 @@
 .palette {
   display: flex;
   width: 100%;
-  /* justify-content: center; */
+
+  &.erasing {
+    opacity: 0.5;
+    cursor: not-allowed;
+    button,
+    label,
+    input {
+      pointer-events: none;
+    }
+  }
 }
 
 .add-color,
@@ -129,7 +141,7 @@ export default {
 
     const handleShortcuts = (e) => {
       if (!isNaN(e.key)) {
-        state.mouse.palette.color = state.mouse.palette.colors[e.key - 1];
+        state.mouse.palette.current = state.mouse.palette.colors[e.key - 1];
       }
 
       switch (e.keyCode) {
@@ -144,7 +156,6 @@ export default {
           break;
         case 221: // "]"
           incrementSize();
-          console.log(e);
           break;
       }
     };
@@ -162,6 +173,7 @@ export default {
           max: 10,
         },
         palette: {
+          current: "#000000",
           colors: [
             "#000000",
             "#F44E3B",
@@ -172,7 +184,6 @@ export default {
             "#AEA1FF",
             "#FDA1FF",
           ],
-          color: "#000000",
         },
       },
     });
@@ -187,7 +198,7 @@ export default {
       let ctx = state.canvas;
       ctx.lineCap = "round";
       ctx.lineJoin = "round";
-      ctx.strokeStyle = state.mouse.palette.color;
+      ctx.strokeStyle = state.mouse.palette.current;
       ctx.lineWidth = state.mouse.size.current;
 
       if (state.mouse.mode === "erase") {
@@ -206,7 +217,6 @@ export default {
     };
 
     const onMouseMove = (e) => {
-      // TODO: add if "d" key is pressed
       if (state.mouse.isDrawing) {
         drawPath(state.mouse.x, state.mouse.y, e.offsetX, e.offsetY);
         state.mouse.x = e.offsetX;
@@ -234,7 +244,7 @@ export default {
         : state.mouse.size.current;
 
     const setColor = (color) => {
-      state.mouse.palette.color = color;
+      state.mouse.palette.current = color;
     };
 
     const addColor = (event) => {
