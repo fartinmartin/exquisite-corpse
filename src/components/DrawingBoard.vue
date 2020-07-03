@@ -27,7 +27,12 @@
             <button @click="undoCanvas" :disabled="state.history.step <= 0">
               Undo
             </button>
-            <button @click="redoCanvas">Redo</button>
+            <button
+              @click="redoCanvas"
+              :disabled="state.history.step >= state.history.drawing.length"
+            >
+              Redo
+            </button>
           </div>
           <button @click="clearCanvas">Clear</button>
         </div>
@@ -59,6 +64,17 @@
       @mousedown="onMouseDown"
       @mouseup="onMouseUp"
     />
+    <div style="display: flex; justify-content: space-between;">
+      <div>
+        <h2>history</h2>
+        <pre>currentStep: {{ state.history.step }}</pre>
+        <pre>length: {{ state.history.drawing.length }}</pre>
+      </div>
+      <div>
+        <h2>drawing</h2>
+        <pre>length: {{ state.drawing.length }}</pre>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -257,6 +273,7 @@ export default {
     const onMouseUp = () => {
       state.mouse.isDrawing = false;
       state.drawing.push(state.currentPath); // log path
+      state.history.drawing.push(state.currentPath); // log path
       state.history.step++; // increment history
       state.currentPath = []; // clear currentPath
     };
@@ -292,11 +309,14 @@ export default {
     };
 
     const redoCanvas = () => {
-      console.log("redo under construction");
-      // need to keep state.history.drawing in sync with every path drawn
-      // trim state.history.drawing length to === state.history.step
-      // use state.history.drawing array to overwrite state.drawing
-      // and then use state.drawing to makeDrawing() in both undoCanvas and redoCanvas
+      if (state.history.step < state.history.drawing.length) {
+        state.history.step++;
+        const newDrawing = [...state.history.drawing];
+        newDrawing.length = state.history.step;
+        state.drawing = newDrawing;
+        clearCanvas();
+        makeDrawing(state.drawing);
+      }
     };
 
     const clearCanvas = () => {
