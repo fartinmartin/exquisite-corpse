@@ -24,7 +24,7 @@
 
         <div class="edits">
           <div>
-            <button @click="undoCanvas" :disabled="state.history <= 0">
+            <button @click="undoCanvas" :disabled="state.history.step <= 0">
               Undo
             </button>
             <button @click="redoCanvas">Redo</button>
@@ -165,7 +165,7 @@ export default {
 
     let state = reactive({
       canvas: null,
-      history: 0,
+      history: { step: 0, drawing: [] },
       drawing: [],
       currentPath: [],
       mouse: {
@@ -241,7 +241,7 @@ export default {
           size: state.mouse.size.current,
           mode: state.mouse.mode,
         };
-        state.currentPath.push(pointData); // log path
+        state.currentPath.push(pointData); // log points
         drawPath(pointData); // draw path
         state.mouse.x = e.offsetX;
         state.mouse.y = e.offsetY;
@@ -256,9 +256,9 @@ export default {
 
     const onMouseUp = () => {
       state.mouse.isDrawing = false;
-      state.drawing.push(state.currentPath);
-      state.history++; // increment history
-      state.currentPath = [];
+      state.drawing.push(state.currentPath); // log path
+      state.history.step++; // increment history
+      state.currentPath = []; // clear currentPath
     };
 
     const decrementSize = () =>
@@ -283,17 +283,20 @@ export default {
     };
 
     const undoCanvas = () => {
-      if (state.history >= 0) {
-        state.history--;
-        let newDrawing = state.drawing;
-        newDrawing.length = state.history;
+      if (state.history.step >= 0) {
+        state.history.step--;
+        state.drawing.length = state.history.step;
         clearCanvas();
-        makeDrawing(newDrawing);
+        makeDrawing(state.drawing);
       }
     };
 
     const redoCanvas = () => {
-      console.log("redo");
+      console.log("redo under construction");
+      // need to keep state.history.drawing in sync with every path drawn
+      // trim state.history.drawing length to === state.history.step
+      // use state.history.drawing array to overwrite state.drawing
+      // and then use state.drawing to makeDrawing() in both undoCanvas and redoCanvas
     };
 
     const clearCanvas = () => {
