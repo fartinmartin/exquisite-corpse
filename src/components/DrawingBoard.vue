@@ -30,15 +30,12 @@
           <button @click="clearCanvas">Clear</button>
         </div>
 
-        <div
-          class="palette"
-          :class="state.mouse.mode === 'erase' ? 'erasing' : null"
-        >
+        <div class="palette" :class="{ erasing: state.mouse.mode === 'erase' }">
           <button
             v-for="(color, index) in state.mouse.palette.colors"
             :key="index"
             class="swatch"
-            :class="color === state.mouse.palette.current ? 'active' : null"
+            :class="{ active: color === state.mouse.palette.current }"
             :style="{ backgroundColor: color }"
             @click="setColor(color)"
           ></button>
