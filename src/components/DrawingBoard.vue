@@ -23,10 +23,10 @@
         </div>
 
         <div class="edits">
-          <!-- <div>
+          <div>
             <button @click="undoCanvas">Undo</button>
             <button @click="redoCanvas">Redo</button>
-          </div> -->
+          </div>
           <button @click="clearCanvas">Clear</button>
         </div>
 
@@ -123,6 +123,7 @@
 
 <script>
 import { onMounted, reactive, onBeforeUnmount } from "vue";
+import { db } from "../../firebase";
 
 export default {
   name: "DrawingBoard",
@@ -255,6 +256,14 @@ export default {
       setColor(newColor);
     };
 
+    const undoCanvas = () => {
+      console.log("undo");
+    };
+
+    const redoCanvas = () => {
+      console.log("redo");
+    };
+
     const clearCanvas = () => {
       let ctx = state.canvas;
       ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
@@ -270,6 +279,8 @@ export default {
       incrementSize,
       setColor,
       addColor,
+      undoCanvas,
+      redoCanvas,
       clearCanvas,
     };
   },
