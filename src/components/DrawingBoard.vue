@@ -67,6 +67,9 @@
     <div
       style="display: flex; justify-content: space-between; flex-wrap: wrap;"
     >
+      <div style="width: 100%;">
+        <button @click="saveDrawing">Save</button>
+      </div>
       <div>
         <h2>history</h2>
         <pre>currentStep: {{ state.history.step }}</pre>
@@ -175,7 +178,6 @@
 .add-color {
   cursor: pointer;
   display: flex;
-  /* border: 2px solid rgba(0, 0, 0, 0.5); */
   align-items: center;
   justify-content: center;
 }
@@ -184,7 +186,6 @@
 <script>
 import { onMounted, reactive, onBeforeUnmount } from "vue";
 import { db } from "../../firebase";
-import drawing from "../assets/drawing.json";
 
 export default {
   name: "DrawingBoard",
@@ -321,9 +322,10 @@ export default {
       state.mouse.isDrawing = false;
       state.drawing.push(state.currentPath); // log path
 
+      // overwrite "redo" history when drawing this line
       if (state.history.step < state.history.drawing.length) {
         const dif = state.history.drawing.length - state.history.step;
-        state.history.drawing.length = state.history.drawing.length - dif; // log path
+        state.history.drawing.length = state.history.drawing.length - dif;
       }
 
       state.history.drawing.push(state.currentPath); // log path
@@ -362,6 +364,9 @@ export default {
       }
     };
 
+    // if clear > draw > undo then canvas paints ALL lines imediately instead of returning to clear state 🤔
+    // because makeDrawing doesn't have "clear" item?
+
     const redoCanvas = () => {
       if (state.history.step < state.history.drawing.length) {
         state.history.step++;
@@ -382,6 +387,23 @@ export default {
       ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
     };
 
+    const saveDrawing = () => {
+      let data = {
+        name: "fartin",
+        drawing: state.drawing,
+      };
+
+      db.ref("drawings").push(data, finished);
+
+      const finished = (error) => {
+        if (error) {
+          console.log("ooops");
+        } else {
+          console.log("data saved!");
+        }
+      };
+    };
+
     return {
       state,
       toggleMode,
@@ -396,6 +418,7 @@ export default {
       undoCanvas,
       redoCanvas,
       clearCanvas,
+      saveDrawing,
     };
   },
 };
