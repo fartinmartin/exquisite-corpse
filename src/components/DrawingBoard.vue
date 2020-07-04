@@ -102,13 +102,11 @@
     <div class="debug">
       <div class="debug-heading">
         <div>
-          <h2>history</h2>
-          <pre>currentStep: {{ state.history.step }}</pre>
-          <pre>length: {{ state.history.drawing.length }}</pre>
+          <pre>history.step: {{ state.history.step }}</pre>
+          <pre>history.drawing.length: {{ state.history.drawing.length }}</pre>
         </div>
         <div>
-          <h2>drawing</h2>
-          <pre>length: {{ state.drawing.length }}</pre>
+          <pre>drawing.length: {{ state.drawing.length }}</pre>
         </div>
       </div>
       <div class="log">
@@ -138,6 +136,7 @@
   width: 100%;
   display: flex;
   justify-content: space-between;
+  text-align: left;
 }
 
 .log-item {
@@ -183,6 +182,7 @@
   flex-wrap: wrap;
   justify-content: space-between;
 
+  :not(.palette) label,
   :not(.palette) button,
   :not(.palette) span {
     margin-right: 1rem;
