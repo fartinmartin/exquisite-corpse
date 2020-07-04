@@ -3,7 +3,39 @@
     <div>
       <div class="toolbar">
         <div class="brush">
-          <button @click="toggleMode">Mode: {{ state.mouse.mode }}</button>
+          <div>
+            <input
+              type="radio"
+              name="mode"
+              id="draw"
+              value="draw"
+              v-model="state.mouse.mode"
+              checked
+            />
+            <label for="draw">Draw</label>
+          </div>
+
+          <div>
+            <input
+              type="radio"
+              name="mode"
+              id="erase"
+              value="erase"
+              v-model="state.mouse.mode"
+            />
+            <label for="erase">Erase</label>
+          </div>
+
+          <div>
+            <input
+              type="radio"
+              name="mode"
+              id="fill"
+              value="fill"
+              v-model="state.mouse.mode"
+            />
+            <label for="fill">Fill</label>
+          </div>
 
           <div class="size">
             <button
@@ -35,6 +67,7 @@
             </button>
           </div>
           <button @click="clearCanvas">Clear</button>
+          <button @click="saveDrawing">Save</button>
         </div>
 
         <div class="palette" :class="{ erasing: state.mouse.mode === 'erase' }">
@@ -55,36 +88,36 @@
           <label for="addColor" class="add-color">+</label>
         </div>
       </div>
+
+      <canvas
+        id="drawingBoard"
+        width="560"
+        height="560"
+        @mousemove="onMouseMove"
+        @mousedown="onMouseDown"
+        @mouseup="onMouseUp"
+      />
     </div>
-    <canvas
-      id="drawingBoard"
-      width="560"
-      height="560"
-      @mousemove="onMouseMove"
-      @mousedown="onMouseDown"
-      @mouseup="onMouseUp"
-    />
-    <div
-      style="display: flex; justify-content: space-between; flex-wrap: wrap;"
-    >
-      <div style="width: 100%;">
-        <button @click="saveDrawing">Save</button>
+
+    <div class="debug">
+      <div class="debug-heading">
+        <div>
+          <h2>history</h2>
+          <pre>currentStep: {{ state.history.step }}</pre>
+          <pre>length: {{ state.history.drawing.length }}</pre>
+        </div>
+        <div>
+          <h2>drawing</h2>
+          <pre>length: {{ state.drawing.length }}</pre>
+        </div>
       </div>
-      <div>
-        <h2>history</h2>
-        <pre>currentStep: {{ state.history.step }}</pre>
-        <pre>length: {{ state.history.drawing.length }}</pre>
-      </div>
-      <div>
-        <h2>drawing</h2>
-        <pre>length: {{ state.drawing.length }}</pre>
-      </div>
-      <div class="log" style="width: 100%;">
+      <div class="log">
         <h2>log</h2>
         <pre
           v-for="(path, i) in state.history.drawing"
           :key="i"
           style="text-align: left;"
+          class="log-item"
           :class="{ active: i + 1 === state.history.step }"
         ><strong>{{i + 1}}</strong>{{ path }}</pre>
       </div>
@@ -95,6 +128,20 @@
 <style lang="scss" scoped>
 #drawingBoard {
   border: 1px solid gray;
+}
+
+.debug {
+  width: 100%;
+}
+
+.debug-heading {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+}
+
+.log-item {
+  max-width: 562px;
 }
 
 .log strong {
@@ -122,8 +169,11 @@
 }
 
 .container {
-  max-width: 560px;
+  max-width: 1120px;
   margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
 }
 
 .toolbar {
@@ -192,7 +242,7 @@ export default {
 
   setup() {
     onMounted(() => {
-      var c = document.getElementById("drawingBoard");
+      const c = document.getElementById("drawingBoard");
       state.canvas = c.getContext("2d");
 
       document.addEventListener("keydown", handleShortcuts);
@@ -210,7 +260,13 @@ export default {
 
       switch (e.keyCode) {
         case 68: // "d"
-          toggleMode();
+          setMode("draw");
+          break;
+        case 69: // "e"
+          setMode("erase");
+          break;
+        case 70: // "e"
+          setMode("fill");
           break;
         case 67: // "c" OR
         case 8: // "backspace"
@@ -256,10 +312,17 @@ export default {
       },
     });
 
-    const toggleMode = () => {
-      state.mouse.mode === "draw"
+    const setMode = (e) => {
+      typeof e === "string"
+        ? (state.mouse.mode = e)
+        : e.target.value === "draw"
+        ? (state.mouse.mode = "draw")
+        : e.target.value === "erase"
         ? (state.mouse.mode = "erase")
-        : (state.mouse.mode = "draw");
+        : e.target.value === "fill"
+        ? (state.mouse.mode = "fill")
+        : null;
+      console.log(state.mouse.mode);
     };
 
     const drawPath = ({ x1, y1, x2, y2, color, size, mode }) => {
@@ -284,11 +347,17 @@ export default {
       }
     };
 
+    const drawFill = (pointData) => {
+      console.log(pointData);
+    };
+
     const makeDrawing = (drawing) => {
       drawing.forEach((path) => {
         if (Array.isArray(path)) {
           path.forEach((pointData) => {
-            drawPath(pointData);
+            pointData.mode === "fill"
+              ? drawFill(pointData)
+              : drawPath(pointData);
           });
         } else clearCanvas();
       });
@@ -315,7 +384,12 @@ export default {
     const onMouseDown = (e) => {
       state.mouse.x = e.offsetX;
       state.mouse.y = e.offsetY;
-      state.mouse.isDrawing = true;
+      if (state.mouse.mode === "fill") {
+        drawFill();
+        // log fill to history and to drawing?
+      } else {
+        state.mouse.isDrawing = true;
+      }
     };
 
     const onMouseUp = () => {
@@ -364,9 +438,6 @@ export default {
       }
     };
 
-    // if clear > draw > undo then canvas paints ALL lines imediately instead of returning to clear state 🤔
-    // because makeDrawing doesn't have "clear" item?
-
     const redoCanvas = () => {
       if (state.history.step < state.history.drawing.length) {
         state.history.step++;
@@ -377,6 +448,10 @@ export default {
         makeDrawing(state.drawing);
       }
     };
+
+    // TODO: if clear > draw > undo then canvas paints
+    //   ALL lines imediately instead of returning to clear state 🤔
+    //   because makeDrawing doesn't have "clear" item?
 
     const clearCanvas = (e) => {
       if (e) {
@@ -390,23 +465,15 @@ export default {
     const saveDrawing = () => {
       let data = {
         name: "fartin",
-        drawing: state.drawing,
+        drawing: { ...state.drawing },
       };
 
-      db.ref("drawings").push(data, finished);
-
-      const finished = (error) => {
-        if (error) {
-          console.log("ooops");
-        } else {
-          console.log("data saved!");
-        }
-      };
+      db.collection("drawings").add(data);
     };
 
     return {
       state,
-      toggleMode,
+      setMode,
       onMouseMove,
       onMouseUp,
       onMouseDown,
