@@ -237,10 +237,49 @@
 import { onMounted, reactive, onBeforeUnmount } from "vue";
 import { db } from "../../firebase";
 
+import {
+  getPixel,
+  hexToRgb,
+  floodFill,
+  fillColor,
+  setPixel,
+} from "../modules/useFill.js";
+
 export default {
   name: "DrawingBoard",
 
   setup() {
+    let state = reactive({
+      canvas: null,
+      history: { step: 0, drawing: [] },
+      drawing: [],
+      currentPath: [],
+      mouse: {
+        x: 0,
+        y: 0,
+        isDrawing: false,
+        mode: "draw",
+        size: {
+          current: 2,
+          min: 1,
+          max: 10,
+        },
+        palette: {
+          current: "#000000",
+          colors: [
+            "#000000",
+            "#F44E3B",
+            "#FE9200",
+            "#FCDC00",
+            "#A4DD00",
+            "#68CCCA",
+            "#AEA1FF",
+            "#FDA1FF",
+          ],
+        },
+      },
+    });
+
     onMounted(() => {
       const c = document.getElementById("drawingBoard");
       state.canvas = c.getContext("2d");
@@ -281,37 +320,6 @@ export default {
       }
     };
 
-    let state = reactive({
-      canvas: null,
-      history: { step: 0, drawing: [] },
-      drawing: [],
-      currentPath: [],
-      mouse: {
-        x: 0,
-        y: 0,
-        isDrawing: false,
-        mode: "draw",
-        size: {
-          current: 2,
-          min: 1,
-          max: 10,
-        },
-        palette: {
-          current: "#000000",
-          colors: [
-            "#000000",
-            "#F44E3B",
-            "#FE9200",
-            "#FCDC00",
-            "#A4DD00",
-            "#68CCCA",
-            "#AEA1FF",
-            "#FDA1FF",
-          ],
-        },
-      },
-    });
-
     const setMode = (e) => {
       typeof e === "string"
         ? (state.mouse.mode = e)
@@ -322,7 +330,6 @@ export default {
         : e.target.value === "fill"
         ? (state.mouse.mode = "fill")
         : null;
-      console.log(state.mouse.mode);
     };
 
     const drawPath = ({ x1, y1, x2, y2, color, size, mode }) => {
@@ -345,10 +352,6 @@ export default {
       if (mode === "erase") {
         ctx.globalCompositeOperation = "source-over";
       }
-    };
-
-    const drawFill = (pointData) => {
-      console.log(pointData);
     };
 
     const makeDrawing = (drawing) => {
@@ -385,7 +388,10 @@ export default {
       state.mouse.x = e.offsetX;
       state.mouse.y = e.offsetY;
       if (state.mouse.mode === "fill") {
-        drawFill();
+        let targetColor = getPixelColor(state.mouse.x, state.mouse.y);
+        let currentColor = hexToRgb(state.mouse.palette.current);
+        console.log(targetColor, currentColor);
+        // floodFillStack(state.mouse.x, state.mouse.y, targetColor, currentColor);
         // log fill to history and to drawing?
       } else {
         state.mouse.isDrawing = true;
@@ -449,14 +455,17 @@ export default {
       }
     };
 
-    // TODO: if clear > draw > undo then canvas paints
-    //   ALL lines imediately instead of returning to clear state 🤔
-    //   because makeDrawing doesn't have "clear" item?
-
     const clearCanvas = (e) => {
       if (e) {
+        if (state.history.step < state.history.drawing.length) {
+          const dif = state.history.drawing.length - state.history.step;
+          state.history.drawing.length = state.history.drawing.length - dif;
+        }
+
         state.history.step++;
+
         state.history.drawing.push("clear");
+        state.drawing.push("clear");
       }
       let ctx = state.canvas;
       ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
