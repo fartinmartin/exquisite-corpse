@@ -1,14 +1,12 @@
 <template>
-  <div>
-    <canvas
-      id="c"
-      width="540"
-      height="540"
-      @mousemove="onMouseMove"
-      @mousedown="onMouseDown"
-      @mouseup="onMouseUp"
-    />
-  </div>
+  <canvas
+    id="c"
+    width="540"
+    height="540"
+    @mousemove="onMouseMove"
+    @mousedown="onMouseDown"
+    @mouseup="onMouseUp"
+  />
 </template>
 
 <style lang="scss" scoped>
@@ -47,31 +45,44 @@ export default {
       store.dispatch("setCanvasCtx", canvasElementCtx);
     });
 
+    const drawPath = (e) => {
+      let pointData = {
+        mode: mode.value,
+        x1: x.value,
+        y1: y.value,
+        x2: e.offsetX,
+        y2: e.offsetY,
+        color: color.value,
+        size: size.value,
+      };
+      store.dispatch("pushPointDataToCurrentPath", pointData);
+      store.dispatch("drawPath", pointData);
+      store.dispatch("setMouseXY", { x: e.offsetX, y: e.offsetY });
+    };
+
     const onMouseMove = (e) => {
       if (isDrawing.value && mode.value !== "fill") {
-        let pointData = {
-          mode: mode.value,
-          x1: x.value,
-          y1: y.value,
-          x2: e.offsetX,
-          y2: e.offsetY,
-          color: color.value,
-          size: size.value,
-        };
-        store.dispatch("pushPointDataToCurrentPath", pointData);
-        store.dispatch("drawPath", pointData);
-        store.dispatch("setMouseXY", { x: e.offsetX, y: e.offsetY });
+        drawPath(e);
       }
     };
 
     const onMouseDown = (e) => {
-      // console.log("down", e.offsetX, e.offsetY);
       store.dispatch("setMouseXY", { x: e.offsetX, y: e.offsetY });
-      store.dispatch("setIsDrawing", true);
+      if (mode.value !== "fill") {
+        store.dispatch("setIsDrawing", true);
+        drawPath(e);
+      } else {
+        let pointData = {
+          mode: mode.value,
+          color: color.value,
+          x: x.value,
+          y: y.value,
+        };
+        store.dispatch("drawFill", pointData);
+      }
     };
 
     const onMouseUp = (e) => {
-      // console.log("up", e.offsetX, e.offsetY);
       store.dispatch("setIsDrawing", false);
       store.dispatch("pushCurrentPathToDrawingAndHistory");
       store.dispatch("incrementHistory");

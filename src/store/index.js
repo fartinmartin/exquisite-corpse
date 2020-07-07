@@ -179,8 +179,8 @@ const actions = {
     commit("DRAW_PATH", path);
   },
 
-  drawFill({ commit }, fill) {
-    console.log("drawFill");
+  drawFill({ commit }, pointData) {
+    console.log("drawFill", pointData);
   },
 
   saveDrawing({ commit, getters }) {
