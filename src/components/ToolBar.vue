@@ -106,6 +106,10 @@ export default {
 
     const handleShortcuts = (e) => {
       // console.log("keydown", e.key, e.keyCode);
+      if (!isNaN(e.key)) {
+        store.dispatch("setColor", colors.value[e.key - 1]);
+      }
+
       switch (e.keyCode) {
         case 68: // "d"
           document.querySelector("#draw").click(); // is this dumb? 🤔
