@@ -148,6 +148,7 @@ const actions = {
     if (event) {
       getters.weAreBackInTime && commit("OVERWRITE_HISTORY");
       commit("INCREMENT_HISTORY");
+      commit("PUSH_CLEAR_TO_DRAWING");
       commit("PUSH_CLEAR_TO_HISTORY");
     }
     commit("CLEAR_CANVAS");
@@ -159,15 +160,18 @@ const actions = {
 
     if (!drawing.length) commit("CLEAR_CANVAS");
 
-    drawing.forEach((path) => {
-      if (Array.isArray(path)) {
+    drawing.forEach((path, i) => {
+      // setTimeout(() => {
+      //   console.log(path);
+      if (path === "clear") commit("CLEAR_CANVAS");
+      else if (Array.isArray(path)) {
         path.forEach((pointData) => {
-          // console.log(pointData);
           pointData.mode === "fill"
             ? dispatch("drawFill", pointData)
             : dispatch("drawPath", pointData);
         });
       } else dispatch("clearCanvas");
+      // }, 500 * (i + 1));
     });
   },
 
@@ -226,6 +230,10 @@ const mutations = {
     let newDrawing = [...state.drawing.history.paths];
     newDrawing.length = state.drawing.history.step;
     state.drawing.paths = newDrawing;
+  },
+
+  PUSH_CLEAR_TO_DRAWING(state) {
+    state.drawing.paths.push("clear");
   },
 
   PUSH_CLEAR_TO_HISTORY(state) {
