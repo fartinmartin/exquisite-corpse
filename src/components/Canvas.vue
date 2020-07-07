@@ -1,6 +1,7 @@
 <template>
   <div>
     <canvas
+      id="c"
       width="540"
       height="540"
       @mousemove="onMouseMove"
@@ -24,9 +25,8 @@ export default {
   name: "Canvas",
   setup() {
     const store = useStore();
-    const canvas = computed(() => store.state.canvas);
-    const ctx = canvas.value;
-    const size = computed(() => store.state.mouse.size);
+    const ctx = computed(() => store.state.canvas.ctx);
+    const size = computed(() => store.state.mouse.size.current);
     const mode = computed(() => store.state.mouse.mode);
     const color = computed(() => store.state.mouse.palette.current);
     const x = computed(() => store.state.mouse.x);
@@ -34,47 +34,24 @@ export default {
     const isDrawing = computed(() => store.state.mouse.isDrawing);
 
     onMounted(() => {
-      const c = document.querySelector("canvas");
-      const ctx = c.getContext("2d");
-      store.dispatch("setCanvas", ctx);
+      const canvasElement = document.querySelector("canvas");
+      const canvasElementCtx = canvasElement.getContext("2d");
+      store.dispatch("setCanvasCtx", canvasElementCtx);
     });
 
-    const drawPath = ({ x1, y1, x2, y2, color, size, mode }) => {
-      console.log("hello");
-      console.log(ctx);
-      ctx.lineCap = "round";
-      ctx.lineJoin = "round";
-      ctx.strokeStyle = color;
-      ctx.lineWidth = size;
-
-      if (mode === "erase") {
-        ctx.globalCompositeOperation = "destination-out";
-      }
-
-      ctx.beginPath();
-      ctx.moveTo(x1, y1);
-      ctx.lineTo(x2, y2);
-      ctx.stroke();
-      ctx.closePath();
-
-      if (mode === "erase") {
-        ctx.globalCompositeOperation = "source-over";
-      }
-    };
-
     const onMouseMove = (e) => {
-      if (isDrawing.value) {
+      if (isDrawing.value && mode.value !== "fill") {
         let pointData = {
-          x1: x,
-          y1: y,
+          mode: mode.value,
+          x1: x.value,
+          y1: y.value,
           x2: e.offsetX,
           y2: e.offsetY,
-          color,
-          size,
-          mode,
+          color: color.value,
+          size: size.value,
         };
         store.dispatch("pushPointDataToCurrentPath", pointData);
-        drawPath(pointData);
+        store.dispatch("drawPath", pointData);
         store.dispatch("setMouseXY", { x: e.offsetX, y: e.offsetY });
       }
     };
@@ -89,6 +66,7 @@ export default {
       console.log("up", e.offsetX, e.offsetY);
       store.dispatch("setIsDrawing", false);
       store.dispatch("pushCurrentPathToDrawing");
+      store.dispatch("incrementHistory");
     };
 
     return {

@@ -1,7 +1,10 @@
 import { createStore } from "vuex";
 
 const state = {
-  canvas: null,
+  canvas: {
+    canvas: null,
+    ctx: null,
+  },
   drawing: {
     currentPath: [],
     paths: [],
@@ -34,25 +37,18 @@ const state = {
 };
 
 const getters = {
-  getMode(state) {
-    return state.mouse.mode;
-  },
-  getSize(state) {
-    return {
-      current: state.mouse.size.current,
-      min: state.mouse.size.min,
-      max: state.mouse.size.max,
-    };
-  },
-  getCurrentPath(state) {
-    return state.drawing.currentPath;
-  },
+  getCanvasCtx: (state) => state.canvas.ctx,
+  getMode: (state) => state.mouse.mode,
+  getHistory: (state) => state.drawing.history,
+  getSize: (state) => state.mouse.size,
+  getCurrentPath: (state) => state.drawing.currentPath,
+  getDrawing: (state) => state.drawing.paths,
 };
 
 const actions = {
   // canvas
-  setCanvas({ commit }, canvas) {
-    commit("SET_CANVAS", canvas);
+  setCanvasCtx({ commit }, ctx) {
+    commit("SET_CANVAS_CTX", ctx);
   },
 
   // tool _ mode
@@ -77,7 +73,24 @@ const actions = {
     getters.getSize.current > getters.getSize.min && commit("DECREMENT_SIZE");
   },
 
+  // tool _ color
+  setColor({ commit }, color) {
+    commit("SET_COLOR", color);
+  },
+
+  addColor({ commit }, color) {
+    commit("ADD_COLOR", color);
+  },
+
   // canvas _ history
+  incrementHistory({ commit }) {
+    commit("INCREMENT_HISTORY");
+  },
+
+  decrementHistory({ commit }) {
+    commit("DECREMENT_HISTORY");
+  },
+
   undoCanvas({ commit }) {
     commit("UNDO_CANVAS");
   },
@@ -102,11 +115,15 @@ const actions = {
   setMouseXY({ commit }, mouseXY) {
     commit("SET_MOUSE_XY", mouseXY);
   },
+
+  drawPath({ commit }, path) {
+    commit("DRAW_PATH", path);
+  },
 };
 
 const mutations = {
-  SET_CANVAS(state, canvas) {
-    state.canvas = canvas;
+  SET_CANVAS_CTX(state, ctx) {
+    state.canvas.ctx = ctx;
   },
 
   SET_MODE(state, mode) {
@@ -119,6 +136,22 @@ const mutations = {
 
   DECREMENT_SIZE(state) {
     state.mouse.size.current--;
+  },
+
+  SET_COLOR(state, color) {
+    state.mouse.palette.current = color;
+  },
+
+  ADD_COLOR(state, color) {
+    state.mouse.palette.colors.push(color);
+  },
+
+  INCREMENT_HISTORY(state) {
+    state.drawing.history.step++;
+  },
+
+  DECREMENT_HISTORY(state) {
+    state.drawing.history.step--;
   },
 
   UNDO_CANVAS(state) {
@@ -143,11 +176,36 @@ const mutations = {
 
   PUSH_CURRENT_PATH_TO_DRAWING(state, currentPath) {
     state.drawing.paths.push(currentPath);
+    state.drawing.history.paths.push(currentPath);
+    state.drawing.currentPath = [];
   },
 
   SET_MOUSE_XY(state, mouseXY) {
     state.mouse.x = mouseXY.x;
     state.mouse.y = mouseXY.y;
+  },
+
+  DRAW_PATH(state, { x1, y1, x2, y2, color, size, mode }) {
+    let ctx = state.canvas.ctx;
+
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+    ctx.strokeStyle = color;
+    ctx.lineWidth = size;
+
+    if (mode === "erase") {
+      ctx.globalCompositeOperation = "destination-out";
+    }
+
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y2);
+    ctx.stroke();
+    ctx.closePath();
+
+    if (mode === "erase") {
+      ctx.globalCompositeOperation = "source-over";
+    }
   },
 };
 

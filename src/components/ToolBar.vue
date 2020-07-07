@@ -46,7 +46,20 @@
     </div>
 
     <div class="palette">
-      <input type="color" id="addColor" style="display: none;" />
+      <button
+        v-for="(color, index) in colors"
+        :key="index"
+        class="swatch"
+        :class="{ active: color === currentColor }"
+        :style="{ backgroundColor: color }"
+        @click="setColor(color)"
+      ></button>
+      <input
+        type="color"
+        id="addColor"
+        @change="addColor($event)"
+        style="display: none;"
+      />
       <label for="addColor" class="add-color">+</label>
     </div>
   </div>
@@ -63,6 +76,8 @@ export default {
   setup() {
     const store = useStore();
     const size = computed(() => store.state.mouse.size);
+    const colors = computed(() => store.state.mouse.palette.colors);
+    const currentColor = computed(() => store.state.mouse.palette.current);
     const mode = computed({
       get: () => store.state.mode,
       set: (mode) => store.dispatch("setMode", mode),
@@ -110,16 +125,28 @@ export default {
 
     const incrementSize = () => store.dispatch("incrementSize");
     const decrementSize = () => store.dispatch("decrementSize");
-    const undoCanvas = () => store.dispatch("undoCanvas");
+    const setColor = () => store.dispatch("setColor");
+    const addColor = () => store.dispatch("addColor");
+    const undoCanvas = () => {
+      console.log("undo clicked");
+      if (store.getters.getHistory.step >= 0) {
+        store.dispatch("incrementHistory");
+        store.dispatch("undoCanvas");
+      }
+    };
     const redoCanvas = () => store.dispatch("redoCanvas");
 
     return {
       size,
       mode,
+      colors,
+      currentColor,
       incrementSize,
       decrementSize,
       undoCanvas,
       redoCanvas,
+      setColor,
+      addColor,
     };
   },
 };

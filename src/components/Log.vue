@@ -15,7 +15,19 @@
       </div>
     </div>
     <div class="log">
-      <h2>log</h2>
+      <h2>currentPath log</h2>
+      <pre
+        v-for="(path, i) in drawing.currentPath"
+        :key="i"
+        style="text-align: left;"
+        class="log-item"
+        :class="{ active: i + 1 === drawing.history.step }"
+      >
+        <strong>{{i + 1}}</strong>{{ path }}
+      </pre>
+    </div>
+    <div class="log">
+      <h2>drawing log</h2>
       <pre
         v-for="(path, i) in drawing.history.paths"
         :key="i"
