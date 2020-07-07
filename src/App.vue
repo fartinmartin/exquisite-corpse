@@ -1,14 +1,14 @@
 <template>
-  <DrawingBoard />
+  <ExquisiteCorpse />
 </template>
 
 <script>
-import DrawingBoard from "./components/DrawingBoard.vue";
+import ExquisiteCorpse from "./components/ExquisiteCorpse.vue";
 
 export default {
   name: "App",
   components: {
-    DrawingBoard,
+    ExquisiteCorpse,
   },
 };
 </script>
