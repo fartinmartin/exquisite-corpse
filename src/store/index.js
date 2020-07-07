@@ -41,8 +41,12 @@ const getters = {
   getMode: (state) => state.mouse.mode,
   getHistory: (state) => state.drawing.history,
   getSize: (state) => state.mouse.size,
+  getColors: (state) => state.mouse.palette.colors,
   getCurrentPath: (state) => state.drawing.currentPath,
   getDrawing: (state) => state.drawing.paths,
+  drawingIsEmpty: (state) =>
+    !state.drawing.paths.length ||
+    state.drawing.history.paths[state.drawing.history.step - 1] === "clear",
 };
 
 const actions = {
@@ -88,8 +92,9 @@ const actions = {
     commit("SET_COLOR", color);
   },
 
-  addColor({ commit }, color) {
-    commit("ADD_COLOR", color);
+  addColor({ commit, getters, dispatch }, color) {
+    getters.getColors.includes(color) ? null : commit("ADD_COLOR", color);
+    dispatch("setColor", color);
   },
 
   // set state _ history
@@ -123,9 +128,9 @@ const actions = {
     commit("REDO_CANVAS");
   },
 
-  clearCanvas({ commit }, event) {
+  clearCanvas({ commit, getters }, event) {
+    if (getters.drawingIsEmpty) return;
     if (event) {
-      console.log(event);
       commit("INCREMENT_HISTORY");
       commit("PUSH_CLEAR_TO_HISTORY");
     }
@@ -152,6 +157,11 @@ const actions = {
 
   drawFill({ commit }, path) {
     console.log("drawFill");
+  },
+
+  saveDrawing({ commit, getters }) {
+    if (getters.drawingIsEmpty) return;
+    console.log("saveDrawing");
   },
 };
 

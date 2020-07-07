@@ -30,19 +30,34 @@
       </div>
 
       <div class="size">
-        <button @click="decrementSize">-</button>
+        <button @click="decrementSize" :disabled="size.current == size.min">
+          -
+        </button>
         <span>{{ size.current }}px</span>
-        <button @click="incrementSize">+</button>
+        <button @click="incrementSize" :disabled="size.current == size.max">
+          +
+        </button>
       </div>
     </div>
 
     <div class="edits">
       <div>
-        <button @click="undoCanvas">Undo</button>
-        <button @click="redoCanvas">Redo</button>
+        <button @click="undoCanvas" :disabled="history.step <= 0">
+          Undo
+        </button>
+        <button
+          @click="redoCanvas"
+          :disabled="history.step >= history.paths.length"
+        >
+          Redo
+        </button>
       </div>
-      <button>Clear</button>
-      <button>Save</button>
+      <button @click="clearCanvas" :disabled="drawingIsEmpty">
+        Clear
+      </button>
+      <button @click="saveDrawing" :disabled="drawingIsEmpty">
+        Save
+      </button>
     </div>
 
     <div class="palette">
@@ -77,7 +92,10 @@ export default {
     const store = useStore();
     const size = computed(() => store.state.mouse.size);
     const colors = computed(() => store.state.mouse.palette.colors);
+    const history = computed(() => store.state.drawing.history);
+    const drawing = computed(() => store.state.drawing.paths);
     const currentColor = computed(() => store.state.mouse.palette.current);
+    const drawingIsEmpty = computed(() => store.getters.drawingIsEmpty);
     const mode = computed({
       get: () => store.state.mode,
       set: (mode) => store.dispatch("setMode", mode),
@@ -85,7 +103,7 @@ export default {
 
     onMounted(() => {
       document.addEventListener("keydown", handleShortcuts);
-      document.querySelector("#draw").click(); // this is dumb? 🤔
+      document.querySelector("#draw").click(); // is this dumb? 🤔
     });
 
     onBeforeUnmount(() => {
@@ -96,13 +114,13 @@ export default {
       // console.log("keydown", e.key, e.keyCode);
       switch (e.keyCode) {
         case 68: // "d"
-          document.querySelector("#draw").click(); // this is dumb? 🤔
+          document.querySelector("#draw").click(); // is this dumb? 🤔
           break;
         case 69: // "e"
-          document.querySelector("#erase").click(); // this is dumb? 🤔
+          document.querySelector("#erase").click(); // is this dumb? 🤔
           break;
         case 70: // "e"
-          document.querySelector("#fill").click(); // this is dumb? 🤔
+          document.querySelector("#fill").click(); // is this dumb? 🤔
           break;
 
         case 219: // "["
@@ -112,14 +130,21 @@ export default {
           store.dispatch("incrementSize");
           break;
 
-        // case 67: // "c" OR
-        // case 8: // "backspace"
-        //   clearCanvas();
-        //   break;
+        case 90: // "z"
+          store.dispatch("undoCanvas");
+          break;
+        case 88: // "x"
+          store.dispatch("redoCanvas");
+          break;
 
-        // case 83: // "s"
-        //   saveDrawing();
-        //   break;
+        case 67: // "c" OR
+        case 8: // "backspace"
+          store.dispatch("clearCanvas", e);
+          break;
+
+        case 83: // "s"
+          store.dispatch("saveDrawing");
+          break;
       }
     };
 
@@ -130,6 +155,7 @@ export default {
     const undoCanvas = () => store.dispatch("undoCanvas");
     const redoCanvas = () => store.dispatch("redoCanvas");
     const clearCanvas = (event) => store.dispatch("clearCanvas", event);
+    const saveDrawing = () => store.dispatch("saveDrawing");
 
     return {
       size,
@@ -140,8 +166,13 @@ export default {
       decrementSize,
       undoCanvas,
       redoCanvas,
+      clearCanvas,
       setColor,
       addColor,
+      history,
+      drawing,
+      saveDrawing,
+      drawingIsEmpty,
     };
   },
 };

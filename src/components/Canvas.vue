@@ -14,6 +14,14 @@
 <style lang="scss" scoped>
 canvas {
   border: 1px solid gray;
+  /*
+    eventually edit scale for high-res output:
+    transform: scale(0.5);
+
+    and adjust HTML element to match:
+    width="1080"
+    height="1080"
+  */
 }
 </style>
 
