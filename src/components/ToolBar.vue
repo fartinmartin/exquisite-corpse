@@ -2,14 +2,7 @@
   <div class="toolbar">
     <div class="brush">
       <div>
-        <input
-          type="radio"
-          name="mode"
-          id="draw"
-          value="draw"
-          v-model="mode"
-          :class="{ active: mode === 'draw' }"
-        />
+        <input type="radio" name="mode" id="draw" value="draw" v-model="mode" />
         <label for="draw">Draw</label>
       </div>
 
@@ -60,7 +53,7 @@
       </button>
     </div>
 
-    <div class="palette">
+    <div class="palette" :class="{ erasing: getMode === 'erase' }">
       <button
         class="swatch"
         v-for="(color, index) in colors"
@@ -96,6 +89,7 @@ export default {
     const drawing = computed(() => store.state.drawing.paths);
     const currentColor = computed(() => store.state.mouse.palette.current);
     const drawingIsEmpty = computed(() => store.getters.drawingIsEmpty);
+    const getMode = computed(() => store.getters.getMode);
     const mode = computed({
       get: () => store.state.mode,
       set: (mode) => store.dispatch("setMode", mode),
@@ -160,6 +154,7 @@ export default {
     return {
       size,
       mode,
+      getMode,
       colors,
       currentColor,
       incrementSize,
