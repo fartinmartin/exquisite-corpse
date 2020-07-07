@@ -125,8 +125,8 @@ export default {
 
     const incrementSize = () => store.dispatch("incrementSize");
     const decrementSize = () => store.dispatch("decrementSize");
-    const setColor = () => store.dispatch("setColor");
-    const addColor = () => store.dispatch("addColor");
+    const setColor = (color) => store.dispatch("setColor", color);
+    const addColor = (e) => store.dispatch("addColor", e.target.value);
     const undoCanvas = () => {
       console.log("undo clicked");
       if (store.getters.getHistory.step >= 0) {
