@@ -73,8 +73,9 @@ export default {
     const onMouseUp = (e) => {
       // console.log("up", e.offsetX, e.offsetY);
       store.dispatch("setIsDrawing", false);
-      store.dispatch("pushCurrentPathToDrawing");
+      store.dispatch("pushCurrentPathToDrawingAndHistory");
       store.dispatch("incrementHistory");
+      store.dispatch("ifWeAreBackInTimeOverwriteHistory");
     };
 
     return {

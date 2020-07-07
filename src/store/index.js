@@ -44,6 +44,8 @@ const getters = {
   getColors: (state) => state.mouse.palette.colors,
   getCurrentPath: (state) => state.drawing.currentPath,
   getDrawing: (state) => state.drawing.paths,
+  weAreBackInTime: (state) =>
+    state.drawing.history.step < state.drawing.history.paths.length,
   drawingIsEmpty: (state) =>
     !state.drawing.paths.length ||
     state.drawing.history.paths[state.drawing.history.step - 1] === "clear",
@@ -110,8 +112,16 @@ const actions = {
     commit("PUSH_POINT_DATA_TO_CURRENT_PATH", pathData);
   },
 
-  pushCurrentPathToDrawing({ commit, getters }) {
+  pushCurrentPathToDrawingAndHistory({ commit, getters }) {
     commit("PUSH_CURRENT_PATH_TO_DRAWING", getters.getCurrentPath);
+    commit("PUSH_CURRENT_PATH_TO_HISTORY", getters.getCurrentPath);
+    commit("CLEAR_CURRENT_PATH");
+  },
+
+  ifWeAreBackInTimeOverwriteHistory({ commit, getters }) {
+    if (getters.weAreBackInTime) {
+      commit("OVERWRITE_HISTORY");
+    }
   },
 
   // canvas pixel stuff
@@ -124,13 +134,19 @@ const actions = {
     }
   },
 
-  redoCanvas({ commit }) {
-    commit("REDO_CANVAS");
+  redoCanvas({ commit, dispatch, getters }) {
+    if (getters.weAreBackInTime) {
+      commit("INCREMENT_HISTORY");
+      commit("SET_DRAWING_TO_TRIMMED_HISTORY");
+      dispatch("clearCanvas");
+      dispatch("makeDrawing");
+    }
   },
 
   clearCanvas({ commit, getters }, event) {
     if (getters.drawingIsEmpty) return;
     if (event) {
+      getters.weAreBackInTime && commit("OVERWRITE_HISTORY");
       commit("INCREMENT_HISTORY");
       commit("PUSH_CLEAR_TO_HISTORY");
     }
@@ -139,7 +155,11 @@ const actions = {
 
   // draw
   makeDrawing({ commit, dispatch, getters }) {
-    getters.getDrawing.forEach((path) => {
+    let drawing = getters.getDrawing;
+
+    if (!drawing.length) commit("CLEAR_CANVAS");
+
+    drawing.forEach((path) => {
       if (Array.isArray(path)) {
         path.forEach((pointData) => {
           // console.log(pointData);
@@ -155,7 +175,7 @@ const actions = {
     commit("DRAW_PATH", path);
   },
 
-  drawFill({ commit }, path) {
+  drawFill({ commit }, fill) {
     console.log("drawFill");
   },
 
@@ -202,8 +222,20 @@ const mutations = {
     state.drawing.paths.length = state.drawing.history.step;
   },
 
+  SET_DRAWING_TO_TRIMMED_HISTORY(state) {
+    let newDrawing = [...state.drawing.history.paths];
+    newDrawing.length = state.drawing.history.step;
+    state.drawing.paths = newDrawing;
+  },
+
   PUSH_CLEAR_TO_HISTORY(state) {
     state.drawing.history.paths.push("clear");
+  },
+
+  OVERWRITE_HISTORY(state) {
+    let dif = state.drawing.history.paths.length - state.drawing.history.step;
+    state.drawing.history.paths.length =
+      state.drawing.history.paths.length - dif;
   },
 
   CLEAR_CANVAS(state) {
@@ -213,10 +245,6 @@ const mutations = {
       state.canvas.ctx.canvas.width,
       state.canvas.ctx.canvas.height
     );
-  },
-
-  REDO_CANVAS(state) {
-    console.log("redo", state.drawing.history.step);
   },
 
   SET_IS_DRAWING(state, isDrawing) {
@@ -229,7 +257,13 @@ const mutations = {
 
   PUSH_CURRENT_PATH_TO_DRAWING(state, currentPath) {
     state.drawing.paths.push(currentPath);
+  },
+
+  PUSH_CURRENT_PATH_TO_HISTORY(state, currentPath) {
     state.drawing.history.paths.push(currentPath);
+  },
+
+  CLEAR_CURRENT_PATH(state) {
     state.drawing.currentPath = [];
   },
 
