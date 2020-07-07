@@ -31,7 +31,9 @@ export default {
   name: "Canvas",
   setup() {
     const store = useStore();
+    const ctx = computed(() => store.state.canvas.ctx);
     const mode = computed(() => store.state.mouse.mode);
+    const currentColor = computed(() => store.state.mouse.palette.current);
     const isDrawing = computed(() => store.state.mouse.isDrawing);
 
     onMounted(() => {
@@ -58,7 +60,11 @@ export default {
 
     const onMouseUp = (e) => {
       store.dispatch("setIsDrawing", false);
-      store.dispatch("pushCurrentPathToDrawingAndHistory");
+      if (mode.value !== "fill") {
+        store.dispatch("pushCurrentPathToDrawingAndHistory");
+      } else {
+        store.dispatch("pushFilltoDrawingAndHistory");
+      }
       store.dispatch("incrementHistory");
       store.dispatch("ifWeAreBackInTimeOverwriteHistory");
     };

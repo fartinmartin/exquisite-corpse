@@ -1,4 +1,5 @@
 import { createStore } from "vuex";
+import floodFill from "../modules/floodFill";
 
 const state = {
   canvas: {
@@ -120,6 +121,17 @@ const actions = {
     commit("CLEAR_CURRENT_PATH");
   },
 
+  pushFilltoDrawingAndHistory({ commit, getters }) {
+    let fill = {
+      mode: "fill",
+      x: getters.getMouseXY.x,
+      y: getters.getMouseXY.y,
+      color: getters.getCurrentColor,
+    };
+    commit("PUSH_FILL_TO_DRAWING", fill);
+    commit("PUSH_FILL_TO_HISTORY", fill);
+  },
+
   ifWeAreBackInTimeOverwriteHistory({ commit, getters }) {
     if (getters.weAreBackInTime) {
       commit("OVERWRITE_HISTORY");
@@ -166,11 +178,15 @@ const actions = {
       // setTimeout(() => {
       //   console.log(path);
       if (path === "clear") commit("CLEAR_CANVAS");
-      else if (Array.isArray(path)) {
+      else if (path.mode === "fill") {
+        let e = {
+          offsetX: path.x,
+          offsetY: path.y,
+        };
+        dispatch("handleDrawFill", e);
+      } else if (Array.isArray(path)) {
         path.forEach((pointData) => {
-          pointData.mode === "fill"
-            ? dispatch("drawFill", pointData)
-            : dispatch("drawPath", pointData);
+          dispatch("drawPath", pointData);
         });
       } else dispatch("clearCanvas");
       // }, 500 * (i + 1));
@@ -196,14 +212,12 @@ const actions = {
     dispatch("setMouseXY", { x: event.offsetX, y: event.offsetY });
   },
 
-  handleDrawFill({ commit, getters }, event) {
-    let pointData = {
-      mode: getters.getMode,
-      color: getters.getCurrentColor,
-      x: event.offsetX,
-      y: event.offsetY,
-    };
-    console.log("handleDrawFill", pointData);
+  handleDrawFill({ commit, dispatch, getters }, event) {
+    let ctx = getters.getCanvasCtx;
+    let currentColor = getters.getCurrentColor;
+    ctx.fillStyle = currentColor;
+    let tolerance = 10;
+    floodFill.fill(event.offsetX, event.offsetY, tolerance, ctx);
   },
 
   saveDrawing({ commit, getters }) {
@@ -261,6 +275,14 @@ const mutations = {
 
   PUSH_CLEAR_TO_HISTORY(state) {
     state.drawing.history.paths.push("clear");
+  },
+
+  PUSH_FILL_TO_DRAWING(state, fill) {
+    state.drawing.paths.push(fill);
+  },
+
+  PUSH_FILL_TO_HISTORY(state, fill) {
+    state.drawing.history.paths.push(fill);
   },
 
   OVERWRITE_HISTORY(state) {
