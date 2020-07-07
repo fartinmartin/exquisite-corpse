@@ -42,8 +42,10 @@ const getters = {
   getHistory: (state) => state.drawing.history,
   getSize: (state) => state.mouse.size,
   getColors: (state) => state.mouse.palette.colors,
+  getCurrentColor: (state) => state.mouse.palette.current,
   getCurrentPath: (state) => state.drawing.currentPath,
   getDrawing: (state) => state.drawing.paths,
+  getMouseXY: (state) => ({ x: state.mouse.x, y: state.mouse.y }),
   weAreBackInTime: (state) =>
     state.drawing.history.step < state.drawing.history.paths.length,
   drawingIsEmpty: (state) =>
@@ -179,8 +181,29 @@ const actions = {
     commit("DRAW_PATH", path);
   },
 
-  drawFill({ commit }, pointData) {
-    console.log("drawFill", pointData);
+  handleDrawPath({ dispatch, getters }, event) {
+    let pointData = {
+      mode: getters.getMode,
+      x1: getters.getMouseXY.x,
+      y1: getters.getMouseXY.y,
+      x2: event.offsetX,
+      y2: event.offsetY,
+      color: getters.getCurrentColor,
+      size: getters.getSize.current,
+    };
+    dispatch("pushPointDataToCurrentPath", pointData);
+    dispatch("drawPath", pointData);
+    dispatch("setMouseXY", { x: event.offsetX, y: event.offsetY });
+  },
+
+  handleDrawFill({ commit, getters }, event) {
+    let pointData = {
+      mode: getters.getMode,
+      color: getters.getCurrentColor,
+      x: event.offsetX,
+      y: event.offsetY,
+    };
+    console.log("handleDrawFill", pointData);
   },
 
   saveDrawing({ commit, getters }) {
