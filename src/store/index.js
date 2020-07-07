@@ -46,12 +46,12 @@ const getters = {
 };
 
 const actions = {
-  // canvas
+  // set state _ canvas
   setCanvasCtx({ commit }, ctx) {
     commit("SET_CANVAS_CTX", ctx);
   },
 
-  // tool _ mode
+  // set state _ tool _ mode
   setMode({ commit }, mode) {
     typeof mode === "string"
       ? commit("SET_MODE", mode)
@@ -64,7 +64,17 @@ const actions = {
       : null;
   },
 
-  // tool _ size
+  // set state _ isDrawing
+  setIsDrawing({ commit }, isDrawing) {
+    commit("SET_IS_DRAWING", isDrawing);
+  },
+
+  // set state _ mouse
+  setMouseXY({ commit }, mouseXY) {
+    commit("SET_MOUSE_XY", mouseXY);
+  },
+
+  // set state _ tool _ size
   incrementSize({ commit, getters }) {
     getters.getSize.current < getters.getSize.max && commit("INCREMENT_SIZE");
   },
@@ -73,7 +83,7 @@ const actions = {
     getters.getSize.current > getters.getSize.min && commit("DECREMENT_SIZE");
   },
 
-  // tool _ color
+  // set state _ tool _ color
   setColor({ commit }, color) {
     commit("SET_COLOR", color);
   },
@@ -82,26 +92,13 @@ const actions = {
     commit("ADD_COLOR", color);
   },
 
-  // canvas _ history
+  // set state _ history
   incrementHistory({ commit }) {
     commit("INCREMENT_HISTORY");
   },
 
   decrementHistory({ commit }) {
     commit("DECREMENT_HISTORY");
-  },
-
-  undoCanvas({ commit }) {
-    commit("UNDO_CANVAS");
-  },
-
-  redoCanvas({ commit }) {
-    commit("REDO_CANVAS");
-  },
-
-  // isDrawing
-  setIsDrawing({ commit }, isDrawing) {
-    commit("SET_IS_DRAWING", isDrawing);
   },
 
   pushPointDataToCurrentPath({ commit }, pathData) {
@@ -112,12 +109,49 @@ const actions = {
     commit("PUSH_CURRENT_PATH_TO_DRAWING", getters.getCurrentPath);
   },
 
-  setMouseXY({ commit }, mouseXY) {
-    commit("SET_MOUSE_XY", mouseXY);
+  // canvas pixel stuff
+  undoCanvas({ commit, dispatch, getters }) {
+    if (getters.getHistory.step >= 0) {
+      commit("DECREMENT_HISTORY");
+      commit("SET_DRAWING_TO_HISTORY");
+      dispatch("clearCanvas");
+      dispatch("makeDrawing");
+    }
+  },
+
+  redoCanvas({ commit }) {
+    commit("REDO_CANVAS");
+  },
+
+  clearCanvas({ commit }, event) {
+    if (event) {
+      console.log(event);
+      commit("INCREMENT_HISTORY");
+      commit("PUSH_CLEAR_TO_HISTORY");
+    }
+    commit("CLEAR_CANVAS");
+  },
+
+  // draw
+  makeDrawing({ commit, dispatch, getters }) {
+    getters.getDrawing.forEach((path) => {
+      if (Array.isArray(path)) {
+        path.forEach((pointData) => {
+          // console.log(pointData);
+          pointData.mode === "fill"
+            ? dispatch("drawFill", pointData)
+            : dispatch("drawPath", pointData);
+        });
+      } else dispatch("clearCanvas");
+    });
   },
 
   drawPath({ commit }, path) {
     commit("DRAW_PATH", path);
+  },
+
+  drawFill({ commit }, path) {
+    console.log("drawFill");
   },
 };
 
@@ -154,12 +188,21 @@ const mutations = {
     state.drawing.history.step--;
   },
 
-  UNDO_CANVAS(state) {
-    state.drawing.history.step--;
+  SET_DRAWING_TO_HISTORY(state) {
     state.drawing.paths.length = state.drawing.history.step;
-    // clearCanvas
-    // makeDrawing() with current state.drawing.paths
-    console.log("undo", state.drawing.history.step);
+  },
+
+  PUSH_CLEAR_TO_HISTORY(state) {
+    state.drawing.history.paths.push("clear");
+  },
+
+  CLEAR_CANVAS(state) {
+    state.canvas.ctx.clearRect(
+      0,
+      0,
+      state.canvas.ctx.canvas.width,
+      state.canvas.ctx.canvas.height
+    );
   },
 
   REDO_CANVAS(state) {

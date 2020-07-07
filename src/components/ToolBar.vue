@@ -47,18 +47,18 @@
 
     <div class="palette">
       <button
+        class="swatch"
         v-for="(color, index) in colors"
         :key="index"
-        class="swatch"
         :class="{ active: color === currentColor }"
         :style="{ backgroundColor: color }"
         @click="setColor(color)"
       ></button>
       <input
+        style="display: none;"
         type="color"
         id="addColor"
         @change="addColor($event)"
-        style="display: none;"
       />
       <label for="addColor" class="add-color">+</label>
     </div>
@@ -126,15 +126,10 @@ export default {
     const incrementSize = () => store.dispatch("incrementSize");
     const decrementSize = () => store.dispatch("decrementSize");
     const setColor = (color) => store.dispatch("setColor", color);
-    const addColor = (e) => store.dispatch("addColor", e.target.value);
-    const undoCanvas = () => {
-      console.log("undo clicked");
-      if (store.getters.getHistory.step >= 0) {
-        store.dispatch("incrementHistory");
-        store.dispatch("undoCanvas");
-      }
-    };
+    const addColor = (event) => store.dispatch("addColor", event.target.value);
+    const undoCanvas = () => store.dispatch("undoCanvas");
     const redoCanvas = () => store.dispatch("redoCanvas");
+    const clearCanvas = (event) => store.dispatch("clearCanvas", event);
 
     return {
       size,

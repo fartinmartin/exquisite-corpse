@@ -57,13 +57,13 @@ export default {
     };
 
     const onMouseDown = (e) => {
-      console.log("down", e.offsetX, e.offsetY);
+      // console.log("down", e.offsetX, e.offsetY);
       store.dispatch("setMouseXY", { x: e.offsetX, y: e.offsetY });
       store.dispatch("setIsDrawing", true);
     };
 
     const onMouseUp = (e) => {
-      console.log("up", e.offsetX, e.offsetY);
+      // console.log("up", e.offsetX, e.offsetY);
       store.dispatch("setIsDrawing", false);
       store.dispatch("pushCurrentPathToDrawing");
       store.dispatch("incrementHistory");
