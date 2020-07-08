@@ -1,5 +1,6 @@
 <template>
   <span
+    class="border"
     v-bind:id="label"
     :style="style"
     @mousemove="onMouseMove"
@@ -54,7 +55,7 @@ export default {
     };
 
     const onMouseLeave = (e) => {
-      pickedUp.value = false;
+      // pickedUp.value = false;
     };
 
     const onMouseUp = (e) => {
@@ -84,7 +85,7 @@ span {
   justify-content: center;
 
   position: absolute;
-  left: -40px;
+  left: -50px;
   top: 0;
 
   &:target {
@@ -95,15 +96,16 @@ span {
     content: "";
     position: absolute;
     width: 540px;
-    border-bottom: 2px solid #eee;
-    left: calc(100% + 1px);
+    border-bottom: 3px dotted #000;
+    left: calc(100% + 10px + 2px);
     opacity: 0.5;
+    /* mix-blend-mode: color-burn; */
     pointer-events: none;
   }
 
   &:hover::after {
     opacity: 1;
-    border-bottom: 3px solid #eee;
+    border-bottom: 3px dotted #000;
   }
 }
 </style>

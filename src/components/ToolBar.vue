@@ -5,7 +5,49 @@
         <input type="radio" name="mode" id="draw" value="draw" v-model="mode" />
         <label for="draw">
           <!-- Draw -->
-          <img src="../assets/toolbar/draw.gif" alt="" />
+          <!-- <img src="../assets/toolbar/draw.gif" alt="" /> -->
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 60">
+            <defs>
+              <style>
+                .cls-7 {
+                  fill: none;
+                  stroke: #231f20;
+                  stroke-miterlimit: 10;
+                  stroke-width: 4px;
+                }
+              </style>
+            </defs>
+            <g id="Layer_2" data-name="Layer 2">
+              <g id="Exports">
+                <path fill="none" d="M0 0h60v60H0z" />
+                <path
+                  fill="#fbb040"
+                  d="M38 32l-9.02 9.02h-.02V41H19V31l9-9 10 10z"
+                />
+                <path fill="#ffc840" d="M19 31h-8v-2l12-12 5 5-9 9z" />
+                <path
+                  fill="#ee2a7b"
+                  d="M23 17l8-8 20 20-8.01 7.99L38 32 28 22l-5-5z"
+                />
+                <path
+                  fill="#f7941d"
+                  d="M28.99 49l-.03-7.98h.02L38 32l4.99 4.99L30.96 49h-1.97z"
+                />
+                <path
+                  fill="#fff3b5"
+                  d="M19 41h9.96v.02l.03 7.98H16l-5-5V31h8v10z"
+                />
+                <path
+                  class="cls-7"
+                  d="M23 17l8-8 20 20-8.01 7.99L30.96 49H11V29l12-12zM23 17l5 5 10 10 4.99 4.99.01.01M11 44l5 5"
+                />
+                <path
+                  class="cls-7"
+                  d="M29 51l-.01-2-.03-7.98V41H19V31H9M28 22l-9 9M28.98 41.02L38 32"
+                />
+              </g>
+            </g>
+          </svg>
         </label>
       </div>
 
@@ -19,7 +61,49 @@
         />
         <label for="erase">
           <!-- Erase -->
-          <img src="../assets/toolbar/erase.gif" alt="" />
+          <!-- <img src="../assets/toolbar/draw.gif" alt="" /> -->
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 60">
+            <defs>
+              <style>
+                .cls-7 {
+                  fill: none;
+                  stroke: #231f20;
+                  stroke-miterlimit: 10;
+                  stroke-width: 4px;
+                }
+              </style>
+            </defs>
+            <g id="Layer_2" data-name="Layer 2">
+              <g id="Exports">
+                <path fill="none" d="M0 0h60v60H0z" />
+                <path
+                  fill="#ffc840"
+                  d="M17.01 25.51L29.04 13.5h1.97l.03 7.98h-.02L22 30.5l-4.99-4.99z"
+                />
+                <path
+                  fill="#fff3b5"
+                  d="M31.04 21.48l-.03-7.98H44l5 5v13h-8v-10h-9.96v-.02z"
+                />
+                <path
+                  fill="#ee2a7b"
+                  d="M9 33.5l8.01-7.99L22 30.5l10 10 5 5-3 3H24l-15-15z"
+                />
+                <path fill="#f7941d" d="M32 40.5l9-9h8v2l-12 12-5-5z" />
+                <path
+                  fill="#fbb040"
+                  d="M31.04 21.5H41v10l-9 9-10-10 9.02-9.02h.02v.02z"
+                />
+                <path
+                  class="cls-7"
+                  d="M37 45.5l-3 3H24l-15-15 8.01-7.99L29.04 13.5H49v20l-12 12zM37 45.5l-5-5-10-10-4.99-4.99-.01-.01M49 18.5l-5-5"
+                />
+                <path
+                  class="cls-7"
+                  d="M31 11.5l.01 2 .03 7.98v.02H41v10h10M32 40.5l9-9M31.02 21.48L22 30.5"
+                />
+              </g>
+            </g>
+          </svg>
         </label>
       </div>
 
@@ -27,7 +111,32 @@
         <input type="radio" name="mode" id="fill" value="fill" v-model="mode" />
         <label for="fill">
           <!-- Fill -->
-          <img src="../assets/toolbar/fill.gif" alt="" />
+          <!-- <img src="../assets/toolbar/fill.gif" alt="" /> -->
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 60">
+            <g data-name="Layer 2">
+              <path fill="none" d="M0 0h60v60H0z" />
+              <path
+                stroke="#231f20"
+                stroke-width="4"
+                fill="#fff"
+                stroke-miterlimit="10"
+                d="M50.65 30l-20-20-20 20 19.96 20 20.04-20z"
+              />
+              <path
+                stroke-miterlimit="1"
+                stroke="#231f20"
+                stroke-width="4"
+                fill="none"
+                d="M25.65 25l21-11"
+              />
+              <path
+                fill="#231f20"
+                stroke="#231f20"
+                stroke-width="4"
+                d="M10.65 50l-2-22 6-2-4 24z"
+              />
+            </g>
+          </svg>
         </label>
       </div>
 
@@ -314,7 +423,8 @@ input[type="radio"]:checked {
   justify-content: center;
 }
 
-img {
+img,
+svg {
   width: 100%;
   max-width: 35px;
   height: auto;

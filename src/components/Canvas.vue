@@ -1,7 +1,7 @@
 <template>
   <div
     class="border"
-    style="position: relative; width: 540px; height: 540px; margin: 0 auto;"
+    style="position: relative; width: 544px; height: 544px; margin: 0 auto;"
   >
     <canvas
       id="c"
@@ -16,7 +16,7 @@
   </div>
 </template>
 
-<style lang="scss" scoped>
+<style lang="scss">
 canvas {
   padding: 0;
   /*
@@ -27,6 +27,15 @@ canvas {
     width="1080"
     height="1080"
   */
+}
+#eq.draw canvas {
+  cursor: url("../assets/toolbar/draw.png") 0 45, auto;
+}
+#eq.erase canvas {
+  cursor: url("../assets/toolbar/erase.png") 20 45, auto;
+}
+#eq.fill canvas {
+  cursor: url("../assets/toolbar/fill.png") 0 45, auto;
 }
 </style>
 
