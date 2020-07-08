@@ -20,7 +20,7 @@
 }
 
 .ec-wrap {
-  margin-top: -4rem;
+  margin-top: -2rem;
   min-height: 100vh;
   display: flex;
   align-items: center;

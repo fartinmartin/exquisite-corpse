@@ -1,5 +1,5 @@
 <template>
-  <div class="toolbar">
+  <div class="toolbar border">
     <div class="brush">
       <div class="tool" :class="{ active: getMode === 'draw' }">
         <input type="radio" name="mode" id="draw" value="draw" v-model="mode" />
@@ -219,7 +219,7 @@ export default {
 
 <style lang="scss" scoped>
 .toolbar {
-  padding: 0.5rem 0;
+  padding: 1rem;
   margin: 1rem 0;
   display: flex;
   flex-wrap: wrap;
@@ -249,10 +249,6 @@ input {
   label {
     cursor: pointer;
   }
-}
-
-.edits {
-  margin-right: -0.5rem;
 }
 
 :disabled {

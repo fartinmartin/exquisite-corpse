@@ -1,5 +1,8 @@
 <template>
-  <div style="position: relative; width: 540px; height: 540px; margin: 0 auto;">
+  <div
+    class="border"
+    style="position: relative; width: 540px; height: 540px; margin: 0 auto;"
+  >
     <canvas
       id="c"
       width="540"
@@ -15,7 +18,7 @@
 
 <style lang="scss" scoped>
 canvas {
-  border: 1px solid gray;
+  padding: 0;
   /*
     eventually edit scale for high-res output:
     transform: scale(0.5);
