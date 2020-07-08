@@ -41,3 +41,15 @@ export default {
   },
 };
 </script>
+
+<style>
+#eq.draw canvas {
+  cursor: url("./assets/toolbar/draw@0.5x.png") 0 45, auto;
+}
+#eq.erase canvas {
+  cursor: url("./assets/toolbar/erase@0.5x.png") 10 45, auto;
+}
+#eq.fill canvas {
+  cursor: url("./assets/toolbar/fill@0.5x.png") 0 45, auto;
+}
+</style>

@@ -344,7 +344,7 @@ input {
 }
 
 .tool {
-  opacity: 0.8;
+  opacity: 0.5;
   margin-right: 1rem;
 }
 
@@ -426,7 +426,7 @@ input[type="radio"]:checked {
 img,
 svg {
   width: 100%;
-  max-width: 35px;
+  max-width: 25px;
   height: auto;
 }
 </style>

@@ -28,15 +28,6 @@ canvas {
     height="1080"
   */
 }
-#eq.draw canvas {
-  cursor: url("../assets/toolbar/draw.png") 0 45, auto;
-}
-#eq.erase canvas {
-  cursor: url("../assets/toolbar/erase.png") 20 45, auto;
-}
-#eq.fill canvas {
-  cursor: url("../assets/toolbar/fill.png") 0 45, auto;
-}
 </style>
 
 <script>
