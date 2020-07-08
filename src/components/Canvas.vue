@@ -1,12 +1,16 @@
 <template>
-  <canvas
-    id="c"
-    width="540"
-    height="540"
-    @mousemove="onMouseMove"
-    @mousedown="onMouseDown"
-    @mouseup="onMouseUp"
-  />
+  <div style="position: relative; width: 540px; height: 540px; margin: 0 auto;">
+    <canvas
+      id="c"
+      width="540"
+      height="540"
+      @mousemove="onMouseMove"
+      @mousedown="onMouseDown"
+      @mouseup="onMouseUp"
+    />
+    <guide label="hT" v-bind:position="guides.hT"></guide>
+    <guide label="tL" v-bind:position="guides.tL"></guide>
+  </div>
 </template>
 
 <style lang="scss" scoped>
@@ -26,15 +30,18 @@ canvas {
 <script>
 import { onMounted, computed } from "vue";
 import { useStore } from "vuex";
+import Guide from "./Guide.vue";
 
 export default {
   name: "Canvas",
+  components: { Guide },
   setup() {
     const store = useStore();
     const ctx = computed(() => store.state.canvas.ctx);
     const mode = computed(() => store.state.mouse.mode);
     const currentColor = computed(() => store.state.mouse.palette.current);
     const isDrawing = computed(() => store.state.mouse.isDrawing);
+    const guides = computed(() => store.state.drawing.guides);
 
     onMounted(() => {
       const canvasElement = document.querySelector("canvas");
@@ -73,6 +80,7 @@ export default {
       onMouseMove,
       onMouseUp,
       onMouseDown,
+      guides,
     };
   },
 };

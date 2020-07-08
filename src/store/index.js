@@ -2,6 +2,10 @@ import { createStore } from "vuex";
 import floodFill from "../modules/floodFill";
 
 const state = {
+  user: {
+    name: null,
+    uid: null,
+  },
   canvas: {
     canvas: null,
     ctx: null,
@@ -10,6 +14,10 @@ const state = {
     currentPath: [],
     paths: [],
     history: { step: 0, paths: [] },
+    guides: {
+      hT: `${540 / 5}px`,
+      tL: `${(540 / 5) * 2}px`,
+    },
   },
   mouse: {
     x: 0,
@@ -38,6 +46,7 @@ const state = {
 };
 
 const getters = {
+  getUser: (state) => state.user,
   getCanvasCtx: (state) => state.canvas.ctx,
   getMode: (state) => state.mouse.mode,
   getHistory: (state) => state.drawing.history,
@@ -46,6 +55,7 @@ const getters = {
   getCurrentColor: (state) => state.mouse.palette.current,
   getCurrentPath: (state) => state.drawing.currentPath,
   getDrawing: (state) => state.drawing.paths,
+  getGuides: (state) => state.drawing.guides,
   getMouseXY: (state) => ({ x: state.mouse.x, y: state.mouse.y }),
   weAreBackInTime: (state) =>
     state.drawing.history.step < state.drawing.history.paths.length,
@@ -55,6 +65,11 @@ const getters = {
 };
 
 const actions = {
+  // set state _ user
+  setUser({ commit }, user) {
+    commit("SET_USER", user);
+  },
+
   // set state _ canvas
   setCanvasCtx({ commit }, ctx) {
     commit("SET_CANVAS_CTX", ctx);
@@ -64,13 +79,7 @@ const actions = {
   setMode({ commit }, mode) {
     typeof mode === "string"
       ? commit("SET_MODE", mode)
-      : mode.target.value === "draw"
-      ? commit("SET_MODE", "draw")
-      : mode.target.value === "erase"
-      ? commit("SET_MODE", "erase")
-      : mode.target.value === "fill"
-      ? commit("SET_MODE", "fill")
-      : null;
+      : commit("SET_MODE", mode.target.value);
   },
 
   // set state _ isDrawing
@@ -212,21 +221,30 @@ const actions = {
     dispatch("setMouseXY", { x: event.offsetX, y: event.offsetY });
   },
 
-  handleDrawFill({ commit, dispatch, getters }, event) {
+  handleDrawFill({ getters }, event) {
     let ctx = getters.getCanvasCtx;
     let currentColor = getters.getCurrentColor;
     ctx.fillStyle = currentColor;
-    let tolerance = 10;
+    let tolerance = 100;
     floodFill.fill(event.offsetX, event.offsetY, tolerance, ctx);
   },
 
-  saveDrawing({ commit, getters }) {
-    if (getters.drawingIsEmpty) return;
-    console.log("saveDrawing");
+  // guides
+  setGuidePosition({ commit }, payload) {
+    commit("SET_GUIDE_POSITION", payload);
   },
 };
 
 const mutations = {
+  SET_USER(state, user) {
+    if (user) {
+      state.user.name = user.isAnonymous
+        ? `anonymous-${user.uid.substr(1, 4)}`
+        : user.displayName;
+      state.user.uid = user.uid;
+    }
+  },
+
   SET_CANVAS_CTX(state, ctx) {
     state.canvas.ctx = ctx;
   },
@@ -346,6 +364,10 @@ const mutations = {
     if (mode === "erase") {
       ctx.globalCompositeOperation = "source-over";
     }
+  },
+
+  SET_GUIDE_POSITION(state, { id, y }) {
+    state.drawing.guides[id] = y;
   },
 };
 

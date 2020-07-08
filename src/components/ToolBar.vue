@@ -1,12 +1,15 @@
 <template>
   <div class="toolbar">
     <div class="brush">
-      <div>
+      <div class="tool" :class="{ active: getMode === 'draw' }">
         <input type="radio" name="mode" id="draw" value="draw" v-model="mode" />
-        <label for="draw">Draw</label>
+        <label for="draw">
+          <!-- Draw -->
+          <img src="../assets/toolbar/draw.gif" alt="" />
+        </label>
       </div>
 
-      <div>
+      <div class="tool" :class="{ active: getMode === 'erase' }">
         <input
           type="radio"
           name="mode"
@@ -14,42 +17,63 @@
           value="erase"
           v-model="mode"
         />
-        <label for="erase">Erase</label>
+        <label for="erase">
+          <!-- Erase -->
+          <img src="../assets/toolbar/erase.gif" alt="" />
+        </label>
       </div>
 
-      <div>
+      <div class="tool" :class="{ active: getMode === 'fill' }">
         <input type="radio" name="mode" id="fill" value="fill" v-model="mode" />
-        <label for="fill">Fill</label>
+        <label for="fill">
+          <!-- Fill -->
+          <img src="../assets/toolbar/fill.gif" alt="" />
+        </label>
       </div>
 
       <div class="size">
-        <button @click="decrementSize" :disabled="size.current == size.min">
-          -
+        <button
+          @click="decrementSize"
+          :disabled="size.current == size.min"
+          class="tool"
+        >
+          <!-- - -->
+          <img src="../assets/toolbar/sizeDown.gif" alt="" />
         </button>
         <span>{{ size.current }}px</span>
-        <button @click="incrementSize" :disabled="size.current == size.max">
-          +
+        <button
+          @click="incrementSize"
+          :disabled="size.current == size.max"
+          class="tool"
+        >
+          <!-- + -->
+          <img src="../assets/toolbar/sizeUp.gif" alt="" />
         </button>
       </div>
     </div>
 
     <div class="edits">
       <div>
-        <button @click="undoCanvas" :disabled="history.step <= 0">
-          Undo
+        <button @click="undoCanvas" :disabled="history.step <= 0" class="tool">
+          <!-- Undo -->
+          <img src="../assets/toolbar/undo.gif" alt="" />
         </button>
         <button
           @click="redoCanvas"
           :disabled="history.step >= history.paths.length"
+          class="tool"
         >
-          Redo
+          <!-- Redo -->
+          <img src="../assets/toolbar/redo.gif" alt="" />
         </button>
       </div>
-      <button @click="clearCanvas" :disabled="drawingIsEmpty">
-        Clear
+      <button @click="clearCanvas" :disabled="drawingIsEmpty" class="tool">
+        <!-- Clear -->
+        <img src="../assets/toolbar/clear.gif" alt="" />
       </button>
-      <button @click="saveDrawing" :disabled="drawingIsEmpty">
-        Save
+      <button @click="saveDrawing" :disabled="drawingIsEmpty" class="tool">
+        <!-- Save -->
+        <img src="../assets/toolbar/save.gif" alt="" />
       </button>
     </div>
 
@@ -153,7 +177,23 @@ export default {
     const undoCanvas = () => store.dispatch("undoCanvas");
     const redoCanvas = () => store.dispatch("redoCanvas");
     const clearCanvas = (event) => store.dispatch("clearCanvas", event);
-    const saveDrawing = () => store.dispatch("saveDrawing");
+    const saveDrawing = () => {
+      if (store.getters.drawingIsEmpty) return;
+      let data = {
+        user: { ...store.getters.getUser },
+        drawing: { ...store.getters.getDrawing },
+        guides: { ...store.getters.getGuides },
+      };
+      console.log(data);
+      db.collection("drawings")
+        .add(data)
+        .then(function (docRef) {
+          console.log("drawing saved with id: ", docRef.id);
+        })
+        .catch(function (error) {
+          console.error("error saving drawing: ", error);
+        });
+    };
 
     return {
       size,
@@ -185,14 +225,57 @@ export default {
   flex-wrap: wrap;
   justify-content: space-between;
 
-  :not(.palette) label,
-  :not(.palette) button,
-  :not(.palette) span {
-    margin-right: 1rem;
-  }
-
   > div > button:last-child {
     margin-right: 0;
+  }
+}
+
+input {
+  display: none;
+}
+
+.tool {
+  opacity: 0.8;
+  margin-right: 1rem;
+}
+
+.tool.active {
+  border-bottom: 2px solid black;
+  opacity: 1;
+}
+
+.tool:hover {
+  opacity: 1;
+  label {
+    cursor: pointer;
+  }
+}
+
+.edits {
+  margin-right: -0.5rem;
+}
+
+:disabled {
+  opacity: 0.25;
+}
+
+input[type="radio"]:checked {
+  opacity: 0.5;
+}
+
+.size {
+  display: flex;
+  align-items: center;
+  margin-left: 1rem;
+  > * {
+    margin-right: 0;
+  }
+  > span {
+    margin-right: 0.5rem;
+    margin-top: -0.25rem;
+    width: 4ch;
+    font-size: 14px;
+    text-align: center;
   }
 }
 
@@ -233,5 +316,11 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+img {
+  width: 100%;
+  max-width: 35px;
+  height: auto;
 }
 </style>
