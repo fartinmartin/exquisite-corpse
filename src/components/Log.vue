@@ -60,6 +60,7 @@ export default {
 <style lang="scss" scoped>
 .debug {
   width: 100%;
+  align-self: start;
 }
 
 .debug-heading {
