@@ -59,8 +59,8 @@ export default {
 
 <style lang="scss" scoped>
 .debug {
-  width: 100%;
-  align-self: start;
+  position: absolute;
+  top: 80vh;
 }
 
 .debug-heading {
@@ -68,6 +68,10 @@ export default {
   display: flex;
   justify-content: space-between;
   text-align: left;
+}
+
+.log {
+  margin-bottom: 2rem;
 }
 
 .log-item {
