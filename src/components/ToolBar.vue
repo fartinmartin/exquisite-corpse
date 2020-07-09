@@ -115,12 +115,19 @@
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 60">
             <g data-name="Layer 2">
               <path fill="none" d="M0 0h60v60H0z" />
+              <path fill="#fff" d="M50.65 30l-20-20-20 20 19.96 20 20.04-20z" />
               <path
-                stroke="#231f20"
-                stroke-width="4"
-                fill="#fff"
-                stroke-miterlimit="10"
-                d="M50.65 30l-20-20-20 20 19.96 20 20.04-20z"
+                fill="#e6e6e6"
+                d="M30 50l15-15-19.98-19.98-15 14.96L30 50z"
+              />
+              <path fill="#ccc" d="M30 50l5-5-19.98-19.98L10.01 30 30 50z" />
+              <path
+                fill="#f2f2f2"
+                d="M45.01 34.99l5-5-19.98-19.98-5.02 4.98 20 20z"
+              />
+              <path
+                d="M30.61 52.83L7.83 30 30.65 7.17 53.48 30zM13.48 30l17.14 17.17L47.82 30 30.65 12.83z"
+                fill="#231f20"
               />
               <path
                 stroke-miterlimit="1"
@@ -130,9 +137,9 @@
                 d="M25.65 25l21-11"
               />
               <path
-                fill="#231f20"
                 stroke="#231f20"
                 stroke-width="4"
+                fill="#231f20"
                 d="M10.65 50l-2-22 6-2-4 24z"
               />
             </g>

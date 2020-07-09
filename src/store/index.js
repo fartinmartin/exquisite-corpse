@@ -25,7 +25,7 @@ const state = {
     isDrawing: false,
     mode: "draw",
     size: {
-      current: 2,
+      current: 5,
       min: 1,
       max: 10,
     },
