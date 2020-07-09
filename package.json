@@ -1,0 +1,23 @@
+{
+  "name": "exquisite-corpse",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "nuxt",
+    "build": "nuxt build",
+    "start": "nuxt start",
+    "export": "nuxt export",
+    "serve": "nuxt serve"
+  },
+  "dependencies": {
+    "@nuxtjs/firebase": "^6.1.0",
+    "@nuxtjs/pwa": "^3.0.0-beta.20",
+    "firebase": "^7.15.5",
+    "nuxt": "^2.13.0"
+  },
+  "devDependencies": {
+    "@nuxtjs/dotenv": "^1.4.1",
+    "node-sass": "^4.14.1",
+    "sass-loader": "^9.0.2"
+  }
+}
