@@ -42,14 +42,14 @@ export default {
 };
 </script>
 
-<style>
+<style lang="scss">
 #eq.draw canvas {
-  cursor: url("./assets/toolbar/draw@0.5x.png") 0 45, auto;
+  cursor: url("./assets/toolbar/draw@0.5x.png") 0 22, auto; // 23 × 23px
 }
 #eq.erase canvas {
-  cursor: url("./assets/toolbar/erase@0.5x.png") 10 45, auto;
+  cursor: url("./assets/toolbar/erase@0.5x.png") 10 19, auto; // 23 × 20px
 }
 #eq.fill canvas {
-  cursor: url("./assets/toolbar/fill@0.5x.png") 0 45, auto;
+  cursor: url("./assets/toolbar/fill@0.5x.png") 0 22, auto; // 24 × 23px
 }
 </style>
