@@ -5,8 +5,8 @@
   >
     <canvas
       id="c"
-      width="540"
-      height="540"
+      width="1080"
+      height="1080"
       @mousemove="onMouseMove"
       @mousedown="onMouseDown"
       @mouseup="onMouseUp"
@@ -19,14 +19,8 @@
 <style lang="scss">
 canvas {
   padding: 0;
-  /*
-    eventually edit scale for high-res output:
-    transform: scale(0.5);
-
-    and adjust HTML element to match:
-    width="1080"
-    height="1080"
-  */
+  transform: scale(0.5) translate3D(-50%, -50%, 0);
+  overflow: hidden;
 }
 </style>
 

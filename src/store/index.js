@@ -349,7 +349,7 @@ const mutations = {
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
     ctx.strokeStyle = color;
-    ctx.lineWidth = size;
+    ctx.lineWidth = size * 2;
 
     if (mode === "erase") {
       ctx.globalCompositeOperation = "destination-out";
