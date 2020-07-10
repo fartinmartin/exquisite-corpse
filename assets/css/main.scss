@@ -1,5 +1,10 @@
-$black: #000;
-$white: #fff;
+:root {
+  --black: #000;
+  --white: #fff;
+  --blue: #0064ff;
+  --light-blue: #81b2ff;
+  --lighter-blue: #deebff;
+}
 
 @import url("https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap");
 
@@ -14,7 +19,7 @@ html {
   box-sizing: border-box;
 
   // http://www.patternify.com/
-  background: #deebff
+  background: var(--lighter-blue)
     url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAAEklEQVQImWNgYGD4z0AswK4SAFXuAf8EPy+xAAAAAElFTkSuQmCC)
     repeat;
   background-blend-mode: overlay;
@@ -67,11 +72,15 @@ button[disabled] {
   opacity: 0.5;
 }
 
-$border-size: 2px;
-
 .border {
-  border: 2px solid #81b2ff;
-  box-shadow: $border-size $border-size 0 0 #0064ff;
-  background: $white;
-  // box-shadow: 1px 1px 0 0 rgba(255, 255, 255, 1), $border-size $border-size 0 0 $black;
+  --border-size: 2px;
+  --box-shadow-color: var(--blue);
+  border: 2px solid var(--light-blue);
+  box-shadow: var(--border-size) var(--border-size) 0 0 var(--box-shadow-color);
+  background: var(--white);
+}
+
+.mw-canvas {
+  max-width: 544px; // 540 = 1080/3 ... plus 4px for border
+  margin: 0 auto;
 }

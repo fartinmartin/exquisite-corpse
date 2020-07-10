@@ -1,25 +1,23 @@
 <template>
-  <div class="container">
+  <div class="container mw-canvas">
     <tool-bar />
     <!-- <canvas-top /> -->
-    <!-- <canvas-mid /> -->
+    <canvas-write type="mid" />
     <!-- <canvas-bot /> -->
   </div>
 </template>
 
-<style lang="scss" scoped>
-.container {
-  max-width: 540px;
-}
-</style>
+<style lang="scss" scoped></style>
 
 <script>
 import ToolBar from "./ToolBar.vue";
+import CanvasWrite from "./CanvasWrite.vue";
 
 export default {
   name: "ExquisiteCorpse",
   components: {
-    ToolBar
+    ToolBar,
+    CanvasWrite
   }
 };
 </script>
