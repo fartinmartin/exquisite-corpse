@@ -1,85 +1,169 @@
 <template>
-  <div class="toolbar border mw-canvas">
-    <div class="tool-group brush">
-      <div class="tool">
-        <input type="radio" name="mode" id="draw" value="draw" />
-        <label for="draw">
-          <img src="~/assets/img/toolbar/draw.svg" />
-        </label>
+  <div>
+    <div class="toolbar border mw-canvas">
+      <div class="tool-group mode">
+        <div class="tool draw" :class="{ active: mode === 'draw' }">
+          <input
+            type="radio"
+            name="mode"
+            id="draw"
+            value="draw"
+            v-model="mode"
+          />
+          <label for="draw">
+            <img src="~/assets/img/toolbar/draw.svg" />
+          </label>
+        </div>
+
+        <div class="tool erase" :class="{ active: mode === 'erase' }">
+          <input
+            type="radio"
+            name="mode"
+            id="erase"
+            value="erase"
+            v-model="mode"
+          />
+          <label for="erase">
+            <img src="~/assets/img/toolbar/erase.svg" />
+          </label>
+        </div>
+
+        <div class="tool fill" :class="{ active: mode === 'fill' }">
+          <input
+            type="radio"
+            name="mode"
+            id="fill"
+            value="fill"
+            v-model="mode"
+          />
+          <label for="fill">
+            <img src="~/assets/img/toolbar/fill.svg" />
+          </label>
+        </div>
       </div>
 
-      <div class="tool">
-        <input type="radio" name="mode" id="erase" value="erase" />
-        <label for="erase">
-          <img src="~/assets/img/toolbar/erase.svg" />
-        </label>
+      <div class="tool-group size">
+        <button class="tool size-down">
+          <img src="~/assets/img/toolbar/size-down.svg" alt="" />
+        </button>
+        <span>{{ size.current }}px</span>
+        <button class="tool size-up">
+          <img src="~/assets/img/toolbar/size-up.svg" alt="" />
+        </button>
       </div>
 
-      <div class="tool">
-        <input type="radio" name="mode" id="fill" value="fill" />
-        <label for="fill">
-          <img src="~/assets/img/toolbar/fill.svg" />
-        </label>
+      <div class="tool-group edits">
+        <button class="tool undo">
+          <img src="~/assets/img/toolbar/undo.gif" alt="" />
+        </button>
+        <button class="tool redo">
+          <img src="~/assets/img/toolbar/redo.gif" alt="" />
+        </button>
+        <button class="tool clear">
+          <img src="~/assets/img/toolbar/clear.svg" alt="" />
+        </button>
+        <button class="tool save">
+          <img src="~/assets/img/toolbar/save.svg" alt="" />
+        </button>
       </div>
     </div>
-
-    <div class="tool-group size">
-      <button class="tool">
-        <img src="~/assets/img/toolbar/size-down.svg" alt="" />
-      </button>
-      <span>5px</span>
-      <button class="tool">
-        <img src="~/assets/img/toolbar/size-up.svg" alt="" />
-      </button>
-    </div>
-
-    <div class="tool-group edits">
-      <button class="tool">
-        <img src="~/assets/img/toolbar/undo.gif" alt="" />
-      </button>
-      <button class="tool">
-        <img src="~/assets/img/toolbar/redo.gif" alt="" />
-      </button>
-      <button class="tool">
-        <img src="~/assets/img/toolbar/clear.svg" alt="" />
-      </button>
-      <button class="tool">
-        <img src="~/assets/img/toolbar/save.svg" alt="" />
-      </button>
-    </div>
-
-    <div class="tool-group palette">
-      <button
-        class="swatch"
-        v-for="(color, index) in colors"
-        :key="index"
-        :class="{ active: color === currentColor }"
-        :style="{ backgroundColor: color }"
-      ></button>
-      <input style="display: none;" type="color" id="addColor" />
-      <label for="addColor" class="add-color">+</label>
-      <!-- https://github.com/xiaokaike/vue-color -->
+    <div class="border" style="margin: 1rem 0; padding: 1rem ">
+      <div class="tool-group palette">
+        <button
+          class="swatch"
+          v-for="(color, index) in palette.colors"
+          :key="index"
+          :class="{ active: color === palette.current }"
+          :style="{ backgroundColor: color }"
+        ></button>
+        <input
+          style="display: none;"
+          type="color"
+          id="addColor"
+          @change="addColor($event)"
+        />
+        <label for="addColor" class="add-color">+</label>
+        <!-- https://github.com/xiaokaike/vue-color -->
+      </div>
     </div>
   </div>
 </template>
 
 <script>
+import { mapState, mapGetters } from "vuex";
+
 export default {
   name: "ToolBar",
-  mounted() {},
-  computed: {
-    // mode
-    colors() {
-      return ["#fff", "#000"];
-    },
-    currentColor() {
-      return "#fff";
-    }
-    // colors, current color
-    // currentSize
-    // drawingIsEmpty
+  mounted() {
+    document.addEventListener("keydown", this.handleShortcuts);
   },
-  methods: {}
+  beforeDestroy() {
+    document.removeEventListener("keydown", this.handleShortcuts);
+  },
+  computed: {
+    mode: {
+      get() {
+        return this.$store.state.modules.mouse.mode;
+      },
+      set(value) {
+        this.$store.dispatch("modules/mouse/setMode", value);
+      }
+    },
+    ...mapState("modules/mouse", ["palette", "size"]),
+    ...mapGetters("modules/drawing", ["isDrawingEmpty"])
+  },
+  methods: {
+    handleShortcuts(e) {
+      // console.log("keydown", e.key, e.keyCode);
+      if (!isNaN(e.key)) {
+        this.$store.dispatch(
+          "modules/mouse/setColor",
+          this.palette.colors[e.key - 1]
+        );
+      }
+
+      switch (e.keyCode) {
+        case 68: // "d"
+          // document.querySelector("#draw").click(); // is this dumb? 🤔
+          this.$store.dispatch("modules/mouse/setMode", "draw");
+          break;
+        case 69: // "e"
+          // document.querySelector("#erase").click(); // is this dumb? 🤔
+          this.$store.dispatch("modules/mouse/setMode", "erase");
+          break;
+        case 70: // "e"
+          // document.querySelector("#fill").click(); // is this dumb? 🤔
+          this.$store.dispatch("modules/mouse/setMode", "fill");
+          break;
+
+        case 219: // "["
+          this.$store.dispatch("modules/mouse/decrementSize");
+          break;
+        case 221: // "]"
+          this.$store.dispatch("modules/mouse/incrementSize");
+          break;
+
+        case 90: // "z"
+          this.$store.dispatch("modules/drawing/undoCanvas");
+          break;
+        case 88: // "x"
+          this.$store.dispatch("modules/drawing/redoCanvas");
+          break;
+
+        case 67: // "c" OR
+        case 8: // "backspace"
+          this.$store.dispatch("modules/drawing/clearCanvas", e);
+          break;
+
+        case 83: // "s"
+          this.$store.dispatch("modules/drawing/saveDrawing");
+          break;
+      }
+    },
+    addColor(e) {
+      this.$store.dispatch("modules/mouse/addColor", e.target.value);
+    }
+  }
 };
 </script>
 
@@ -126,6 +210,19 @@ $icon-size: 25px;
   }
 }
 
+.mode .tool.active {
+  background: var(--lighter-blue);
+}
+
+.mode .tool:not(.active) {
+  filter: grayscale(1);
+  opacity: 0.6;
+}
+
+.fill {
+  margin-left: 0.6rem !important;
+}
+
 .size {
   span {
     width: 4ch;
@@ -136,7 +233,11 @@ $icon-size: 25px;
 
 .palette {
   width: 100%;
-  margin-top: 1rem;
+  /* margin-top: 1rem; */
+
+  > *:not(:first-child) {
+    margin-left: 0;
+  }
 }
 
 .add-color,

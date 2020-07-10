@@ -24,11 +24,60 @@ export const state = () => ({
 });
 
 export const getters = {
-  getPos(state) {
-    return { x: state.x, y: state.y };
+  currentSizeLessThanMax(state) {
+    return state.size.current < state.size.max;
+  },
+  currentSizeMoreThanMin(state) {
+    return state.size.current > state.size.min;
   }
 };
 
-export const actions = {};
+export const actions = {
+  setMousePosition({ commit }, position) {
+    commit("SET_MOUSE_POSITION", position);
+  },
+  setIsDrawing({ commit }, isDrawing) {
+    commit("SET_IS_DRAWING", isDrawing);
+  },
+  setMode({ commit }, value) {
+    commit("SET_MODE", value);
+  },
+  incrementSize({ commit, getters }) {
+    getters.currentSizeLessThanMax && commit("INCREMENT_SIZE");
+  },
+  decrementSize({ commit, getters }) {
+    getters.currentSizeMoreThanMin && commit("DECREMENT_SIZE");
+  },
+  setColor({ commit }, color) {
+    commit("SET_COLOR", color);
+  },
+  addColor({ commit, dispatch, state }, color) {
+    state.palette.colors.includes(color) ? null : commit("ADD_COLOR", color);
+    dispatch("setColor", color);
+  }
+};
 
-export const mutations = {};
+export const mutations = {
+  SET_MOUSE_POSITION(state, position) {
+    state.x = position.x;
+    state.y = position.y;
+  },
+  SET_IS_DRAWING(state, isDrawing) {
+    state.isDrawing = isDrawing;
+  },
+  SET_MODE(state, value) {
+    state.mode = value;
+  },
+  INCREMENT_SIZE(state) {
+    state.size.current++;
+  },
+  DECREMENT_SIZE(state) {
+    state.size.current--;
+  },
+  SET_COLOR(state, color) {
+    state.palette.current = color;
+  },
+  ADD_COLOR(state, color) {
+    state.palette.colors.push(color);
+  }
+};

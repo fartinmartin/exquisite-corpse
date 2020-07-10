@@ -1,9 +1,9 @@
 <template>
   <div class="container mw-canvas">
     <tool-bar />
-    <!-- <canvas-top /> -->
-    <canvas-write type="mid" />
-    <!-- <canvas-bot /> -->
+    <Canvas id="top" :write="false" />
+    <Canvas id="mid" :write="true" />
+    <Canvas id="bot" :write="false" />
   </div>
 </template>
 
@@ -11,13 +11,13 @@
 
 <script>
 import ToolBar from "./ToolBar.vue";
-import CanvasWrite from "./CanvasWrite.vue";
+import Canvas from "./Canvas.vue";
 
 export default {
   name: "ExquisiteCorpse",
   components: {
     ToolBar,
-    CanvasWrite
+    Canvas
   }
 };
 </script>

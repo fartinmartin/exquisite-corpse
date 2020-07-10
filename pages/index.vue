@@ -1,7 +1,9 @@
 <template>
-  <div>
-    <Alert />
-    <ExquisiteCorpse />
+  <div class="wrap">
+    <div>
+      <Alert />
+      <ExquisiteCorpse />
+    </div>
   </div>
 </template>
 
@@ -13,3 +15,12 @@ export default {
   components: { ExquisiteCorpse, Alert }
 };
 </script>
+
+<style lang="scss" scoped>
+.wrap {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+</style>
