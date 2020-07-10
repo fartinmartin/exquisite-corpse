@@ -62,10 +62,10 @@
 
       <div class="tool-group edits">
         <button class="tool undo">
-          <img src="~/assets/img/toolbar/undo.gif" alt="" />
+          <img src="~/assets/img/toolbar/undo.svg" alt="" />
         </button>
         <button class="tool redo">
-          <img src="~/assets/img/toolbar/redo.gif" alt="" />
+          <img src="~/assets/img/toolbar/redo.svg" alt="" />
         </button>
         <button class="tool clear">
           <img src="~/assets/img/toolbar/clear.svg" alt="" />
