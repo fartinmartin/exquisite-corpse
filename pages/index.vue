@@ -1,23 +1,13 @@
 <template>
-  <div class="container">
-    <div>
-      <h1>Hello</h1>
-    </div>
+  <div>
+    <ExquisiteCorpse />
   </div>
 </template>
 
 <script>
+import ExquisiteCorpse from "~/components/ExquisiteCorpse";
 export default {
-  name: "index"
+  name: "index",
+  components: { ExquisiteCorpse }
 };
 </script>
-
-<style>
-.container {
-  margin: 0 auto;
-  min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-</style>
