@@ -3,6 +3,8 @@ export const state = () => ({
   ctx: null
 });
 
-// export const getters = {};
-// export const actions = {};
-// export const mutations = {};
+export const getters = {};
+
+export const actions = {};
+
+export const mutations = {};

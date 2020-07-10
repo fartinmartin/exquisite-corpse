@@ -1,18 +1,22 @@
 <template>
   <div class="container">
     <div>
-      <h1>Hello</h1>
-      <div></div>
+      <h1>Gallery</h1>
+      <div v-for="drawing in gallery" :key="drawing[0]">
+        <pre>{{ drawing }}</pre>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
+import { mapGetters } from "vuex";
 export default {
-  name: "index",
+  name: "gallery",
   mounted() {
     this.$store.dispatch("modules/gallery/setGallery");
-  }
+  },
+  computed: mapGetters({ gallery: "modules/gallery/getGallery" })
 };
 </script>
 
