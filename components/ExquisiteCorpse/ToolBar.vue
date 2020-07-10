@@ -43,11 +43,19 @@
       </div>
 
       <div class="tool-group size">
-        <button class="tool size-down">
+        <button
+          class="tool size-down"
+          :disabled="!currentSizeMoreThanMin"
+          @click="decrementSize"
+        >
           <img src="~/assets/img/toolbar/size-down.svg" alt="" />
         </button>
         <span>{{ size.current }}px</span>
-        <button class="tool size-up">
+        <button
+          class="tool size-up"
+          :disabled="!currentSizeLessThanMax"
+          @click="incrementSize"
+        >
           <img src="~/assets/img/toolbar/size-up.svg" alt="" />
         </button>
       </div>
@@ -67,6 +75,7 @@
         </button>
       </div>
     </div>
+
     <div class="border" style="margin: 1rem 0; padding: 1rem ">
       <div class="tool-group palette">
         <button
@@ -75,6 +84,7 @@
           :key="index"
           :class="{ active: color === palette.current }"
           :style="{ backgroundColor: color }"
+          @click="setColor(color)"
         ></button>
         <input
           style="display: none;"
@@ -110,6 +120,10 @@ export default {
       }
     },
     ...mapState("modules/mouse", ["palette", "size"]),
+    ...mapGetters("modules/mouse", [
+      "currentSizeLessThanMax",
+      "currentSizeMoreThanMin"
+    ]),
     ...mapGetters("modules/drawing", ["isDrawingEmpty"])
   },
   methods: {
@@ -124,15 +138,12 @@ export default {
 
       switch (e.keyCode) {
         case 68: // "d"
-          // document.querySelector("#draw").click(); // is this dumb? 🤔
           this.$store.dispatch("modules/mouse/setMode", "draw");
           break;
         case 69: // "e"
-          // document.querySelector("#erase").click(); // is this dumb? 🤔
           this.$store.dispatch("modules/mouse/setMode", "erase");
           break;
         case 70: // "e"
-          // document.querySelector("#fill").click(); // is this dumb? 🤔
           this.$store.dispatch("modules/mouse/setMode", "fill");
           break;
 
@@ -162,6 +173,15 @@ export default {
     },
     addColor(e) {
       this.$store.dispatch("modules/mouse/addColor", e.target.value);
+    },
+    setColor(e) {
+      this.$store.dispatch("modules/mouse/setColor", e);
+    },
+    decrementSize() {
+      this.$store.dispatch("modules/mouse/decrementSize");
+    },
+    incrementSize() {
+      this.$store.dispatch("modules/mouse/incrementSize");
     }
   }
 };

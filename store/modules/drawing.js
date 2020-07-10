@@ -27,14 +27,15 @@ export const actions = {
   },
   drawPath({ rootState, dispatch, commit }, event) {
     const pointData = {
-      mode: rootState.mouse.mode,
-      x1: rootState.mouse.x,
-      y1: rootState.mouse.y,
+      mode: rootState.modules.mouse.mode,
+      color: rootState.modules.mouse.palette.current,
+      size: rootState.modules.mouse.size.current,
+      x1: rootState.modules.mouse.x,
+      y1: rootState.modules.mouse.y,
       x2: event.offsetX,
-      y2: event.offsetY,
-      color: rootState.mouse.palette.current,
-      size: rootState.mouse.size.current
+      y2: event.offsetY
     };
+    console.log(pointData);
     // commit("PUSH_POINT_DATA_TO_CURRENT_PATH", pointData);
     // commit("DRAW_PATH", pointData);
     dispatch(
