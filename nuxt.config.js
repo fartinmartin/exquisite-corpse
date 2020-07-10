@@ -16,17 +16,16 @@ export default {
    ** See https://nuxtjs.org/api/configuration-head
    */
   head: {
-    title: process.env.npm_package_name || "",
+    title: `Exquisite Corpse Club` || "",
     meta: [
       { charset: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       {
         hid: "description",
         name: "description",
-        content: process.env.npm_package_description || ""
+        content: `An online collaborative drawing game. 🔪` || ""
       }
-    ],
-    link: [{ rel: "icon", type: "image/x-icon", href: "/favicon.ico" }]
+    ]
   },
   /*
    ** Global CSS
@@ -52,7 +51,7 @@ export default {
   /*
    ** Nuxt.js modules
    */
-  modules: ["@nuxtjs/firebase"],
+  modules: ["@nuxtjs/firebase", "@nuxtjs/svg"],
   /*
    ** Firebase config
    ** See:
@@ -75,6 +74,22 @@ export default {
         ssr: true
       },
       firestore: true
+    }
+  },
+  /*
+   ** @nuxtjs/pwa configuration
+   ** See https://pwa.nuxtjs.org/modules/meta.html
+   */
+  pwa: {
+    meta: {
+      title: "Exquisite Corpse Club",
+      author: "Martin Lindberg",
+      description: "An online collaborative drawing game. 🔪"
+    },
+    manifest: {
+      name: "Exquisite Corpse Club",
+      short_name: "ECC",
+      lang: "en"
     }
   },
   /*

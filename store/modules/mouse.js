@@ -23,7 +23,11 @@ export const state = () => ({
   }
 });
 
-export const getters = {};
+export const getters = {
+  getPos(state) {
+    return { x: state.x, y: state.y };
+  }
+};
 
 export const actions = {};
 

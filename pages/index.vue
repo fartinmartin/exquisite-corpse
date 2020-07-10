@@ -2,17 +2,13 @@
   <div class="container">
     <div>
       <h1>Hello</h1>
-      <div></div>
     </div>
   </div>
 </template>
 
 <script>
 export default {
-  name: "index",
-  mounted() {
-    this.$store.dispatch("modules/gallery/setGallery");
-  }
+  name: "index"
 };
 </script>
 

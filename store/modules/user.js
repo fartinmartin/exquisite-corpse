@@ -1,14 +1,11 @@
 export const state = () => ({
-  name: "",
-  id: null
+  id: null,
+  displayName: ""
 });
 
 export const getters = {
-  getUserName(state) {
-    return state.name;
-  },
-  getUserId(state) {
-    return state.id;
+  getUser(state) {
+    return { displayName: state.displayName, id: state.id };
   }
 };
 

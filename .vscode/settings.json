@@ -1,0 +1,13 @@
+{
+  "files.exclude": {
+    "node_modules/": true,
+    ".nuxt": true,
+    ".vscode": true,
+    "dist/": true,
+    ".editorconfig": true,
+    "README.md": true,
+    "package-lock.json": true,
+    ".gitignore": true,
+    ".env": true
+  }
+}
