@@ -41,6 +41,7 @@ export const actions = {
   },
   setMode({ commit }, value) {
     commit("SET_MODE", value);
+    // potentially: set local state of CustomCursor too 🤔
   },
   incrementSize({ commit, getters }) {
     getters.currentSizeLessThanMax && commit("INCREMENT_SIZE");

@@ -72,6 +72,23 @@ export default {
   }
 }
 
+.canvas-wrap.not-allowed {
+  position: relative;
+  &::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    /* height: calc(100% - 10px); */
+    height: 100%;
+    // http://www.patternify.com/
+    background: #ffffff
+      url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAkAAAAJCAYAAADgkQYQAAAAFUlEQVQYlWNgoAb4N4HhP2UKhoUVAL3oD0/YmVPIAAAAAElFTkSuQmCC)
+      repeat;
+  }
+}
+
 canvas {
   transform: scale(0.5) translate3D(-50%, -50%, 0);
   overflow: hidden;
