@@ -1,6 +1,7 @@
 <template>
   <div class="wrap">
     <div>
+      <CustomCursor />
       <Alert />
       <ExquisiteCorpse />
     </div>
@@ -10,9 +11,10 @@
 <script>
 import Alert from "~/components/Alert";
 import ExquisiteCorpse from "~/components/ExquisiteCorpse";
+import CustomCursor from "~/components/CustomCursor";
 export default {
   name: "index",
-  components: { ExquisiteCorpse, Alert }
+  components: { CustomCursor, ExquisiteCorpse, Alert }
 };
 </script>
 

@@ -220,7 +220,6 @@ $icon-size: 25px;
 
   label {
     width: 100%;
-    cursor: pointer;
   }
 
   svg,
@@ -272,7 +271,7 @@ $icon-size: 25px;
 }
 
 .add-color {
-  cursor: pointer;
+  /* cursor: pointer; */
   display: flex;
   align-items: center;
   justify-content: center;
