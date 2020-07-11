@@ -1,5 +1,7 @@
 # exquisite-corpse
 
+[Figma prototype](https://www.figma.com/file/RNg8lCVQnMU5HAeYxu03UT/Exquisite-Corpse-Club?node-id=0%3A1).
+
 ## Build Setup
 
 ```bash
