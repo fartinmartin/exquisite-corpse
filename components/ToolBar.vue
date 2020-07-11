@@ -61,13 +61,13 @@
       </div>
 
       <div class="tool-group edits">
-        <button class="tool undo">
+        <button class="tool undo" @click="undoCanvas">
           <img src="~/assets/img/toolbar/undo.svg" alt="" />
         </button>
-        <button class="tool redo">
+        <button class="tool redo" @click="redoCanvas">
           <img src="~/assets/img/toolbar/redo.svg" alt="" />
         </button>
-        <button class="tool clear">
+        <button class="tool clear" @click="clearCanvas">
           <img src="~/assets/img/toolbar/clear.svg" alt="" />
         </button>
         <button class="tool save">
@@ -128,6 +128,7 @@ export default {
   },
   methods: {
     handleShortcuts(e) {
+      // 🚨 TODO: swatch dispach() with this.methods
       // console.log("keydown", e.key, e.keyCode);
       if (!isNaN(e.key)) {
         this.$store.dispatch(
@@ -182,6 +183,15 @@ export default {
     },
     incrementSize() {
       this.$store.dispatch("modules/mouse/incrementSize");
+    },
+    undoCanvas(e) {
+      this.$store.dispatch("modules/drawing/undoCanvas");
+    },
+    redoCanvas(e) {
+      this.$store.dispatch("modules/drawing/redoCanvas");
+    },
+    clearCanvas(e) {
+      this.$store.dispatch("modules/drawing/clearCanvas", e);
     }
   }
 };

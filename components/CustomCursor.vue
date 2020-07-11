@@ -1,5 +1,5 @@
 <template>
-  <div id="cursor" ref="cursor">
+  <div id="cursor" ref="cursorRef">
     <img
       v-show="state === 'auto'"
       src="~/assets/img/cursor/cursor-default.svg"
@@ -94,8 +94,8 @@ export default {
       // this.state = "auto";
 
       //move custom cursor
-      const cursor = this.$refs.cursor;
-      cursor.style.transform = `translate(${this.x}px,${this.y}px)`;
+      const cursor = this.$refs.cursorRef;
+      if (cursor) cursor.style.transform = `translate(${this.x}px,${this.y}px)`;
     },
     cursorDown(e) {
       if (e.target.tagName === "CANVAS") {

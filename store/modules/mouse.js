@@ -33,8 +33,8 @@ export const getters = {
 };
 
 export const actions = {
-  setMousePosition({ commit }, position) {
-    commit("SET_MOUSE_POSITION", position);
+  setMousePosition({ commit }, event) {
+    commit("SET_MOUSE_POSITION", event);
   },
   setIsDrawing({ commit }, isDrawing) {
     commit("SET_IS_DRAWING", isDrawing);
@@ -42,6 +42,7 @@ export const actions = {
   setMode({ commit }, value) {
     commit("SET_MODE", value);
     // potentially: set local state of CustomCursor too 🤔
+    // or *better idea* move cursor state to store and from there set mode state = mouse state
   },
   incrementSize({ commit, getters }) {
     getters.currentSizeLessThanMax && commit("INCREMENT_SIZE");
@@ -59,9 +60,9 @@ export const actions = {
 };
 
 export const mutations = {
-  SET_MOUSE_POSITION(state, position) {
-    state.x = position.x;
-    state.y = position.y;
+  SET_MOUSE_POSITION(state, event) {
+    state.x = event.offsetX;
+    state.y = event.offsetY;
   },
   SET_IS_DRAWING(state, isDrawing) {
     state.isDrawing = isDrawing;
