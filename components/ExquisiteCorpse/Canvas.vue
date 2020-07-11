@@ -1,5 +1,5 @@
 <template>
-  <div class="canvas-wrap border">
+  <div class="canvas-wrap border" :class="{ 'not-allowed': !write }">
     <canvas
       width="1080"
       height="360"
@@ -58,6 +58,7 @@ export default {
   width: 544px;
   height: calc(544px / 3);
   margin: 0 auto;
+  overflow: hidden;
 
   &#top {
     border-bottom: none;

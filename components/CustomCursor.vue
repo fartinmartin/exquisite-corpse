@@ -41,18 +41,17 @@ export default {
     };
   },
   mounted() {
-    window.addEventListener("mousemove", this.customCursorMove);
-    window.addEventListener("mousedown", this.customCursorDown);
-    window.addEventListener("mouseup", this.customCursorUp);
+    window.addEventListener("mousemove", this.cursorMove);
+    window.addEventListener("mousedown", this.cursorDown);
+    window.addEventListener("mouseup", this.cursorUp);
   },
   beforeDestroy() {
-    window.removeEventListener("mousemove", this.customCursorMove);
-    window.addEventListener("mousedown", this.customCursorDown);
-    window.addEventListener("mouseup", this.customCursorUp);
+    window.removeEventListener("mousemove", this.cursorMove);
+    window.addEventListener("mousedown", this.cursorDown);
+    window.addEventListener("mouseup", this.cursorUp);
   },
   methods: {
-    customCursorMove(e) {
-      // console.log(e.target.parentNode.tagName);
+    cursorMove(e) {
       // hotspot offsets based on state
       let offset = {
         ...(this.state === "auto" && { x: -3, y: 0 }),
@@ -69,17 +68,25 @@ export default {
       this.y = e.clientY + offset.y;
 
       //change state based on hovered targets
-      if (e.target.tagName === "CANVAS") {
+      if (
+        e.target.disabled ||
+        e.target.parentNode.disabled ||
+        e.target.classList.contains("not-allowed") ||
+        e.target.parentNode.classList.contains("not-allowed")
+      ) {
+        this.state = "notAllowed";
+      } else if (e.target.tagName === "CANVAS") {
         this.state = this.$store.state.modules.mouse.mode;
       } else if (
+        // https://css-tricks.com/snippets/css/give-clickable-elements-a-pointer-cursor/
         e.target.tagName === "BUTTON" ||
         e.target.tagName === "LABEL" ||
+        e.target.tagName === "A" ||
         e.target.parentNode.tagName === "BUTTON" ||
-        e.target.parentNode.tagName === "LABEL"
+        e.target.parentNode.tagName === "LABEL" ||
+        e.target.parentNode.tagName === "A"
       ) {
         this.state = "pointer";
-      } else if (e.target.parentNode.disabled) {
-        this.state = "notAllowed";
       } else {
         this.state = "auto";
       }
@@ -90,18 +97,18 @@ export default {
       const cursor = this.$refs.cursor;
       cursor.style.transform = `translate(${this.x}px,${this.y}px)`;
     },
-    customCursorDown(e) {
+    cursorDown(e) {
       if (e.target.tagName === "CANVAS") {
         return;
       } else {
         this.state = "grabbing";
       }
     },
-    customCursorUp(e) {
+    cursorUp(e) {
       if (e.target.tagName === "CANVAS") {
         return;
       } else {
-        this.state = "auto";
+        this.cursorMove(e);
       }
     }
   }

@@ -1,10 +1,12 @@
 <template>
-  <div class="wrap">
-    <div>
-      <CustomCursor />
-      <Alert />
-      <ExquisiteCorpse />
+  <div>
+    <div class="wrap">
+      <div>
+        <Alert />
+        <ExquisiteCorpse />
+      </div>
     </div>
+    <CustomCursor />
   </div>
 </template>
 
