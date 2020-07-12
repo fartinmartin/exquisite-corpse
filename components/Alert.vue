@@ -1,5 +1,5 @@
 <template>
-  <div class="border mw-canvas">
+  <div class="border yellow mw-canvas">
     <span>This VueJS app is a WIP—check back soon!</span>
     <a
       href="https://fartinmartin.github.io/"
@@ -19,9 +19,6 @@ export default {
 
 <style lang="scss" scoped>
 .border {
-  --box-shadow-color: rgb(254, 146, 0);
-  border-color: rgb(252, 220, 0);
-
   padding: 1rem;
   margin-top: 2rem;
   margin-bottom: 2rem;

@@ -20,16 +20,22 @@ export default {
   },
   data: function() {
     return {
+      canvas: null,
       ctx: null
     };
   },
   mounted() {
-    const ctx = this.$refs.canvas.getContext("2d");
+    const canvas = this.$refs.canvas;
+    const ctx = canvas.getContext("2d");
+
+    this.canvas = canvas; // set local state
     this.ctx = ctx; // set local state
 
     if (!this.drawing) {
+      this.$store.dispatch("modules/drawing/setCanvas", canvas); // set store state
       this.$store.dispatch("modules/drawing/setCtx", ctx); // set store state
     } else if (this.drawing) {
+      // this.makeDrawing(this.drawing);
     }
   },
   methods: {
@@ -135,10 +141,8 @@ export default {
       ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
     },
 
-    makeDrawing(ctx, drawing, timeout) {
-      drawing.forEach(path =>
-        path.forEach(point => this.handleDraw(ctx, point))
-      );
+    makeDrawing(drawing, timeout) {
+      drawing.forEach(path => path.forEach(point => this.handleDraw(point)));
     }
   }
 };

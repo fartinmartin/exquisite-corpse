@@ -13,11 +13,7 @@ import Canvas from "./Canvas.vue";
 
 export default {
   name: "Display",
-  props: {
-    sections: Object
-  },
-  components: {
-    Canvas
-  }
+  props: { sections: Object },
+  components: { Canvas }
 };
 </script>

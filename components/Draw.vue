@@ -27,9 +27,7 @@ import Canvas from "./Canvas.vue";
 
 export default {
   name: "Draw",
-  props: {
-    sections: Object
-  },
+  props: { sections: Object },
   components: {
     ToolBar,
     Canvas

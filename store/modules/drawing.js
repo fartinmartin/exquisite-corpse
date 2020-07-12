@@ -1,6 +1,7 @@
 import floodFill from "~/assets/js/floodFill";
 
 export const state = () => ({
+  canvas: null,
   ctx: null,
   type: "",
   currentPath: [],
@@ -27,6 +28,10 @@ export const getters = {
 };
 
 export const actions = {
+  setCanvas({ commit }, canvas) {
+    commit("SET_CANVAS", canvas);
+  },
+
   setCtx({ commit }, ctx) {
     commit("SET_CTX", ctx);
   },
@@ -151,6 +156,10 @@ export const actions = {
 };
 
 export const mutations = {
+  SET_CANVAS(state, canvas) {
+    state.canvas = canvas;
+  },
+
   SET_CTX(state, ctx) {
     state.ctx = ctx;
   },

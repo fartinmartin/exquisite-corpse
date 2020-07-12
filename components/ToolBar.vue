@@ -104,14 +104,27 @@
         <!-- https://github.com/xiaokaike/vue-color (mostly for safari support 🤔) -->
       </div>
     </div>
+
+    <SaveModal
+      v-show="isSaving"
+      :drawing="paths"
+      @cancel-save="isSaving = false"
+    />
   </div>
 </template>
 
 <script>
 import { mapState, mapGetters } from "vuex";
+import SaveModal from "./SaveModal";
 
 export default {
   name: "ToolBar",
+  components: { SaveModal },
+  data: function() {
+    return {
+      isSaving: false
+    };
+  },
   mounted() {
     document.addEventListener("keydown", this.handleShortcuts);
   },
@@ -128,6 +141,7 @@ export default {
       }
     },
     ...mapState("modules/mouse", ["palette", "size"]),
+    ...mapState("modules/drawing", ["paths"]),
     ...mapGetters("modules/mouse", [
       "currentSizeLessThanMax",
       "currentSizeMoreThanMin"
@@ -198,19 +212,45 @@ export default {
       this.$store.dispatch("modules/drawing/clearCanvas", e);
     },
     saveSection() {
-      // const section = {
-      //   title: String,
-      //   artist: String,
-      //   date: Date,
-      //   type: String,
-      //   likes: Number,
-      //   permalink: String,
-      //   thumbnail: Image, // (?)
-      //   drawing: Array,
-      //   featuredIn: Array
+      this.isSaving = true;
+      // let section = {
+      //   title: "",
+      //   artist: "",
+      //   date: null,
+      //   type: String, // 🚨
+      //   likes: 0,
+      //   permalink: "",
+      //   thumbnail: this.$store.state.modules.drawing.ctx, // (?)
+      //   drawing: this.$store.state.modules.drawing.paths,
+      //   featuredIn: []
       // };
       // this.$store.dispatch("modules/drawing/saveSection", section);
     }
+
+    // saveImage(name) {
+    //   // https://github.com/Eraince/firebase-pic-json/blob/a4a56e89c3310148382b91e6a762049bbe28ff29/script.js
+    //   // change canvas data to Blob so it can be submitted
+    //   this.$store.state.modules.drawing.canvas.toBlob(function(blob) {
+    //     var image = new Image();
+    //     image.src = blob;
+    //     var metadata = {
+    //       contentType: "image/png"
+    //     };
+
+    //     storageRef
+    //       // create or access a folder called "images",and put the new image under that folder
+    //       // TODO: figure out where to store this 🤔
+    //       .child("images/" + name)
+    //       .put(blob, metadata)
+    //       .then(function(snapshot) {
+    //         console.log("Uploaded", snapshot.totalBytes, "bytes.");
+    //         window.location.href = "gallery.html";
+    //       })
+    //       .catch(function(error) {
+    //         console.error("Upload failed:", error);
+    //       });
+    //   });
+    // }
   }
 };
 </script>

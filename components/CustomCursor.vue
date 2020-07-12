@@ -81,9 +81,11 @@ export default {
         // https://css-tricks.com/snippets/css/give-clickable-elements-a-pointer-cursor/
         e.target.tagName === "BUTTON" ||
         e.target.tagName === "LABEL" ||
+        e.target.tagName === "INPUT" ||
         e.target.tagName === "A" ||
         e.target.parentNode.tagName === "BUTTON" ||
         e.target.parentNode.tagName === "LABEL" ||
+        e.target.parentNode.tagName === "INPUT" ||
         e.target.parentNode.tagName === "A"
       ) {
         this.state = "pointer";
