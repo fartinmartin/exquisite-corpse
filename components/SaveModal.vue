@@ -128,6 +128,7 @@ form {
     border-top: 2px solid var(--lighter-yellow);
     border-left: 2px solid var(--lighter-yellow);
 
+    /* TODO: this function could/should be a global class 🤔 */
     &:active {
       border: 2px solid var(--lighter-yellow);
       border-top: 2px solid var(--yellow);

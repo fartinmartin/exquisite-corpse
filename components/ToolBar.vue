@@ -278,6 +278,9 @@ $icon-size: 25px;
   width: $icon-size;
   height: $icon-size;
 
+  box-sizing: content-box;
+  border: 2px solid transparent;
+
   display: flex;
   align-items: center;
   justify-content: center;
@@ -295,10 +298,26 @@ $icon-size: 25px;
     width: 100%;
     display: block;
   }
+
+  &:active {
+    border: 2px solid var(--lighter-yellow);
+    border-top: 2px solid var(--yellow);
+    border-left: 2px solid var(--yellow);
+    transform: translate3D(2px, 2px, 0);
+  }
 }
 
 .mode .tool.active {
-  background: var(--lighter-blue);
+  border: 2px solid var(--yellow);
+  border-top: 2px solid var(--lighter-yellow);
+  border-left: 2px solid var(--lighter-yellow);
+
+  &:active {
+    border: 2px solid var(--lighter-yellow);
+    border-top: 2px solid var(--yellow);
+    border-left: 2px solid var(--yellow);
+    transform: translate3D(2px, 2px, 0);
+  }
 }
 
 .mode .tool:not(.active) {
