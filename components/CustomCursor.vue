@@ -2,7 +2,7 @@
   <div id="cursor" ref="cursorRef">
     <img
       v-show="state === 'auto'"
-      src="~/assets/img/cursor/cursor-default.svg"
+      src="~/assets/img/cursor/cursor-auto.svg"
       alt=""
     />
     <img
@@ -91,7 +91,9 @@ export default {
         this.state = "auto";
       }
 
-      // this.state = "auto";
+      // TODO: check if window is not focused (dif app or diff window)
+      //       AND/OR check if mouse has left the window
+      //       in those cases: hide the cursor entirely? 🤔
 
       //move custom cursor
       const cursor = this.$refs.cursorRef;

@@ -9,14 +9,20 @@ export const state = () => ({
 });
 
 export const getters = {
-  isDrawingEmpty(state) {
-    return !state.paths.length;
+  isDrawingEmpty({ paths, history: { step } }) {
+    return !paths.length || paths[step - 1][0].mode === "clear";
   },
   weAreBackInTime(state) {
     return state.history.step < state.history.paths.length;
   },
   historyDif(state) {
     return state.history.paths.length - state.history.step;
+  },
+  canUndo(state) {
+    return state.history.step <= 0;
+  },
+  canRedo(state) {
+    return state.history.step >= state.history.paths.length;
   }
 };
 
@@ -89,12 +95,7 @@ export const actions = {
   },
 
   makeDrawing({ state: { paths }, dispatch }) {
-    // if (!paths.length) dispatch("clearCanvas"); // not sure why this is here 🤔
-    // paths.forEach(path => path.forEach(point => dispatch("handleDraw", point)));
-    paths.forEach(path => {
-      console.log(path);
-      path.forEach(point => dispatch("handleDraw", point));
-    });
+    paths.forEach(path => path.forEach(point => dispatch("handleDraw", point)));
   },
 
   handleDraw({ dispatch }, point) {

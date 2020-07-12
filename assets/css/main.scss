@@ -1,5 +1,5 @@
 :root {
-  --black: #000;
+  --black: #231f20;
   --white: #fff;
   --blue: #0064ff;
   --light-blue: #81b2ff;
@@ -16,14 +16,15 @@ html {
   -webkit-text-size-adjust: 100%;
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
-  box-sizing: border-box;
 
+  color: var(--black);
   // http://www.patternify.com/
   background: var(--lighter-blue)
     url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAAEklEQVQImWNgYGD4z0AswK4SAFXuAf8EPy+xAAAAAElFTkSuQmCC)
     repeat;
   background-blend-mode: overlay;
 
+  box-sizing: border-box;
   overflow-x: hidden; // for scaled canvas element(s)
 }
 

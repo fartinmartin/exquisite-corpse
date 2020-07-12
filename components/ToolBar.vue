@@ -61,16 +61,24 @@
       </div>
 
       <div class="tool-group edits">
-        <button class="tool undo" @click="undoCanvas">
+        <button class="tool undo" :disabled="canUndo" @click="undoCanvas">
           <img src="~/assets/img/toolbar/undo.svg" alt="" />
         </button>
-        <button class="tool redo" @click="redoCanvas">
+        <button class="tool redo" :disabled="canRedo" @click="redoCanvas">
           <img src="~/assets/img/toolbar/redo.svg" alt="" />
         </button>
-        <button class="tool clear" @click="clearCanvas">
+        <button
+          class="tool clear"
+          :disabled="isDrawingEmpty"
+          @click="clearCanvas"
+        >
           <img src="~/assets/img/toolbar/clear.svg" alt="" />
         </button>
-        <button class="tool save">
+        <button
+          class="tool save"
+          :disabled="isDrawingEmpty"
+          @click="saveSection"
+        >
           <img src="~/assets/img/toolbar/save.svg" alt="" />
         </button>
       </div>
@@ -124,51 +132,47 @@ export default {
       "currentSizeLessThanMax",
       "currentSizeMoreThanMin"
     ]),
-    ...mapGetters("modules/drawing", ["isDrawingEmpty"])
+    ...mapGetters("modules/drawing", ["canUndo", "canRedo", "isDrawingEmpty"])
   },
   methods: {
     handleShortcuts(e) {
-      // 🚨 TODO: swatch dispach() with this.methods
       // console.log("keydown", e.key, e.keyCode);
       if (!isNaN(e.key)) {
-        this.$store.dispatch(
-          "modules/mouse/setColor",
-          this.palette.colors[e.key - 1]
-        );
+        this.setColor(this.palette.colors[e.key - 1]);
       }
 
       switch (e.keyCode) {
         case 68: // "d"
-          this.$store.dispatch("modules/mouse/setMode", "draw");
+          this.mode = "draw";
           break;
         case 69: // "e"
-          this.$store.dispatch("modules/mouse/setMode", "erase");
+          this.mode = "erase";
           break;
         case 70: // "e"
-          this.$store.dispatch("modules/mouse/setMode", "fill");
+          this.mode = "fill";
           break;
 
         case 219: // "["
-          this.$store.dispatch("modules/mouse/decrementSize");
+          this.decrementSize();
           break;
         case 221: // "]"
-          this.$store.dispatch("modules/mouse/incrementSize");
+          this.incrementSize();
           break;
 
         case 90: // "z"
-          this.$store.dispatch("modules/drawing/undoCanvas");
+          this.undoCanvas();
           break;
         case 88: // "x"
-          this.$store.dispatch("modules/drawing/redoCanvas");
+          this.redoCanvas();
           break;
 
         case 67: // "c" OR
         case 8: // "backspace"
-          this.$store.dispatch("modules/drawing/clearCanvas", e);
+          this.clearCanvas(e); // sent with event in order to log in history
           break;
 
         case 83: // "s"
-          this.$store.dispatch("modules/drawing/saveDrawing");
+          this.saveSection();
           break;
       }
     },
@@ -184,14 +188,28 @@ export default {
     incrementSize() {
       this.$store.dispatch("modules/mouse/incrementSize");
     },
-    undoCanvas(e) {
+    undoCanvas() {
       this.$store.dispatch("modules/drawing/undoCanvas");
     },
-    redoCanvas(e) {
+    redoCanvas() {
       this.$store.dispatch("modules/drawing/redoCanvas");
     },
     clearCanvas(e) {
       this.$store.dispatch("modules/drawing/clearCanvas", e);
+    },
+    saveSection() {
+      // const section = {
+      //   title: String,
+      //   artist: String,
+      //   date: Date,
+      //   type: String,
+      //   likes: Number,
+      //   permalink: String,
+      //   thumbnail: Image, // (?)
+      //   drawing: Array,
+      //   featuredIn: Array
+      // };
+      // this.$store.dispatch("modules/drawing/saveSection", section);
     }
   }
 };

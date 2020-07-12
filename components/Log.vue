@@ -53,8 +53,7 @@ export default {
   components: { Draggable },
   data: function() {
     return {
-      // isHidden: true
-      isHidden: false
+      isHidden: true
     };
   },
   mounted() {
