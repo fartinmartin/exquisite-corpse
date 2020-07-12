@@ -18,10 +18,10 @@ export const getters = {
   historyDif(state) {
     return state.history.paths.length - state.history.step;
   },
-  canUndo(state) {
+  cantUndo(state) {
     return state.history.step <= 0;
   },
-  canRedo(state) {
+  cantRedo(state) {
     return state.history.step >= state.history.paths.length;
   }
 };

@@ -61,10 +61,10 @@
       </div>
 
       <div class="tool-group edits">
-        <button class="tool undo" :disabled="canUndo" @click="undoCanvas">
+        <button class="tool undo" :disabled="cantUndo" @click="undoCanvas">
           <img src="~/assets/img/toolbar/undo.svg" alt="" />
         </button>
-        <button class="tool redo" :disabled="canRedo" @click="redoCanvas">
+        <button class="tool redo" :disabled="cantRedo" @click="redoCanvas">
           <img src="~/assets/img/toolbar/redo.svg" alt="" />
         </button>
         <button
@@ -132,7 +132,7 @@ export default {
       "currentSizeLessThanMax",
       "currentSizeMoreThanMin"
     ]),
-    ...mapGetters("modules/drawing", ["canUndo", "canRedo", "isDrawingEmpty"])
+    ...mapGetters("modules/drawing", ["cantUndo", "cantRedo", "isDrawingEmpty"])
   },
   methods: {
     handleShortcuts(e) {
