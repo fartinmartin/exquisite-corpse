@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="toolbar border mw-canvas canvas-tools">
+    <div class="toolbar border yellow mw-canvas canvas-tools">
       <div class="tool-group mode">
         <div class="tool draw" :class="{ active: mode === 'draw' }">
           <input
@@ -84,7 +84,7 @@
       </div>
     </div>
 
-    <div class="toolbar border color-palette">
+    <div class="toolbar border yellow color-palette">
       <div class="tool-group palette">
         <button
           class="swatch"
@@ -313,22 +313,22 @@ $icon-size: 25px;
 .palette label,
 .tool {
   &:not([disabled]):active {
-    border: 2px solid var(--lighter-yellow);
-    border-top: 2px solid var(--yellow);
-    border-left: 2px solid var(--yellow);
+    border: 2px solid var(--lighter-blue);
+    border-top: 2px solid var(--light-blue);
+    border-left: 2px solid var(--light-blue);
     transform: translate3D(2px, 2px, 0);
   }
 }
 
 .mode .tool.active {
-  border: 2px solid var(--yellow);
-  border-top: 2px solid var(--lighter-yellow);
-  border-left: 2px solid var(--lighter-yellow);
+  border: 2px solid var(--light-blue);
+  border-top: 2px solid var(--lighter-blue);
+  border-left: 2px solid var(--lighter-blue);
 
   &:active {
-    border: 2px solid var(--lighter-yellow);
-    border-top: 2px solid var(--yellow);
-    border-left: 2px solid var(--yellow);
+    border: 2px solid var(--lighter-blue);
+    border-top: 2px solid var(--light-blue);
+    border-left: 2px solid var(--light-blue);
     transform: translate3D(2px, 2px, 0);
   }
 }

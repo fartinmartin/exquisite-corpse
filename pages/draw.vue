@@ -1,5 +1,6 @@
 <template>
   <div>
+    <Nav />
     <Log />
     <div class="wrap">
       <div>
@@ -18,6 +19,7 @@
 
 <script>
 import Log from "~/components/Log";
+import Nav from "~/components/Nav";
 import Draw from "~/components/Draw";
 import CustomCursor from "~/components/CustomCursor";
 import section1 from "~/assets/js/drawing1.json";
@@ -31,7 +33,7 @@ export default {
       section2
     };
   },
-  components: { CustomCursor, Draw, Log }
+  components: { Nav, CustomCursor, Draw, Log }
 };
 </script>
 
