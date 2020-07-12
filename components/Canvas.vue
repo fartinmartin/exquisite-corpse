@@ -18,10 +18,18 @@ export default {
     drawing: Array,
     isPresenting: Boolean
   },
+  data: function() {
+    return {
+      ctx: null
+    };
+  },
   mounted() {
+    const ctx = this.$refs.canvas.getContext("2d");
+    this.ctx = ctx; // set local state
+
     if (!this.drawing) {
-      let ctx = this.$refs.canvas.getContext("2d");
-      this.$store.dispatch("modules/drawing/setCtx", ctx);
+      this.$store.dispatch("modules/drawing/setCtx", ctx); // set store state
+    } else if (this.drawing) {
     }
   },
   methods: {
@@ -52,7 +60,6 @@ export default {
       this.$store.dispatch("modules/mouse/setIsDrawing", false);
       this.$store.dispatch("modules/drawing/pushCurrentPathToDrawingHistory");
       this.$store.dispatch("modules/drawing/incrementHistory");
-      // this.$store.dispatch("modules/drawing/ifWeAreBackInTimeOverwriteHistory");
     },
 
     mouseleave() {
@@ -61,51 +68,78 @@ export default {
     },
 
     handleDraw(e) {
-      let ctx = this.$refs.canvas.getContext("2d");
-      let pointData = {
-        mode: this.$store.state.modules.mouse.mode,
-        color: this.$store.state.modules.mouse.palette.current,
-        size: this.$store.state.modules.mouse.size.current,
-        x1: this.$store.state.modules.mouse.x,
-        y1: this.$store.state.modules.mouse.y,
-        x2: e.offsetX,
-        y2: e.offsetY
-      };
-      if (pointData.mode === "draw" || pointData.mode === "erase")
-        this.drawPath(ctx, pointData);
-      else if (pointData.mode === "fill") this.drawFill(ctx, pointData);
+      // this needs to work for live drawing + redrawing of paths from firebase
+      // ...and it does! for now 😬
+
+      let ctx = this.ctx;
+      let point;
+
+      if (!this.drawing) {
+        point = {
+          mode: this.$store.state.modules.mouse.mode,
+          color: this.$store.state.modules.mouse.palette.current,
+          size: this.$store.state.modules.mouse.size.current,
+          x1: this.$store.state.modules.mouse.x,
+          y1: this.$store.state.modules.mouse.y,
+          x2: e.offsetX,
+          y2: e.offsetY
+        };
+      } else if (this.drawing) {
+        point = e; // e = point passed from this.makeDrawing()
+      }
+
+      switch (point.mode) {
+        case "draw":
+        case "erase":
+          this.drawPath(ctx, point);
+          break;
+        case "fill":
+          this.drawFill(ctx, point);
+          break;
+        case "clear":
+          this.clearCanvas(ctx);
+          break;
+        default:
+          break;
+      }
     },
 
-    drawPath(ctx, pointData) {
+    drawPath(ctx, point) {
       ctx.lineCap = "round";
       ctx.lineJoin = "round";
-      ctx.strokeStyle = pointData.color;
-      ctx.lineWidth = pointData.size * 2;
+      ctx.strokeStyle = point.color;
+      ctx.lineWidth = point.size * 2;
 
-      if (this.$store.state.modules.mouse.mode === "erase") {
+      if (point.mode === "erase") {
         ctx.globalCompositeOperation = "destination-out";
       }
 
       ctx.beginPath();
-      ctx.moveTo(pointData.x1, pointData.y1);
-      ctx.lineTo(pointData.x2, pointData.y2);
+      ctx.moveTo(point.x1, point.y1);
+      ctx.lineTo(point.x2, point.y2);
       ctx.stroke();
       ctx.closePath();
 
-      if (this.$store.state.modules.mouse.mode === "erase") {
+      if (point.mode === "erase") {
         ctx.globalCompositeOperation = "source-over";
       }
     },
 
-    drawFill(ctx, pointData) {
-      ctx.fillStyle = pointData.color;
+    drawFill(ctx, point) {
+      ctx.fillStyle = point.color;
       let tolerance = 100;
-      floodFill.fill(pointData.x2, pointData.y2, tolerance, ctx);
+      floodFill.fill(point.x2, point.y2, tolerance, ctx);
     },
 
-    makeDrawing(ctx, drawing, timeout) {},
+    clearCanvas(ctx) {
+      ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+    },
 
-    draw(path) {}
+    makeDrawing(ctx, drawing, timeout) {
+      drawing.forEach(path =>
+        path.forEach(point => this.handleDraw(ctx, point))
+      );
+    }
   }
 };
 </script>

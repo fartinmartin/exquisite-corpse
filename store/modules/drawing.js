@@ -58,6 +58,10 @@ export const actions = {
   },
 
   clearCanvas({ commit, getters }, event) {
+    // TODO: it is confusing that I call the commit directly half the time
+    //       ...I think it has to do with this getters check, as in ~20% of the
+    //       ...instances in which I'm forced to call it directly fail this check
+    //       ...what's going on there? this next line *does* seem necessary 🤔
     if (getters.isDrawingEmpty) return;
 
     // if triggered by user we need to log it to history
@@ -94,11 +98,14 @@ export const actions = {
     commit("CLEAR_CURRENT_PATH");
   },
 
-  makeDrawing({ state: { paths }, dispatch }) {
+  makeDrawing({ state: { paths }, dispatch, commit }) {
+    // handles undo scenarios that dont trigger undoCanvas() ? 🤔
+    if (!paths.length) commit("CLEAR_CANVAS");
+
     paths.forEach(path => path.forEach(point => dispatch("handleDraw", point)));
   },
 
-  handleDraw({ dispatch }, point) {
+  handleDraw({ dispatch, commit }, point) {
     switch (point.mode) {
       case "draw":
       case "erase":
@@ -108,7 +115,7 @@ export const actions = {
         dispatch("drawFill", point);
         break;
       case "clear":
-        dispatch("clearCanvas");
+        commit("CLEAR_CANVAS"); // 🤔
         break;
       default:
         break;

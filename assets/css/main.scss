@@ -4,6 +4,11 @@
   --blue: #0064ff;
   --light-blue: #81b2ff;
   --lighter-blue: #deebff;
+  // TODO: scale notes (nothing has been implemented with this...) 🤔
+  // our main square is 1080px
+  // our main division is 1/3, which equals 360px
+  // 120px is 1/3rd of 360px
+  // 40px is 1/3rd 120px
 }
 
 @import url("https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap");

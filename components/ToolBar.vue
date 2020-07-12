@@ -101,7 +101,7 @@
           @change="addColor($event)"
         />
         <label for="addColor" class="add-color">+</label>
-        <!-- https://github.com/xiaokaike/vue-color -->
+        <!-- https://github.com/xiaokaike/vue-color (mostly for safari support 🤔) -->
       </div>
     </div>
   </div>
@@ -280,7 +280,6 @@ $icon-size: 25px;
 
 .palette {
   width: 100%;
-  /* margin-top: 1rem; */
 
   > *:not(:first-child) {
     margin-left: 0;
