@@ -1,5 +1,5 @@
 <template>
-  <div class="container mw-canvas">
+  <div class="mw-canvas">
     <tool-bar />
     <Canvas
       id="top"

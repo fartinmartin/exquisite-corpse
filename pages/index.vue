@@ -1,17 +1,27 @@
 <template>
   <div>
     <div class="wrap">
-      <div>
+      <div class="mw-canvas">
         <Alert />
-        <div class="two-by-one">
-          <About />
-          <Display
-            :sections="{
-              top: section1,
-              mid: section2,
-              bot: section3
-            }"
-          />
+        <div class="info">
+          <h1 class="border yellow link">exquisite corpse club</h1>
+          <button class="border yellow link">wait, the what now?</button>
+        </div>
+        <Display
+          style="margin-top: calc(40px / 3)"
+          :sections="{
+            top: section1,
+            mid: section2,
+            bot: section3
+          }"
+        />
+        <div class="info">
+          <nuxt-link to="/gallery" class="border yellow link">
+            peep the gallery
+          </nuxt-link>
+          <nuxt-link to="/draw" class="border yellow link">
+            start drawing!
+          </nuxt-link>
         </div>
       </div>
     </div>
@@ -49,9 +59,39 @@ export default {
   justify-content: center;
 }
 
-.two-by-one {
+/* .two-by-one {
   display: grid;
   grid-template-columns: repeat(2, 544px);
   gap: 40px;
+} */
+
+h1 {
+  font-size: 1rem;
+}
+
+.info {
+  /* padding: 1rem; */
+  height: 60px;
+  margin-top: calc(40px / 3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.link {
+  /* margin: -1rem; */
+  padding: 1rem;
+  text-align: center;
+  width: 100%;
+
+  text-decoration: none;
+  color: var(--black);
+
+  &:first-child {
+    margin-right: calc(40px / 3 / 2);
+  }
+  &:last-child {
+    margin-left: calc(40px / 3 / 2);
+  }
 }
 </style>

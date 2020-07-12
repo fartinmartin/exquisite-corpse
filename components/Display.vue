@@ -1,5 +1,5 @@
 <template>
-  <div class="container mw-canvas">
+  <div class="mw-canvas">
     <Canvas id="top" :drawing="sections.top" is-presenting />
     <Canvas id="mid" :drawing="sections.mid" is-presenting />
     <Canvas id="bot" :drawing="sections.bot" is-presenting />
