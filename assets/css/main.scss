@@ -51,6 +51,11 @@ img {
   display: block;
 }
 
+a {
+  text-decoration: none;
+  color: var(--black);
+}
+
 button {
   border: none;
   margin: 0;
