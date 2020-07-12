@@ -45,7 +45,16 @@ export default {
       artist: null
     };
   },
+  mounted() {
+    document.addEventListener("keydown", this.handleShortcuts);
+  },
+  beforeDestroy() {
+    document.removeEventListener("keydown", this.handleShortcuts);
+  },
   methods: {
+    handleShortcuts(e) {
+      if (e.keyCode === 27) this.$emit("cancel-save");
+    },
     savedDrawing() {
       // should validate form and/or come up with defaults
       // was there going to be a random word as placeholdler for title?? yes do it
