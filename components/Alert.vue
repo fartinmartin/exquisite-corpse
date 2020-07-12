@@ -20,8 +20,8 @@ export default {
 <style lang="scss" scoped>
 .border {
   padding: 1rem;
-  margin-top: 2rem;
-  margin-bottom: 2rem;
+  margin-top: 40px;
+  margin-bottom: 40px;
 
   display: flex;
   justify-content: space-between;

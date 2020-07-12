@@ -3,15 +3,16 @@
     <div class="wrap">
       <div>
         <Alert />
-        <nuxt-link to="/draw">
+        <div class="two-by-one">
+          <About />
           <Display
             :sections="{
               top: section1,
-              mid: null,
-              bot: section2
+              mid: section2,
+              bot: section3
             }"
           />
-        </nuxt-link>
+        </div>
       </div>
     </div>
     <CustomCursor />
@@ -19,21 +20,24 @@
 </template>
 
 <script>
+import About from "~/components/About";
 import Alert from "~/components/Alert";
 import Display from "~/components/Display";
 import CustomCursor from "~/components/CustomCursor";
 import section1 from "~/assets/js/drawing1.json";
 import section2 from "~/assets/js/drawing2.json";
+import section3 from "~/assets/js/drawing3.json";
 
 export default {
   name: "index",
   data() {
     return {
       section1,
-      section2
+      section2,
+      section3
     };
   },
-  components: { CustomCursor, Display, Alert }
+  components: { CustomCursor, About, Display, Alert }
 };
 </script>
 
@@ -43,5 +47,11 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.two-by-one {
+  display: grid;
+  grid-template-columns: repeat(2, 544px);
+  gap: 40px;
 }
 </style>

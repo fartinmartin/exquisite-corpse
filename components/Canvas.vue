@@ -182,6 +182,7 @@ export default {
     background: #ffffff
       url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAkAAAAJCAYAAADgkQYQAAAAFUlEQVQYlWNgoAb4N4HhP2UKhoUVAL3oD0/YmVPIAAAAAElFTkSuQmCC)
       repeat;
+    /* maybe we blur the rest of the illustration? */
   }
 }
 

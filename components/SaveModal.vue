@@ -22,7 +22,6 @@
           />
         </div>
         <div>
-          <!-- <button> -->
           <button @click.prevent="$emit('cancel-save')">
             wait, i'm not done drawing
           </button>
@@ -53,11 +52,12 @@ export default {
   },
   methods: {
     handleShortcuts(e) {
-      if (e.keyCode === 27) this.$emit("cancel-save");
+      if (e.keyCode === 27) this.$emit("cancel-save"); // esc
     },
     savedDrawing() {
-      // should validate form and/or come up with defaults
-      // was there going to be a random word as placeholdler for title?? yes do it
+      // TODO: should validate form and/or come up with defaults
+      //       was there going to be a random word/phrase as placeholdler for title?? yes do it
+      //       also the completed drawing's title should be a junble of the three names
       console.log("Saved drawing...");
     }
   }

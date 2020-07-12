@@ -43,6 +43,7 @@ html {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+  user-select: none;
 }
 
 img {
@@ -105,4 +106,39 @@ button[disabled] {
 .mw-canvas {
   max-width: 544px; // 540 = 1080/3 ... plus 4px for border
   margin: 0 auto;
+}
+
+.button {
+  width: 100%;
+  padding: 0.5rem 0;
+
+  font-size: inherit;
+  font-family: inherit;
+  text-align: center;
+  text-decoration: none;
+  color: var(--black);
+
+  border: none;
+  border-radius: 0;
+  background: none;
+
+  --background-color: none;
+  --border-top-left: var(--yellow);
+  --border-bot-right: var(--lighter-yellow);
+
+  background-color: var(--background-color);
+  border: 2px solid var(--border-top-left);
+  border-top: 2px solid var(--border-bot-right);
+  border-left: 2px solid var(--border-bot-right);
+
+  &:active {
+    border: 2px solid var(--border-bot-right);
+    border-top: 2px solid var(--border-top-left);
+    border-left: 2px solid var(--border-top-left);
+    transform: translate3D(2px, 2px, 0);
+  }
+
+  &.solid.yellow {
+    --background-color: var(--light-yellow);
+  }
 }

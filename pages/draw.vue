@@ -3,7 +3,6 @@
     <Log />
     <div class="wrap">
       <div>
-        <Alert />
         <Draw
           :sections="{
             top: section1,
@@ -18,7 +17,6 @@
 </template>
 
 <script>
-import Alert from "~/components/Alert";
 import Log from "~/components/Log";
 import Draw from "~/components/Draw";
 import CustomCursor from "~/components/CustomCursor";
@@ -33,7 +31,7 @@ export default {
       section2
     };
   },
-  components: { CustomCursor, Draw, Alert, Log }
+  components: { CustomCursor, Draw, Log }
 };
 </script>
 

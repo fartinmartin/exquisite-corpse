@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="toolbar border mw-canvas">
+    <div class="toolbar border mw-canvas canvas-tools">
       <div class="tool-group mode">
         <div class="tool draw" :class="{ active: mode === 'draw' }">
           <input
@@ -84,7 +84,7 @@
       </div>
     </div>
 
-    <div class="toolbar border">
+    <div class="toolbar border color-palette">
       <div class="tool-group palette">
         <button
           class="swatch"
@@ -257,6 +257,7 @@ export default {
 
 <style lang="scss" scoped>
 .toolbar {
+  height: 60px;
   display: flex;
   padding: 1rem;
   flex-wrap: wrap;
@@ -266,6 +267,10 @@ export default {
   &:not(:first-child) {
     margin: calc(40px / 6 * 2) 0;
   }
+}
+
+.canvas-tools {
+  padding: calc(1rem - 4px) 1rem; // to account for box-sizing 🤔
 }
 
 .tool-group {
@@ -303,7 +308,10 @@ $icon-size: 25px;
     width: 100%;
     display: block;
   }
+}
 
+.palette label,
+.tool {
   &:not([disabled]):active {
     border: 2px solid var(--lighter-yellow);
     border-top: 2px solid var(--yellow);
