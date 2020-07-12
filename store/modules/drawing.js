@@ -10,15 +10,13 @@ export const state = () => ({
 
 export const getters = {
   isDrawingEmpty(state) {
-    console.log(state.paths.length);
-    return (
-      !state.paths.length ||
-      state.history.paths[state.history.step - 1][0].mode === "clear" ||
-      false
-    );
+    return !state.paths.length;
   },
   weAreBackInTime(state) {
     return state.history.step < state.history.paths.length;
+  },
+  historyDif(state) {
+    return state.history.paths.length - state.history.step;
   }
 };
 
@@ -36,7 +34,7 @@ export const actions = {
   },
 
   undoCanvas({ commit, dispatch, state }) {
-    if (state.history.step >= 0) {
+    if (state.history.step > 0) {
       commit("DECREMENT_HISTORY");
       commit("SET_DRAWING_TO_HISTORY");
       dispatch("clearCanvas");
@@ -58,7 +56,8 @@ export const actions = {
 
     // if triggered by user we need to log it to history
     if (event) {
-      getters.weAreBackInTime && commit("OVERWRITE_HISTORY");
+      getters.weAreBackInTime &&
+        commit("OVERWRITE_HISTORY", getters.historyDif);
       commit("INCREMENT_HISTORY");
       commit("PUSH_CLEAR_TO_DRAWING");
       commit("PUSH_CLEAR_TO_HISTORY");
@@ -80,21 +79,22 @@ export const actions = {
     commit("PUSH_POINT_DATA_TO_CURRENT_PATH", pointData);
   },
 
-  pushCurrentPathToDrawingHistory({ state, commit }) {
+  pushCurrentPathToDrawingHistory({ state, getters, commit }) {
+    if (getters.weAreBackInTime) {
+      commit("OVERWRITE_HISTORY", getters.historyDif);
+    }
     commit("PUSH_CURRENT_PATH_TO_DRAWING", state.currentPath);
     commit("PUSH_CURRENT_PATH_TO_HISTORY", state.currentPath);
     commit("CLEAR_CURRENT_PATH");
   },
 
-  ifWeAreBackInTimeOverwriteHistory({ commit, getters }) {
-    if (getters.weAreBackInTime) {
-      commit("OVERWRITE_HISTORY");
-    }
-  },
-
   makeDrawing({ state: { paths }, dispatch }) {
-    if (!paths.length) dispatch("clearCanvas"); // not sure what this is doing
-    paths.forEach(path => path.forEach(point => dispatch("handleDraw", point)));
+    // if (!paths.length) dispatch("clearCanvas"); // not sure why this is here 🤔
+    // paths.forEach(path => path.forEach(point => dispatch("handleDraw", point)));
+    paths.forEach(path => {
+      console.log(path);
+      path.forEach(point => dispatch("handleDraw", point));
+    });
   },
 
   handleDraw({ dispatch }, point) {
@@ -114,13 +114,13 @@ export const actions = {
     }
   },
 
-  drawPath({ state: { ctx, mode } }, point) {
+  drawPath({ state: { ctx } }, point) {
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
     ctx.strokeStyle = point.color;
     ctx.lineWidth = point.size * 2;
 
-    if (mode === "erase") {
+    if (point.mode === "erase") {
       ctx.globalCompositeOperation = "destination-out";
     }
 
@@ -130,7 +130,7 @@ export const actions = {
     ctx.stroke();
     ctx.closePath();
 
-    if (mode === "erase") {
+    if (point.mode === "erase") {
       ctx.globalCompositeOperation = "source-over";
     }
   },
@@ -155,9 +155,8 @@ export const mutations = {
     state.history.step--;
   },
 
-  OVERWRITE_HISTORY(state) {
-    let dif = state.history.paths.length - state.history.step;
-    state.history.paths.length = state.history.paths.length - dif;
+  OVERWRITE_HISTORY(state, historyDif) {
+    state.history.paths.length = state.history.paths.length - historyDif;
   },
 
   PUSH_POINT_DATA_TO_CURRENT_PATH(state, pointData) {

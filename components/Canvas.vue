@@ -32,7 +32,7 @@ export default {
         this.handleDraw(e); // for dots
         this.$store.dispatch("modules/drawing/logPathToCurrentPath", e);
       } else {
-        this.handleDraw(e);
+        this.handleDraw(e); // for fills
         this.$store.dispatch("modules/drawing/logPathToCurrentPath", e);
       }
     },
@@ -42,7 +42,7 @@ export default {
         this.$store.state.modules.mouse.isDrawing &&
         this.$store.state.modules.mouse.mode !== "fill"
       ) {
-        this.handleDraw(e);
+        this.handleDraw(e); // for paths
         this.$store.dispatch("modules/drawing/logPathToCurrentPath", e);
         this.$store.dispatch("modules/mouse/setMousePosition", e);
       }
@@ -52,7 +52,7 @@ export default {
       this.$store.dispatch("modules/mouse/setIsDrawing", false);
       this.$store.dispatch("modules/drawing/pushCurrentPathToDrawingHistory");
       this.$store.dispatch("modules/drawing/incrementHistory");
-      this.$store.dispatch("modules/drawing/ifWeAreBackInTimeOverwriteHistory");
+      // this.$store.dispatch("modules/drawing/ifWeAreBackInTimeOverwriteHistory");
     },
 
     mouseleave() {

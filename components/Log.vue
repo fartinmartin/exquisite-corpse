@@ -4,13 +4,17 @@
     :y="0"
     :w="350"
     style="position: absolute; z-index: 1000"
-    :style="{ display: isHidden ? 'none' : 'block' }"
+    v-show="!isHidden"
   >
     <div class="log">
-      <span
-        >{{ drawing.history.step }} / {{ drawing.history.paths.length }} /
-        {{ drawing.paths.length }}</span
-      >
+      <div style="display: flex; justify-content: space-between">
+        <span>
+          {{ drawing.history.step }} / {{ drawing.history.paths.length }} /
+          {{ drawing.paths.length }}
+        </span>
+        <!-- <span>{{ isDrawingEmpty ? "empty" : "not empty" }}</span> -->
+        <span>{{ isDrawingEmpty }}</span>
+      </div>
 
       <div class="current-path">
         <h2>currentPath</h2>
@@ -42,14 +46,15 @@
 
 <script>
 import Draggable from "vue-draggable-resizable";
-import { mapState } from "vuex";
+import { mapState, mapGetters } from "vuex";
 
 export default {
   name: "Log",
   components: { Draggable },
   data: function() {
     return {
-      isHidden: true
+      // isHidden: true
+      isHidden: false
     };
   },
   mounted() {
@@ -65,9 +70,12 @@ export default {
       }
     }
   },
-  computed: mapState({
-    drawing: state => state.modules.drawing
-  })
+  computed: {
+    ...mapGetters({ isDrawingEmpty: "modules/drawing/isDrawingEmpty" }),
+    ...mapState({
+      drawing: state => state.modules.drawing
+    })
+  }
 };
 </script>
 
