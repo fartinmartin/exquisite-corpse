@@ -65,7 +65,10 @@ export default {
   width: 100vw;
   height: 100vh;
 
-  background: var(--lighter-blue);
+  background: var(--lighter-blue)
+    url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAAEklEQVQImWNgYGD4z0AswK4SAFXuAf8EPy+xAAAAAElFTkSuQmCC)
+    repeat;
+  background-blend-mode: overlay;
 
   display: flex;
   align-items: center;

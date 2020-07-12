@@ -84,7 +84,7 @@
       </div>
     </div>
 
-    <div class="border" style="margin: 1rem 0; padding: 1rem ">
+    <div class="toolbar border">
       <div class="tool-group palette">
         <button
           class="swatch"
@@ -261,6 +261,11 @@ export default {
   padding: 1rem;
   flex-wrap: wrap;
   justify-content: space-between;
+  user-select: none;
+
+  &:not(:first-child) {
+    margin: calc(40px / 6 * 2) 0;
+  }
 }
 
 .tool-group {
@@ -299,7 +304,7 @@ $icon-size: 25px;
     display: block;
   }
 
-  &:active {
+  &:not([disabled]):active {
     border: 2px solid var(--lighter-yellow);
     border-top: 2px solid var(--yellow);
     border-left: 2px solid var(--yellow);
