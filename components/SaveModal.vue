@@ -1,5 +1,5 @@
 <template>
-  <div class="save-modal">
+  <div class="save-modal" @click="closeMe">
     <div>
       <Canvas :drawing="drawing" is-presenting />
       <form class="border yellow">
@@ -54,6 +54,11 @@ export default {
     handleShortcuts(e) {
       if (e.keyCode === 27) this.$emit("cancel-save"); // esc
     },
+    closeMe(e) {
+      if (e.target.className === "save-modal") {
+        this.$emit("cancel-save");
+      }
+    },
     savedDrawing() {
       // TODO: should validate form and/or come up with defaults
       //       was there going to be a random word/phrase as placeholdler for title?? yes do it
@@ -65,6 +70,17 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.close-me {
+  position: absolute;
+  z-index: 950;
+  background: green;
+
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+}
+
 .save-modal {
   position: absolute;
   z-index: 900;
