@@ -2,7 +2,7 @@
   <div class="container">
     <div>
       <h1>Gallery</h1>
-      <div v-for="drawing in gallery" :key="drawing[0]">
+      <div v-for="drawing in gallery" :key="drawing">
         <pre>{{ drawing }}</pre>
       </div>
     </div>
@@ -10,14 +10,13 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex";
-
 export default {
   name: "gallery",
-  mounted() {
-    this.$store.dispatch("modules/gallery/setGallery");
-  },
-  computed: mapGetters({ gallery: "modules/gallery/getGallery" })
+  data: function() {
+    return {
+      gallery: ["this", "is", "a", "test"]
+    };
+  }
 };
 </script>
 
