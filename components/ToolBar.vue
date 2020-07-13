@@ -74,11 +74,7 @@
         >
           <img src="~/assets/img/toolbar/clear.svg" alt="" />
         </button>
-        <button
-          class="tool save"
-          :disabled="isDrawingEmpty"
-          @click="saveSection"
-        >
+        <button class="tool save" :disabled="isDrawingEmpty" @click="startSave">
           <img src="~/assets/img/toolbar/save.svg" alt="" />
         </button>
       </div>
@@ -108,7 +104,7 @@
     <SaveModal
       v-show="isSaving"
       :drawing="paths"
-      @cancel-save="isSaving = false"
+      @close-save="isSaving = false"
     />
   </div>
 </template>
@@ -151,43 +147,45 @@ export default {
   methods: {
     handleShortcuts(e) {
       // console.log("keydown", e.key, e.keyCode);
-      if (!isNaN(e.key)) {
-        this.setColor(this.palette.colors[e.key - 1]);
-      }
+      if (!this.isSaving) {
+        if (!isNaN(e.key)) {
+          this.setColor(this.palette.colors[e.key - 1]);
+        }
 
-      switch (e.keyCode) {
-        case 68: // "d"
-          this.mode = "draw";
-          break;
-        case 69: // "e"
-          this.mode = "erase";
-          break;
-        case 70: // "e"
-          this.mode = "fill";
-          break;
+        switch (e.keyCode) {
+          case 68: // "d"
+            this.mode = "draw";
+            break;
+          case 69: // "e"
+            this.mode = "erase";
+            break;
+          case 70: // "e"
+            this.mode = "fill";
+            break;
 
-        case 219: // "["
-          this.decrementSize();
-          break;
-        case 221: // "]"
-          this.incrementSize();
-          break;
+          case 219: // "["
+            this.decrementSize();
+            break;
+          case 221: // "]"
+            this.incrementSize();
+            break;
 
-        case 90: // "z"
-          this.undoCanvas();
-          break;
-        case 88: // "x"
-          this.redoCanvas();
-          break;
+          case 90: // "z"
+            this.undoCanvas();
+            break;
+          case 88: // "x"
+            this.redoCanvas();
+            break;
 
-        case 67: // "c" OR
-        case 8: // "backspace"
-          this.clearCanvas(e); // sent with event in order to log in history
-          break;
+          case 67: // "c" OR
+          case 8: // "backspace"
+            this.clearCanvas(e); // sent with event in order to log in history
+            break;
 
-        case 83: // "s"
-          this.saveSection();
-          break;
+          case 83: // "s"
+            this.startSave();
+            break;
+        }
       }
     },
     addColor(e) {
@@ -211,46 +209,9 @@ export default {
     clearCanvas(e) {
       this.$store.dispatch("modules/drawing/clearCanvas", e);
     },
-    saveSection() {
+    startSave() {
       this.isSaving = true;
-      // let section = {
-      //   title: "",
-      //   artist: "",
-      //   date: null,
-      //   type: String, // 🚨
-      //   likes: 0,
-      //   permalink: "",
-      //   thumbnail: this.$store.state.modules.drawing.ctx, // (?)
-      //   drawing: this.$store.state.modules.drawing.paths,
-      //   featuredIn: []
-      // };
-      // this.$store.dispatch("modules/drawing/saveSection", section);
     }
-
-    // saveImage(name) {
-    //   // https://github.com/Eraince/firebase-pic-json/blob/a4a56e89c3310148382b91e6a762049bbe28ff29/script.js
-    //   // change canvas data to Blob so it can be submitted
-    //   this.$store.state.modules.drawing.canvas.toBlob(function(blob) {
-    //     var image = new Image();
-    //     image.src = blob;
-    //     var metadata = {
-    //       contentType: "image/png"
-    //     };
-
-    //     storageRef
-    //       // create or access a folder called "images",and put the new image under that folder
-    //       // TODO: figure out where to store this 🤔
-    //       .child("images/" + name)
-    //       .put(blob, metadata)
-    //       .then(function(snapshot) {
-    //         console.log("Uploaded", snapshot.totalBytes, "bytes.");
-    //         window.location.href = "gallery.html";
-    //       })
-    //       .catch(function(error) {
-    //         console.error("Upload failed:", error);
-    //       });
-    //   });
-    // }
   }
 };
 </script>

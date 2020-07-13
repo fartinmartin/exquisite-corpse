@@ -18,11 +18,11 @@
           <input
             type="submit"
             value="save & show me our masterpiece!"
-            @click.prevent="savedDrawing"
+            @click.prevent="saveDrawing"
           />
         </div>
         <div>
-          <button @click.prevent="$emit('cancel-save')">
+          <button @click.prevent="$emit('close-save')">
             wait, i'm not done drawing
           </button>
         </div>
@@ -33,6 +33,7 @@
 
 <script>
 import Canvas from "./Canvas.vue";
+import { mapState } from "vuex";
 
 export default {
   name: "SaveModal",
@@ -44,6 +45,10 @@ export default {
       artist: null
     };
   },
+  computed: {
+    ...mapState("modules/user", ["id", "displayName"]),
+    ...mapState("modules/drawing", ["type", "paths"])
+  },
   mounted() {
     document.addEventListener("keydown", this.handleShortcuts);
   },
@@ -52,19 +57,85 @@ export default {
   },
   methods: {
     handleShortcuts(e) {
-      if (e.keyCode === 27) this.$emit("cancel-save"); // esc
+      if (e.keyCode === 27) this.$emit("close-save"); // esc
     },
     closeMe(e) {
       if (e.target.className === "save-modal") {
-        this.$emit("cancel-save");
+        this.$emit("close-save");
       }
     },
-    savedDrawing() {
+    saveDrawing() {
       // TODO: should validate form and/or come up with defaults
       //       was there going to be a random word/phrase as placeholdler for title?? yes do it
       //       also the completed drawing's title should be a junble of the three names
-      console.log("Saved drawing...");
+
+      let payload = {
+        artist: this.artist || this.displayName,
+        date: this.$fireStoreObj.Timestamp.fromDate(new Date()),
+        drawing: { ...this.paths },
+        featuredIn: "", // TOOD: on drawing start, generate a new completed doc and set a local references to that docs name for use on this line, also set all three drawings featuredin array to reference the new collection
+        likes: 0,
+        permalink: "", // TODO: learn how to do this...
+        thumb: "", // TODO: learn how to do this...
+        title: this.title || "untitled", // TODO: random phrase from Wordnik API
+        type: this.type,
+        userId: this.id
+      };
+
+      // TODO: start loading component
+
+      this.$fireStore
+        .collection("sections")
+        .add(payload)
+        .then(() => {
+          // TODO: tell loading component to show success then route to the completed drawing!
+          alert("You did it! Ur drawing was saved!");
+          this.$emit("close-save");
+        })
+        .catch(error => {
+          alert("Oops, there was an error.. try again?");
+          console.error("Error writing document: ", error);
+          // TODO: tell loading component to deal with error
+        });
     }
+    // let section = {
+    //   title: "",
+    //   artist: "",
+    //   date: null,
+    //   type: String, // 🚨
+    //   likes: 0,
+    //   permalink: "",
+    //   thumbnail: this.$store.state.modules.drawing.ctx, // (?)
+    //   drawing: this.$store.state.modules.drawing.paths,
+    //   featuredIn: []
+    // };
+    // this.$store.dispatch("modules/drawing/saveSection", section);
+    // }
+
+    // saveImage(name) {
+    //   // https://github.com/Eraince/firebase-pic-json/blob/a4a56e89c3310148382b91e6a762049bbe28ff29/script.js
+    //   // change canvas data to Blob so it can be submitted
+    //   this.$store.state.modules.drawing.canvas.toBlob(function(blob) {
+    //     var image = new Image();
+    //     image.src = blob;
+    //     var metadata = {
+    //       contentType: "image/png"
+    //     };
+
+    //     storageRef
+    //       // create or access a folder called "images",and put the new image under that folder
+    //       // TODO: figure out where to store this 🤔
+    //       .child("images/" + name)
+    //       .put(blob, metadata)
+    //       .then(function(snapshot) {
+    //         console.log("Uploaded", snapshot.totalBytes, "bytes.");
+    //         window.location.href = "gallery.html";
+    //       })
+    //       .catch(function(error) {
+    //         console.error("Upload failed:", error);
+    //       });
+    //   });
+    // }
   }
 };
 </script>
