@@ -39,6 +39,7 @@ export default {
     }
   },
   methods: {
+    // TODO: replace this.$store.state.modules with mapSate ? 🤔
     mousedown(e) {
       this.$store.dispatch("modules/mouse/setMousePosition", e);
       if (this.$store.state.modules.mouse.mode !== "fill") {
