@@ -73,7 +73,9 @@ export default {
       auth: {
         ssr: true
       },
-      firestore: true
+      firestore: true,
+      performance: true,
+      analytics: true
     }
   },
   /*
