@@ -39,7 +39,7 @@ export default {
     }
   },
   methods: {
-    // TODO: replace this.$store.state.modules with mapSate ? 🤔
+    // TODO: replace this.$store.state.modules with mapSate ? 🤔 this.canvas and this.ctx are taken
     mousedown(e) {
       this.$store.dispatch("modules/mouse/setMousePosition", e);
       if (this.$store.state.modules.mouse.mode !== "fill") {
