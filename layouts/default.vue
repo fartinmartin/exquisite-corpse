@@ -11,6 +11,9 @@ import Nav from "~/components/Nav.vue";
 import CustomCursor from "~/components/CustomCursor.vue";
 
 export default {
-  components: { Nav, CustomCursor }
+  components: { Nav, CustomCursor },
+  mounted() {
+    this.$store.dispatch("modules/user/signInAnonymously");
+  }
 };
 </script>

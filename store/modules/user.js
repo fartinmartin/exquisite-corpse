@@ -3,22 +3,18 @@ export const state = () => ({
   displayName: ""
 });
 
-export const getters = {
-  getUser(state) {
-    return { displayName: state.displayName, id: state.id };
-  }
-};
+export const getters = {};
 
 export const actions = {
-  signInAnonymously({ commit }, user) {
-    this.$fireAuth.signInAnonymously();
-    this.$fireAuth.onAuthStateChanged(user => {
-      if (user) {
-        store.commit("SET_USER", user);
-      } else {
-        store.commit("SET_USER", null);
-      }
-    });
+  signInAnonymously({ commit }) {
+    this.$fireAuth
+      .signInAnonymously()
+      .then(function(response) {
+        commit("SET_USER", response.user);
+      })
+      .catch(function(error) {
+        console.error(error);
+      });
   }
 };
 
@@ -26,7 +22,7 @@ export const mutations = {
   SET_USER(state, user) {
     if (user) {
       state.name = user.isAnonymous
-        ? `anonymous-${user.uid.substr(1, 4)}`
+        ? `anonymous-${user.uid.substr(1, 4)}` // TODO: use a random word from Wordnik API
         : user.displayName;
       state.id = user.uid;
     }
