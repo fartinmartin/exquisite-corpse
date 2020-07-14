@@ -86,7 +86,9 @@ export default {
         e.target.parentNode.tagName === "BUTTON" ||
         e.target.parentNode.tagName === "LABEL" ||
         e.target.parentNode.tagName === "INPUT" ||
-        e.target.parentNode.tagName === "A"
+        e.target.parentNode.tagName === "A" ||
+        e.target.classList.contains("pointer") ||
+        e.target.parentNode.classList.contains("pointer")
       ) {
         this.state = "pointer";
       } else {
