@@ -23,6 +23,10 @@ export default {
         bot: drawings[0]
       }
     };
+  },
+  mounted() {
+    // https://stackoverflow.com/questions/46798981/firestore-how-to-get-random-documents-in-a-collection
+    // 🤔 generate random timestamp between date of database "birth" and now.. and find doc with closest date... 🤷‍♂️
   }
 };
 </script>
