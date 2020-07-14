@@ -33,6 +33,11 @@ export const getters = {
 };
 
 export const actions = {
+  resetMouse({ commit }) {
+    commit("SET_MODE", "draw");
+    commit("SET_SIZE", 5);
+    commit("SET_COLOR", "#000000");
+  },
   setMousePosition({ commit }, event) {
     commit("SET_MOUSE_POSITION", event);
   },
@@ -75,6 +80,9 @@ export const mutations = {
   },
   DECREMENT_SIZE(state) {
     state.size.current--;
+  },
+  SET_SIZE(state, size) {
+    state.size.current = size;
   },
   SET_COLOR(state, color) {
     state.palette.current = color;

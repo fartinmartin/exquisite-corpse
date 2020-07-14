@@ -22,6 +22,7 @@ export default {
   },
   mounted() {
     this.$store.dispatch("modules/drawing/clearDrawing");
+    this.$store.dispatch("modules/mouse/resetMouse"); // "opinionated" i guess.. i dunno what that means really
   }
 };
 </script>
