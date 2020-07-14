@@ -180,9 +180,15 @@ export default {
 
     makeDrawing(drawing, timeout) {
       if (timeout) {
+        // 🚨 POTENTIAL IDEA: batch drawing off into arrays separated by "erase", "fill", and "clear"
+        //                    run the "draw" points simlutaneously
+        let pathTotal = 0;
         let pointTotal = 0;
-        drawing.forEach(path => path.forEach(point => pointTotal++));
-        const delay = pointTotal / timeout;
+        drawing.forEach(path => {
+          pathTotal++;
+          path.forEach(point => pointTotal++);
+        });
+        const delay = (pointTotal * pathTotal) / timeout;
 
         const waitFor = ms => new Promise(r => setTimeout(r, ms));
         const asyncForEach = async (array, callback) => {
