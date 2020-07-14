@@ -34,7 +34,6 @@ html {
   background-blend-mode: overlay;
 
   box-sizing: border-box;
-  overflow-x: hidden; // for scaled canvas element(s)
 }
 
 *,
@@ -111,9 +110,17 @@ button[disabled] {
   }
 }
 
+.wrap {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 calc(40px / 3);
+}
+
 .mw-canvas {
-  max-width: 544px; // 540 = 1080/3 ... plus 4px for border
-  margin: 0 auto;
+  width: 100%;
+  max-width: 544px;
 }
 
 .button {

@@ -1,12 +1,8 @@
 <template>
-  <div>
+  <div class="wrap">
     <Log />
-    <div class="wrap">
-      <div>
-        <PickSection v-if="!type" @picked-type="handlePickedType" />
-        <Draw v-if="type" :type="type" :sections="sections" />
-      </div>
-    </div>
+    <PickSection v-if="!type" @picked-type="handlePickedType" />
+    <Draw v-if="type" :type="type" :sections="sections" />
   </div>
 </template>
 
@@ -44,12 +40,3 @@ export default {
   }
 };
 </script>
-
-<style lang="scss" scoped>
-.wrap {
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-</style>

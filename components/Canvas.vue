@@ -1,18 +1,18 @@
 <template>
-  <div class="canvas-wrap border">
-    <div v-if="section && !section.type" class="drawing-meta">
-      <div class="info">{{ section.title }} by {{ section.artist }}</div>
+  <div class="border">
+    <div class="canvas-wrap">
+      <div v-if="section && !section.type" class="drawing-meta">
+        <div class="info">{{ section.title }} by {{ section.artist }}</div>
+      </div>
+      <div v-if="drawMode && !section.type" class="drawing-meta not-allowed">
+        <div class="info">{{ section.title }} by {{ section.artist }}</div>
+      </div>
+      <canvas
+        ref="canvas"
+        v-on="drawMode ? { mousemove, mousedown, mouseup, mouseleave } : {}"
+        :class="{ blur: drawMode && !section.type }"
+      />
     </div>
-    <div v-if="drawMode && !section.type" class="drawing-meta not-allowed">
-      <div class="info">{{ section.title }} by {{ section.artist }}</div>
-    </div>
-    <canvas
-      width="1080"
-      height="360"
-      ref="canvas"
-      v-on="drawMode ? { mousemove, mousedown, mouseup, mouseleave } : {}"
-      :class="{ blur: drawMode && !section.type }"
-    />
   </div>
 </template>
 
@@ -35,6 +35,8 @@ export default {
     const canvas = this.$refs.canvas;
     const ctx = canvas.getContext("2d");
 
+    this.highDPI(canvas, ctx);
+
     this.canvas = canvas; // set local state
     this.ctx = ctx; // set local state
 
@@ -47,6 +49,17 @@ export default {
     }
   },
   methods: {
+    highDPI(canvas, ctx) {
+      let rect = canvas.getBoundingClientRect();
+
+      canvas.width = rect.width * devicePixelRatio;
+      canvas.height = rect.height * devicePixelRatio;
+
+      ctx.scale(devicePixelRatio, devicePixelRatio);
+
+      canvas.style.width = rect.width + "px";
+      canvas.style.height = rect.height + "px";
+    },
     // TODO: replace this.$store.state.modules with mapSate ? 🤔 this.canvas and this.ctx are taken
     mousedown(e) {
       this.$store.dispatch("modules/mouse/setMousePosition", e);
@@ -183,27 +196,43 @@ export default {
 </script>
 
 <style lang="scss">
+#top {
+  border-bottom: none;
+}
+
+#mid {
+  border-top: none;
+  border-bottom: none;
+}
+
+#bot {
+  border-top: none;
+}
+
 .canvas-wrap {
   position: relative;
-  width: 544px;
-  height: 180px;
-  margin: 0 auto;
   overflow: hidden;
 
-  &#top {
-    border-bottom: none;
-  }
-  &#mid {
-    border-top: none;
-    border-bottom: none;
-  }
-  &#bot {
-    border-top: none;
-  }
+  width: 100%;
+  max-width: 540px;
+  height: 0;
+  padding-top: calc(100% / 3);
+
+  /* width: 540px;
+  height: 180px; */
 
   &:hover .drawing-meta {
     display: block;
   }
+}
+
+canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+
+  width: 100%;
+  height: 100%;
 }
 
 .drawing-meta {
@@ -247,16 +276,5 @@ export default {
   &:hover .info {
     display: flex;
   }
-}
-
-canvas {
-  transform: scale(0.5) translate3d(-50%, -50%, 0);
-  overflow: hidden;
-}
-
-canvas.blur {
-  // this blur should be done directly on the CANVAS via JS
-  transform: scale(0.55) translate3d(-45%, -45%, 0);
-  filter: blur(25px);
 }
 </style>
