@@ -6,13 +6,17 @@
       </nuxt-link>
       <div class="links">
         <button @click.prevent="openHelp">
-          <div class="icon">🤔</div>
+          <div class="icon">
+            <img src="~/assets/img/icons/info.svg" />
+          </div>
         </button>
         <nuxt-link
           to="/gallery"
           :class="{ active: this.$route.name !== 'gallery' }"
         >
-          <div class="icon">🖼</div>
+          <div class="icon">
+            <img src="~/assets/img/icons/gallery.svg" />
+          </div>
         </nuxt-link>
         <nuxt-link to="/draw" :class="{ active: this.$route.name !== 'draw' }">
           <div class="icon">
