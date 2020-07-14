@@ -5,7 +5,7 @@
         <h1 v-show="this.$route.name === 'index'">exquisite corpse club</h1>
         <h1 v-show="this.$route.name !== 'index'">ecc</h1>
       </nuxt-link>
-      <button @click="runTutorial">
+      <button @click.prevent="openHelp">
         <div class="icon">🤔</div>
       </button>
       <nuxt-link
@@ -34,6 +34,17 @@
     </div>
   </div>
 </template>
+
+<script>
+export default {
+  name: "Nav",
+  methods: {
+    openHelp() {
+      this.$store.dispatch("setIsHelping", true);
+    }
+  }
+};
+</script>
 
 <style lang="scss" scoped>
 .nav-wrap {
@@ -64,6 +75,7 @@ nav,
 .me {
   left: initial;
   right: calc(40px / 3);
+  z-index: 955;
 }
 
 .icon {
@@ -86,14 +98,3 @@ nav,
   }
 }
 </style>
-
-<script>
-export default {
-  name: "Nav",
-  methods: {
-    runTutorial() {
-      alert("tutorial");
-    }
-  }
-};
-</script>

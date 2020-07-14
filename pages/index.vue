@@ -5,7 +5,7 @@
         <h1>exquisite corpse club</h1>
       </nuxt-link>
       <div class="links">
-        <button @click="runTutorial">
+        <button @click.prevent="openHelp">
           <div class="icon">🤔</div>
         </button>
         <nuxt-link
@@ -46,6 +46,11 @@ export default {
     // this.$store.dispatch("modules/gallery/fetchSections");
     // https://stackoverflow.com/questions/46798981/firestore-how-to-get-random-documents-in-a-collection
     // 🤔 generate random timestamp between date of database "birth" and now.. and find doc with closest date... 🤷‍♂️
+  },
+  methods: {
+    openHelp() {
+      this.$store.dispatch("setIsHelping", true);
+    }
   }
 };
 </script>
