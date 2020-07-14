@@ -1,5 +1,27 @@
 <template>
   <div class="wrap">
+    <nav class="border yellow">
+      <nuxt-link to="/">
+        <h1>exquisite corpse club</h1>
+      </nuxt-link>
+      <div class="links">
+        <button @click="runTutorial">
+          <div class="icon">🤔</div>
+        </button>
+        <nuxt-link
+          to="/gallery"
+          :class="{ active: this.$route.name !== 'gallery' }"
+        >
+          <div class="icon">🖼</div>
+        </nuxt-link>
+        <nuxt-link to="/draw" :class="{ active: this.$route.name !== 'draw' }">
+          <div class="icon">
+            <img src="~/assets/img/toolbar/draw.svg" />
+          </div>
+        </nuxt-link>
+      </div>
+    </nav>
+
     <Display v-if="sections" :sections="sections" />
   </div>
 </template>
@@ -27,3 +49,52 @@ export default {
   }
 };
 </script>
+
+<style lang="scss" scoped>
+.wrap {
+  flex-direction: column;
+}
+
+nav {
+  width: 100%;
+  height: 60px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  max-width: 544px;
+  margin-bottom: calc(40px / 3);
+}
+
+h1 {
+  font-size: 1rem;
+}
+
+.icon {
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 25px;
+  height: 25px;
+
+  box-sizing: content-box;
+  border: 2px solid transparent;
+
+  &:active {
+    border: 2px solid var(--lighter-yellow);
+    border-top: 2px solid var(--yellow);
+    border-left: 2px solid var(--yellow);
+    transform: translate3d(2px, 2px, 0);
+  }
+}
+
+.links {
+  display: flex;
+
+  > * {
+    margin-left: 1rem;
+  }
+}
+</style>

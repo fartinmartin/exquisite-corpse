@@ -1,6 +1,6 @@
 <template>
   <div class="nav-wrap">
-    <nav class="border yellow">
+    <nav v-show="this.$route.name !== 'index'" class="border yellow">
       <nuxt-link to="/">
         <h1 v-show="this.$route.name === 'index'">exquisite corpse club</h1>
         <h1 v-show="this.$route.name !== 'index'">ecc</h1>
