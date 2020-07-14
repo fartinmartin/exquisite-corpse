@@ -105,20 +105,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.close-me {
-  position: absolute;
-  z-index: 950;
-  background: green;
-
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-}
-
 .save-modal {
   position: absolute;
-  z-index: 900;
+  z-index: 951;
 
   top: 0;
   left: 0;
