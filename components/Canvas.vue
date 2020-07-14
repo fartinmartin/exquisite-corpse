@@ -4,13 +4,16 @@
       <div v-if="section && !section.type" class="drawing-meta">
         <div class="info">{{ section.title }} by {{ section.artist }}</div>
       </div>
-      <div v-if="drawMode && !section.type" class="drawing-meta not-allowed">
+      <div
+        v-if="drawMode && !section.type"
+        class="drawing-meta not-allowed"
+        ref="notAllowed"
+      >
         <div class="info">{{ section.title }} by {{ section.artist }}</div>
       </div>
       <canvas
         ref="canvas"
         v-on="drawMode ? { mousemove, mousedown, mouseup, mouseleave } : {}"
-        :class="{ blur: drawMode && !section.type }"
       />
     </div>
   </div>
@@ -44,13 +47,10 @@ export default {
       this.$store.dispatch("modules/drawing/setCanvas", canvas); // set store state
       this.$store.dispatch("modules/drawing/setCtx", ctx); // set store state
     } else if (this.section) {
-      !this.drawMode && this.makeDrawing(this.drawing, 3000);
+      !this.drawMode && this.makeDrawing(this.drawing, 1250);
       if (this.drawMode) {
-        this.canvas.style.opacity = 0;
         this.makeDrawing(this.drawing);
         this.pixelateDrawing(this.canvas, this.ctx, 50);
-        // lighten?
-        this.canvas.style.opacity = 1;
       }
     }
   },
@@ -179,23 +179,41 @@ export default {
     },
 
     makeDrawing(drawing, timeout) {
-      // https://medium.com/@lelandzach/is-javascript-array-foreach-asynchronous-a473e59ee592
-      drawing.forEach((path, i) => {
-        if (timeout) {
-          setTimeout(() =>
-            path.forEach((point, i) => {
-              setTimeout(
-                () => this.handleDraw(point),
-                (timeout / 100) * (i + 1)
-              );
-            }, timeout * (i + 1))
-          );
-        } else if (!timeout) {
+      if (timeout) {
+        let pointTotal = 0;
+        drawing.forEach(path => path.forEach(point => pointTotal++));
+        const delay = pointTotal / timeout;
+
+        const waitFor = ms => new Promise(r => setTimeout(r, ms));
+        const asyncForEach = async (array, callback) => {
+          for (let index = 0; index < array.length; index++) {
+            await callback(array[index], index, array);
+          }
+        };
+
+        const handlePaths = async () => {
+          await asyncForEach(drawing, async (path, i) => {
+            await waitFor(delay);
+            await handlePoints(path, i);
+          });
+          console.log("Done!");
+        };
+
+        const handlePoints = async (path, i) => {
+          await asyncForEach(path, async (point, i) => {
+            await waitFor(delay / 100);
+            this.handleDraw(point);
+          });
+        };
+
+        handlePaths();
+      } else {
+        drawing.forEach((path, i) => {
           path.forEach(point => {
             this.handleDraw(point);
           });
-        }
-      });
+        });
+      }
     },
 
     async pixelateDrawing(canvas, ctx, value) {
@@ -234,6 +252,8 @@ export default {
         img2.width / devicePixelRatio,
         img2.height / devicePixelRatio
       );
+
+      this.$refs.notAllowed.style.backgroundColor = "transparent";
     }
   },
   computed: {
@@ -316,6 +336,7 @@ canvas {
 
 .drawing-meta.not-allowed {
   display: block;
+  background-color: var(--white);
 
   .info {
     display: none;
