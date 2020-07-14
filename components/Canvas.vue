@@ -45,8 +45,13 @@ export default {
       this.$store.dispatch("modules/drawing/setCtx", ctx); // set store state
     } else if (this.section) {
       !this.drawMode && this.makeDrawing(this.drawing, 3000);
-      this.drawMode && this.makeDrawing(this.drawing);
-      this.drawMode && this.pixelateDrawing(this.canvas, this.ctx);
+      if (this.drawMode) {
+        this.canvas.style.opacity = 0;
+        this.makeDrawing(this.drawing);
+        this.pixelateDrawing(this.canvas, this.ctx, 50);
+        // lighten?
+        this.canvas.style.opacity = 1;
+      }
     }
   },
   methods: {
@@ -193,7 +198,8 @@ export default {
       });
     },
 
-    async pixelateDrawing(canvas, ctx) {
+    async pixelateDrawing(canvas, ctx, value) {
+      ctx.filter = "opacity(50%)";
       const imgData = ctx.getImageData(
         0,
         0,
@@ -201,20 +207,33 @@ export default {
         ctx.canvas.height
       );
       const img = await createImageBitmap(imgData);
-      const value = 1;
 
-      /// calculate the factor
       var fw = (img.width / value) | 0,
         fh = (img.height / value) | 0;
 
       /// turn off image smoothing (prefixed in some browsers)
       ctx.imageSmoothingEnabled = ctx.mozImageSmoothingEnabled = ctx.msImageSmoothingEnabled = ctx.webkitImageSmoothingEnabled = false;
 
-      /// draw mini-version of image
       ctx.drawImage(img, 0, 0, fw, fh);
-
-      /// draw the mini-version back up, voila, pixelated
-      ctx.drawImage(canvas, 0, 0, fw, fh, 0, 0, img.width, img.height);
+      const imgData2 = ctx.getImageData(
+        0,
+        0,
+        ctx.canvas.width,
+        ctx.canvas.height
+      );
+      const img2 = await createImageBitmap(imgData2);
+      this.clearCanvas(ctx);
+      ctx.drawImage(
+        img2,
+        0,
+        0,
+        fw,
+        fh,
+        0,
+        0,
+        img2.width / devicePixelRatio,
+        img2.height / devicePixelRatio
+      );
     }
   },
   computed: {
@@ -297,7 +316,6 @@ canvas {
 
 .drawing-meta.not-allowed {
   display: block;
-  background: rgba(255, 255, 255, 0.6);
 
   .info {
     display: none;
