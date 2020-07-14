@@ -3,7 +3,7 @@ import floodFill from "~/assets/js/floodFill";
 export const state = () => ({
   canvas: null,
   ctx: null,
-  type: "",
+  type: null,
   currentPath: [],
   paths: [],
   history: { step: 0, paths: [] }
@@ -38,6 +38,10 @@ export const actions = {
 
   setCtx({ commit }, ctx) {
     commit("SET_CTX", ctx);
+  },
+
+  setType({ commit }, type) {
+    commit("SET_TYPE", type);
   },
 
   incrementHistory({ commit }) {
@@ -162,6 +166,10 @@ export const actions = {
 export const mutations = {
   CLEAR_DRAWING(state) {
     state.paths = [];
+    state.history.paths = [];
+    state.history.step = 0;
+    state.currentPath = []; // probs unecessary but oh well
+    state.type = null;
   },
 
   SET_CANVAS(state, canvas) {
@@ -170,6 +178,10 @@ export const mutations = {
 
   SET_CTX(state, ctx) {
     state.ctx = ctx;
+  },
+
+  SET_TYPE(state, type) {
+    state.type = type;
   },
 
   INCREMENT_HISTORY(state) {

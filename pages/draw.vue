@@ -1,6 +1,6 @@
 <template>
   <div>
-    <!-- <Log /> -->
+    <Log />
     <div class="wrap">
       <div>
         <PickSection v-if="!type" @picked-type="handlePickedType" />
@@ -28,8 +28,9 @@ export default {
   methods: {
     handlePickedType(type) {
       this.type = type;
+      this.$store.dispatch("modules/drawing/setType", type);
 
-      // set sections that *aren't* type to pull from gallery.sections
+      // set sections that *aren't* same type to pull from gallery.sections
       // or for now... pull from drawings aka ecc.json
 
       this.sections = {

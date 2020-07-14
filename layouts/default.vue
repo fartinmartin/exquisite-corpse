@@ -14,6 +14,7 @@ export default {
   components: { Nav, CustomCursor },
   mounted() {
     this.$store.dispatch("modules/user/signInAnonymously");
+    console.log("default layout");
   }
 };
 </script>

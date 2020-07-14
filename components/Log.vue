@@ -64,7 +64,9 @@ export default {
   },
   methods: {
     handleShortcuts(e) {
-      if (e.keyCode === 76) {
+      // if (e.keyCode === 76) { // "l"
+      if (e.keyCode === 12) {
+        // 12 = "clear"
         this.isHidden = !this.isHidden;
       }
     }
