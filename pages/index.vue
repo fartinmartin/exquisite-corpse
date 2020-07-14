@@ -2,9 +2,7 @@
   <div>
     <div class="wrap">
       <div class="mw-canvas">
-        <nuxt-link to="/draw">
-          <Display v-if="sections" :sections="sections" />
-        </nuxt-link>
+        <Display v-if="sections" :sections="sections" />
       </div>
     </div>
   </div>

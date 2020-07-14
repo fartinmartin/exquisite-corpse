@@ -18,7 +18,7 @@
 
 <script>
 import floodFill from "~/assets/js/floodFill";
-import { orderKeys } from "~/assets/js/orderKeys";
+// import { orderKeys } from "~/assets/js/orderKeys";
 
 export default {
   name: "Canvas",
