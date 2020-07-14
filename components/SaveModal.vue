@@ -1,7 +1,7 @@
 <template>
   <div class="save-modal" @click="closeMe">
     <div>
-      <Canvas :drawing="drawing" is-presenting />
+      <Canvas id="save-preview" :section="section" />
       <form class="border yellow">
         <div>
           <label for="title">your section's title:</label>
@@ -37,7 +37,6 @@ import { mapState } from "vuex";
 
 export default {
   name: "SaveModal",
-  props: { drawing: Array },
   components: { Canvas },
   data() {
     return {
@@ -47,7 +46,10 @@ export default {
   },
   computed: {
     ...mapState("modules/user", ["id", "displayName"]),
-    ...mapState("modules/drawing", ["type", "paths"])
+    ...mapState("modules/drawing", ["type", "paths"]),
+    section() {
+      return { drawing: this.paths };
+    }
   },
   mounted() {
     document.addEventListener("keydown", this.handleShortcuts);
@@ -72,7 +74,7 @@ export default {
       let payload = {
         artist: this.artist || this.displayName,
         date: this.$fireStoreObj.Timestamp.fromDate(new Date()),
-        drawing: { ...this.paths },
+        drawing: { ...this.paths }, // POTENTIAL WARNING 🚨 : could this be saving the drawing out of order ?!
         featuredIn: "", // TOOD: on drawing start, generate a new completed doc and set a local references to that docs name for use on this line, also set all three drawings featuredin array to reference the new collection
         likes: 0,
         permalink: "", // TODO: learn how to do this...
@@ -212,7 +214,7 @@ form {
     position: absolute;
     right: 0;
     bottom: 0;
-    transform: translate3D(100%, 100%, 0);
+    transform: translate3d(100%, 100%, 0);
 
     font-size: 10px;
     text-align: center;
@@ -232,7 +234,7 @@ form {
       border: 2px solid var(--lighter-yellow);
       border-top: 2px solid var(--yellow);
       border-left: 2px solid var(--yellow);
-      transform: translate3D(2px, 2px, 0);
+      transform: translate3d(2px, 2px, 0);
     }
   }
 

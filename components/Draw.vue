@@ -1,21 +1,9 @@
 <template>
   <div class="mw-canvas">
     <tool-bar />
-    <Canvas
-      id="top"
-      :drawing="sections.top"
-      :is-presenting="sections.top !== null"
-    />
-    <Canvas
-      id="mid"
-      :drawing="sections.mid"
-      :is-presenting="sections.mid !== null"
-    />
-    <Canvas
-      id="bot"
-      :drawing="sections.bot"
-      :is-presenting="sections.bot !== null"
-    />
+    <Canvas id="top" :section="sections.top" draw-mode />
+    <Canvas id="mid" :section="sections.mid" draw-mode />
+    <Canvas id="bot" :section="sections.bot" draw-mode />
   </div>
 </template>
 
@@ -27,11 +15,13 @@ import Canvas from "./Canvas.vue";
 
 export default {
   name: "Draw",
-  props: { sections: Object },
+  props: { type: String, sections: Object },
   components: {
     ToolBar,
     Canvas
   },
-  mounted() {}
+  mounted() {
+    this.$store.dispatch("modules/drawing/clearDrawing");
+  }
 };
 </script>

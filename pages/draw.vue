@@ -1,39 +1,46 @@
 <template>
   <div>
-    <Nav />
-    <Log />
+    <!-- <Log /> -->
     <div class="wrap">
       <div>
-        <Draw
-          :sections="{
-            top: section1,
-            mid: null,
-            bot: section2
-          }"
-        />
+        <PickSection v-if="!type" @picked-type="handlePickedType" />
+        <Draw v-if="type" :type="type" :sections="sections" />
       </div>
     </div>
-    <CustomCursor />
   </div>
 </template>
 
 <script>
 import Log from "~/components/Log";
-import Nav from "~/components/Nav";
 import Draw from "~/components/Draw";
-import CustomCursor from "~/components/CustomCursor";
-import section1 from "~/assets/js/drawing1.json";
-import section2 from "~/assets/js/drawing2.json";
+import PickSection from "~/components/PickSection";
+import sections from "~/assets/js/ecc.json";
 
 export default {
   name: "draw",
   data() {
     return {
-      section1,
-      section2
+      type: null,
+      sections: {}
     };
   },
-  components: { Nav, CustomCursor, Draw, Log }
+  components: { Draw, PickSection, Log },
+  methods: {
+    handlePickedType(type) {
+      this.type = type;
+
+      // set sections that *aren't* type to pull from gallery.sections
+      // or for now... pull from drawings aka ecc.json
+
+      this.sections = {
+        top: sections[2],
+        mid: sections[1],
+        bot: sections[0]
+      };
+
+      this.sections[type] = { type };
+    }
+  }
 };
 </script>
 

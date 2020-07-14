@@ -82,7 +82,7 @@ nav,
     border: 2px solid var(--lighter-yellow);
     border-top: 2px solid var(--yellow);
     border-left: 2px solid var(--yellow);
-    transform: translate3D(2px, 2px, 0);
+    transform: translate3d(2px, 2px, 0);
   }
 }
 </style>

@@ -2,8 +2,9 @@
   <div>
     <div class="wrap">
       <div class="mw-canvas">
-        <!-- <Display v-if="sections" :sections="sections" /> -->
-        {{ this.$store.state.modules.user.id }}
+        <nuxt-link to="/draw">
+          <Display v-if="sections" :sections="sections" />
+        </nuxt-link>
       </div>
     </div>
   </div>
@@ -11,10 +12,20 @@
 
 <script>
 import Display from "~/components/Display";
+import drawings from "~/assets/js/ecc.json";
 
 export default {
   name: "index",
-  components: { Display }
+  components: { Display },
+  data: function() {
+    return {
+      sections: {
+        top: drawings[2],
+        mid: drawings[1],
+        bot: drawings[0]
+      }
+    };
+  }
 };
 </script>
 

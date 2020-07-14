@@ -28,6 +28,10 @@ export const getters = {
 };
 
 export const actions = {
+  clearDrawing({ commit }) {
+    commit("CLEAR_DRAWING");
+  },
+
   setCanvas({ commit }, canvas) {
     commit("SET_CANVAS", canvas);
   },
@@ -156,6 +160,10 @@ export const actions = {
 };
 
 export const mutations = {
+  CLEAR_DRAWING(state) {
+    state.paths = [];
+  },
+
   SET_CANVAS(state, canvas) {
     state.canvas = canvas;
   },

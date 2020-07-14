@@ -101,11 +101,7 @@
       </div>
     </div>
 
-    <SaveModal
-      v-show="isSaving"
-      :drawing="paths"
-      @close-save="isSaving = false"
-    />
+    <SaveModal v-if="isSaving" @close-save="isSaving = false" />
   </div>
 </template>
 
@@ -137,7 +133,6 @@ export default {
       }
     },
     ...mapState("modules/mouse", ["palette", "size"]),
-    ...mapState("modules/drawing", ["paths"]),
     ...mapGetters("modules/mouse", [
       "currentSizeLessThanMax",
       "currentSizeMoreThanMin"
@@ -277,7 +272,7 @@ $icon-size: 25px;
     border: 2px solid var(--lighter-blue);
     border-top: 2px solid var(--light-blue);
     border-left: 2px solid var(--light-blue);
-    transform: translate3D(2px, 2px, 0);
+    transform: translate3d(2px, 2px, 0);
   }
 }
 
@@ -290,7 +285,7 @@ $icon-size: 25px;
     border: 2px solid var(--lighter-blue);
     border-top: 2px solid var(--light-blue);
     border-left: 2px solid var(--light-blue);
-    transform: translate3D(2px, 2px, 0);
+    transform: translate3d(2px, 2px, 0);
   }
 }
 
