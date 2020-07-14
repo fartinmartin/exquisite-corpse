@@ -4,13 +4,13 @@
 // FloodFill2D by Blindman67 2016. Original source code from https://github.com/blindman67/FloodFill2D
 // export default floodFill;
 
-const floodFill = (function () {
+const floodFill = (function() {
   "use strict";
   const extent = {
     top: 0,
     left: 0,
     bottom: 0,
-    right: 0,
+    right: 0
   };
   var keepMask = false; // if true then a mask of the filled area is returned as a canvas image
   var extentOnly = false; // if true then the extent of the fill is returned
@@ -295,9 +295,12 @@ const floodFill = (function () {
       return true;
     }
     canvas = document.createElement("canvas");
-    canvas.width = w;
-    canvas.height = h;
+    // canvas.width = w;
+    // canvas.height = h;
+    canvas.width = w * devicePixelRatio;
+    canvas.height = h * devicePixelRatio;
     ctx = canvas.getContext("2d");
+    ctx.scale(devicePixelRatio, devicePixelRatio);
     ctx.fillStyle = context2D.fillStyle;
     ctx.fillRect(0, 0, w, h);
     colImgDat = ctx.getImageData(0, 0, w, h);
@@ -352,7 +355,7 @@ const floodFill = (function () {
   }
 
   return {
-    fill: function (
+    fill: function(
       posX,
       posY,
       tolerance,
@@ -373,7 +376,7 @@ const floodFill = (function () {
       ctx = undefined;
       canvas = undefined;
     },
-    getMask: function (
+    getMask: function(
       posX,
       posY,
       tolerance,
@@ -396,7 +399,7 @@ const floodFill = (function () {
       keepMask = false;
       return canvas;
     },
-    getExtent: function (
+    getExtent: function(
       posX,
       posY,
       tolerance,
@@ -424,13 +427,13 @@ const floodFill = (function () {
           right: extent.right,
           bottom: extent.bottom,
           width: extent.right - extent.left,
-          height: extent.bottom - extent.top,
+          height: extent.bottom - extent.top
         };
       }
       extentOnly = false;
       return null;
     },
-    cut: function (
+    cut: function(
       posX,
       posY,
       tolerance,
@@ -455,7 +458,7 @@ const floodFill = (function () {
       ctx = undefined;
       return canvas;
     },
-    copy: function (
+    copy: function(
       posX,
       posY,
       tolerance,
@@ -479,7 +482,7 @@ const floodFill = (function () {
       ctx = undefined;
       return canvas;
     },
-    setCompareValues: function (R, G, B, A) {
+    setCompareValues: function(R, G, B, A) {
       if (R === null && G === null && B === null && A === null) {
         return;
       }
@@ -490,14 +493,14 @@ const floodFill = (function () {
       useBoundingColor = false;
       useCompareColor = true;
     },
-    setBoundingColor: function (R, G, B, A) {
+    setBoundingColor: function(R, G, B, A) {
       red = R;
       green = G;
       blue = B;
       alpha = A;
       useCompareColor = false;
       useBoundingColor = true;
-    },
+    }
   };
 })();
 

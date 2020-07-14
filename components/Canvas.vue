@@ -46,6 +46,7 @@ export default {
     } else if (this.section) {
       !this.drawMode && this.makeDrawing(this.drawing, 3000);
       this.drawMode && this.makeDrawing(this.drawing);
+      this.drawMode && this.pixelateDrawing(this.canvas, this.ctx);
     }
   },
   methods: {
@@ -92,7 +93,11 @@ export default {
 
     mouseleave() {
       // to prevent sticky brush when leaving CANVAS
-      this.$store.dispatch("modules/mouse/setIsDrawing", false);
+      if (this.$store.state.modules.mouse.isDrawing) {
+        this.$store.dispatch("modules/mouse/setIsDrawing", false);
+        this.$store.dispatch("modules/drawing/pushCurrentPathToDrawingHistory");
+        this.$store.dispatch("modules/drawing/incrementHistory");
+      }
     },
 
     handleDraw(e) {
@@ -157,7 +162,11 @@ export default {
     drawFill(ctx, point) {
       ctx.fillStyle = point.color;
       let tolerance = 100;
-      floodFill.fill(point.x2, point.y2, tolerance, ctx);
+      let dpiPoint = {
+        x2: point.x2 * devicePixelRatio,
+        y2: point.y2 * devicePixelRatio
+      };
+      floodFill.fill(dpiPoint.x2, dpiPoint.y2, tolerance, ctx);
     },
 
     clearCanvas(ctx) {
@@ -182,6 +191,30 @@ export default {
           });
         }
       });
+    },
+
+    async pixelateDrawing(canvas, ctx) {
+      const imgData = ctx.getImageData(
+        0,
+        0,
+        ctx.canvas.width,
+        ctx.canvas.height
+      );
+      const img = await createImageBitmap(imgData);
+      const value = 1;
+
+      /// calculate the factor
+      var fw = (img.width / value) | 0,
+        fh = (img.height / value) | 0;
+
+      /// turn off image smoothing (prefixed in some browsers)
+      ctx.imageSmoothingEnabled = ctx.mozImageSmoothingEnabled = ctx.msImageSmoothingEnabled = ctx.webkitImageSmoothingEnabled = false;
+
+      /// draw mini-version of image
+      ctx.drawImage(img, 0, 0, fw, fh);
+
+      /// draw the mini-version back up, voila, pixelated
+      ctx.drawImage(canvas, 0, 0, fw, fh, 0, 0, img.width, img.height);
     }
   },
   computed: {
@@ -217,9 +250,6 @@ export default {
   max-width: 540px;
   height: 0;
   padding-top: calc(100% / 3);
-
-  /* width: 540px;
-  height: 180px; */
 
   &:hover .drawing-meta {
     display: block;
