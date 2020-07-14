@@ -97,14 +97,17 @@ button[disabled] {
 
 .border {
   --border-size: 2px;
+  --border-color: var(--light-blue);
+  --box-shadow-size: 2px;
   --box-shadow-color: var(--blue);
-  border: 2px solid var(--light-blue);
-  box-shadow: var(--border-size) var(--border-size) 0 0 var(--box-shadow-color);
+  border: var(--border-size) solid var(--border-color);
+  box-shadow: var(--box-shadow-size) var(--box-shadow-size) 0 0
+    var(--box-shadow-color);
   background: var(--white);
 
   &.yellow {
     --box-shadow-color: var(--orange);
-    border-color: var(--light-yellow);
+    --border-color: var(--light-yellow);
   }
 }
 
@@ -140,7 +143,7 @@ button[disabled] {
     border: 2px solid var(--border-bot-right);
     border-top: 2px solid var(--border-top-left);
     border-left: 2px solid var(--border-top-left);
-    transform: translate3D(2px, 2px, 0);
+    transform: translate3d(2px, 2px, 0);
   }
 
   &.solid.yellow {
