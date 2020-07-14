@@ -202,7 +202,7 @@ export default {
             await waitFor(delay);
             await handlePoints(path, i);
           });
-          console.log("Done!");
+          // console.log("Done!");
         };
 
         const handlePoints = async (path, i) => {
