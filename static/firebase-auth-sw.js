@@ -6,7 +6,7 @@ importScripts(
 importScripts(
   'https://www.gstatic.com/firebasejs/7.16.0/firebase-auth.js'
 )
-firebase.initializeApp({"apiKey":"AIzaSyC5Op1IGajRH-KUj-i9AS5hJ0Sw-yblERE","authDomain":"exquisite-corpse-d0cbf.firebaseapp.com","databaseURL":"https:\u002F\u002Fexquisite-corpse-d0cbf.firebaseio.com","projectId":"exquisite-corpse-d0cbf","storageBucket":"exquisite-corpse-d0cbf.appspot.com","messagingSenderId":"247490126037","appId":"1:247490126037:web:5721043963f00c0ec0425c","measurementId":"G-NX8QXVTJ47"})
+firebase.initializeApp({"apiKey":"AIzaSyC5Op1IGajRH-KUj-i9AS5hJ0Sw-yblERE","authDomain":"exquisite-corpse-d0cbf.firebaseapp.com","databaseURL":"https:\u002F\u002Fexquisite-corpse-d0cbf.firebaseio.com","projectId":"exquisite-corpse-d0cbf","storageBucket":"exquisite-corpse-d0cbf.appspot.com","messagingSenderId":"247490126037","appId":"1:247490126037:web:5721043963f00c0ec0425c","measurementId":"G-NX8QXVTJ4"})
 
 /**
  * Returns a promise that resolves with an ID token if available.

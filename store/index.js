@@ -1,12 +1,6 @@
-export const state = () => ({
-  rootTest: 5
-});
+export const state = () => ({});
 
-export const getters = {
-  rootTest(state) {
-    return state.rootTest;
-  }
-};
+export const getters = {};
 
 export const actions = {};
 

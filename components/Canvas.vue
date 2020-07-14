@@ -18,7 +18,6 @@
 
 <script>
 import floodFill from "~/assets/js/floodFill";
-// import { orderKeys } from "~/assets/js/orderKeys";
 
 export default {
   name: "Canvas",
@@ -174,10 +173,6 @@ export default {
   },
   computed: {
     drawing() {
-      // This doesn't seem to do anything because the drawing is already out of order!
-      // let drawingCopy = { ...this.section.drawing };
-      // let drawingOrdered = orderKeys(drawingCopy);
-      // return Object.values(drawingOrdered);
       if (this.section) {
         let drawing = { ...this.section.drawing };
         return Object.values(drawing);
