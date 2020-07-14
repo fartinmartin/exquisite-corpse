@@ -6,7 +6,7 @@
 
 <script>
 import Display from "~/components/Display";
-import drawings from "~/assets/js/ecc.json";
+import drawings from "~/assets/js/drawings.json";
 
 export default {
   name: "index",
@@ -14,13 +14,14 @@ export default {
   data: function() {
     return {
       sections: {
-        top: drawings[2],
-        mid: drawings[1],
-        bot: drawings[0]
+        top: drawings[1],
+        mid: drawings[0],
+        bot: drawings[2]
       }
     };
   },
   mounted() {
+    // this.$store.dispatch("modules/gallery/fetchSections");
     // https://stackoverflow.com/questions/46798981/firestore-how-to-get-random-documents-in-a-collection
     // 🤔 generate random timestamp between date of database "birth" and now.. and find doc with closest date... 🤷‍♂️
   }

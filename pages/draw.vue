@@ -10,7 +10,7 @@
 import Log from "~/components/Log";
 import Draw from "~/components/Draw";
 import PickSection from "~/components/PickSection";
-import sections from "~/assets/js/ecc.json";
+import sections from "~/assets/js/drawings.json";
 
 export default {
   name: "draw",
@@ -30,9 +30,9 @@ export default {
       // or for now... pull from drawings aka ecc.json
 
       this.sections = {
-        top: sections[2],
-        mid: sections[1],
-        bot: sections[0]
+        top: sections[1],
+        mid: sections[0],
+        bot: sections[2]
       };
 
       this.sections[type] = { type };
