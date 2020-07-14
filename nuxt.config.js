@@ -73,9 +73,9 @@ export default {
       auth: {
         ssr: true
       },
-      firestore: true
-      // performance: true,
-      // analytics: true
+      firestore: true,
+      // performance: true, 🚨 one of these breaks shit! causes chunk not found errors on netlify deploy... 🤷‍♂️
+      analytics: true
     }
   },
   /*
