@@ -74,7 +74,7 @@ export default {
         ssr: true
       },
       firestore: true,
-      // performance: true, 🚨 one of these breaks shit! causes chunk not found errors on netlify deploy... 🤷‍♂️
+      // performance: true, 🚨 this *might* be the cause of "chunk 0 not found" errors on netlify deploy... 🤷‍♂️
       analytics: true
     }
   },
