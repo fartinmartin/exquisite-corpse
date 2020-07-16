@@ -21,6 +21,7 @@
 
 <script>
 import floodFill from "~/assets/js/floodFill";
+import asyncForEach, { waitFor } from "~/assets/js/asyncForEach";
 
 export default {
   name: "Canvas",
@@ -180,13 +181,6 @@ export default {
 
     makeDrawing(drawing, timeout) {
       if (timeout) {
-        const waitFor = ms => new Promise(r => setTimeout(r, ms));
-        const asyncForEach = async (array, callback) => {
-          for (let index = 0; index < array.length; index++) {
-            await callback(array[index], index, array);
-          }
-        };
-
         const handlePaths = async () => {
           await asyncForEach(drawing, async (path, i) => {
             let newTimeout;
