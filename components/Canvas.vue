@@ -47,8 +47,9 @@ export default {
       this.$store.dispatch("modules/drawing/setCanvas", canvas); // set store state
       this.$store.dispatch("modules/drawing/setCtx", ctx); // set store state
     } else if (this.section) {
-      !this.drawMode && this.makeDrawing(this.drawing, 1250);
-      if (this.drawMode) {
+      if (!this.drawMode) {
+        this.makeDrawing(this.drawing, 1250);
+      } else {
         this.makeDrawing(this.drawing);
         this.pixelateDrawing(this.canvas, this.ctx, 50);
       }
@@ -107,7 +108,7 @@ export default {
 
     handleDraw(e) {
       // this needs to work for live drawing + redrawing of paths from firebase
-      // ...and it does! for now 😬
+      // ...and it does! for now 😬 sort of (like only on my iMac...) 🤔
 
       let ctx = this.ctx;
       let point;
@@ -124,7 +125,6 @@ export default {
         };
       } else if (this.drawing) {
         point = e; // e = point passed from this.makeDrawing()
-        // console.log(point.mode);
       }
 
       switch (point.mode) {
@@ -202,7 +202,6 @@ export default {
             await waitFor(delay);
             await handlePoints(path, i);
           });
-          // console.log("Done!");
         };
 
         const handlePoints = async (path, i) => {
@@ -343,6 +342,7 @@ canvas {
 .drawing-meta.not-allowed {
   display: block;
   background-color: var(--white);
+  /* background-blend-mode: multiply; */
 
   .info {
     display: none;
