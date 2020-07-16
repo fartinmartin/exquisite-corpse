@@ -17,7 +17,7 @@ export const actions = {
       id: doc.id,
       ...doc.data()
     }));
-    console.log(sections);
+    // console.log(sections);
     // commit("SET_SECTIONS", sections);
   }
 };
