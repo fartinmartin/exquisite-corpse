@@ -48,7 +48,7 @@ export default {
       this.$store.dispatch("modules/drawing/setCtx", ctx); // set store state
     } else if (this.section) {
       if (!this.drawMode) {
-        this.makeDrawing(this.drawing, 1250);
+        this.makeDrawing(this.drawing, 500);
       } else {
         this.makeDrawing(this.drawing);
         this.pixelateDrawing(this.canvas, this.ctx, 50);
@@ -180,16 +180,6 @@ export default {
 
     makeDrawing(drawing, timeout) {
       if (timeout) {
-        // 🚨 POTENTIAL IDEA: batch drawing off into arrays separated by "erase", "fill", and "clear"
-        //                    run the "draw" points simlutaneously
-        let pathTotal = 0;
-        let pointTotal = 0;
-        drawing.forEach(path => {
-          pathTotal++;
-          path.forEach(point => pointTotal++);
-        });
-        const delay = (pointTotal * pathTotal) / timeout;
-
         const waitFor = ms => new Promise(r => setTimeout(r, ms));
         const asyncForEach = async (array, callback) => {
           for (let index = 0; index < array.length; index++) {
@@ -199,14 +189,18 @@ export default {
 
         const handlePaths = async () => {
           await asyncForEach(drawing, async (path, i) => {
-            await waitFor(delay);
+            let newTimeout;
+            i > 0
+              ? (newTimeout = timeout / drawing[i - 1].length / 100)
+              : (newTimeout = timeout);
+            await waitFor(newTimeout);
             await handlePoints(path, i);
           });
         };
 
         const handlePoints = async (path, i) => {
           await asyncForEach(path, async (point, i) => {
-            await waitFor(delay / 100);
+            await waitFor(5);
             this.handleDraw(point);
           });
         };
