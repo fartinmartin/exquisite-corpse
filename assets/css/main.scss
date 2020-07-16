@@ -26,6 +26,10 @@
   user-select: none;
 }
 
+input[type="text"] {
+  user-select: initial;
+}
+
 html {
   font-family: "Space Mono", monospace;
   font-size: 16px;
