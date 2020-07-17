@@ -1,19 +1,21 @@
 <template>
-  <div class="border">
+  <div class="border" :id="id">
     <div class="canvas-wrap">
-      <div v-if="section && !section.type" class="drawing-meta">
+      <div v-if="mode === 'display'" class="drawing-meta">
         <div class="info">{{ section.title }} by {{ section.artist }}</div>
       </div>
       <div
-        v-if="drawMode && !section.type"
+        v-if="mode === 'pixelate'"
         class="drawing-meta not-allowed"
         ref="notAllowed"
       >
-        <div class="info">{{ section.title }} by {{ section.artist }}</div>
+        <div class="info">{{ drawing.title }} by {{ drawing.artist }}</div>
       </div>
       <canvas
         ref="canvas"
-        v-on="drawMode ? { mousemove, mousedown, mouseup, mouseleave } : {}"
+        v-on="
+          mode === 'draw' ? { mousemove, mousedown, mouseup, mouseleave } : {}
+        "
       />
     </div>
   </div>
@@ -22,12 +24,20 @@
 <script>
 import floodFill from "~/assets/js/floodFill";
 import asyncForEach, { waitFor } from "~/assets/js/asyncForEach";
+import { mapState } from "vuex";
 
 export default {
   name: "Canvas",
   props: {
-    section: Object,
-    drawMode: Boolean
+    id: {
+      type: String, // top, mid, or bot
+      required: true
+    },
+    mode: {
+      type: String, // draw, display, or pixelate
+      required: true
+    },
+    section: Object // maybe instead of passing we use getters to get state (using id) but then how do we handle display? maybe section only applys during display mode...
   },
   data: function() {
     return {
@@ -36,6 +46,7 @@ export default {
     };
   },
   mounted() {
+    console.log(this.drawing);
     const canvas = this.$refs.canvas;
     const ctx = canvas.getContext("2d");
 
@@ -44,16 +55,14 @@ export default {
     this.canvas = canvas; // set local state
     this.ctx = ctx; // set local state
 
-    if (this.drawMode && this.section.type) {
+    if (this.mode === "draw") {
       this.$store.dispatch("modules/drawing/setCanvas", canvas); // set store state
-      this.$store.dispatch("modules/drawing/setCtx", ctx); // set store state
-    } else if (this.section) {
-      if (!this.drawMode) {
-        this.makeDrawing(this.drawing, 500);
-      } else {
-        this.makeDrawing(this.drawing);
-        this.pixelateDrawing(this.canvas, this.ctx, 50);
-      }
+      this.$store.dispatch("modules/drawing/setCtx", ctx);
+    } else if (this.mode === "display") {
+      this.makeDrawing(this.drawing.paths, 500);
+    } else if (this.mode === "pixelate") {
+      this.makeDrawing(this.drawing.paths);
+      this.pixelateDrawing(this.canvas, this.ctx, 50);
     }
   },
   methods: {
@@ -68,10 +77,9 @@ export default {
       canvas.style.width = rect.width + "px";
       canvas.style.height = rect.height + "px";
     },
-    // TODO: replace this.$store.state.modules with mapSate ? 🤔 this.canvas and this.ctx are taken
     mousedown(e) {
       this.$store.dispatch("modules/mouse/setMousePosition", e);
-      if (this.$store.state.modules.mouse.mode !== "fill") {
+      if (this.mouseMode !== "fill") {
         this.$store.dispatch("modules/mouse/setIsDrawing", true);
         this.handleDraw(e); // for dots
         this.$store.dispatch("modules/drawing/logPathToCurrentPath", e);
@@ -82,10 +90,7 @@ export default {
     },
 
     mousemove(e) {
-      if (
-        this.$store.state.modules.mouse.isDrawing &&
-        this.$store.state.modules.mouse.mode !== "fill"
-      ) {
+      if (this.isDrawing && this.mouseMode !== "fill") {
         this.handleDraw(e); // for paths
         this.$store.dispatch("modules/drawing/logPathToCurrentPath", e);
         this.$store.dispatch("modules/mouse/setMousePosition", e);
@@ -100,7 +105,8 @@ export default {
 
     mouseleave() {
       // to prevent sticky brush when leaving CANVAS
-      if (this.$store.state.modules.mouse.isDrawing) {
+      // TODO: this causes some history state error.. or something 🤷‍♂️
+      if (this.isDrawing) {
         this.$store.dispatch("modules/mouse/setIsDrawing", false);
         this.$store.dispatch("modules/drawing/pushCurrentPathToDrawingHistory");
         this.$store.dispatch("modules/drawing/incrementHistory");
@@ -109,22 +115,22 @@ export default {
 
     handleDraw(e) {
       // this needs to work for live drawing + redrawing of paths from firebase
-      // ...and it does! for now 😬 sort of (like only on my iMac...) 🤔
+      // ...and it does! for now 😬 sort of (not in safari...) 🤔
 
       let ctx = this.ctx;
       let point;
 
-      if (this.drawMode && this.section.type) {
+      if (this.mode === "draw") {
         point = {
-          mode: this.$store.state.modules.mouse.mode,
-          color: this.$store.state.modules.mouse.palette.current,
-          size: this.$store.state.modules.mouse.size.current,
-          x1: this.$store.state.modules.mouse.x,
-          y1: this.$store.state.modules.mouse.y,
+          mode: this.mouseMode,
+          color: this.palette.current,
+          size: this.size.current,
+          x1: this.x,
+          y1: this.y,
           x2: e.offsetX,
           y2: e.offsetY
         };
-      } else if (this.drawing) {
+      } else if (this.mode === "display" || this.mode === "pixelate") {
         point = e; // e = point passed from this.makeDrawing()
       }
 
@@ -250,11 +256,15 @@ export default {
     }
   },
   computed: {
+    ...mapState("modules/mouse", ["palette", "size", "x", "y", "isDrawing"]),
+    ...mapState("modules/mouse", { mouseMode: s => s.mode }),
+    ...mapState("modules/drawing", ["sections"]),
     drawing() {
-      if (this.section) {
-        let drawing = { ...this.section.drawing };
-        return Object.values(drawing);
-      } else return;
+      if (this.mode === "display") {
+        return this.section;
+      } else if (this.mode === "pixelate") {
+        return this.sections[this.id].data;
+      }
     }
   }
 };

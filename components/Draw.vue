@@ -1,9 +1,9 @@
 <template>
   <div class="mw-canvas">
     <tool-bar />
-    <Canvas id="top" :section="sections.top" draw-mode />
-    <Canvas id="mid" :section="sections.mid" draw-mode />
-    <Canvas id="bot" :section="sections.bot" draw-mode />
+    <Canvas id="top" :mode="sections.top.type === type ? 'draw' : 'pixelate'" />
+    <Canvas id="mid" :mode="sections.mid.type === type ? 'draw' : 'pixelate'" />
+    <Canvas id="bot" :mode="sections.bot.type === type ? 'draw' : 'pixelate'" />
   </div>
 </template>
 
@@ -12,17 +12,16 @@
 <script>
 import ToolBar from "./ToolBar.vue";
 import Canvas from "./Canvas.vue";
+import { mapState } from "vuex";
 
 export default {
   name: "Draw",
-  props: { type: String, sections: Object },
   components: {
     ToolBar,
     Canvas
   },
-  mounted() {
-    this.$store.dispatch("modules/drawing/clearDrawing");
-    this.$store.dispatch("modules/mouse/resetMouse"); // "opinionated" i guess.. i dunno what that means really
+  computed: {
+    ...mapState("modules/drawing", ["type", "sections"])
   }
 };
 </script>

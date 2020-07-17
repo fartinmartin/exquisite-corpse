@@ -1,7 +1,7 @@
 <template>
   <div class="save-modal" @click="closeMe">
     <div>
-      <Canvas id="save-preview" :section="section" />
+      <Canvas id="save-preview" :section="section" mode="display" />
       <form class="border yellow">
         <div>
           <label for="title">your section's title:</label>
@@ -48,10 +48,11 @@ export default {
     ...mapState("modules/user", ["id", "displayName"]),
     ...mapState("modules/drawing", ["type", "paths"]),
     section() {
-      return { drawing: this.paths };
+      return { paths: this.paths, title: this.title, artist: this.artist };
     }
   },
   mounted() {
+    console.log(this.section);
     document.addEventListener("keydown", this.handleShortcuts);
   },
   beforeDestroy() {
@@ -70,10 +71,32 @@ export default {
       // TODO: should validate form and/or come up with defaults
       //       was there going to be a random word/phrase as placeholdler for title?? yes do it
       //       also the completed drawing's title should be a junble of the three names
+      let timestamp = this.$fireStoreObj.Timestamp.fromDate(new Date());
 
-      let payload = {
+      let completePaylod = {
+        name: "", // jumble of all three names
+        date: timestamp,
+        likes: 0,
+        permalink: "", // based on id?
+        // sections: {
+        //   top: this.$fireStore.doc(
+        //     `sections/${this.$store.state.modules.drawing.sections.top}`
+        //   ).ref,
+        //   mid: this.$fireStore.doc(
+        //     `sections/${this.$store.state.modules.drawing.sections.mid}`
+        //   ).ref,
+        //   bot: this.$fireStore.doc(
+        //     `sections/${this.$store.state.modules.drawing.sections.bot}`
+        //   ).ref
+        // }
+        thumb: ""
+      };
+
+      this.$fireStore.collection("completed").add(completePaylod);
+
+      let sectionPayload = {
         artist: this.artist || this.displayName,
-        date: this.$fireStoreObj.Timestamp.fromDate(new Date()),
+        date: timestamp,
         drawing: { ...this.paths }, // POTENTIAL WARNING 🚨 : could this be saving the drawing out of order ?!
         featuredIn: "", // TOOD: on drawing start, generate a new completed doc and set a local references to that docs name for use on this line, also set all three drawings featuredin array to reference the new collection
         likes: 0,
@@ -85,10 +108,9 @@ export default {
       };
 
       // TODO: start loading component
-
       this.$fireStore
         .collection("sections")
-        .add(payload)
+        .add(sectionPayload)
         .then(() => {
           // TODO: tell loading component to show success then route to the completed drawing!
           alert("You did it! Ur drawing was saved!");

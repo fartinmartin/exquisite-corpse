@@ -1,42 +1,103 @@
 <template>
   <div class="wrap">
-    <Log />
-    <PickSection v-if="!type" @picked-type="handlePickedType" />
-    <Draw v-if="type" :type="type" :sections="sections" />
+    <!-- <Log /> -->
+    <PickSection
+      v-if="isFetching === 'not yet'"
+      @picked-type="handlePickedType"
+    />
+    <div v-if="isFetching === 'yes'">we r loadings</div>
+    <Draw v-if="isFetching === 'done'" />
   </div>
 </template>
 
 <script>
-import Log from "~/components/Log";
+// import Log from "~/components/Log";
 import Draw from "~/components/Draw";
 import PickSection from "~/components/PickSection";
-import sections from "~/assets/js/drawings.json";
+import { mapState } from "vuex";
+import asyncForEach from "~/assets/js/asyncForEach";
 
 export default {
   name: "draw",
-  data() {
-    return {
-      type: null,
-      sections: {}
-    };
+  components: { Draw, PickSection },
+  data: function() {
+    return { isFetching: "not yet" };
   },
-  components: { Draw, PickSection, Log },
+  mounted() {
+    this.$store.dispatch("modules/drawing/clearDrawing");
+    this.$store.dispatch("modules/mouse/resetMouse"); // "opinionated" i guess.. i dunno what that means really
+  },
   methods: {
-    handlePickedType(type) {
-      this.type = type;
-      this.$store.dispatch("modules/drawing/setType", type);
+    async handlePickedType(type) {
+      this.isFetching = "yes";
 
-      // set sections that *aren't* same type to pull from gallery.sections
-      // or for now... pull from drawings aka ecc.json
+      const sectionsRef = this.$fireStore.collection("sections");
+      const $storeSectionsKeys = Object.keys(this.sections);
 
-      this.sections = {
-        top: sections[1],
-        mid: sections[0],
-        bot: sections[2]
+      const handleKeys = async () => {
+        await asyncForEach($storeSectionsKeys, async key => {
+          if (key === type) {
+            this.$store.dispatch("modules/drawing/setSections", {
+              type,
+              sectionData: null
+            });
+          } else {
+            let sectionData = {};
+
+            // https://stackoverflow.com/a/54801398/8703073
+            const randomKey = sectionsRef.doc().id;
+            const query = sectionsRef
+              .where(this.$fireStoreObj.FieldPath.documentId(), ">=", randomKey)
+              .where("type", "==", key)
+              .limit(1);
+            const section = await query.get();
+
+            if (section.size > 0) {
+              section.forEach(doc => {
+                sectionData = {
+                  docId: doc.id,
+                  ...doc.data()
+                };
+                let payload = {
+                  type: sectionData.type,
+                  sectionData
+                };
+                this.$store.dispatch("modules/drawing/setSections", payload);
+              });
+            } else {
+              const secondQuery = sectionsRef
+                .where(
+                  this.$fireStoreObj.FieldPath.documentId(),
+                  "<",
+                  randomKey
+                )
+                .where("type", "==", key)
+                .limit(1);
+              const secondSection = await secondQuery.get();
+
+              secondSection.forEach(doc => {
+                sectionData = {
+                  docId: doc.id,
+                  ...doc.data()
+                };
+                let payload = {
+                  type: sectionData.type,
+                  sectionData
+                };
+                this.$store.dispatch("modules/drawing/setSections", payload);
+              });
+            }
+          }
+        });
       };
 
-      this.sections[type] = { type };
+      await handleKeys();
+      this.$store.dispatch("modules/drawing/setType", type);
+      this.isFetching = "done";
     }
+  },
+  computed: {
+    ...mapState("modules/drawing", ["sections"])
   }
 };
 </script>

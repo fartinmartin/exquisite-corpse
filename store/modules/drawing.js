@@ -6,7 +6,12 @@ export const state = () => ({
   type: null,
   currentPath: [],
   paths: [],
-  history: { step: 0, paths: [] }
+  history: { step: 0, paths: [] },
+  sections: {
+    top: null,
+    mid: null,
+    bot: null
+  }
 });
 
 export const getters = {
@@ -28,6 +33,14 @@ export const getters = {
 };
 
 export const actions = {
+  setSections({ commit }, { type, sectionData }) {
+    if (sectionData) {
+      // convert firestore object to an array
+      sectionData.paths = Object.values(sectionData.drawing);
+    }
+    commit("SET_SECTIONS", { type, sectionData });
+  },
+
   clearDrawing({ commit }) {
     commit("CLEAR_DRAWING");
   },
@@ -182,6 +195,14 @@ export const mutations = {
 
   SET_TYPE(state, type) {
     state.type = type;
+  },
+
+  SET_SECTIONS(state, { type, sectionData }) {
+    if (!sectionData) {
+      state.sections[type] = { type }; // sets it to string so that Canvas component knows how to deal
+    } else {
+      state.sections[type] = { type, data: sectionData };
+    }
   },
 
   INCREMENT_HISTORY(state) {

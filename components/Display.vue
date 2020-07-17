@@ -1,8 +1,8 @@
 <template>
   <div class="mw-canvas">
-    <Canvas id="top" :section="sections.top" />
-    <Canvas id="mid" :section="sections.mid" />
-    <Canvas id="bot" :section="sections.bot" />
+    <Canvas id="top" mode="display" :section="sections.top" />
+    <Canvas id="mid" mode="display" :section="sections.mid" />
+    <Canvas id="bot" mode="display" :section="sections.bot" />
   </div>
 </template>
 
