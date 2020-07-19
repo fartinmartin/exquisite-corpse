@@ -45,14 +45,15 @@ export default {
     };
   },
   computed: {
+    ...mapState(["baseURL"]),
     ...mapState("modules/user", ["id", "displayName"]),
-    ...mapState("modules/drawing", ["type", "paths"]),
+    ...mapState("modules/drawing", ["type", "paths", "sections"]),
     section() {
       return { paths: this.paths, title: this.title, artist: this.artist };
     }
   },
   mounted() {
-    console.log(this.section);
+    console.log(this.sections);
     document.addEventListener("keydown", this.handleShortcuts);
   },
   beforeDestroy() {
@@ -72,35 +73,46 @@ export default {
       //       was there going to be a random word/phrase as placeholdler for title?? yes do it
       //       also the completed drawing's title should be a junble of the three names
       let timestamp = this.$fireStoreObj.Timestamp.fromDate(new Date());
+      const completedRef = this.$fireStore.collection("completed").doc();
+      const completedId = completedRef.id;
+      const sectionsRef = this.$fireStore.collection("sections").doc();
+      const sectionId = sectionsRef.id;
 
       let completePaylod = {
         name: "", // jumble of all three names
         date: timestamp,
+
         likes: 0,
-        permalink: "", // based on id?
-        // sections: {
-        //   top: this.$fireStore.doc(
-        //     `sections/${this.$store.state.modules.drawing.sections.top}`
-        //   ).ref,
-        //   mid: this.$fireStore.doc(
-        //     `sections/${this.$store.state.modules.drawing.sections.mid}`
-        //   ).ref,
-        //   bot: this.$fireStore.doc(
-        //     `sections/${this.$store.state.modules.drawing.sections.bot}`
-        //   ).ref
-        // }
+        permalink: `${this.baseURL}/gallery/${completedId}`,
+        sections: {
+          top: this.$fireStore.doc(
+            `sections/${
+              this.type === "top" ? sectionId : this.sections.top.data.docId
+            }`
+          ),
+          mid: this.$fireStore.doc(
+            `sections/${
+              this.type === "mid" ? sectionId : this.sections.mid.data.docId
+            }`
+          ),
+          bot: this.$fireStore.doc(
+            `sections/${
+              this.type === "bot" ? sectionId : this.sections.bot.data.docId
+            }`
+          )
+        },
         thumb: ""
       };
 
-      this.$fireStore.collection("completed").add(completePaylod);
+      completedRef.set(completePaylod);
 
       let sectionPayload = {
-        artist: this.artist || this.displayName,
+        artist: this.artist || this.displayName || "anonymous",
         date: timestamp,
         drawing: { ...this.paths }, // POTENTIAL WARNING 🚨 : could this be saving the drawing out of order ?!
-        featuredIn: "", // TOOD: on drawing start, generate a new completed doc and set a local references to that docs name for use on this line, also set all three drawings featuredin array to reference the new collection
+        featuredIn: [this.$fireStore.doc(`completed/${completedId}`)],
         likes: 0,
-        permalink: "", // TODO: learn how to do this...
+        permalink: `${this.baseURL}/section/${sectionId}`,
         thumb: "", // TODO: learn how to do this...
         title: this.title || "untitled", // TODO: random phrase from Wordnik API
         type: this.type,
@@ -108,9 +120,8 @@ export default {
       };
 
       // TODO: start loading component
-      this.$fireStore
-        .collection("sections")
-        .add(sectionPayload)
+      sectionsRef
+        .set(sectionPayload)
         .then(() => {
           // TODO: tell loading component to show success then route to the completed drawing!
           alert("You did it! Ur drawing was saved!");
@@ -121,6 +132,8 @@ export default {
           console.error("Error writing document: ", error);
           // TODO: tell loading component to deal with error
         });
+
+      // TODO: for each drawing that is NOT active type, push the "completedId" to their "featuredIn" array
     }
   }
 };

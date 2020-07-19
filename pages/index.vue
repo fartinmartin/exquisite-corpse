@@ -46,6 +46,9 @@ export default {
       }
     };
   },
+  async mounted() {
+    // fetch random completed drawing!
+  },
   mounted() {
     // this.$store.dispatch("modules/gallery/fetchSections");
     // https://stackoverflow.com/questions/46798981/firestore-how-to-get-random-documents-in-a-collection

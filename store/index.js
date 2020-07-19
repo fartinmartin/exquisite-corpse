@@ -1,5 +1,6 @@
 export const state = () => ({
-  isHelping: false
+  isHelping: false,
+  baseURL: "https://exquisitecorpse.club"
 });
 
 export const getters = {};

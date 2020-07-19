@@ -34,7 +34,7 @@ export default {
       const sectionsRef = this.$fireStore.collection("sections");
       const $storeSectionsKeys = Object.keys(this.sections);
 
-      const handleKeys = async () => {
+      const fetchSectionsPerKey = async () => {
         await asyncForEach($storeSectionsKeys, async key => {
           if (key === type) {
             this.$store.dispatch("modules/drawing/setSections", {
@@ -50,10 +50,10 @@ export default {
               .where(this.$fireStoreObj.FieldPath.documentId(), ">=", randomKey)
               .where("type", "==", key)
               .limit(1);
-            const section = await query.get();
+            const firstResponse = await query.get();
 
-            if (section.size > 0) {
-              section.forEach(doc => {
+            if (firstResponse.size > 0) {
+              firstResponse.forEach(doc => {
                 sectionData = {
                   docId: doc.id,
                   ...doc.data()
@@ -73,9 +73,9 @@ export default {
                 )
                 .where("type", "==", key)
                 .limit(1);
-              const secondSection = await secondQuery.get();
+              const secondResponse = await secondQuery.get();
 
-              secondSection.forEach(doc => {
+              secondResponse.forEach(doc => {
                 sectionData = {
                   docId: doc.id,
                   ...doc.data()
@@ -91,7 +91,7 @@ export default {
         });
       };
 
-      await handleKeys();
+      await fetchSectionsPerKey();
       this.$store.dispatch("modules/drawing/setType", type);
       this.isFetching = "done";
     }

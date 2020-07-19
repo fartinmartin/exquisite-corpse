@@ -257,13 +257,13 @@ export default {
   },
   computed: {
     ...mapState("modules/mouse", ["palette", "size", "x", "y", "isDrawing"]),
-    ...mapState("modules/mouse", { mouseMode: s => s.mode }),
+    ...mapState("modules/mouse", { mouseMode: state => state.mode }),
     ...mapState("modules/drawing", ["sections"]),
     drawing() {
       if (this.mode === "display") {
         return this.section;
       } else if (this.mode === "pixelate") {
-        return this.sections[this.id].data;
+        return { ...this.sections[this.id].data };
       }
     }
   }

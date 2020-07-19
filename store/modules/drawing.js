@@ -199,7 +199,7 @@ export const mutations = {
 
   SET_SECTIONS(state, { type, sectionData }) {
     if (!sectionData) {
-      state.sections[type] = { type }; // sets it to string so that Canvas component knows how to deal
+      state.sections[type] = { type, data: { type, docId: "temp" } }; // sets it to string so that Canvas component knows how to deal
     } else {
       state.sections[type] = { type, data: sectionData };
     }
