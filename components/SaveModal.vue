@@ -53,7 +53,6 @@ export default {
     }
   },
   mounted() {
-    console.log(this.sections);
     document.addEventListener("keydown", this.handleShortcuts);
   },
   beforeDestroy() {
@@ -79,9 +78,8 @@ export default {
       const sectionId = sectionsRef.id;
 
       let completePaylod = {
-        name: "", // jumble of all three names
+        title: "", // jumble of all three names
         date: timestamp,
-
         likes: 0,
         permalink: `${this.baseURL}/gallery/${completedId}`,
         sections: {
@@ -112,7 +110,7 @@ export default {
         drawing: { ...this.paths }, // POTENTIAL WARNING 🚨 : could this be saving the drawing out of order ?!
         featuredIn: [this.$fireStore.doc(`completed/${completedId}`)],
         likes: 0,
-        permalink: `${this.baseURL}/section/${sectionId}`,
+        permalink: `${this.baseURL}/gallery/${this.type}/${sectionId}`,
         thumb: "", // TODO: learn how to do this...
         title: this.title || "untitled", // TODO: random phrase from Wordnik API
         type: this.type,
