@@ -25,78 +25,103 @@
         </nuxt-link>
       </div>
     </nav>
-
-    <Display v-if="sections" :sections="sections" />
+    <div v-if="isFetching !== 'done'" class="loading mw-canvas">loading</div>
+    <Display v-if="isFetching === 'done'" :sections="sections" />
+    <div v-if="isFetching === 'done'" class="border yellow title mw-canvas">
+      <nuxt-link :to="`/gallery/${meta.docId}`">{{ meta.title }}</nuxt-link>
+    </div>
   </div>
 </template>
 
 <script>
 import Display from "~/components/Display";
-import drawings from "~/assets/js/drawings.json";
+import { mapState } from "vuex";
+import asyncForEach from "~/assets/js/asyncForEach";
 
 export default {
   name: "index",
   components: { Display },
   data: function() {
     return {
-      sections: {
-        top: drawings[1],
-        mid: drawings[0],
-        bot: drawings[2]
-      }
+      isFetching: "not yet",
+      meta: null,
+      sections: {}
     };
   },
-  // async mounted() {
-  //   const completedRef = this.$fireStore.collection("completed");
-  //   let completedData = {};
-
-  //   // https://stackoverflow.com/a/54801398/8703073
-  //   const randomKey = completedRef.doc().id;
-  //   const query = completedRef
-  //     .where(this.$fireStoreObj.FieldPath.documentId(), ">=", randomKey)
-  //     .where("type", "==", key)
-  //     .limit(1);
-  //   const firstResponse = await query.get();
-
-  //   if (firstResponse.size > 0) {
-  //     firstResponse.forEach(doc => {
-  //       completedData = {
-  //         docId: doc.id,
-  //         ...doc.data()
-  //         // title, docId, sections, likes
-  //       };
-  //       let payload = {
-  //         type: completedData.type,
-  //         completedData
-  //       };
-  //       this.$store.dispatch("modules/drawing/setCompleted", payload);
-  //     });
-  //   } else {
-  //     const secondQuery = completedRef
-  //       .where(this.$fireStoreObj.FieldPath.documentId(), "<", randomKey)
-  //       .where("type", "==", key)
-  //       .limit(1);
-  //     const secondResponse = await secondQuery.get();
-
-  //     secondResponse.forEach(doc => {
-  //       completedData = {
-  //         docId: doc.id,
-  //         ...doc.data()
-  //       };
-  //       let payload = {
-  //         type: completedData.type,
-  //         completedData
-  //       };
-  //       this.$store.dispatch("modules/drawing/setCompleted", payload);
-  //     });
-  //   }
-  // },
   mounted() {
-    // this.$store.dispatch("modules/gallery/fetchSections");
-    // https://stackoverflow.com/questions/46798981/firestore-how-to-get-random-documents-in-a-collection
-    // 🤔 generate random timestamp between date of database "birth" and now.. and find doc with closest date... 🤷‍♂️
+    this.fetchRandomCompleted();
   },
   methods: {
+    async fetchRandomCompleted() {
+      this.isFetching = "yes";
+      const completedRef = this.$fireStore.collection("completed");
+
+      const randomKey = completedRef.doc().id;
+      const query = completedRef
+        .where(this.$fireStoreObj.FieldPath.documentId(), ">=", randomKey)
+        .limit(1);
+      const firstResponse = await query.get();
+      if (firstResponse.size > 0) {
+        firstResponse.forEach(doc => {
+          let completedMeta = {
+            docId: doc.id,
+            likes: doc.data().likes,
+            title: doc.data().title,
+            date: doc.data().date
+          };
+
+          let vm = this;
+
+          async function handleSections() {
+            await vm.getSections(doc.data().sections);
+          }
+
+          handleSections();
+
+          return (this.meta = completedMeta);
+        });
+      } else {
+        const secondQuery = completedRef
+          .where(this.$fireStoreObj.FieldPath.documentId(), "<", randomKey)
+          .limit(1);
+        const secondResponse = await secondQuery.get();
+        secondResponse.forEach(doc => {
+          let completedMeta = {
+            docId: doc.id,
+            likes: doc.data().likes,
+            title: doc.data().title,
+            date: doc.data().date
+          };
+
+          let vm = this;
+
+          async function handleSections() {
+            await vm.getSections(doc.data().sections);
+          }
+
+          handleSections();
+
+          return (this.meta = completedMeta);
+        });
+      }
+      return;
+    },
+    async getSections(sections) {
+      const top = await this.getSection(sections.top);
+      const mid = await this.getSection(sections.mid);
+      const bot = await this.getSection(sections.bot);
+      this.sections.top = top;
+      this.sections.mid = mid;
+      this.sections.bot = bot;
+      this.sections.top.paths = Object.values(top.drawing);
+      this.sections.mid.paths = Object.values(mid.drawing);
+      this.sections.bot.paths = Object.values(bot.drawing);
+      this.isFetching = "done";
+    },
+    async getSection(docRef) {
+      const response = await docRef.get();
+      return response.data();
+    },
     openHelp() {
       this.$store.dispatch("setIsHelping", true);
     }
@@ -150,5 +175,19 @@ h1 {
   > * {
     margin-left: 1rem;
   }
+}
+
+.title {
+  margin-top: calc(40px / 3);
+  padding: 1rem;
+  text-align: center;
+  height: 60px;
+}
+
+.loading {
+  height: calc(544px + 60px + (40px / 3));
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 </style>

@@ -23,7 +23,7 @@ export default {
       {
         hid: "description",
         name: "description",
-        content: `An online collaborative drawing game. 🔪` || ""
+        content: `An online collaborative drawing game. ✏️` || ""
       }
     ]
   },

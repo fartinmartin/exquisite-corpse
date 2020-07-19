@@ -76,6 +76,7 @@ export default {
       canvas.style.width = rect.width + "px";
       canvas.style.height = rect.height + "px";
     },
+
     mousedown(e) {
       this.$store.dispatch("modules/mouse/setMousePosition", e);
       if (this.mouseMode !== "fill") {
@@ -96,7 +97,7 @@ export default {
       }
     },
 
-    mouseup(e) {
+    mouseup() {
       this.$store.dispatch("modules/mouse/setIsDrawing", false);
       this.$store.dispatch("modules/drawing/pushCurrentPathToDrawingHistory");
       this.$store.dispatch("modules/drawing/incrementHistory");
@@ -262,7 +263,7 @@ export default {
       if (this.mode === "display") {
         return this.section;
       } else if (this.mode === "pixelate") {
-        return { ...this.sections[this.id].data };
+        return this.sections[this.id].data;
       }
     }
   }

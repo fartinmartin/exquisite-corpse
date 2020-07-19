@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="wrap">
     {{ $route.params.id }}
   </div>
 </template>
@@ -11,8 +11,12 @@ export default {
   },
   async fetch({ store, params }) {
     const completedId = params.id;
+    console.log(this);
 
-    // await store.dispatc("fetchCompletedFromFirebase", { docId: completedId });
+    // first, look up id in store
+    // then go try firestore
+    // then display
+    // if nothing then tell 'em they effed up
   }
 };
 </script>
