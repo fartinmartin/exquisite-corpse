@@ -46,9 +46,51 @@ export default {
       }
     };
   },
-  async mounted() {
-    // fetch random completed drawing!
-  },
+  // async mounted() {
+  //   const completedRef = this.$fireStore.collection("completed");
+  //   let completedData = {};
+
+  //   // https://stackoverflow.com/a/54801398/8703073
+  //   const randomKey = completedRef.doc().id;
+  //   const query = completedRef
+  //     .where(this.$fireStoreObj.FieldPath.documentId(), ">=", randomKey)
+  //     .where("type", "==", key)
+  //     .limit(1);
+  //   const firstResponse = await query.get();
+
+  //   if (firstResponse.size > 0) {
+  //     firstResponse.forEach(doc => {
+  //       completedData = {
+  //         docId: doc.id,
+  //         ...doc.data()
+  //         // title, docId, sections, likes
+  //       };
+  //       let payload = {
+  //         type: completedData.type,
+  //         completedData
+  //       };
+  //       this.$store.dispatch("modules/drawing/setCompleted", payload);
+  //     });
+  //   } else {
+  //     const secondQuery = completedRef
+  //       .where(this.$fireStoreObj.FieldPath.documentId(), "<", randomKey)
+  //       .where("type", "==", key)
+  //       .limit(1);
+  //     const secondResponse = await secondQuery.get();
+
+  //     secondResponse.forEach(doc => {
+  //       completedData = {
+  //         docId: doc.id,
+  //         ...doc.data()
+  //       };
+  //       let payload = {
+  //         type: completedData.type,
+  //         completedData
+  //       };
+  //       this.$store.dispatch("modules/drawing/setCompleted", payload);
+  //     });
+  //   }
+  // },
   mounted() {
     // this.$store.dispatch("modules/gallery/fetchSections");
     // https://stackoverflow.com/questions/46798981/firestore-how-to-get-random-documents-in-a-collection
