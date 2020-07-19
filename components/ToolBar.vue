@@ -101,7 +101,7 @@
       </div>
     </div>
 
-    <SaveModal v-if="isSaving" @close-save="isSaving = false" />
+    <SaveModal v-if="isSaving" @close-save="closeSave" />
   </div>
 </template>
 
@@ -206,6 +206,12 @@ export default {
     },
     startSave() {
       this.isSaving = true;
+    },
+    closeSave(e) {
+      this.isSaving = false;
+      if (e) {
+        this.$router.push({ path: `/gallery/${e}` });
+      }
     }
   }
 };

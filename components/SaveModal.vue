@@ -123,7 +123,7 @@ export default {
         .then(() => {
           // TODO: tell loading component to show success then route to the completed drawing!
           alert("You did it! Ur drawing was saved!");
-          this.$emit("close-save");
+          this.$emit("close-save", completedId);
         })
         .catch(error => {
           alert("Oops, there was an error.. try again?");

@@ -43,6 +43,7 @@ export default {
     this.fetchCompleted();
   },
   methods: {
+    //https://stackoverflow.com/questions/62639778/paginating-firestore-data-when-using-vuex-and-appending-new-data-to-the-state
     async fetchCompleted() {
       this.isFetching = "yes";
       const completedRef = this.$fireStore.collection("completed");

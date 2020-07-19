@@ -332,6 +332,8 @@ canvas {
     background: var(--white);
     height: 60px;
     min-width: 33%;
+    width: 100%;
+    max-width: max-content;
     border: 2px solid var(--orange);
     padding: 0 1rem;
   }
