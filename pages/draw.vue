@@ -23,6 +23,25 @@ export default {
   data: function() {
     return { isFetching: "not yet" };
   },
+  async fetch({ store, $axios }) {
+    const response = await $axios.$get("/randomWords", {
+      params: {
+        hasDictionaryDef: true,
+        includePartOfSpeech: "adjective,noun",
+        maxCorpusCount: -1,
+        minDictionaryCount: 1,
+        maxDictionaryCount: -1,
+        minLength: 5,
+        maxLength: 8,
+        limit: 2,
+        api_key: process.env.WORDNIK_API_KEY
+      }
+    });
+
+    let words = [];
+    response.forEach(word => words.push(word.word));
+    store.dispatch("modules/drawing/setWords", words);
+  },
   mounted() {
     this.$store.dispatch("modules/drawing/clearDrawing");
     this.$store.dispatch("modules/mouse/resetMouse"); // "opinionated" i guess.. i dunno what that means really

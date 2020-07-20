@@ -1,16 +1,19 @@
 <template>
   <div class="border" :id="id">
     <div class="canvas-wrap">
-      <div v-if="mode === 'display'" class="drawing-meta">
-        <div class="info">{{ section.title }} by {{ section.artist }}</div>
-      </div>
-      <div
+      <CanvasMeta
+        v-if="mode === 'display'"
+        class="drawing-meta"
+        :title="section.title"
+        :artist="section.artist"
+      />
+      <CanvasMeta
         v-if="mode === 'pixelate'"
         class="drawing-meta not-allowed"
+        :title="drawing.title"
+        :artist="drawing.artist"
         ref="notAllowed"
-      >
-        <div class="info">{{ drawing.title }} by {{ drawing.artist }}</div>
-      </div>
+      />
       <canvas
         ref="canvas"
         v-on="
@@ -25,9 +28,11 @@
 import floodFill from "~/assets/js/floodFill";
 import asyncForEach, { waitFor } from "~/assets/js/asyncForEach";
 import { mapState } from "vuex";
+import CanvasMeta from "~/components/CanvasMeta.vue";
 
 export default {
   name: "Canvas",
+  components: { CanvasMeta },
   props: {
     id: {
       type: String, // top, mid, or bot
@@ -305,51 +310,5 @@ canvas {
 
   width: 100%;
   height: 100%;
-}
-
-.drawing-meta {
-  display: none;
-  position: absolute;
-  z-index: 100;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  // http://www.patternify.com/
-  background: transparent
-    url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAkAAAAJCAYAAADgkQYQAAAAFUlEQVQYlWNgoAb4N4HhP2UKhoUVAL3oD0/YmVPIAAAAAElFTkSuQmCC)
-    repeat;
-
-  .info {
-    position: absolute;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 101;
-    top: 50%;
-    left: 50%;
-    transform: translate3d(-50%, -50%, 0);
-    background: var(--white);
-    height: 60px;
-    min-width: 33%;
-    width: 100%;
-    max-width: max-content;
-    border: 2px solid var(--orange);
-    padding: 0 1rem;
-  }
-}
-
-.drawing-meta.not-allowed {
-  display: block;
-  background-color: var(--white);
-  /* background-blend-mode: multiply; */
-
-  .info {
-    display: none;
-  }
-
-  &:hover .info {
-    display: flex;
-  }
 }
 </style>

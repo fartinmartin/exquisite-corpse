@@ -35,7 +35,7 @@ export default {
   data: function() {
     return {
       isFetching: "not yet",
-      gallery: [],
+      gallery: [], // this needs to be in the store in order for prev/next nav on individual pages
       lastVisible: null
     };
   },

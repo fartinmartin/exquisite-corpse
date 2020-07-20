@@ -51,7 +51,7 @@ export default {
   /*
    ** Nuxt.js modules
    */
-  modules: ["@nuxtjs/firebase", "@nuxtjs/svg"],
+  modules: ["@nuxtjs/firebase", "@nuxtjs/svg", "@nuxtjs/axios"],
   /*
    ** Firebase config
    ** See:
@@ -93,6 +93,15 @@ export default {
       short_name: "ECC",
       lang: "en"
     }
+  },
+  /*
+   ** axios
+   ** See https://github.com/nuxt-community/axios-module#options
+   */
+  axios: {
+    baseURL: "https://api.wordnik.com/v4/words.json",
+    proxyHeaders: false,
+    credentials: false
   },
   /*
    ** Build configuration

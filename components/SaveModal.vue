@@ -5,14 +5,22 @@
       <form class="border yellow">
         <div>
           <label for="title">your section's title:</label>
-          <input type="text" v-model="title" id="title" />
+          <input
+            type="text"
+            v-model="title"
+            id="title"
+            :placeholder="title"
+            :class="{ temp: isTemp }"
+            @focus="isTemp = false"
+            maxlength="17"
+          />
         </div>
         <div>
           <label for="artist">
             your *ahem* artist name:
             <span>(@s will link to your instagram)</span>
           </label>
-          <input type="text" v-model="artist" id="artist" />
+          <input type="text" v-model="artist" id="artist" maxlength="30" />
         </div>
         <div>
           <input
@@ -41,18 +49,20 @@ export default {
   data() {
     return {
       title: null,
-      artist: null
+      artist: null,
+      isTemp: true
     };
   },
   computed: {
     ...mapState(["baseURL"]),
     ...mapState("modules/user", ["id", "displayName"]),
-    ...mapState("modules/drawing", ["type", "paths", "sections"]),
+    ...mapState("modules/drawing", ["type", "paths", "sections", "words"]),
     section() {
       return { paths: this.paths, title: this.title, artist: this.artist };
     }
   },
   mounted() {
+    this.title = this.words.join(" ");
     document.addEventListener("keydown", this.handleShortcuts);
   },
   beforeDestroy() {
@@ -189,6 +199,12 @@ form {
     background: none;
 
     border-bottom: 1px dotted var(--orange);
+  }
+
+  ::placeholder,
+  input.temp {
+    color: #7f7f7f;
+    opacity: 1;
   }
 
   label span {

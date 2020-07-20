@@ -11,7 +11,8 @@ export const state = () => ({
     top: null,
     mid: null,
     bot: null
-  }
+  },
+  words: []
 });
 
 export const getters = {
@@ -33,6 +34,9 @@ export const getters = {
 };
 
 export const actions = {
+  setWords({ commit }, words) {
+    commit("SET_WORDS", words);
+  },
   setSections({ commit }, { type, sectionData }) {
     if (sectionData) {
       // convert firestore object to an array
@@ -177,6 +181,9 @@ export const actions = {
 };
 
 export const mutations = {
+  SET_WORDS(state, words) {
+    state.words = words;
+  },
   CLEAR_DRAWING(state) {
     state.paths = [];
     state.history.paths = [];
