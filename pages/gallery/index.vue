@@ -48,7 +48,7 @@ export default {
       this.isFetching = "yes";
       const completedRef = this.$fireStore.collection("completed");
 
-      const query = completedRef.orderBy("date").limit(9);
+      const query = completedRef.orderBy("date", "desc").limit(9);
       const firstResponse = await query.get();
       this.lastVisible = firstResponse.docs[firstResponse.docs.length - 1];
       firstResponse.forEach(doc => {
