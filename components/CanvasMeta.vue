@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div ref="bg">
     <div class="info">
       {{ title }} by
       <span>&nbsp;</span>
@@ -25,6 +25,11 @@ export default {
   computed: {
     isInstagram() {
       return this.artist.startsWith("@");
+    }
+  },
+  methods: {
+    bg() {
+      this.$refs.bg.style.backgroundColor = "transparent";
     }
   }
 };

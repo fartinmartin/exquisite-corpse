@@ -257,7 +257,7 @@ export default {
         img2.height / devicePixelRatio
       );
 
-      this.$refs.notAllowed.style.backgroundColor = "transparent";
+      this.$refs.notAllowed.bg();
     }
   },
   computed: {
@@ -268,7 +268,7 @@ export default {
       if (this.mode === "display") {
         return this.section;
       } else if (this.mode === "pixelate") {
-        return this.sections[this.id].data;
+        return { ...this.sections[this.id].data };
       }
     }
   }
