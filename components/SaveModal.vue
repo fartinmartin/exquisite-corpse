@@ -95,20 +95,36 @@ export default {
         return titleAsArray[Math.floor(Math.random() * titleAsArray.length)];
       }
 
+      let thumbsObject = {};
       let titleArray = [randomWordFromTitle(this.title)];
+
       const sectionsObj = Object.keys(this.sections);
+
       sectionsObj.forEach(key => {
         if (key !== this.type) {
           titleArray.push(randomWordFromTitle(this.sections[key].title));
+          thumbsObject[key] = this.sections[key].thumb;
         }
       });
 
-      // TODO: create dataimg thumb
-      // this thumb: this.$refs.previewCanvas.$refs.canvas.toDataURL()
-      // get other thumbs (from above loop ☝️)
+      // create thumb for completed drawing
+      const currentThumb = this.$refs.previewCanvas.$refs.canvas.toDataURL();
+      thumbsObject[this.type] = currentThumb;
+
       // create offscreen canvas
+      const offscreenCanvas = document.createElement("canvas");
+      offscreenCanvas.width = "1080";
+      offscreenCanvas.height = "1080";
+      offscreenCtx = offscreenCanvas.getContext("2d");
+
       // add three images
+      offscreenCtx.drawImage(thumbsObject.top, 0, 0, 1080, 360);
+      offscreenCtx.drawImage(thumbsObject.mid, 0, 360, 1080, 360);
+      offscreenCtx.drawImage(thumbsObject.bot, 0, 720, 1080, 360);
+
+      // shrink canvas to 1/3rd (optional i guess bc this file wont get very big!)
       // convert *that* canvas to dataURL
+      const completedThumb = offscreenCanvas.toDataURL();
 
       let completePaylod = {
         title: titleArray.join(" "), // jumble of all three names
@@ -132,7 +148,7 @@ export default {
             }`
           )
         },
-        thumb: ""
+        thumb: completedThumb
       };
 
       completedRef.set(completePaylod);
@@ -144,7 +160,7 @@ export default {
         featuredIn: [this.$fireStore.doc(`completed/${completedId}`)],
         likes: 0,
         permalink: `${this.baseURL}/gallery/${this.type}/${sectionId}`,
-        thumb: this.$refs.previewCanvas.$refs.canvas.toDataURL(), // TODO: this requires the canvas to have finished animating 🤔
+        thumb: currentThumb, // TODO: this requires the canvas to have finished animating 🤔 i could trigger it to just makeDrawing() w no timeout? ALSO: will this "file" get too big?? seems unlikely!
         title: this.title || "untitled", // TODO: random phrase from Wordnik API
         type: this.type,
         userId: this.id
