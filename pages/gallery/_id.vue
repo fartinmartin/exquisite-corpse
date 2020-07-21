@@ -13,6 +13,13 @@
         <span>💾</span>
       </div>
     </div>
+    <div
+      class="border yellow meta mw-canvas"
+      style="height: auto;"
+      v-if="isFetching === 'done'"
+    >
+      <img :src="meta.thumb" alt="" style="width: 100%;" />
+    </div>
   </div>
 </template>
 
@@ -38,7 +45,8 @@ export default {
         docId: doc.id,
         likes: doc.data().likes,
         title: doc.data().title,
-        date: doc.data().date
+        date: doc.data().date,
+        thumb: doc.data().thumb
       };
 
       this.meta = completedMeta;
