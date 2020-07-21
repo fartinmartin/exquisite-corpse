@@ -2,7 +2,7 @@
   <div class="wrap">
     <div class="border yellow mw-canvas header">
       <h1>Gallery</h1>
-      <div class="menu">
+      <!-- <div class="menu">
         <div class="icon">
           <div class="sections">
             <div class="sec top"></div>
@@ -14,7 +14,7 @@
           <div class="date">📅</div>
           <div class="likes">❤️</div>
         </div>
-      </div>
+      </div> -->
     </div>
     <div class="gallery">
       <nuxt-link

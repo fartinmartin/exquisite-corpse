@@ -11,19 +11,15 @@
       <div class="menu">
         <span>{{ meta.likes }} ❤️</span>
         <span>💾</span>
+        <!-- <button class="button" @click="updateThumb">📷</button> -->
       </div>
-    </div>
-    <div
-      class="border yellow meta mw-canvas"
-      style="height: auto;"
-      v-if="isFetching === 'done'"
-    >
-      <img :src="meta.thumb" alt="" style="width: 100%;" />
     </div>
   </div>
 </template>
 
 <script>
+import { mergeBase64 } from "~/assets/js/mergeImages";
+
 export default {
   data: function() {
     return {
@@ -75,6 +71,34 @@ export default {
     async getSection(docRef) {
       const response = await docRef.get();
       return response.data();
+    },
+    async updateThumb() {
+      let thumbsObject = {};
+
+      const sectionsObj = Object.keys(this.sections);
+
+      sectionsObj.forEach(key => {
+        if (key !== this.type) {
+          thumbsObject[key] = this.sections[key].thumb;
+        }
+      });
+
+      const completedThumb = await mergeBase64([
+        thumbsObject.top,
+        thumbsObject.mid,
+        thumbsObject.bot
+      ]);
+
+      const docId = this.$route.params.id;
+      const docRef = this.$fireStore.collection("completed").doc(docId);
+      return docRef
+        .update({ thumb: completedThumb })
+        .then(() => {
+          console.log("it worked!", completedThumb);
+        })
+        .catch(error => {
+          console.error(error);
+        });
     }
   }
 };

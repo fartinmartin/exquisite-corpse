@@ -19,13 +19,6 @@
         <!-- <button class="button" @click="updateThumb">📷</button> -->
       </div>
     </div>
-    <div
-      class="border yellow meta mw-canvas"
-      style="height: auto;"
-      v-if="isFetching === 'done'"
-    >
-      <img :src="section.thumb" alt="" style="width: 100%;" />
-    </div>
   </div>
 </template>
 

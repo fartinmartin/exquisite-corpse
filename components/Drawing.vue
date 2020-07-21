@@ -1,10 +1,10 @@
 <template>
   <div class="drawing-item">
     <img :src="drawing.thumb" alt="" class="border" />
-    <div class="border yellow meta">
+    <!-- <div class="border yellow meta">
       <h2>{{ drawing.title }}</h2>
       <span>{{ drawing.likes }}</span>
-    </div>
+    </div> -->
   </div>
 </template>
 
@@ -19,6 +19,17 @@ export default {
 <style lang="scss" scoped>
 .drawing-item {
   width: 100%;
+
+  img {
+    transition: transform 0.1s ease, box-shadow 0.1s ease, border 0.1s ease;
+  }
+
+  &:hover img {
+    --border-color: var(--light-yellow);
+    --box-shadow-color: var(--orange);
+    --box-shadow-size: 6px;
+    transform: translate3d(-4px, -4px, 0);
+  }
 }
 
 h2 {

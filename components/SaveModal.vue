@@ -112,61 +112,11 @@ export default {
       const currentThumb = this.$refs.previewCanvas.$refs.canvas.toDataURL();
       thumbsObject[this.type] = currentThumb;
 
-      // // create offscreen canvas
-      // const offscreenCanvas = document.createElement("canvas");
-      // offscreenCanvas.width = "1080";
-      // offscreenCanvas.height = "1080";
-      // const offscreenCtx = offscreenCanvas.getContext("2d");
-
-      // // add three images
-
-      // const topImage = new Image();
-      // topImage.src = thumbsObject.top;
-      // topImage.onload = drawThumb;
-      // topImage.onerror = errorThumb;
-
-      // const midImage = new Image();
-      // midImage.src = thumbsObject.mid;
-      // midImage.onload = drawThumb;
-      // midImage.onerror = errorThumb;
-
-      // const botImage = new Image();
-      // botImage.src = thumbsObject.bot;
-      // botImage.onload = drawThumb;
-      // botImage.onerror = errorThumb;
-
-      // var imgCount = 3;
-
-      // function errorThumb() {
-      //   console.log("error");
-      // }
-
-      // function drawThumb() {
-      //   if (--imgCount > 0) {
-      //     return;
-      //   }
-      //   console.log(
-      //     imgCount,
-      //     "we draw",
-      //     topImage.src,
-      //     midImage.src,
-      //     botImage.src
-      //   );
-      //   offscreenCtx.drawImage(topImage, 0, 0);
-      //   offscreenCtx.drawImage(midImage, 0, 360);
-      //   offscreenCtx.drawImage(botImage, 0, 720);
-      // }
-
-      // convert *that* canvas to dataURL
       const completedThumb = await mergeBase64([
         thumbsObject.top,
         thumbsObject.mid,
         thumbsObject.bot
       ]);
-
-      console.log(completedThumb);
-
-      debugger;
 
       let completePaylod = {
         title: titleArray.join(" "), // jumble of all three names
