@@ -48,8 +48,8 @@ export default {
   components: { Canvas },
   data() {
     return {
-      title: null,
-      artist: null,
+      title: "",
+      artist: "",
       isTemp: true
     };
   },
@@ -79,16 +79,28 @@ export default {
     },
     saveDrawing() {
       // TODO: should validate form and/or come up with defaults
-      //       was there going to be a random word/phrase as placeholdler for title?? yes do it
-      //       also the completed drawing's title should be a junble of the three names
+      // TODO: create dataimg thumb
       let timestamp = this.$fireStoreObj.Timestamp.fromDate(new Date());
       const completedRef = this.$fireStore.collection("completed").doc();
       const completedId = completedRef.id;
       const sectionsRef = this.$fireStore.collection("sections").doc();
       const sectionId = sectionsRef.id;
 
+      function randomWordFromTitle(title) {
+        const titleAsArray = title.split(" ");
+        return titleAsArray[Math.floor(Math.random() * titleAsArray.length)];
+      }
+
+      let titleArray = [randomWordFromTitle(this.title)];
+      const sectionsObj = Object.keys(this.sections);
+      sectionsObj.forEach(key => {
+        if (key !== this.type) {
+          titleArray.push(randomWordFromTitle(this.sections[key].data.title));
+        }
+      });
+
       let completePaylod = {
-        title: "", // jumble of all three names
+        title: titleArray.join(" "), // jumble of all three names
         date: timestamp,
         likes: 0,
         permalink: `${this.baseURL}/gallery/${completedId}`,
@@ -141,7 +153,18 @@ export default {
           // TODO: tell loading component to deal with error
         });
 
-      // TODO: for each drawing that is NOT active type, push the "completedId" to their "featuredIn" array
+      // for each drawing that is NOT active type, push the "completedId" to their "featuredIn" array
+      sectionsObj.forEach(key => {
+        if (key !== this.type) {
+          const docId = this.sections[key].data.docId;
+          const docRef = this.$fireStore.collection("sections").doc(docId);
+          docRef.update({
+            featuredIn: this.$fireStoreObj.FieldValue.arrayUnion(
+              this.$fireStore.doc(`completed/${completedId}`)
+            )
+          });
+        }
+      });
     }
   }
 };
