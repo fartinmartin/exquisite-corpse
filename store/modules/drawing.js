@@ -173,7 +173,11 @@ export const actions = {
   drawFill({ state: { ctx } }, point) {
     ctx.fillStyle = point.color;
     let tolerance = 100;
-    floodFill.fill(point.x2, point.y2, tolerance, ctx);
+    let dpiPoint = {
+      x2: point.x2 * devicePixelRatio,
+      y2: point.y2 * devicePixelRatio
+    };
+    floodFill.fill(dpiPoint.x2, dpiPoint.y2, tolerance, ctx);
   }
 };
 
