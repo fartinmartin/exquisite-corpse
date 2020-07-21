@@ -37,7 +37,7 @@ export default {
           api_key: process.env.WORDNIK_API_KEY
         }
       });
-      response.forEach(word => words.push(word.word));
+      response.forEach(word => words.push(word.word.toLowerCase()));
     } catch (error) {
       console.error(error);
       words.push("untitled");
@@ -79,6 +79,7 @@ export default {
                   docId: doc.id,
                   paths: Object.values(doc.data().drawing),
                   type: doc.data().type,
+                  thumb: doc.data().thumb,
                   artist: doc.data().artist,
                   title: doc.data().title
                 };
@@ -100,6 +101,7 @@ export default {
                   docId: doc.id,
                   paths: Object.values(doc.data().drawing),
                   type: doc.data().type,
+                  thumb: doc.data().thumb,
                   artist: doc.data().artist,
                   title: doc.data().title
                 };
