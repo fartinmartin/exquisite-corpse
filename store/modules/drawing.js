@@ -37,12 +37,9 @@ export const actions = {
   setWords({ commit }, words) {
     commit("SET_WORDS", words);
   },
-  setSections({ commit }, { type, sectionData }) {
-    if (sectionData) {
-      // convert firestore object to an array
-      sectionData.paths = Object.values(sectionData.drawing);
-    }
-    commit("SET_SECTIONS", { type, sectionData });
+
+  setSections({ commit }, payload) {
+    commit("SET_SECTIONS", payload);
   },
 
   clearDrawing({ commit }) {
@@ -184,6 +181,7 @@ export const mutations = {
   SET_WORDS(state, words) {
     state.words = words;
   },
+
   CLEAR_DRAWING(state) {
     state.paths = [];
     state.history.paths = [];
@@ -204,11 +202,11 @@ export const mutations = {
     state.type = type;
   },
 
-  SET_SECTIONS(state, { type, sectionData }) {
-    if (!sectionData) {
-      state.sections[type] = { type, data: { type, docId: "temp" } }; // sets it to string so that Canvas component knows how to deal
+  SET_SECTIONS(state, payload) {
+    if (payload.isTrue) {
+      state.sections[payload.type] = { type, docId: "temp" }; // sets it to string so that Canvas component knows how to deal
     } else {
-      state.sections[type] = { type, data: sectionData };
+      state.sections[payload.type] = { ...payload };
     }
   },
 

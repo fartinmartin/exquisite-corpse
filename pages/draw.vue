@@ -1,6 +1,5 @@
 <template>
   <div class="wrap">
-    <!-- <Log /> -->
     <PickSection
       v-if="isFetching === 'not yet'"
       @picked-type="handlePickedType"
@@ -11,7 +10,6 @@
 </template>
 
 <script>
-// import Log from "~/components/Log";
 import Draw from "~/components/Draw";
 import PickSection from "~/components/PickSection";
 import { mapState } from "vuex";
@@ -44,7 +42,7 @@ export default {
   },
   mounted() {
     this.$store.dispatch("modules/drawing/clearDrawing");
-    this.$store.dispatch("modules/mouse/resetMouse"); // "opinionated" i guess.. i dunno what that means really
+    this.$store.dispatch("modules/mouse/resetMouse");
   },
   methods: {
     async handlePickedType(type) {
@@ -58,11 +56,9 @@ export default {
           if (key === type) {
             this.$store.dispatch("modules/drawing/setSections", {
               type,
-              sectionData: null
+              isTemp: true
             });
           } else {
-            let sectionData = {};
-
             // https://stackoverflow.com/a/54801398/8703073
             const randomKey = sectionsRef.doc().id;
             const query = sectionsRef
@@ -73,13 +69,12 @@ export default {
 
             if (firstResponse.size > 0) {
               firstResponse.forEach(doc => {
-                sectionData = {
+                const payload = {
                   docId: doc.id,
-                  ...doc.data()
-                };
-                let payload = {
-                  type: sectionData.type,
-                  sectionData
+                  paths: Object.values(doc.data().drawing),
+                  type: doc.data().type,
+                  artist: doc.data().artist,
+                  title: doc.data().title
                 };
                 this.$store.dispatch("modules/drawing/setSections", payload);
               });
@@ -95,13 +90,12 @@ export default {
               const secondResponse = await secondQuery.get();
 
               secondResponse.forEach(doc => {
-                sectionData = {
+                const payload = {
                   docId: doc.id,
-                  ...doc.data()
-                };
-                let payload = {
-                  type: sectionData.type,
-                  sectionData
+                  paths: Object.values(doc.data().drawing),
+                  type: doc.data().type,
+                  artist: doc.data().artist,
+                  title: doc.data().title
                 };
                 this.$store.dispatch("modules/drawing/setSections", payload);
               });

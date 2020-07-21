@@ -95,7 +95,7 @@ export default {
       const sectionsObj = Object.keys(this.sections);
       sectionsObj.forEach(key => {
         if (key !== this.type) {
-          titleArray.push(randomWordFromTitle(this.sections[key].data.title));
+          titleArray.push(randomWordFromTitle(this.sections[key].title));
         }
       });
 
@@ -107,17 +107,17 @@ export default {
         sections: {
           top: this.$fireStore.doc(
             `sections/${
-              this.type === "top" ? sectionId : this.sections.top.data.docId
+              this.type === "top" ? sectionId : this.sections.top.docId
             }`
           ),
           mid: this.$fireStore.doc(
             `sections/${
-              this.type === "mid" ? sectionId : this.sections.mid.data.docId
+              this.type === "mid" ? sectionId : this.sections.mid.docId
             }`
           ),
           bot: this.$fireStore.doc(
             `sections/${
-              this.type === "bot" ? sectionId : this.sections.bot.data.docId
+              this.type === "bot" ? sectionId : this.sections.bot.docId
             }`
           )
         },
@@ -156,7 +156,7 @@ export default {
       // for each drawing that is NOT active type, push the "completedId" to their "featuredIn" array
       sectionsObj.forEach(key => {
         if (key !== this.type) {
-          const docId = this.sections[key].data.docId;
+          const docId = this.sections[key].docId;
           const docRef = this.$fireStore.collection("sections").doc(docId);
           docRef.update({
             featuredIn: this.$fireStoreObj.FieldValue.arrayUnion(
