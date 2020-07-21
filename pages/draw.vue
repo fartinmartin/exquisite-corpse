@@ -22,22 +22,27 @@ export default {
     return { isFetching: "not yet" };
   },
   async fetch({ store, $axios }) {
-    const response = await $axios.$get("/randomWords", {
-      params: {
-        hasDictionaryDef: true,
-        includePartOfSpeech: "adjective,noun",
-        maxCorpusCount: -1,
-        minDictionaryCount: 1,
-        maxDictionaryCount: -1,
-        minLength: 5,
-        maxLength: 8,
-        limit: 2,
-        api_key: process.env.WORDNIK_API_KEY
-      }
-    });
-
     let words = [];
-    response.forEach(word => words.push(word.word));
+    try {
+      const response = await $axios.$get("/randomWords", {
+        params: {
+          hasDictionaryDef: true,
+          includePartOfSpeech: "adjective,noun",
+          maxCorpusCount: -1,
+          minDictionaryCount: 1,
+          maxDictionaryCount: -1,
+          minLength: 5,
+          maxLength: 8,
+          limit: 2,
+          api_key: process.env.WORDNIK_API_KEY
+        }
+      });
+      response.forEach(word => words.push(word.word));
+    } catch (error) {
+      console.error(error);
+      words.push("untitled");
+    }
+
     store.dispatch("modules/drawing/setWords", words);
   },
   mounted() {
