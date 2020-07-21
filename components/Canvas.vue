@@ -42,7 +42,7 @@ export default {
       type: String, // draw, display, or pixelate
       required: true
     },
-    section: Object // maybe instead of passing we use getters to get state (using id) but then how do we handle display? maybe section only applys during display mode...
+    section: Object // for display
   },
   data: function() {
     return {
