@@ -69,6 +69,7 @@ export default {
 
             if (firstResponse.size > 0) {
               firstResponse.forEach(doc => {
+                // https://programmersought.com/article/27791951922/;jsessionid=F1AC9A35FBE8713BA67DF8D0090DE51B
                 const payload = {
                   docId: doc.id,
                   paths: Object.values(doc.data().drawing),
