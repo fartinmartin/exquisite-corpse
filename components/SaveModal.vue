@@ -1,7 +1,12 @@
 <template>
   <div class="save-modal" @click="closeMe">
     <div>
-      <Canvas id="save-preview" :section="section" mode="display" />
+      <Canvas
+        id="save-preview"
+        :section="section"
+        mode="display"
+        ref="previewCanvas"
+      />
       <form class="border yellow">
         <div>
           <label for="title">your section's title:</label>
@@ -79,7 +84,6 @@ export default {
     },
     saveDrawing() {
       // TODO: should validate form and/or come up with defaults
-      // TODO: create dataimg thumb
       let timestamp = this.$fireStoreObj.Timestamp.fromDate(new Date());
       const completedRef = this.$fireStore.collection("completed").doc();
       const completedId = completedRef.id;
@@ -98,6 +102,13 @@ export default {
           titleArray.push(randomWordFromTitle(this.sections[key].title));
         }
       });
+
+      // TODO: create dataimg thumb
+      // this thumb: this.$refs.previewCanvas.$refs.canvas.toDataURL()
+      // get other thumbs (from above loop ☝️)
+      // create offscreen canvas
+      // add three images
+      // convert *that* canvas to dataURL
 
       let completePaylod = {
         title: titleArray.join(" "), // jumble of all three names
@@ -133,7 +144,7 @@ export default {
         featuredIn: [this.$fireStore.doc(`completed/${completedId}`)],
         likes: 0,
         permalink: `${this.baseURL}/gallery/${this.type}/${sectionId}`,
-        thumb: "", // TODO: learn how to do this...
+        thumb: this.$refs.previewCanvas.$refs.canvas.toDataURL(), // TODO: this requires the canvas to have finished animating 🤔
         title: this.title || "untitled", // TODO: random phrase from Wordnik API
         type: this.type,
         userId: this.id
