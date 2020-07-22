@@ -1,6 +1,8 @@
 <template>
   <button @click="handleClick">
-    <div class="icon interactive"><span>0</span> ❤️</div>
+    <div class="icon interactive" :class="{ 'border liked': isLiked }">
+      <span>{{ likes }}</span> ❤️
+    </div>
   </button>
 </template>
 
@@ -12,7 +14,7 @@ export default {
       type: String,
       required: true
     },
-    id: {
+    docId: {
       type: String,
       required: true
     }
@@ -23,11 +25,49 @@ export default {
       isLiked: false
     };
   },
-  mounted() {},
+  mounted() {
+    this.subscribeToLikes();
+  },
+  beforeDestroy() {
+    this.subscribeToLikes("destory");
+  },
   methods: {
-    handleClick() {}
+    subscribeToLikes(destory) {
+      const likesRef = this.$fireStore
+        .collection(this.collection)
+        .doc(this.docId)
+        .onSnapshot(doc => {
+          this.likes = doc.data().likes;
+        });
+      if (destory) return likesRef();
+    },
+    handleClick() {
+      this.liked = !this.liked;
+
+      const increment = this.$fireStoreObj.FieldValue.increment(1);
+      const decrement = this.$fireStoreObj.FieldValue.increment(-1);
+
+      const docRef = this.$fireStore
+        .collection(this.collection)
+        .doc(this.docId);
+
+      this.liked && docRef.update({ likes: increment });
+      !this.liked && docRef.update({ likes: decrement });
+    }
   }
 };
 </script>
 
-<style></style>
+<style lang="scss" scoped>
+.icon {
+  width: auto;
+  padding: 0 5px;
+
+  span {
+    margin-right: 0.5rem;
+  }
+}
+
+.liked {
+}
+</style>

@@ -9,7 +9,7 @@
     >
       <h1>{{ meta.title }}</h1>
       <div class="menu">
-        <span>{{ meta.likes }} ❤️</span>
+        <LikeButton collection="completed" :docId="this.$route.params.id" />
         <DownloadButton :image="meta.thumb" :title="meta.title" />
       </div>
     </div>
@@ -19,6 +19,7 @@
 <script>
 import PrevNext from "~/components/PrevNext.vue";
 import DownloadButton from "~/components/DownloadButton.vue";
+import LikeButton from "~/components/LikeButton.vue";
 
 export default {
   head() {
@@ -76,7 +77,7 @@ export default {
 
     async getSection(docRef) {
       const response = await docRef.get();
-      return response.data();
+      return { docId: response.id, ...response.data() };
     }
   }
 };

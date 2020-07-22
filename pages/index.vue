@@ -107,7 +107,7 @@ export default {
 
     async getSection(docRef) {
       const response = await docRef.get();
-      return response.data();
+      return { docId: response.id, ...response.data() };
     },
 
     openHelp() {

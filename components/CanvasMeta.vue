@@ -1,7 +1,12 @@
 <template>
   <div ref="bg">
     <div class="info">
-      {{ title }} by
+      <nuxt-link v-if="docId" :to="`/gallery/section/${docId}`">
+        {{ title }}
+      </nuxt-link>
+      <span v-if="!docId">{{ title }}</span>
+      <span>&nbsp;</span>
+      <span>by</span>
       <span>&nbsp;</span>
       <a
         v-if="isInstagram"
@@ -19,8 +24,18 @@
 <script>
 export default {
   props: {
-    title: String,
-    artist: String
+    title: {
+      type: String,
+      required: true
+    },
+    artist: {
+      type: String,
+      required: true
+    },
+    docId: String
+  },
+  mounted() {
+    console.log(this.docId);
   },
   computed: {
     isInstagram() {

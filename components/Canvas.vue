@@ -6,6 +6,7 @@
         class="drawing-meta"
         :title="section.title"
         :artist="section.artist"
+        :docId="section.docId"
       />
       <CanvasMeta
         v-if="mode === 'pixelate'"

@@ -18,7 +18,7 @@
         <h1>{{ section.title }} <span>by</span>{{ section.artist }}</h1>
       </div>
       <div class="menu">
-        <span>{{ section.likes }} ❤️</span>
+        <LikeButton collection="sections" :docId="this.$route.params.id" />
         <DownloadButton :image="section.thumb" :title="section.title" />
       </div>
     </div>
@@ -27,6 +27,8 @@
 
 <script>
 import Canvas from "~/components/Canvas.vue";
+import LikeButton from "~/components/LikeButton.vue";
+import DownloadButton from "~/components/DownloadButton.vue";
 
 export default {
   name: "Section",
@@ -35,7 +37,7 @@ export default {
       title: `exquisite corpse club • ${this.section.title} by ${this.section.artist}`
     };
   },
-  components: { Canvas },
+  components: { Canvas, LikeButton, DownloadButton },
   data: function() {
     return {
       isFetching: "not yet",
@@ -54,7 +56,6 @@ export default {
       this.section.paths = Object.values(doc.data().drawing);
 
       this.isFetching = "done";
-      console.log(this.section);
     }
   }
 };
