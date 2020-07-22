@@ -1,7 +1,12 @@
 <template>
   <div>
-    <div class="toolbar border yellow">
-      pick a section to start drawing!
+    <div class="border yellow info-panel">
+      <span>pick a section to start drawing!</span>
+      <button @click.prevent="openHelp">
+        <div class="icon interactive">
+          <img src="~/assets/img/icons/info.svg" />
+        </div>
+      </button>
     </div>
     <div
       class="section-template border pointer"
@@ -26,16 +31,21 @@
 
 <script>
 export default {
-  name: "PickSection"
+  name: "PickSection",
+  methods: {
+    openHelp() {
+      this.$store.dispatch("setIsHelping", true);
+    }
+  }
 };
 </script>
 
 <style lang="scss" scoped>
-.toolbar {
-  height: 60px;
-  display: flex;
-  align-items: center;
+.info-panel {
   justify-content: center;
+  span {
+    margin-right: 0.5rem;
+  }
 }
 
 .section-template {
