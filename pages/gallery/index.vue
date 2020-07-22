@@ -13,8 +13,8 @@
       </div>
     </div>
     <div class="border yellow info-panel mb mw-canvas">
-      <h1>gallery</h1>
-      <!-- <form>
+      <!-- <h1>gallery</h1> -->
+      <form>
         <div>
           <input
             type="radio"
@@ -37,7 +37,17 @@
           <input type="radio" id="bots" name="drone" value="bots" />
           <label for="bots"><h1>bots</h1></label>
         </div>
-      </form> -->
+      </form>
+      <form>
+        <div>
+          <input type="radio" id="date" name="drone" value="date" checked />
+          <label for="date"><h1>date</h1></label>
+        </div>
+        <div>
+          <input type="radio" id="likes" name="drone" value="likes" />
+          <label for="likes"><h1>likes</h1></label>
+        </div>
+      </form>
     </div>
     <div v-if="isFetching !== 'done'" class="loading">we is loading</div>
     <div v-if="isFetching === 'done'" class="gallery">
@@ -174,7 +184,7 @@ form {
     display: none;
   }
 
-  > * {
+  > *:not(:last-child) {
     margin-right: 1rem;
   }
 }
