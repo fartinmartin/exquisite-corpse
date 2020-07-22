@@ -36,6 +36,9 @@
               class="button solid yellow"
               @click.native="closeAndDraw"
             >
+              <span class="icon">
+                <img src="~/assets/img/toolbar/draw.svg" />
+              </span>
               start drawing!
             </nuxt-link>
           </div>
@@ -153,5 +156,14 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  span {
+    margin-right: 0.5rem;
+  }
 }
 </style>
