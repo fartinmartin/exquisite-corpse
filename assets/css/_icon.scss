@@ -29,7 +29,7 @@
     top: 25%;
     left: 50%;
     height: 100%;
-    transform: rotate(45deg) translateX(-20px);
+    transform: rotate(45deg) translateX(-30px);
     background: rgba(255, 255, 255, 0.45);
     mix-blend-mode: screen;
 
@@ -54,7 +54,7 @@
 
 @keyframes diagonal {
   0% {
-    transform: rotate(45deg) translateX(-20px);
+    transform: rotate(45deg) translateX(-30px);
   }
   50% {
     transform: rotate(50deg) translateX(10px);
