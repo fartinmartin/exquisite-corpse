@@ -30,6 +30,11 @@ import Canvas from "~/components/Canvas.vue";
 
 export default {
   name: "Section",
+  head() {
+    return {
+      title: `exquisite corpse club • ${this.section.title} by ${this.section.artist}`
+    };
+  },
   components: { Canvas },
   data: function() {
     return {
@@ -62,8 +67,15 @@ export default {
   border: var(--border-size) solid var(--border-color);
 }
 
-h1 span {
-  font-weight: normal;
-  margin-right: 1ch;
+h1 {
+  max-width: 400px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  span {
+    font-weight: normal;
+    margin-right: 1ch;
+  }
 }
 </style>
