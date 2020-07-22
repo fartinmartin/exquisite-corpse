@@ -1,6 +1,6 @@
 <template>
   <div class="wrap">
-    <PrevNext />
+    <!-- <PrevNext /> -->
     <div v-if="isFetching !== 'done'">loading</div>
     <Display v-if="isFetching === 'done'" :sections="sections" />
     <div
