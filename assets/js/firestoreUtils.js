@@ -1,3 +1,5 @@
+// these aren't in use, this is just a notepad for ideas/functions
+// see: ~/components/FirestoreAdminTools.vue for more things like this
 async function findCompletedsThatContainSpecificSections() {
   const completedsRef = this.$fireStore.collection("completed");
   const completedsRes = await completedsRef.get();
