@@ -40,11 +40,6 @@
             </nuxt-link>
           </div>
         </div>
-
-        <!-- <div class="nav">
-          <button disabled>back</button>
-          <button @click.prevent="step++">next</button>
-        </div> -->
       </div>
     </div>
   </div>

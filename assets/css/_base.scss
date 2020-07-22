@@ -1,0 +1,51 @@
+:root {
+  --black: #231f20;
+  --white: #fff;
+  --blue: #0064ff;
+  --light-blue: #81b2ff;
+  --lighter-blue: #deebff;
+  --orange: #fb9200;
+  --yellow: #fcba03;
+  --light-yellow: #fcda00;
+  --lighter-yellow: #fff29d;
+  // TODO: scale notes (nothing has been implemented with this...) 🤔
+  // our main square is 1080px
+  // our main division is 1/3, which equals 360px
+  // 120px is 1/3rd of 360px
+  // 40px is 1/3rd 120px
+}
+
+@import url("https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap");
+
+html {
+  font-family: "Space Mono", monospace;
+  font-size: 16px;
+  word-spacing: 1px;
+  -ms-text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+
+  color: var(--black);
+  // http://www.patternify.com/
+  background: var(--lighter-blue)
+    url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAAEklEQVQImWNgYGD4z0AswK4SAFXuAf8EPy+xAAAAAElFTkSuQmCC)
+    repeat;
+  background-blend-mode: overlay;
+
+  box-sizing: border-box;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+a {
+  text-decoration: none;
+  color: var(--black);
+}
+
+h1 {
+  font-size: 1rem;
+}

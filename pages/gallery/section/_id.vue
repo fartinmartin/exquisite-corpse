@@ -10,13 +10,16 @@
         ref="previewCanvas"
       />
     </div>
-    <div v-if="isFetching === 'done'" class="border yellow meta mw-canvas">
-      <h1>{{ section.title }}</h1>
-      <h1>{{ section.artist }}</h1>
+    <div
+      v-if="isFetching === 'done'"
+      class="border yellow info-panel mt mw-canvas"
+    >
+      <div>
+        <h1>{{ section.title }} <span>by</span>{{ section.artist }}</h1>
+      </div>
       <div class="menu">
         <span>{{ section.likes }} ❤️</span>
-        <span>💾</span>
-        <!-- <button class="button" @click="updateThumb">📷</button> -->
+        <DownloadButton :image="section.thumb" :title="section.title" />
       </div>
     </div>
   </div>
@@ -46,39 +49,21 @@ export default {
       this.section.paths = Object.values(doc.data().drawing);
 
       this.isFetching = "done";
-    },
-    async updateThumb() {
-      const dataImage = this.$refs.previewCanvas.$refs.canvas.toDataURL();
-      const docId = this.$route.params.id;
-      const docRef = this.$fireStore.collection("sections").doc(docId);
-      return docRef
-        .update({ thumb: dataImage })
-        .then(() => {
-          console.log("it worked!", dataImage);
-        })
-        .catch(error => {
-          console.error(error);
-        });
+      console.log(this.section);
     }
   }
 };
 </script>
 
 <style lang="scss" scoped>
-#top {
-  border-bottom: var(--border-size) solid var(--border-color);
+#top,
+#mid,
+#bot {
+  border: var(--border-size) solid var(--border-color);
 }
 
-h1 {
-  font-size: 1rem;
-}
-
-.wrap {
-  flex-direction: column;
-}
-
-.meta {
-  margin-top: calc(40px / 3);
-  padding: 1rem;
+h1 span {
+  font-weight: normal;
+  margin-right: 1ch;
 }
 </style>

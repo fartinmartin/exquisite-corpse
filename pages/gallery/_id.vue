@@ -1,24 +1,24 @@
 <template>
   <div class="wrap">
-    <div class="prev-next">
-      <div class="prev border yellow">👈</div>
-      <div class="next border yellow">👉</div>
-    </div>
+    <PrevNext />
     <div v-if="isFetching !== 'done'">loading</div>
     <Display v-if="isFetching === 'done'" :sections="sections" />
-    <div class="border yellow meta mw-canvas" v-if="isFetching === 'done'">
+    <div
+      v-if="isFetching === 'done'"
+      class="border yellow info-panel mt mw-canvas"
+    >
       <h1>{{ meta.title }}</h1>
       <div class="menu">
         <span>{{ meta.likes }} ❤️</span>
-        <span>💾</span>
-        <!-- <button class="button" @click="updateThumb">📷</button> -->
+        <DownloadButton :image="meta.thumb" :title="meta.title" />
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import { mergeBase64 } from "~/assets/js/mergeImages";
+import PrevNext from "~/components/PrevNext.vue";
+import DownloadButton from "~/components/DownloadButton.vue";
 
 export default {
   data: function() {
@@ -68,79 +68,22 @@ export default {
       this.sections.bot.paths = Object.values(bot.drawing);
       this.isFetching = "done";
     },
+
     async getSection(docRef) {
       const response = await docRef.get();
       return response.data();
-    },
-    async updateThumb() {
-      let thumbsObject = {};
-
-      const sectionsObj = Object.keys(this.sections);
-
-      sectionsObj.forEach(key => {
-        if (key !== this.type) {
-          thumbsObject[key] = this.sections[key].thumb;
-        }
-      });
-
-      const completedThumb = await mergeBase64([
-        thumbsObject.top,
-        thumbsObject.mid,
-        thumbsObject.bot
-      ]);
-
-      const docId = this.$route.params.id;
-      const docRef = this.$fireStore.collection("completed").doc(docId);
-      return docRef
-        .update({ thumb: completedThumb })
-        .then(() => {
-          console.log("it worked!", completedThumb);
-        })
-        .catch(error => {
-          console.error(error);
-        });
     }
   }
 };
 </script>
 
 <style lang="scss" scoped>
-.prev,
-.next {
-  width: 60px;
-  height: 60px;
-  padding: 1rem;
+.menu {
   display: flex;
   align-items: center;
-  justify-content: center;
-  position: absolute;
-  z-index: 100;
-  top: 50%;
-  transform: translateY(-50%);
-  opacity: 0.5;
-}
 
-.prev {
-  left: calc(40px / 3);
-}
-
-.next {
-  right: calc(40px / 3);
-}
-
-h1 {
-  font-size: 1rem;
-}
-
-.meta {
-  display: flex;
-  justify-content: space-between;
-  height: 60px;
-  padding: 1rem;
-  margin-top: calc(40px / 3);
-}
-
-.wrap {
-  flex-direction: column;
+  > * {
+    margin-left: 1rem;
+  }
 }
 </style>

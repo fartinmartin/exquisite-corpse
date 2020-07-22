@@ -1,20 +1,8 @@
 <template>
   <div class="wrap">
-    <div class="border yellow mw-canvas header">
+    <PrevNext />
+    <div class="border yellow info-panel mb mw-canvas">
       <h1>Gallery</h1>
-      <!-- <div class="menu">
-        <div class="icon">
-          <div class="sections">
-            <div class="sec top"></div>
-            <div class="sec bot"></div>
-            <div class="sec mid"></div>
-          </div>
-        </div>
-        <div class="icon">
-          <div class="date">📅</div>
-          <div class="likes">❤️</div>
-        </div>
-      </div> -->
     </div>
     <div class="gallery">
       <nuxt-link
@@ -36,7 +24,12 @@ export default {
     return {
       isFetching: "not yet",
       gallery: [], // this needs to be in the store in order for prev/next nav on individual pages
-      lastVisible: null
+      lastVisible: null,
+      pageSize: 9,
+      query: this.$fireStore
+        .collection("completed")
+        .orderBy("date", "desc")
+        .limit(9)
     };
   },
   mounted() {
@@ -77,78 +70,17 @@ export default {
         this.gallery.push(mydoc);
       });
       this.isFetching = "done";
-    }
+    },
+    nextPage(lastVisible) {}
   }
 };
 </script>
 
 <style lang="scss" scoped>
-.wrap {
-  flex-direction: column;
-}
-
-h1 {
-  font-size: 1rem;
-}
-
-.header {
-  padding: 1rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  height: 60px;
-}
-
-.icon {
-  font-size: 1rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  width: 25px;
-  height: 25px;
-
-  box-sizing: content-box;
-  border: 2px solid transparent;
-
-  &:active {
-    border: 2px solid var(--lighter-yellow);
-    border-top: 2px solid var(--yellow);
-    border-left: 2px solid var(--yellow);
-    transform: translate3d(2px, 2px, 0);
-  }
-}
-
-.menu {
-  display: flex;
-}
-
 .gallery {
   display: grid;
   grid-template-columns: repeat(3, calc(516px / 3));
   grid-template-rows: repeat(3, calc(516px / 3));
   grid-gap: calc(40px / 3);
-  margin-top: calc(40px / 3);
-}
-
-.sections {
-  width: 100%;
-  height: 100%;
-  padding: 4px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-
-  display: none;
-}
-
-.sec {
-  width: 100%;
-  height: calc(12px / 3);
-  background: var(--light-blue);
-  &:not(:first-child) {
-    margin-top: 2px;
-  }
 }
 </style>

@@ -1,0 +1,16 @@
+.info-panel {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  height: 60px;
+  padding: 1rem;
+
+  &.mt {
+    margin-top: calc(40px / 3);
+  }
+
+  &.mb {
+    margin-bottom: calc(40px / 3);
+  }
+}

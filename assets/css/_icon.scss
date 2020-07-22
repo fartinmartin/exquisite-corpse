@@ -1,0 +1,19 @@
+.icon {
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 25px;
+  height: 25px;
+
+  box-sizing: content-box;
+  border: 2px solid transparent;
+
+  &.interactive:active {
+    border: 2px solid var(--lighter-yellow);
+    border-top: 2px solid var(--yellow);
+    border-left: 2px solid var(--yellow);
+    transform: translate3d(2px, 2px, 0);
+  }
+}

@@ -55,10 +55,6 @@ export default {
   display: contents;
 }
 
-h1 {
-  font-size: 1rem;
-}
-
 nav,
 .me {
   position: absolute;

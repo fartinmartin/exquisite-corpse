@@ -1,0 +1,13 @@
+.wrap {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  padding: 0 calc(40px / 3);
+}
+
+.mw-canvas {
+  width: 100%;
+  max-width: 544px;
+}
