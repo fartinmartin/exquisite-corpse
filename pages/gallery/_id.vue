@@ -21,10 +21,15 @@ import PrevNext from "~/components/PrevNext.vue";
 import DownloadButton from "~/components/DownloadButton.vue";
 
 export default {
+  head() {
+    return {
+      title: `exquisite corpse club • ${this.meta.title}`
+    };
+  },
   data: function() {
     return {
       isFetching: "not yet",
-      meta: null,
+      meta: { title: "" },
       sections: {}
     };
   },

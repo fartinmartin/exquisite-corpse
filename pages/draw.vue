@@ -17,6 +17,11 @@ import asyncForEach from "~/assets/js/asyncForEach";
 
 export default {
   name: "draw",
+  head() {
+    return {
+      title: "exquisite corpse club • draw"
+    };
+  },
   components: { Draw, PickSection },
   data: function() {
     return { isFetching: "not yet" };

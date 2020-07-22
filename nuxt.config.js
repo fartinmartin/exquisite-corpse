@@ -16,14 +16,14 @@ export default {
    ** See https://nuxtjs.org/api/configuration-head
    */
   head: {
-    title: `Exquisite Corpse Club` || "",
+    title: `exquisite corpse club` || "",
     meta: [
       { charset: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       {
         hid: "description",
         name: "description",
-        content: `An online collaborative drawing game. ✏️` || ""
+        content: `an online collaborative drawing game. ✏️` || ""
       }
     ]
   },

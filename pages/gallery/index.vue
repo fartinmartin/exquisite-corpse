@@ -20,6 +20,11 @@
 import Drawing from "~/components/Drawing.vue";
 export default {
   name: "gallery",
+  head() {
+    return {
+      title: "exquisite corpse club • gallery"
+    };
+  },
   data: function() {
     return {
       isFetching: "not yet",
