@@ -107,5 +107,13 @@ export default {
    ** Build configuration
    ** See https://nuxtjs.org/api/configuration-build/
    */
-  build: {}
+  build: {},
+  /*
+   ** Loading bar
+   ** See https://nuxtjs.org/api/configuration-loading/
+   */
+  loading: {
+    color: "#fcda00",
+    failedColor: "#f44e3b"
+  }
 };
