@@ -1,3 +1,4 @@
+// https://github.com/postor/canvas-merge-images/blob/master/src/index.js
 export async function mergeBase64(base64s = [], config = {}) {
   const { quality } = {
     quality: 1,
@@ -9,8 +10,14 @@ export async function mergeBase64(base64s = [], config = {}) {
   let offscreenCanvas = document.createElement("canvas");
   offscreenCanvas.width = width;
   offscreenCanvas.height = height;
-  let curTop = 0,
-    imageContext = offscreenCanvas.getContext("2d");
+  let curTop = 0;
+  let imageContext = offscreenCanvas.getContext("2d");
+
+  imageContext.imageSmoothingEnabled = imageContext.mozImageSmoothingEnabled = imageContext.msImageSmoothingEnabled = imageContext.webkitImageSmoothingEnabled = false;
+
+  imageContext.fillStyle = "#ffffff";
+  imageContext.fillRect(0, 0, offscreenCanvas.width, offscreenCanvas.height);
+
   for (let img of imgs) {
     imageContext.drawImage(img, 0, curTop);
     curTop += img.height;
