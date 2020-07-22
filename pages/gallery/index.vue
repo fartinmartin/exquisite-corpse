@@ -1,6 +1,5 @@
 <template>
   <div class="wrap">
-    <!-- <PrevNext /> -->
     <div class="prev-next">
       <div class="prev border yellow">
         <button :disabled="gallery[0].docId === firstItemId" @click="prevPage">
@@ -9,12 +8,36 @@
       </div>
       <div class="next border yellow">
         <button :disabled="gallery.length < 9" @click="nextPage">
-          <div calss="icon interactive">👉</div>
+          <div class="icon interactive">👉</div>
         </button>
       </div>
     </div>
     <div class="border yellow info-panel mb mw-canvas">
-      <h1>Gallery</h1>
+      <h1>gallery</h1>
+      <!-- <form>
+        <div>
+          <input
+            type="radio"
+            id="corpses"
+            name="drone"
+            value="corpses"
+            checked
+          />
+          <label for="corpses"><h1>corpses</h1></label>
+        </div>
+        <div>
+          <input type="radio" id="tops" name="drone" value="tops" />
+          <label for="tops"><h1>tops</h1></label>
+        </div>
+        <div>
+          <input type="radio" id="mids" name="drone" value="mids" />
+          <label for="mids"><h1>mids</h1></label>
+        </div>
+        <div>
+          <input type="radio" id="bots" name="drone" value="bots" />
+          <label for="bots"><h1>bots</h1></label>
+        </div>
+      </form> -->
     </div>
     <div v-if="isFetching !== 'done'" class="loading">we is loading</div>
     <div v-if="isFetching === 'done'" class="gallery">
@@ -41,11 +64,16 @@ export default {
   data: function() {
     return {
       isFetching: "not yet",
-      gallery: [{ docId: "temp" }], // this needs to be in the store in order for prev/next nav on individual pages
+      gallery: [{ docId: "temp" }],
       firstItemId: "",
       lastVisible: null,
       firstVisible: null,
       completedRef: this.$fireStore.collection("completed")
+      // collection: "completed" // switches with "sections"
+      // type: "full" // switches with "top", "mid", and "bot"
+      // field: "date" // switches with "likes"
+      // pageSize: 9 // switches with 18?
+      // 🤔 should these be separate components or could this state dynamically influence the pagination?
     };
   },
   mounted() {
@@ -135,6 +163,25 @@ export default {
   grid-template-columns: repeat(3, calc(516px / 3));
   grid-template-rows: repeat(3, calc(516px / 3));
   grid-gap: calc(40px / 3);
+}
+</style>
+
+<style lang="scss" scoped>
+form {
+  display: flex;
+
+  input {
+    display: none;
+  }
+
+  > * {
+    margin-right: 1rem;
+  }
+}
+
+input:not(:checked) + label h1 {
+  font-weight: normal;
+  opacity: 0.5;
 }
 </style>
 
