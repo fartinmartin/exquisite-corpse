@@ -5,24 +5,7 @@
         <h1 v-show="this.$route.name === 'index'">exquisite corpse club</h1>
         <h1 v-show="this.$route.name !== 'index'">ecc</h1>
       </nuxt-link>
-      <button @click.prevent="openHelp">
-        <div class="icon">
-          <img src="~/assets/img/icons/info.svg" />
-        </div>
-      </button>
-      <nuxt-link
-        to="/gallery"
-        :class="{ active: this.$route.name !== 'gallery' }"
-      >
-        <div class="icon">
-          <img src="~/assets/img/icons/gallery.svg" />
-        </div>
-      </nuxt-link>
-      <nuxt-link to="/draw" :class="{ active: this.$route.name !== 'draw' }">
-        <div class="icon">
-          <img src="~/assets/img/toolbar/draw.svg" />
-        </div>
-      </nuxt-link>
+      <NavMenu />
     </nav>
 
     <div class="border yellow me">
@@ -40,8 +23,10 @@
 </template>
 
 <script>
+import NavMenu from "~/components/NavMenu.vue";
 export default {
   name: "Nav",
+  components: { NavMenu },
   methods: {
     openHelp() {
       this.$store.dispatch("setIsHelping", true);
@@ -76,25 +61,5 @@ nav,
   left: initial;
   right: calc(40px / 3);
   z-index: 955;
-}
-
-.icon {
-  font-size: 1rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  width: 25px;
-  height: 25px;
-
-  box-sizing: content-box;
-  border: 2px solid transparent;
-
-  &:active {
-    border: 2px solid var(--lighter-yellow);
-    border-top: 2px solid var(--yellow);
-    border-left: 2px solid var(--yellow);
-    transform: translate3d(2px, 2px, 0);
-  }
 }
 </style>
