@@ -1,5 +1,5 @@
 <template>
-  <div class="drawing-item">
+  <div class="drawing-item pointer">
     <img :src="drawing.thumb" alt="" class="border" />
   </div>
 </template>

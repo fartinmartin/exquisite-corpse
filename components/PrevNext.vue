@@ -1,7 +1,7 @@
 <template>
   <div class="prev-next">
     <div class="prev border yellow"><div class="icon interactive">👈</div></div>
-    <div class="next border yellow"><div calss="icon interactive">👉</div></div>
+    <div class="next border yellow"><div class="icon interactive">👉</div></div>
   </div>
 </template>
 

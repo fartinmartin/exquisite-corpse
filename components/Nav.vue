@@ -14,7 +14,7 @@
         target="_blank"
         rel="noopener noreferrer"
       >
-        <div class="icon">
+        <div class="icon interactive">
           <img src="~/assets/img/logo/m-light.svg" alt="" />
         </div>
       </a>
