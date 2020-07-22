@@ -7,54 +7,97 @@
         </button>
       </div>
       <div class="next border yellow">
-        <button :disabled="gallery.length < 9" @click="nextPage">
+        <button :disabled="gallery.length < pageSize" @click="nextPage">
           <div class="icon interactive">👉</div>
         </button>
       </div>
     </div>
     <div class="border yellow info-panel mb mw-canvas">
-      <!-- <h1>gallery</h1> -->
       <form>
         <div>
           <input
             type="radio"
             id="corpses"
-            name="drone"
+            name="collection"
             value="corpses"
-            checked
+            v-model="type"
+            @click="handleTypeChoice"
           />
-          <label for="corpses"><h1>corpses</h1></label>
+          <label for="corpses"><h1 class="icon interactive">corpses</h1></label>
         </div>
         <div>
-          <input type="radio" id="tops" name="drone" value="tops" />
-          <label for="tops"><h1>tops</h1></label>
+          <input
+            type="radio"
+            id="tops"
+            name="collection"
+            value="top"
+            v-model="type"
+            @click="handleTypeChoice"
+          />
+          <label for="tops"><h1 class="icon interactive">tops</h1></label>
         </div>
         <div>
-          <input type="radio" id="mids" name="drone" value="mids" />
-          <label for="mids"><h1>mids</h1></label>
+          <input
+            type="radio"
+            id="mids"
+            name="collection"
+            value="mid"
+            v-model="type"
+            @click="handleTypeChoice"
+          />
+          <label for="mids"><h1 class="icon interactive">mids</h1></label>
         </div>
         <div>
-          <input type="radio" id="bots" name="drone" value="bots" />
-          <label for="bots"><h1>bots</h1></label>
+          <input
+            type="radio"
+            id="bots"
+            name="collection"
+            value="bot"
+            v-model="type"
+            @click="handleTypeChoice"
+          />
+          <label for="bots"><h1 class="icon interactive">bots</h1></label>
         </div>
       </form>
       <form>
         <div>
-          <input type="radio" id="date" name="drone" value="date" checked />
-          <label for="date"><h1>date</h1></label>
+          <input
+            type="radio"
+            id="date"
+            name="field"
+            value="date"
+            v-model="field"
+            @click="handleSortBy"
+          />
+          <label for="date"><h1 class="icon interactive">date</h1></label>
         </div>
         <div>
-          <input type="radio" id="likes" name="drone" value="likes" />
-          <label for="likes"><h1>likes</h1></label>
+          <input
+            type="radio"
+            id="likes"
+            name="field"
+            value="likes"
+            v-model="field"
+            @click="handleSortBy"
+          />
+          <label for="likes"><h1 class="icon interactive">likes</h1></label>
         </div>
       </form>
     </div>
     <div v-if="isFetching !== 'done'" class="loading">we is loading</div>
-    <div v-if="isFetching === 'done'" class="gallery">
+    <div
+      v-if="isFetching === 'done'"
+      class="gallery"
+      :class="{ section: collection === 'sections' }"
+    >
       <nuxt-link
         v-for="drawing in gallery"
         :key="drawing.docId"
-        :to="`/gallery/${drawing.docId}`"
+        :to="
+          `/${collection === 'completed' ? 'gallery' : 'gallery/section'}/${
+            drawing.docId
+          }`
+        "
       >
         <Drawing :drawing="drawing" />
       </nuxt-link>
@@ -78,29 +121,36 @@ export default {
       firstItemId: "",
       lastVisible: null,
       firstVisible: null,
-      completedRef: this.$fireStore.collection("completed")
-      // collection: "completed" // switches with "sections"
-      // type: "full" // switches with "top", "mid", and "bot"
-      // field: "date" // switches with "likes"
-      // pageSize: 9 // switches with 18?
-      // 🤔 should these be separate components or could this state dynamically influence the pagination?
+      collection: "completed", // switches with "sections"
+      type: "corpses", // switches with "top", "mid", and "bot"
+      field: "date", // switches with "likes"
+      pageSize: 9 // switches with 18?
     };
   },
+  // computed: {
+  //   isFirstPage: () => this.gallery[0].docId === this.firstItemId,
+  //   isLastPage: () => this.gallery.length < 9
+  // },
   mounted() {
-    this.fetchCompleted();
+    this.fetchFirst();
   },
   methods: {
-    //https://stackoverflow.com/questions/62639778/paginating-firestore-data-when-using-vuex-and-appending-new-data-to-the-state
-    async fetchCompleted() {
+    // https://stackoverflow.com/questions/62639778/paginating-firestore-data-when-using-vuex-and-appending-new-data-to-the-state
+    async fetchFirst() {
       this.isFetching = "yes";
+      this.gallery = [{ docId: "temp" }];
 
-      const query = this.completedRef.orderBy("date", "desc").limit(9);
+      let query = this.$fireStore.collection(this.collection);
+      if (this.collection === "sections")
+        query = query.where("type", "==", this.type);
+      query = query.orderBy(this.field, "desc").limit(this.pageSize);
+
       const firstResponse = await query.get();
       this.lastVisible = firstResponse.docs[firstResponse.docs.length - 1];
       firstResponse.forEach(doc => {
         let mydoc = {
           docId: doc.id,
-          ...doc.data()
+          thumb: doc.data().thumb
         };
         this.gallery.push(mydoc);
       });
@@ -115,18 +165,23 @@ export default {
       this.isFetching = "yes";
       this.gallery = [{ docId: "temp" }];
 
-      const query = this.completedRef
-        .orderBy("date", "desc")
+      let query = this.$fireStore.collection(this.collection);
+      if (this.collection === "sections")
+        query = query.where("type", "==", this.type);
+      query = query
+        .orderBy(this.field, "desc")
         .startAfter(this.lastVisible)
-        .limit(9);
+        .limit(this.pageSize);
+
       const nextResponse = await query.get();
       nextResponse.forEach(doc => {
         let mydoc = {
           docId: doc.id,
-          ...doc.data()
+          thumb: doc.data().thumb
         };
         this.gallery.push(mydoc);
       });
+
       this.lastVisible = nextResponse.docs[nextResponse.docs.length - 1];
       this.firstVisible = nextResponse.docs[0];
 
@@ -138,23 +193,53 @@ export default {
       this.isFetching = "yes";
       this.gallery = [{ docId: "temp" }];
 
-      const query = this.completedRef
-        .orderBy("date", "desc")
+      let query = this.$fireStore.collection(this.collection);
+      if (this.collection === "sections")
+        query = query.where("type", "==", this.type);
+      query = query
+        .orderBy(this.field, "desc")
         .endBefore(this.firstVisible)
-        .limitToLast(9);
+        .limitToLast(this.pageSize);
+
       const prevResponse = await query.get();
       prevResponse.forEach(doc => {
         let mydoc = {
           docId: doc.id,
-          ...doc.data()
+          thumb: doc.data().thumb
         };
         this.gallery.push(mydoc);
       });
+
       this.lastVisible = prevResponse.docs[prevResponse.docs.length - 1];
       this.firstVisible = prevResponse.docs[0];
 
       this.gallery.shift();
       this.isFetching = "done";
+    },
+
+    handleTypeChoice(e) {
+      const type = e.target.value;
+
+      if (type === this.type) return;
+      this.type = type;
+
+      if (type === "corpses") {
+        this.collection = "completed";
+        this.pageSize = 9;
+      } else {
+        this.collection = "sections";
+        this.pageSize = 18;
+      }
+
+      this.fetchFirst();
+    },
+
+    handleSortBy(e) {
+      const field = e.target.value;
+      if (field === this.field) return;
+
+      this.field = field;
+      this.fetchFirst();
     }
   }
 };
@@ -174,11 +259,21 @@ export default {
   grid-template-rows: repeat(3, calc(516px / 3));
   grid-gap: calc(40px / 3);
 }
+
+.gallery.section {
+  grid-template-rows: repeat(6, max-content);
+  min-height: 542.667px;
+}
 </style>
 
 <style lang="scss" scoped>
 form {
   display: flex;
+
+  .icon {
+    width: auto;
+    padding: 0 5px;
+  }
 
   input {
     display: none;
