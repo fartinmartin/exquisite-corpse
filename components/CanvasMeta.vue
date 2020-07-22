@@ -34,9 +34,6 @@ export default {
     },
     docId: String
   },
-  mounted() {
-    console.log(this.docId);
-  },
   computed: {
     isInstagram() {
       return this.artist.startsWith("@");
