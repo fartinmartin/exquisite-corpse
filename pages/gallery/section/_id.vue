@@ -19,8 +19,69 @@
       </div>
       <div class="menu">
         <LikeButton collection="sections" :docId="this.$route.params.id" />
-        <DownloadButton :image="section.thumb" :title="section.title" />
+        <DownloadButton
+          :image="section.thumb"
+          :title="section.title"
+          :artist="section.artist"
+        />
       </div>
+    </div>
+
+    <div
+      class="border yellow info-panel mt mb mw-canvas related"
+      v-if="isFetching === 'done'"
+    >
+      <form>
+        <div>
+          <input
+            type="radio"
+            id="featuredIn"
+            name="toggle"
+            value="featuredIn"
+            v-model="related.toggle"
+          />
+          <label for="featuredIn">
+            <h1 class="icon interactive">featured in...</h1>
+          </label>
+        </div>
+        <div>
+          <input
+            type="radio"
+            id="moreBy"
+            name="toggle"
+            value="moreBy"
+            v-model="related.toggle"
+          />
+          <label for="moreBy">
+            <h1 class="icon interactive">more by this artist...</h1>
+          </label>
+        </div>
+      </form>
+    </div>
+    <div
+      v-if="isFetching === 'done' && related.toggle === 'featuredIn'"
+      class="gallery"
+      :class="{ more: related.toggle === 'moreBy' }"
+    >
+      <nuxt-link
+        v-for="drawing in related.featuredIn"
+        :key="drawing.docId"
+        :to="`/gallery/${drawing.docId}`"
+      >
+        <Drawing :drawing="drawing" />
+      </nuxt-link>
+    </div>
+    <div
+      v-if="isFetching === 'done' && related.toggle === 'moreBy'"
+      class="gallery more-by"
+    >
+      <nuxt-link
+        v-for="drawing in related.moreBy"
+        :key="drawing.docId"
+        :to="`/gallery/${drawing.docId}`"
+      >
+        <Drawing :drawing="drawing" />
+      </nuxt-link>
     </div>
   </div>
 </template>
@@ -41,13 +102,52 @@ export default {
   data: function() {
     return {
       isFetching: "not yet",
-      section: {}
+      section: {},
+      related: {
+        featuredIn: [],
+        moreBy: [],
+        toggle: "featuredIn"
+      }
     };
   },
   mounted() {
     this.fetchDocById("sections", this.$route.params.id);
   },
   methods: {
+    async fetchRelated() {
+      let featuredInLimit = 3;
+      this.section.featuredIn.forEach(ref => {
+        featuredInLimit--;
+        if (featuredInLimit < 0) return;
+
+        ref.get().then(doc => {
+          const mydoc = {
+            docId: doc.id,
+            thumb: doc.data().thumb
+          };
+          this.related.featuredIn.push(mydoc);
+        });
+      });
+
+      const sectionsRef = this.$fireStore.collection("sections");
+      const query = sectionsRef
+        .where("artist", "==", this.section.artist)
+        .orderBy("likes", "desc")
+        .limit(6);
+      const moreByDocs = await query.get();
+
+      moreByDocs.forEach(doc => {
+        const mydoc = {
+          docId: doc.id,
+          thumb: doc.data().thumb
+        };
+        if (doc.id !== this.$route.params.id) {
+          this.related.moreBy.push(mydoc);
+        }
+      });
+
+      this.isFetching = "done";
+    },
     async fetchDocById(collection, id) {
       this.isFetching = "yes";
       const query = this.$fireStore.collection(collection).doc(id);
@@ -55,7 +155,7 @@ export default {
       this.section = { ...doc.data() };
       this.section.paths = Object.values(doc.data().drawing);
 
-      this.isFetching = "done";
+      this.fetchRelated();
     }
   }
 };
@@ -78,5 +178,48 @@ h1 {
     font-weight: normal;
     margin-right: 1ch;
   }
+}
+</style>
+
+<style lang="scss" scoped>
+.related {
+  margin-top: 60px;
+  margin-top: 120px;
+}
+
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(3, calc(516px / 3));
+  grid-template-rows: repeat(1, calc(516px / 3));
+  grid-gap: calc(40px / 3);
+}
+
+.gallery.more-by {
+  grid-template-rows: repeat(2, max-content);
+  min-height: 172px;
+}
+</style>
+
+<style lang="scss" scoped>
+form {
+  display: flex;
+
+  .icon {
+    width: auto;
+    padding: 0 5px;
+  }
+
+  input {
+    display: none;
+  }
+
+  > *:not(:last-child) {
+    margin-right: 1rem;
+  }
+}
+
+input:not(:checked) + label h1 {
+  font-weight: normal;
+  opacity: 0.5;
 }
 </style>
