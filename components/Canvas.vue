@@ -60,6 +60,9 @@ export default {
     this.canvas = canvas; // set local state
     this.ctx = ctx; // set local state
 
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
     if (this.mode === "draw") {
       this.$store.dispatch("modules/drawing/setCanvas", canvas); // set store state
       this.$store.dispatch("modules/drawing/setCtx", ctx);
@@ -67,7 +70,7 @@ export default {
       this.makeDrawing(this.drawing.paths, 500);
     } else if (this.mode === "pixelate") {
       this.makeDrawing(this.drawing.paths);
-      this.pixelateDrawing(this.canvas, this.ctx, 50);
+      this.pixelateDrawing(this.canvas, this.ctx, 75);
     }
   },
   methods: {
@@ -226,8 +229,8 @@ export default {
       const imgData = ctx.getImageData(
         0,
         0,
-        ctx.canvas.width,
-        ctx.canvas.height
+        ctx.canvas.width * devicePixelRatio,
+        ctx.canvas.height * devicePixelRatio
       );
       const img = await createImageBitmap(imgData);
 
