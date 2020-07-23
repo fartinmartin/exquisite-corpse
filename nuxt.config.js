@@ -115,27 +115,27 @@ export default {
   loading: {
     color: "#fcda00",
     failedColor: "#f44e3b"
-  },
+  }
   /*
-   ** Loading bar
+   ** Generate dynamic routes
    ** See https://nuxtjs.org/api/configuration-generate/
    */
-  generate: {
-    routes() {
-      let docIds = [];
-      const completedsRef = this.$fireStore.collection("completed");
-      completedsRef.get().then(querySnapshot => {
-        querySnapshot.forEach(doc => {
-          docIds.push(`/gallery/${doc.id}`);
-        });
-      });
-      const sectionsRef = this.$fireStore.collection("sections");
-      sectionsRef.get().then(querySnapshot => {
-        querySnapshot.forEach(doc => {
-          docIds.push(`/gallery/section/${doc.id}`);
-        });
-      });
-      return docIds;
-    }
-  }
+  // generate: {
+  //   routes() {
+  //     let docIds = [];
+  //     const completedsRef = app.$fireStore.collection("completed");
+  //     completedsRef.get().then(querySnapshot => {
+  //       querySnapshot.forEach(doc => {
+  //         docIds.push(`/gallery/${doc.id}`);
+  //       });
+  //     });
+  //     const sectionsRef = app.$fireStore.collection("sections");
+  //     sectionsRef.get().then(querySnapshot => {
+  //       querySnapshot.forEach(doc => {
+  //         docIds.push(`/gallery/section/${doc.id}`);
+  //       });
+  //     });
+  //     return docIds;
+  //   }
+  // }
 };
