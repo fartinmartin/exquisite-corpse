@@ -15,7 +15,8 @@ export default {
     title: {
       type: String,
       required: true
-    }
+    },
+    artist: String
   },
   methods: {
     saveImage() {
@@ -37,7 +38,9 @@ export default {
     },
 
     downloadImage(canvas) {
-      let fileName = `exquisite corpse club-${this.title}`;
+      let fileName = this.artist
+        ? `exquisite corpse club-${this.title} by ${this.artist}`
+        : `exquisite corpse club-${this.title}`;
       const link = document.createElement("a");
       link.download = fileName + ".png";
       canvas.toBlob(function(blob) {
