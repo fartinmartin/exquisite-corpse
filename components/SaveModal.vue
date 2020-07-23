@@ -61,7 +61,6 @@ export default {
   },
   computed: {
     ...mapState(["baseURL"]),
-    ...mapState("modules/user", ["id", "displayName"]),
     ...mapState("modules/drawing", ["type", "paths", "sections", "words"]),
     section() {
       return { paths: this.paths, title: this.title, artist: this.artist };
@@ -122,7 +121,6 @@ export default {
         title: titleArray.join(" "), // jumble of all three names
         date: timestamp,
         likes: 0,
-        permalink: `${this.baseURL}/gallery/${completedId}`,
         sections: {
           top: this.$fireStore.doc(
             `sections/${
@@ -146,16 +144,14 @@ export default {
       completedRef.set(completePaylod);
 
       let sectionPayload = {
-        artist: this.artist || this.displayName || "anonymous",
+        artist: this.artist || "anonymous",
         date: timestamp,
         drawing: { ...this.paths }, // POTENTIAL WARNING 🚨 : could this be saving the drawing out of order ?!
         featuredIn: [this.$fireStore.doc(`completed/${completedId}`)],
         likes: 0,
-        permalink: `${this.baseURL}/gallery/${this.type}/${sectionId}`,
         thumb: currentThumb, // TODO: this requires the canvas to have finished animating 🤔 i could trigger it to just makeDrawing() w no timeout? ALSO: will this "file" get too big?? seems unlikely!
-        title: this.title || "untitled", // TODO: random phrase from Wordnik API
-        type: this.type,
-        userId: this.id
+        title: this.title || "untitled",
+        type: this.type
       };
 
       // TODO: start loading component
