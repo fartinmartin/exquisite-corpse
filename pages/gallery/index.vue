@@ -12,7 +12,7 @@
         </button>
       </div>
     </div>
-    <div class="border yellow info-panel mb mw-canvas">
+    <div class="border yellow info-panel mb mw-canvas filters">
       <form>
         <div>
           <input
@@ -267,6 +267,10 @@ export default {
 </style>
 
 <style lang="scss" scoped>
+.filters {
+  padding: 1rem calc(1rem - 7px);
+}
+
 form {
   display: flex;
 

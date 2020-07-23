@@ -1,6 +1,5 @@
 <template>
   <div class="wrap">
-    <!-- <PrevNext /> -->
     <div v-if="isFetching !== 'done'">loading</div>
     <Display v-if="isFetching === 'done'" :sections="sections" />
     <div
@@ -17,7 +16,6 @@
 </template>
 
 <script>
-import PrevNext from "~/components/PrevNext.vue";
 import DownloadButton from "~/components/DownloadButton.vue";
 import LikeButton from "~/components/LikeButton.vue";
 

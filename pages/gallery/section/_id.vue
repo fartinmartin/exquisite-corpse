@@ -183,8 +183,8 @@ h1 {
 
 <style lang="scss" scoped>
 .related {
-  margin-top: 60px;
   margin-top: 120px;
+  padding: 1rem calc(1rem - 7px);
 }
 
 .gallery {
