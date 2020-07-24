@@ -75,6 +75,9 @@
       v-if="isFetching === 'done' && related.toggle === 'moreBy'"
       class="gallery more-by"
     >
+      <div v-if="!related.moreBy.length" class="none-found">
+        no drawings found!
+      </div>
       <nuxt-link
         v-for="drawing in related.moreBy"
         :key="drawing.docId"
@@ -197,6 +200,12 @@ h1 {
 .gallery.more-by {
   grid-template-rows: repeat(2, max-content);
   min-height: 172px;
+}
+
+.none-found {
+  text-align: center;
+  grid-column: 1 / -1;
+  margin-top: 60px;
 }
 </style>
 
