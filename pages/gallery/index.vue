@@ -2,12 +2,20 @@
   <div class="wrap">
     <div class="prev-next">
       <div class="prev border yellow">
-        <button :disabled="gallery[0].docId === firstItemId" @click="prevPage">
+        <button
+          :disabled="isFetching !== 'done' || gallery[0].docId === firstItemId"
+          @click="prevPage"
+          data-tooltip="prev"
+        >
           <div class="icon interactive">👈</div>
         </button>
       </div>
       <div class="next border yellow">
-        <button :disabled="gallery.length < pageSize" @click="nextPage">
+        <button
+          :disabled="isFetching !== 'done' || gallery.length < pageSize"
+          @click="nextPage"
+          data-tooltip="next"
+        >
           <div class="icon interactive">👉</div>
         </button>
       </div>

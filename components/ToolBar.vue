@@ -2,7 +2,11 @@
   <div>
     <div class="toolbar border yellow mw-canvas canvas-tools">
       <div class="tool-group mode">
-        <div class="tool draw" :class="{ active: mode === 'draw' }">
+        <div
+          class="tool draw"
+          :class="{ active: mode === 'draw' }"
+          data-tooltip="draw"
+        >
           <input
             type="radio"
             name="mode"
@@ -15,7 +19,11 @@
           </label>
         </div>
 
-        <div class="tool erase" :class="{ active: mode === 'erase' }">
+        <div
+          class="tool erase"
+          :class="{ active: mode === 'erase' }"
+          data-tooltip="erase"
+        >
           <input
             type="radio"
             name="mode"
@@ -28,7 +36,11 @@
           </label>
         </div>
 
-        <div class="tool fill" :class="{ active: mode === 'fill' }">
+        <div
+          class="tool fill"
+          :class="{ active: mode === 'fill' }"
+          data-tooltip="fill"
+        >
           <input
             type="radio"
             name="mode"
@@ -47,6 +59,7 @@
           class="tool size-down"
           :disabled="!currentSizeMoreThanMin"
           @click="decrementSize"
+          data-tooltip="smaller"
         >
           <img src="~/assets/img/toolbar/size-down.svg" alt="" />
         </button>
@@ -55,26 +68,43 @@
           class="tool size-up"
           :disabled="!currentSizeLessThanMax"
           @click="incrementSize"
+          data-tooltip="bigger"
         >
           <img src="~/assets/img/toolbar/size-up.svg" alt="" />
         </button>
       </div>
 
       <div class="tool-group edits">
-        <button class="tool undo" :disabled="cantUndo" @click="undoCanvas">
+        <button
+          class="tool undo"
+          :disabled="cantUndo"
+          @click="undoCanvas"
+          data-tooltip="undo"
+        >
           <img src="~/assets/img/toolbar/undo.svg" alt="" />
         </button>
-        <button class="tool redo" :disabled="cantRedo" @click="redoCanvas">
+        <button
+          class="tool redo"
+          :disabled="cantRedo"
+          @click="redoCanvas"
+          data-tooltip="redo"
+        >
           <img src="~/assets/img/toolbar/redo.svg" alt="" />
         </button>
         <button
           class="tool clear"
           :disabled="isDrawingEmpty"
           @click="clearCanvas"
+          data-tooltip="clear"
         >
           <img src="~/assets/img/toolbar/clear.svg" alt="" />
         </button>
-        <button class="tool save" :disabled="isDrawingEmpty" @click="startSave">
+        <button
+          class="tool save"
+          :disabled="isDrawingEmpty"
+          @click="startSave"
+          data-tooltip="save"
+        >
           <img src="~/assets/img/toolbar/save.svg" alt="" />
         </button>
       </div>
@@ -228,6 +258,11 @@ export default {
 
   &:not(:first-child) {
     margin: calc(40px / 6 * 2) 0;
+  }
+
+  label,
+  img {
+    pointer-events: none;
   }
 }
 

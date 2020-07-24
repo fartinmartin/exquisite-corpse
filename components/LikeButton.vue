@@ -1,6 +1,6 @@
 <template>
   <button @click="handleClick">
-    <div class="icon interactive" :class="{ 'border liked': isLiked }">
+    <div class="icon interactive" :data-tooltip="isLiked ? 'unlike' : 'like'">
       <span>{{ likes }}</span> ❤️
     </div>
   </button>
@@ -42,7 +42,9 @@ export default {
       if (destory) return likesRef();
     },
     handleClick() {
-      this.liked = !this.liked;
+      this.isLiked = !this.isLiked;
+
+      if (this.likes === 0) return;
 
       const increment = this.$fireStoreObj.FieldValue.increment(1);
       const decrement = this.$fireStoreObj.FieldValue.increment(-1);
@@ -51,8 +53,8 @@ export default {
         .collection(this.collection)
         .doc(this.docId);
 
-      this.liked && docRef.update({ likes: increment });
-      !this.liked && docRef.update({ likes: decrement });
+      this.isLiked && docRef.update({ likes: increment });
+      !this.isLiked && docRef.update({ likes: decrement });
     }
   }
 };
@@ -66,8 +68,5 @@ export default {
   span {
     margin-right: 0.5rem;
   }
-}
-
-.liked {
 }
 </style>

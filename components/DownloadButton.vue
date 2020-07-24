@@ -1,5 +1,5 @@
 <template>
-  <button @click="saveImage">
+  <button @click="saveImage" data-tooltip="download">
     <div class="icon interactive">💾</div>
   </button>
 </template>

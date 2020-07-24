@@ -16,6 +16,10 @@
     border-left: 2px solid var(--yellow);
     transform: translate3d(2px, 2px, 0);
   }
+
+  img {
+    pointer-events: none;
+  }
 }
 
 .look-at-me {
@@ -32,6 +36,7 @@
     transform: rotate(45deg) translateX(-30px);
     background: rgba(255, 255, 255, 0.45);
     mix-blend-mode: screen;
+    pointer-events: none;
 
     animation: diagonal 2.5s infinite ease-in-out;
   }

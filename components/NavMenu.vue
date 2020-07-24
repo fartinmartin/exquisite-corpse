@@ -3,6 +3,7 @@
     <button
       @click.prevent="openHelp"
       :class="{ 'look-at-me': this.$route.name === 'index' }"
+      data-tooltip="help"
     >
       <div class="icon interactive">
         <img src="~/assets/img/icons/info.svg" />
@@ -14,6 +15,7 @@
         'look-@-me': this.$route.name === 'index',
         active: this.$route.name !== 'gallery'
       }"
+      data-tooltip="gallery"
     >
       <div class="icon interactive">
         <img src="~/assets/img/icons/gallery.svg" />
@@ -25,6 +27,7 @@
         'look-@-me': this.$route.name === 'index',
         active: this.$route.name !== 'draw'
       }"
+      data-tooltip="draw"
     >
       <div class="icon interactive">
         <img src="~/assets/img/toolbar/draw.svg" />

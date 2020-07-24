@@ -27,6 +27,7 @@
       alt=""
     />
     <img v-show="state === 'fill'" src="~/assets/img/cursor/fill.svg" alt="" />
+    <div v-if="tooltip" class="tooltip">{{ tooltip }}</div>
   </div>
 </template>
 
@@ -37,7 +38,8 @@ export default {
     return {
       x: null,
       y: null,
-      state: "auto"
+      state: "auto",
+      tooltip: null
     };
   },
   mounted() {
@@ -95,6 +97,15 @@ export default {
         this.state = "auto";
       }
 
+      // console.log(e);
+      // tooltip state:
+      if (e.target.dataset.tooltip || e.target.parentNode.dataset.tooltip) {
+        this.tooltip =
+          e.target.dataset.tooltip || e.target.parentNode.dataset.tooltip;
+      } else {
+        this.tooltip = null;
+      }
+
       // TODO: check if window is not focused (dif app or diff window)
       //       AND/OR check if mouse has left the window
       //       in those cases: hide the cursor entirely? 🤔
@@ -115,6 +126,7 @@ export default {
         return;
       } else {
         this.cursorMove(e);
+        this.tooltip = null;
       }
     }
   }
@@ -124,6 +136,24 @@ export default {
 <style>
 * {
   cursor: none;
+}
+</style>
+
+<style lang="scss" scoped>
+.tooltip {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem 0.5rem 0.4rem 0.5rem;
+  line-height: 1;
+  background: #eeeeee;
+  border: 2px solid var(--black);
+
+  position: absolute;
+  top: 30px;
+  left: 30px;
+  z-index: -1;
+  pointer-events: none;
 }
 </style>
 
