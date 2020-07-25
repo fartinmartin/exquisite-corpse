@@ -28,6 +28,13 @@ export default {
     ]
   },
   /*
+   ** Dev sever config, used to fix cache issues
+   */
+  // server: {
+  //   port: 8000, // default: 3000
+  //   host: "localhost" // default: localhost
+  // },
+  /*
    ** Global CSS
    */
   css: ["~/assets/css/main.scss"],

@@ -4,8 +4,6 @@
   "private": true,
   "scripts": {
     "dev": "nuxt",
-    "dev-local": "HOST=0.0.0.0 nuxt",
-    "dev-cache-fix": "npm run dev --port 3001",
     "build": "nuxt build",
     "start": "nuxt start",
     "export": "nuxt export",
