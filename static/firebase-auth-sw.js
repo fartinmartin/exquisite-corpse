@@ -1,12 +1,9 @@
 const ignorePaths = ["\u002F__webpack_hmr","\u002F_loading","\u002F_nuxt\u002F"]
 
-importScripts(
-  'https://www.gstatic.com/firebasejs/7.16.0/firebase-app.js'
-)
-importScripts(
-  'https://www.gstatic.com/firebasejs/7.16.0/firebase-auth.js'
-)
-firebase.initializeApp({"apiKey":"AIzaSyC5Op1IGajRH-KUj-i9AS5hJ0Sw-yblERE","authDomain":"exquisite-corpse-d0cbf.firebaseapp.com","databaseURL":"https:\u002F\u002Fexquisite-corpse-d0cbf.firebaseio.com","projectId":"exquisite-corpse-d0cbf","storageBucket":"exquisite-corpse-d0cbf.appspot.com","messagingSenderId":"247490126037","appId":"1:247490126037:web:5721043963f00c0ec0425c","measurementId":"G-NX8QXVTJ4"})
+// Only works on Firebase hosting!
+importScripts('/__/firebase/7.16.0/firebase-app.js')
+importScripts('/__/firebase/7.16.0/firebase-auth.js')
+importScripts('/__/firebase/init.js')
 
 /**
  * Returns a promise that resolves with an ID token if available.

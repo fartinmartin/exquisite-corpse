@@ -1,0 +1,44 @@
+[
+  {
+    "name": "draw",
+    "path": "/draw",
+    "component": "/Users/Martin/Sites/_playground/exquisite-corpse/pages/draw.vue",
+    "chunkName": "pages/draw",
+    "_name": "_c09dd3cc"
+  },
+  {
+    "name": "gallery",
+    "path": "/gallery",
+    "component": "/Users/Martin/Sites/_playground/exquisite-corpse/pages/gallery/index.vue",
+    "chunkName": "pages/gallery/index",
+    "_name": "_7112cd6f"
+  },
+  {
+    "name": "gallery-section",
+    "path": "/gallery/section",
+    "component": "/Users/Martin/Sites/_playground/exquisite-corpse/pages/gallery/section/index.vue",
+    "chunkName": "pages/gallery/section/index",
+    "_name": "_4847a1c5"
+  },
+  {
+    "name": "gallery-section-id",
+    "path": "/gallery/section/:id",
+    "component": "/Users/Martin/Sites/_playground/exquisite-corpse/pages/gallery/section/_id.vue",
+    "chunkName": "pages/gallery/section/_id",
+    "_name": "_03255d26"
+  },
+  {
+    "name": "gallery-id",
+    "path": "/gallery/:id",
+    "component": "/Users/Martin/Sites/_playground/exquisite-corpse/pages/gallery/_id.vue",
+    "chunkName": "pages/gallery/_id",
+    "_name": "_54835f97"
+  },
+  {
+    "name": "index",
+    "path": "/",
+    "component": "/Users/Martin/Sites/_playground/exquisite-corpse/pages/index.vue",
+    "chunkName": "pages/index",
+    "_name": "_2030b1ec"
+  }
+]
