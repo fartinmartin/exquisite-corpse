@@ -1,5 +1,12 @@
 [
   {
+    "name": "admin",
+    "path": "/admin",
+    "component": "/Users/Martin/Sites/_playground/exquisite-corpse/pages/admin.vue",
+    "chunkName": "pages/admin",
+    "_name": "_51a005e9"
+  },
+  {
     "name": "draw",
     "path": "/draw",
     "component": "/Users/Martin/Sites/_playground/exquisite-corpse/pages/draw.vue",

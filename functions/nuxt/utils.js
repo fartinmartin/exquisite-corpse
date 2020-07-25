@@ -150,7 +150,7 @@ export async function setContext (app, context) {
       payload: context.payload,
       error: context.error,
       base: '/',
-      env: {"FIREBASE_API_KEY":"AIzaSyC5Op1IGajRH-KUj-i9AS5hJ0Sw-yblERE","FIREBASE_AUTH_DOMAIN":"exquisite-corpse-d0cbf.firebaseapp.com","FIREBASE_DATABASE_URL":"https://exquisite-corpse-d0cbf.firebaseio.com","FIREBASE_PROJECT_ID":"exquisite-corpse-d0cbf","FIREBASE_STORAGEBUCKET":"exquisite-corpse-d0cbf.appspot.com","FIREBASE_MESSAGING_SENDER_ID":"247490126037","FIREBASE_APP_ID":"1:247490126037:web:5721043963f00c0ec0425c","FIREBASE_MEASUREMENT_ID":"G-NX8QXVTJ4","WORDNIK_API_KEY":"fpti903j2soh7wgmcqp4t00kg0vn924nk8hvouyx4o49k4ylf"}
+      env: {"FIREBASE_API_KEY":"AIzaSyDaoNA0Wi3pb93VZE066031x1mxfi9lAtk","FIREBASE_AUTH_DOMAIN":"exquisite-corpse-club.firebaseapp.com","FIREBASE_DATABASE_URL":"https://exquisite-corpse-club.firebaseio.com","FIREBASE_PROJECT_ID":"exquisite-corpse-club","FIREBASE_STORAGEBUCKET":"exquisite-corpse-club.appspot.com","FIREBASE_MESSAGING_SENDER_ID":"624585249671","FIREBASE_APP_ID":"1:624585249671:web:0c69b0f2bb39c7224df922","FIREBASE_MEASUREMENT_ID":"G-M6YF2FQJZ0","WORDNIK_API_KEY":"fpti903j2soh7wgmcqp4t00kg0vn924nk8hvouyx4o49k4ylf"}
     }
     // Only set once
     if (!process.static && context.req) {

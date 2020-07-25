@@ -3,6 +3,7 @@ import Router from 'vue-router'
 import { interopDefault } from './utils'
 import scrollBehavior from './router.scrollBehavior.js'
 
+const _51a005e9 = () => interopDefault(import('../pages/admin.vue' /* webpackChunkName: "pages/admin" */))
 const _c09dd3cc = () => interopDefault(import('../pages/draw.vue' /* webpackChunkName: "pages/draw" */))
 const _7112cd6f = () => interopDefault(import('../pages/gallery/index.vue' /* webpackChunkName: "pages/gallery/index" */))
 const _4847a1c5 = () => interopDefault(import('../pages/gallery/section/index.vue' /* webpackChunkName: "pages/gallery/section/index" */))
@@ -27,6 +28,10 @@ export const routerOptions = {
   scrollBehavior,
 
   routes: [{
+    path: "/admin",
+    component: _51a005e9,
+    name: "admin"
+  }, {
     path: "/draw",
     component: _c09dd3cc,
     name: "draw"

@@ -8,6 +8,8 @@
     "README.md": true,
     "package-lock.json": true,
     ".gitignore": true,
+    ".firebaserc": true,
+    ".firebase": true,
     ".env": true
   }
 }

@@ -1,6 +1,6 @@
 import * as firebase from 'firebase/app'
 
-const config = {"apiKey":"AIzaSyC5Op1IGajRH-KUj-i9AS5hJ0Sw-yblERE","authDomain":"exquisite-corpse-d0cbf.firebaseapp.com","databaseURL":"https:\u002F\u002Fexquisite-corpse-d0cbf.firebaseio.com","projectId":"exquisite-corpse-d0cbf","storageBucket":"exquisite-corpse-d0cbf.appspot.com","messagingSenderId":"247490126037","appId":"1:247490126037:web:5721043963f00c0ec0425c","measurementId":"G-NX8QXVTJ4"}
+const config = {"apiKey":"AIzaSyDaoNA0Wi3pb93VZE066031x1mxfi9lAtk","authDomain":"exquisite-corpse-club.firebaseapp.com","databaseURL":"https:\u002F\u002Fexquisite-corpse-club.firebaseio.com","projectId":"exquisite-corpse-club","storageBucket":"exquisite-corpse-club.appspot.com","messagingSenderId":"624585249671","appId":"1:624585249671:web:0c69b0f2bb39c7224df922","measurementId":"G-M6YF2FQJZ0"}
 
 export default async ({ res }, inject) => {
   if (!firebase.apps.length) {

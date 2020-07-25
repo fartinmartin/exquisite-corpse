@@ -1,6 +1,6 @@
 require("dotenv").config();
 
-export default {
+module.exports = {
   /*
    ** Nuxt rendering mode
    ** See https://nuxtjs.org/api/configuration-mode
@@ -23,9 +23,9 @@ export default {
       {
         hid: "description",
         name: "description",
-        content: `an online collaborative drawing game. ✏️` || ""
-      }
-    ]
+        content: `an online collaborative drawing game. ✏️` || "",
+      },
+    ],
   },
   /*
    ** Dev sever config, used to fix cache issues
@@ -74,16 +74,16 @@ export default {
       storageBucket: process.env.FIREBASE_STORAGEBUCKET,
       messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
       appId: process.env.FIREBASE_APP_ID,
-      measurementId: process.env.FIREBASE_MEASUREMENT_ID
+      measurementId: process.env.FIREBASE_MEASUREMENT_ID,
     },
     services: {
       auth: {
-        ssr: true
+        ssr: true,
       },
       firestore: true,
-      analytics: true
+      analytics: true,
     },
-    onFirebaseHosting: true
+    onFirebaseHosting: true,
   },
   /*
    ** @nuxtjs/pwa configuration
@@ -93,13 +93,13 @@ export default {
     meta: {
       title: "Exquisite Corpse Club",
       author: "Martin Lindberg",
-      description: "An online collaborative drawing game. 🔪"
+      description: "An online collaborative drawing game. 🔪",
     },
     manifest: {
       name: "Exquisite Corpse Club",
       short_name: "ECC",
-      lang: "en"
-    }
+      lang: "en",
+    },
   },
   /*
    ** axios
@@ -108,7 +108,7 @@ export default {
   axios: {
     baseURL: "https://api.wordnik.com/v4/words.json",
     proxyHeaders: false,
-    credentials: false
+    credentials: false,
   },
   /*
    ** Build configuration
@@ -121,8 +121,8 @@ export default {
    */
   loading: {
     color: "#fcda00",
-    failedColor: "#f44e3b"
-  }
+    failedColor: "#f44e3b",
+  },
   /*
    ** Generate dynamic routes
    ** See https://nuxtjs.org/api/configuration-generate/

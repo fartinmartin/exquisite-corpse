@@ -117,7 +117,22 @@ export default {
     this.fetchDocById("sections", this.$route.params.id);
   },
   methods: {
+    async fetchDocById(collection, id) {
+      this.isFetching = "yes";
+      const query = this.$fireStore.collection(collection).doc(id);
+      const doc = await query.get();
+      this.section = { ...doc.data() };
+      this.section.paths = Object.values(doc.data().drawing);
+
+      this.fetchRelated();
+    },
+
     async fetchRelated() {
+      if (!this.section.featuredIn) {
+        this.isFetching = "done";
+        return;
+      }
+
       let featuredInLimit = 3;
       this.section.featuredIn.forEach(ref => {
         featuredInLimit--;
@@ -150,15 +165,6 @@ export default {
       });
 
       this.isFetching = "done";
-    },
-    async fetchDocById(collection, id) {
-      this.isFetching = "yes";
-      const query = this.$fireStore.collection(collection).doc(id);
-      const doc = await query.get();
-      this.section = { ...doc.data() };
-      this.section.paths = Object.values(doc.data().drawing);
-
-      this.fetchRelated();
     }
   }
 };
