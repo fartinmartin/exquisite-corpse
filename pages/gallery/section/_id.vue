@@ -134,11 +134,7 @@ export default {
         return;
       }
 
-      let featuredInLimit = 3;
-      this.section.featuredIn.forEach((ref) => {
-        featuredInLimit--;
-        if (featuredInLimit < 0) return;
-
+      this.section.featuredIn.slice(-3).forEach((ref) => {
         ref.get().then((doc) => {
           const mydoc = {
             docId: doc.id,
