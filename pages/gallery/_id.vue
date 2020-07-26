@@ -1,8 +1,10 @@
 <template>
   <div class="wrap">
-    <div v-if="isFetching !== 'done'" class="loading mw-canvas border">
-      <span>plz hold</span>
-    </div>
+    <Loading
+      v-if="isFetching !== 'done'"
+      subtext="waking up our artists"
+      style="height: 544px;"
+    />
     <Display v-if="isFetching === 'done'" :sections="sections" />
     <div class="border yellow info-panel mt mw-canvas">
       <div class="data-wrap" v-if="isFetching === 'done'">
@@ -17,6 +19,7 @@
 </template>
 
 <script>
+import Loading from "~/components/Loading.vue";
 import DownloadButton from "~/components/DownloadButton.vue";
 import LikeButton from "~/components/LikeButton.vue";
 
@@ -26,6 +29,7 @@ export default {
       title: `exquisite corpse club • ${this.meta.title}`,
     };
   },
+  components: { Loading, DownloadButton, LikeButton },
   data: function () {
     return {
       isFetching: "not yet",
@@ -90,8 +94,5 @@ export default {
   > * {
     margin-left: 1rem;
   }
-}
-.loading {
-  height: 544px;
 }
 </style>

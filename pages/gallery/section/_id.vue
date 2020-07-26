@@ -1,8 +1,10 @@
 <template>
   <div class="wrap">
-    <div v-if="isFetching !== 'done'" class="loading border mw-canvas">
-      <span>plz hold</span>
-    </div>
+    <Loading
+      v-if="isFetching !== 'done'"
+      subtext="getting paint ready"
+      style="height: 184px;"
+    />
     <div class="mw-canvas" v-if="isFetching === 'done'">
       <Canvas id="top" mode="display" :section="section" ref="previewCanvas" />
     </div>
@@ -52,12 +54,11 @@
         </form>
       </div>
     </div>
-    <div
+    <Loading
       v-if="isFetching !== 'done' && related.toggle === 'featuredIn'"
-      class="loading mw-canvas featuredIn"
-    >
-      <span>plz hold</span>
-    </div>
+      subtext="checkin out the studio"
+      style="height: 172px;"
+    />
     <div
       v-if="isFetching === 'done' && related.toggle === 'featuredIn'"
       class="gallery"
@@ -216,18 +217,6 @@ h1 {
   span {
     padding: 1rem;
     background: var(--white);
-    border: 2px solid var(--light-blue);
-  }
-}
-
-.loading {
-  height: 184px;
-}
-
-.loading.featuredIn {
-  height: 172px;
-
-  span {
     border: 2px solid var(--light-blue);
   }
 }

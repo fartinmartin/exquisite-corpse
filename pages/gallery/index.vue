@@ -92,9 +92,11 @@
         </div>
       </form>
     </div>
-    <div v-if="isFetching !== 'done'" class="loading mw-canvas">
-      <span>plz hold</span>
-    </div>
+    <Loading
+      v-if="isFetching !== 'done'"
+      subtext="curating masterpieces"
+      style="height: 542.667px;"
+    />
     <div
       v-if="isFetching === 'done'"
       class="gallery"
@@ -114,9 +116,11 @@
 </template>
 
 <script>
+import Loading from "~/components/Loading.vue";
 import Drawing from "~/components/Drawing.vue";
 export default {
   name: "gallery",
+  components: { Loading, Drawing },
   head() {
     return {
       title: "exquisite corpse club • gallery",
@@ -250,14 +254,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.loading {
-  height: 542.667px;
-
-  span {
-    border: 2px solid var(--light-blue);
-  }
-}
-
 .gallery {
   display: grid;
   grid-template-columns: repeat(3, calc(516px / 3));

@@ -7,7 +7,7 @@
     <div v-if="isFetching === 'yes'" class="mw-canvas">
       <div class="border yellow info-panel mw-canvas"></div>
       <div class="border yellow info-panel mw-canvas mt mb"></div>
-      <div class="border loading mw-canvas"><span>plz hold</span></div>
+      <Loading subtext="preparing your canvas" style="height: 544px;" />
     </div>
     <Draw v-if="isFetching === 'done'" />
   </div>
@@ -131,9 +131,3 @@ export default {
   },
 };
 </script>
-
-<style lang="scss" scoped>
-.loading {
-  height: 544px;
-}
-</style>

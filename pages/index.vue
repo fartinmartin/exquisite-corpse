@@ -6,9 +6,11 @@
       </nuxt-link>
       <NavMenu />
     </nav>
-    <div v-if="isFetching !== 'done'" class="border loading mw-canvas">
-      <span>hold plz</span>
-    </div>
+    <Loading
+      v-if="isFetching !== 'done'"
+      subtext="fetching random corpse"
+      style="height: 544px;"
+    />
     <Display v-if="isFetching === 'done'" :sections="sections" />
     <div class="border yellow info-panel mt mw-canvas title">
       <nuxt-link v-if="isFetching === 'done'" :to="`/gallery/${meta.docId}`">{{
@@ -20,13 +22,14 @@
 
 <script>
 import Display from "~/components/Display";
+import Loading from "~/components/Loading";
 import NavMenu from "~/components/NavMenu";
 import { mapState } from "vuex";
 import asyncForEach from "~/assets/js/asyncForEach";
 
 export default {
   name: "index",
-  components: { Display },
+  components: { Display, NavMenu, Loading },
   data: function () {
     return {
       isFetching: "not yet",
@@ -121,9 +124,5 @@ export default {
 <style lang="scss" scoped>
 .title {
   justify-content: center;
-}
-
-.loading {
-  height: 544px;
 }
 </style>
