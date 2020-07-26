@@ -142,9 +142,9 @@ import SaveModal from "./SaveModal";
 export default {
   name: "ToolBar",
   components: { SaveModal },
-  data: function() {
+  data: function () {
     return {
-      isSaving: false
+      isSaving: false,
     };
   },
   mounted() {
@@ -160,14 +160,18 @@ export default {
       },
       set(value) {
         this.$store.dispatch("modules/mouse/setMode", value);
-      }
+      },
     },
     ...mapState("modules/mouse", ["palette", "size"]),
     ...mapGetters("modules/mouse", [
       "currentSizeLessThanMax",
-      "currentSizeMoreThanMin"
+      "currentSizeMoreThanMin",
     ]),
-    ...mapGetters("modules/drawing", ["cantUndo", "cantRedo", "isDrawingEmpty"])
+    ...mapGetters("modules/drawing", [
+      "cantUndo",
+      "cantRedo",
+      "isDrawingEmpty",
+    ]),
   },
   methods: {
     handleShortcuts(e) {
@@ -242,8 +246,8 @@ export default {
       if (e) {
         this.$router.push({ path: `/gallery/${e}` });
       }
-    }
-  }
+    },
+  },
 };
 </script>
 
@@ -260,7 +264,7 @@ export default {
     margin: calc(40px / 6 * 2) 0;
   }
 
-  label,
+  /* label, */
   img {
     pointer-events: none;
   }
