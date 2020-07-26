@@ -1,1 +1,0 @@
-(window.webpackJsonp=window.webpackJsonp||[]).push([[8],{330:function(e,n,l){"use strict";l.r(n);var o={middleware:[function(e){(0,e.redirect)("/gallery")}]},d=l(7),component=Object(d.a)(o,void 0,void 0,!1,null,null,null);n.default=component.exports}}]);

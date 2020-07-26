@@ -88,3 +88,8 @@ sw.*
 
 # Vim swap files
 *.swp
+
+# firebase hosting/functions
+public
+functions
+.firebase
