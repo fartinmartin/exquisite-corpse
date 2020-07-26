@@ -6,13 +6,14 @@
       </nuxt-link>
       <NavMenu />
     </nav>
-    <div v-if="isFetching !== 'done'" class="loading mw-canvas">loading</div>
+    <div v-if="isFetching !== 'done'" class="border loading mw-canvas">
+      <span>hold plz</span>
+    </div>
     <Display v-if="isFetching === 'done'" :sections="sections" />
-    <div
-      v-if="isFetching === 'done'"
-      class="border yellow info-panel mt mw-canvas title"
-    >
-      <nuxt-link :to="`/gallery/${meta.docId}`">{{ meta.title }}</nuxt-link>
+    <div class="border yellow info-panel mt mw-canvas title">
+      <nuxt-link v-if="isFetching === 'done'" :to="`/gallery/${meta.docId}`">{{
+        meta.title
+      }}</nuxt-link>
     </div>
   </div>
 </template>
@@ -26,11 +27,11 @@ import asyncForEach from "~/assets/js/asyncForEach";
 export default {
   name: "index",
   components: { Display },
-  data: function() {
+  data: function () {
     return {
       isFetching: "not yet",
       meta: null,
-      sections: {}
+      sections: {},
     };
   },
   mounted() {
@@ -47,12 +48,12 @@ export default {
         .limit(1);
       const firstResponse = await query.get();
       if (firstResponse.size > 0) {
-        firstResponse.forEach(doc => {
+        firstResponse.forEach((doc) => {
           let completedMeta = {
             docId: doc.id,
             likes: doc.data().likes,
             title: doc.data().title,
-            date: doc.data().date
+            date: doc.data().date,
           };
 
           let vm = this;
@@ -70,12 +71,12 @@ export default {
           .where(this.$fireStoreObj.FieldPath.documentId(), "<", randomKey)
           .limit(1);
         const secondResponse = await secondQuery.get();
-        secondResponse.forEach(doc => {
+        secondResponse.forEach((doc) => {
           let completedMeta = {
             docId: doc.id,
             likes: doc.data().likes,
             title: doc.data().title,
-            date: doc.data().date
+            date: doc.data().date,
           };
 
           let vm = this;
@@ -112,8 +113,8 @@ export default {
 
     openHelp() {
       this.$store.dispatch("setIsHelping", true);
-    }
-  }
+    },
+  },
 };
 </script>
 
@@ -123,9 +124,6 @@ export default {
 }
 
 .loading {
-  height: calc(544px + 60px + (40px / 3));
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  height: 544px;
 }
 </style>

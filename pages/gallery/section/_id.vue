@@ -1,62 +1,62 @@
 <template>
   <div class="wrap">
-    <div v-if="isFetching !== 'done'">loading</div>
-    <div class="mw-canvas">
-      <Canvas
-        v-if="isFetching === 'done'"
-        id="top"
-        mode="display"
-        :section="section"
-        ref="previewCanvas"
-      />
+    <div v-if="isFetching !== 'done'" class="loading border mw-canvas">
+      <span>plz hold</span>
     </div>
-    <div
-      v-if="isFetching === 'done'"
-      class="border yellow info-panel mt mw-canvas"
-    >
-      <div>
-        <h1>{{ section.title }} <span>by</span>{{ section.artist }}</h1>
-      </div>
-      <div class="menu">
-        <LikeButton collection="sections" :docId="this.$route.params.id" />
-        <DownloadButton
-          :image="section.thumb"
-          :title="section.title"
-          :artist="section.artist"
-        />
+    <div class="mw-canvas" v-if="isFetching === 'done'">
+      <Canvas id="top" mode="display" :section="section" ref="previewCanvas" />
+    </div>
+    <div class="border yellow info-panel mt mw-canvas">
+      <div class="data-wrap" v-if="isFetching === 'done'">
+        <div>
+          <h1>{{ section.title }} <span>by</span>{{ section.artist }}</h1>
+        </div>
+        <div class="menu">
+          <LikeButton collection="sections" :docId="this.$route.params.id" />
+          <DownloadButton
+            :image="section.thumb"
+            :title="section.title"
+            :artist="section.artist"
+          />
+        </div>
       </div>
     </div>
 
+    <div class="border yellow info-panel mt mb mw-canvas related">
+      <div class="data-wrap" v-if="isFetching === 'done'">
+        <form>
+          <div>
+            <input
+              type="radio"
+              id="featuredIn"
+              name="toggle"
+              value="featuredIn"
+              v-model="related.toggle"
+            />
+            <label for="featuredIn">
+              <h1 class="icon interactive">featured in...</h1>
+            </label>
+          </div>
+          <div>
+            <input
+              type="radio"
+              id="moreBy"
+              name="toggle"
+              value="moreBy"
+              v-model="related.toggle"
+            />
+            <label for="moreBy">
+              <h1 class="icon interactive">more by this artist...</h1>
+            </label>
+          </div>
+        </form>
+      </div>
+    </div>
     <div
-      class="border yellow info-panel mt mb mw-canvas related"
-      v-if="isFetching === 'done'"
+      v-if="isFetching !== 'done' && related.toggle === 'featuredIn'"
+      class="loading mw-canvas featuredIn"
     >
-      <form>
-        <div>
-          <input
-            type="radio"
-            id="featuredIn"
-            name="toggle"
-            value="featuredIn"
-            v-model="related.toggle"
-          />
-          <label for="featuredIn">
-            <h1 class="icon interactive">featured in...</h1>
-          </label>
-        </div>
-        <div>
-          <input
-            type="radio"
-            id="moreBy"
-            name="toggle"
-            value="moreBy"
-            v-model="related.toggle"
-          />
-          <label for="moreBy">
-            <h1 class="icon interactive">more by this artist...</h1>
-          </label>
-        </div>
-      </form>
+      <span>plz hold</span>
     </div>
     <div
       v-if="isFetching === 'done' && related.toggle === 'featuredIn'"
@@ -76,7 +76,7 @@
       class="gallery more-by"
     >
       <div v-if="!related.moreBy.length" class="none-found">
-        no drawings found!
+        <span class="border">no drawings found!</span>
       </div>
       <nuxt-link
         v-for="drawing in related.moreBy"
@@ -98,19 +98,19 @@ export default {
   name: "Section",
   head() {
     return {
-      title: `exquisite corpse club • ${this.section.title} by ${this.section.artist}`
+      title: `exquisite corpse club • ${this.section.title} by ${this.section.artist}`,
     };
   },
   components: { Canvas, LikeButton, DownloadButton },
-  data: function() {
+  data: function () {
     return {
       isFetching: "not yet",
       section: {},
       related: {
         featuredIn: [],
         moreBy: [],
-        toggle: "featuredIn"
-      }
+        toggle: "featuredIn",
+      },
     };
   },
   mounted() {
@@ -134,14 +134,14 @@ export default {
       }
 
       let featuredInLimit = 3;
-      this.section.featuredIn.forEach(ref => {
+      this.section.featuredIn.forEach((ref) => {
         featuredInLimit--;
         if (featuredInLimit < 0) return;
 
-        ref.get().then(doc => {
+        ref.get().then((doc) => {
           const mydoc = {
             docId: doc.id,
-            thumb: doc.data().thumb
+            thumb: doc.data().thumb,
           };
           this.related.featuredIn.push(mydoc);
         });
@@ -154,10 +154,10 @@ export default {
         .limit(6);
       const moreByDocs = await query.get();
 
-      moreByDocs.forEach(doc => {
+      moreByDocs.forEach((doc) => {
         const mydoc = {
           docId: doc.id,
-          thumb: doc.data().thumb
+          thumb: doc.data().thumb,
         };
         if (doc.id !== this.$route.params.id) {
           this.related.moreBy.push(mydoc);
@@ -165,8 +165,8 @@ export default {
       });
 
       this.isFetching = "done";
-    }
-  }
+    },
+  },
 };
 </script>
 
@@ -212,6 +212,24 @@ h1 {
   text-align: center;
   grid-column: 1 / -1;
   margin-top: 60px;
+
+  span {
+    padding: 1rem;
+    background: var(--white);
+    border: 2px solid var(--light-blue);
+  }
+}
+
+.loading {
+  height: 184px;
+}
+
+.loading.featuredIn {
+  height: 172px;
+
+  span {
+    border: 2px solid var(--light-blue);
+  }
 }
 </style>
 

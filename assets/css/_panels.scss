@@ -13,4 +13,11 @@
   &.mb {
     margin-bottom: calc(40px / 3);
   }
+
+  > .data-wrap {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
 }

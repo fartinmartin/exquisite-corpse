@@ -4,7 +4,11 @@
       v-if="isFetching === 'not yet'"
       @picked-type="handlePickedType"
     />
-    <div v-if="isFetching === 'yes'">we r loadings</div>
+    <div v-if="isFetching === 'yes'" class="mw-canvas">
+      <div class="border yellow info-panel mw-canvas"></div>
+      <div class="border yellow info-panel mw-canvas mt mb"></div>
+      <div class="border loading mw-canvas"><span>plz hold</span></div>
+    </div>
     <Draw v-if="isFetching === 'done'" />
   </div>
 </template>
@@ -19,11 +23,11 @@ export default {
   name: "draw",
   head() {
     return {
-      title: "exquisite corpse club • draw"
+      title: "exquisite corpse club • draw",
     };
   },
   components: { Draw, PickSection },
-  data: function() {
+  data: function () {
     return { isFetching: "not yet" };
   },
   async fetch({ store, $axios }) {
@@ -39,10 +43,10 @@ export default {
           minLength: 5,
           maxLength: 8,
           limit: 2,
-          api_key: process.env.WORDNIK_API_KEY
-        }
+          api_key: process.env.WORDNIK_API_KEY,
+        },
       });
-      response.forEach(word => words.push(word.word.toLowerCase()));
+      response.forEach((word) => words.push(word.word.toLowerCase()));
     } catch (error) {
       console.error(error);
       words.push("untitled");
@@ -62,11 +66,11 @@ export default {
       const $storeSectionsKeys = Object.keys(this.sections);
 
       const fetchSectionsPerKey = async () => {
-        await asyncForEach($storeSectionsKeys, async key => {
+        await asyncForEach($storeSectionsKeys, async (key) => {
           if (key === type) {
             this.$store.dispatch("modules/drawing/setSections", {
               type,
-              isTemp: true
+              isTemp: true,
             });
           } else {
             // https://stackoverflow.com/a/54801398/8703073
@@ -78,7 +82,7 @@ export default {
             const firstResponse = await query.get();
 
             if (firstResponse.size > 0) {
-              firstResponse.forEach(doc => {
+              firstResponse.forEach((doc) => {
                 // https://programmersought.com/article/27791951922/;jsessionid=F1AC9A35FBE8713BA67DF8D0090DE51B
                 const payload = {
                   docId: doc.id,
@@ -86,7 +90,7 @@ export default {
                   type: doc.data().type,
                   thumb: doc.data().thumb,
                   artist: doc.data().artist,
-                  title: doc.data().title
+                  title: doc.data().title,
                 };
                 this.$store.dispatch("modules/drawing/setSections", payload);
               });
@@ -101,14 +105,14 @@ export default {
                 .limit(1);
               const secondResponse = await secondQuery.get();
 
-              secondResponse.forEach(doc => {
+              secondResponse.forEach((doc) => {
                 const payload = {
                   docId: doc.id,
                   paths: Object.values(doc.data().drawing),
                   type: doc.data().type,
                   thumb: doc.data().thumb,
                   artist: doc.data().artist,
-                  title: doc.data().title
+                  title: doc.data().title,
                 };
                 this.$store.dispatch("modules/drawing/setSections", payload);
               });
@@ -120,10 +124,16 @@ export default {
       await fetchSectionsPerKey();
       this.$store.dispatch("modules/drawing/setType", type);
       this.isFetching = "done";
-    }
+    },
   },
   computed: {
-    ...mapState("modules/drawing", ["sections"])
-  }
+    ...mapState("modules/drawing", ["sections"]),
+  },
 };
 </script>
+
+<style lang="scss" scoped>
+.loading {
+  height: 544px;
+}
+</style>

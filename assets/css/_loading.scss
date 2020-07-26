@@ -1,0 +1,16 @@
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: var(--lighter-blue)
+    url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAAEklEQVQImWNgYGD4z0AswK4SAFXuAf8EPy+xAAAAAElFTkSuQmCC)
+    repeat;
+  background-blend-mode: overlay;
+
+  span {
+    padding: 1rem;
+    background: var(--white);
+    border: 2px solid var(--border-color);
+  }
+}

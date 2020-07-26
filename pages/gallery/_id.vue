@@ -1,15 +1,16 @@
 <template>
   <div class="wrap">
-    <div v-if="isFetching !== 'done'">loading</div>
+    <div v-if="isFetching !== 'done'" class="loading mw-canvas border">
+      <span>plz hold</span>
+    </div>
     <Display v-if="isFetching === 'done'" :sections="sections" />
-    <div
-      v-if="isFetching === 'done'"
-      class="border yellow info-panel mt mw-canvas"
-    >
-      <h1>{{ meta.title }}</h1>
-      <div class="menu">
-        <LikeButton collection="completed" :docId="this.$route.params.id" />
-        <DownloadButton :image="meta.thumb" :title="meta.title" />
+    <div class="border yellow info-panel mt mw-canvas">
+      <div class="data-wrap" v-if="isFetching === 'done'">
+        <h1>{{ meta.title }}</h1>
+        <div class="menu">
+          <LikeButton collection="completed" :docId="this.$route.params.id" />
+          <DownloadButton :image="meta.thumb" :title="meta.title" />
+        </div>
       </div>
     </div>
   </div>
@@ -22,14 +23,14 @@ import LikeButton from "~/components/LikeButton.vue";
 export default {
   head() {
     return {
-      title: `exquisite corpse club • ${this.meta.title}`
+      title: `exquisite corpse club • ${this.meta.title}`,
     };
   },
-  data: function() {
+  data: function () {
     return {
       isFetching: "not yet",
       meta: { title: "" },
-      sections: {}
+      sections: {},
     };
   },
   mounted() {
@@ -46,7 +47,7 @@ export default {
         likes: doc.data().likes,
         title: doc.data().title,
         date: doc.data().date,
-        thumb: doc.data().thumb
+        thumb: doc.data().thumb,
       };
 
       this.meta = completedMeta;
@@ -76,8 +77,8 @@ export default {
     async getSection(docRef) {
       const response = await docRef.get();
       return { docId: response.id, ...response.data() };
-    }
-  }
+    },
+  },
 };
 </script>
 
@@ -89,5 +90,8 @@ export default {
   > * {
     margin-left: 1rem;
   }
+}
+.loading {
+  height: 544px;
 }
 </style>

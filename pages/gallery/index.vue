@@ -92,7 +92,9 @@
         </div>
       </form>
     </div>
-    <div v-if="isFetching !== 'done'" class="loading">we is loading</div>
+    <div v-if="isFetching !== 'done'" class="loading mw-canvas">
+      <span>plz hold</span>
+    </div>
     <div
       v-if="isFetching === 'done'"
       class="gallery"
@@ -101,11 +103,9 @@
       <nuxt-link
         v-for="drawing in gallery"
         :key="drawing.docId"
-        :to="
-          `/${collection === 'completed' ? 'gallery' : 'gallery/section'}/${
-            drawing.docId
-          }`
-        "
+        :to="`/${collection === 'completed' ? 'gallery' : 'gallery/section'}/${
+          drawing.docId
+        }`"
       >
         <Drawing :drawing="drawing" />
       </nuxt-link>
@@ -119,10 +119,10 @@ export default {
   name: "gallery",
   head() {
     return {
-      title: "exquisite corpse club • gallery"
+      title: "exquisite corpse club • gallery",
     };
   },
-  data: function() {
+  data: function () {
     return {
       isFetching: "not yet",
       gallery: [{ docId: "temp" }],
@@ -132,13 +132,9 @@ export default {
       collection: "completed", // switches with "sections"
       type: "corpses", // switches with "top", "mid", and "bot"
       field: "date", // switches with "likes"
-      pageSize: 9 // switches with 18?
+      pageSize: 9, // switches with 18?
     };
   },
-  // computed: {
-  //   isFirstPage: () => this.gallery[0].docId === this.firstItemId,
-  //   isLastPage: () => this.gallery.length < 9
-  // },
   mounted() {
     this.fetchFirst();
   },
@@ -155,10 +151,10 @@ export default {
 
       const firstResponse = await query.get();
       this.lastVisible = firstResponse.docs[firstResponse.docs.length - 1];
-      firstResponse.forEach(doc => {
+      firstResponse.forEach((doc) => {
         let mydoc = {
           docId: doc.id,
-          thumb: doc.data().thumb
+          thumb: doc.data().thumb,
         };
         this.gallery.push(mydoc);
       });
@@ -182,10 +178,10 @@ export default {
         .limit(this.pageSize);
 
       const nextResponse = await query.get();
-      nextResponse.forEach(doc => {
+      nextResponse.forEach((doc) => {
         let mydoc = {
           docId: doc.id,
-          thumb: doc.data().thumb
+          thumb: doc.data().thumb,
         };
         this.gallery.push(mydoc);
       });
@@ -210,10 +206,10 @@ export default {
         .limitToLast(this.pageSize);
 
       const prevResponse = await query.get();
-      prevResponse.forEach(doc => {
+      prevResponse.forEach((doc) => {
         let mydoc = {
           docId: doc.id,
-          thumb: doc.data().thumb
+          thumb: doc.data().thumb,
         };
         this.gallery.push(mydoc);
       });
@@ -248,17 +244,18 @@ export default {
 
       this.field = field;
       this.fetchFirst();
-    }
-  }
+    },
+  },
 };
 </script>
 
 <style lang="scss" scoped>
 .loading {
   height: 542.667px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+
+  span {
+    border: 2px solid var(--light-blue);
+  }
 }
 
 .gallery {
