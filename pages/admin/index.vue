@@ -87,7 +87,8 @@ export default {
       const sectionRef = this.$fireStore.collection("sections").doc(sectionId);
       const doc = await sectionRef.get();
       const { featuredIn, ...docData } = doc.data();
-      return { docId: doc.id, ...docData };
+      const section = { docId: doc.id, ...docData };
+      return { sectionRef, section };
     },
 
     async getRandomSectionByType(type) {
@@ -124,7 +125,7 @@ export default {
     },
 
     async makeCompletedFromSingleSection(sectionId) {
-      const section = await this.getSingleSection(sectionId);
+      const { sectionRef, section } = await this.getSingleSection(sectionId);
 
       // get two other section types NOT of section.type
       let types = ["top", "mid", "bot"];
@@ -181,14 +182,16 @@ export default {
 
       batch.set(completedRef, completedPaylod);
 
+      batch.update(sectionRef, {
+        featuredIn: this.$fireStoreObj.FieldValue.arrayUnion(completedRef),
+      });
+
       types.forEach((type) => {
         const docRef = this.$fireStore
           .collection("sections")
           .doc(idObject[type]);
         batch.update(docRef, {
-          featuredIn: this.$fireStoreObj.FieldValue.arrayUnion(
-            this.$fireStore.doc(`completed/${completedId}`)
-          ),
+          featuredIn: this.$fireStoreObj.FieldValue.arrayUnion(completedRef),
         });
       });
 
@@ -199,6 +202,7 @@ export default {
     },
 
     async removeCompletedAndItsReferences(completedId) {
+      // 🚨 HAVE NOT TESTED
       // get ref to this completed
       const completedRef = this.$fireStore
         .collection("completed")
