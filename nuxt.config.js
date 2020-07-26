@@ -58,7 +58,26 @@ module.exports = {
   /*
    ** Nuxt.js modules
    */
-  modules: ["@nuxtjs/firebase", "@nuxtjs/svg", "@nuxtjs/axios"],
+  modules: [
+    "@nuxtjs/firebase",
+    "@nuxtjs/svg",
+    "@nuxtjs/axios",
+    "nuxt-password-protect",
+  ],
+  /*
+   ** Nuxt.js modules
+   */
+  passwordProtect: {
+    formPath: "/admin/login",
+    password: process.env.ECC_ADMIN_PASSWORD,
+    tokenSeed: 101010,
+    queryString: "_pw",
+    cookieName: "_password",
+    cookie: {
+      prefix: "",
+      expires: 5,
+    },
+  },
   /*
    ** Firebase config
    ** See:
@@ -123,26 +142,4 @@ module.exports = {
     color: "#fcda00",
     failedColor: "#f44e3b",
   },
-  /*
-   ** Generate dynamic routes
-   ** See https://nuxtjs.org/api/configuration-generate/
-   */
-  // generate: {
-  //   routes() {
-  //     let docIds = [];
-  //     const completedsRef = app.$fireStore.collection("completed");
-  //     completedsRef.get().then(querySnapshot => {
-  //       querySnapshot.forEach(doc => {
-  //         docIds.push(`/gallery/${doc.id}`);
-  //       });
-  //     });
-  //     const sectionsRef = app.$fireStore.collection("sections");
-  //     sectionsRef.get().then(querySnapshot => {
-  //       querySnapshot.forEach(doc => {
-  //         docIds.push(`/gallery/section/${doc.id}`);
-  //       });
-  //     });
-  //     return docIds;
-  //   }
-  // }
 };
