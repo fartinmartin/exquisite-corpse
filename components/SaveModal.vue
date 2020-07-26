@@ -56,15 +56,14 @@ export default {
     return {
       title: "",
       artist: "",
-      isTemp: true
+      isTemp: true,
     };
   },
   computed: {
-    ...mapState(["baseURL"]),
     ...mapState("modules/drawing", ["type", "paths", "sections", "words"]),
     section() {
       return { paths: this.paths, title: this.title, artist: this.artist };
-    }
+    },
   },
   mounted() {
     this.title = this.words.join(" ");
@@ -100,7 +99,7 @@ export default {
 
       const sectionsObj = Object.keys(this.sections);
 
-      sectionsObj.forEach(key => {
+      sectionsObj.forEach((key) => {
         if (key !== this.type) {
           titleArray.push(randomWordFromTitle(this.sections[key].title));
           thumbsObject[key] = this.sections[key].thumb;
@@ -114,7 +113,7 @@ export default {
       const completedThumb = await mergeBase64([
         thumbsObject.top,
         thumbsObject.mid,
-        thumbsObject.bot
+        thumbsObject.bot,
       ]);
 
       let completePaylod = {
@@ -136,9 +135,9 @@ export default {
             `sections/${
               this.type === "bot" ? sectionId : this.sections.bot.docId
             }`
-          )
+          ),
         },
-        thumb: completedThumb
+        thumb: completedThumb,
       };
 
       completedRef.set(completePaylod);
@@ -151,7 +150,7 @@ export default {
         likes: 0,
         thumb: currentThumb, // TODO: this requires the canvas to have finished animating 🤔 i could trigger it to just makeDrawing() w no timeout? ALSO: will this "file" get too big?? seems unlikely!
         title: this.title || "untitled",
-        type: this.type
+        type: this.type,
       };
 
       // TODO: start loading component
@@ -162,26 +161,26 @@ export default {
           alert("You did it! Ur drawing was saved!");
           this.$emit("close-save", completedId);
         })
-        .catch(error => {
+        .catch((error) => {
           alert("Oops, there was an error.. try again?");
           console.error("Error writing document: ", error);
           // TODO: tell loading component to deal with error
         });
 
       // for each drawing that is NOT active type, push the "completedId" to their "featuredIn" array
-      sectionsObj.forEach(key => {
+      sectionsObj.forEach((key) => {
         if (key !== this.type) {
           const docId = this.sections[key].docId;
           const docRef = this.$fireStore.collection("sections").doc(docId);
           docRef.update({
             featuredIn: this.$fireStoreObj.FieldValue.arrayUnion(
               this.$fireStore.doc(`completed/${completedId}`)
-            )
+            ),
           });
         }
       });
-    }
-  }
+    },
+  },
 };
 </script>
 
