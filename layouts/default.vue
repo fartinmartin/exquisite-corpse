@@ -15,9 +15,10 @@ import { mapState } from "vuex";
 
 export default {
   components: { Nav, CustomCursor, Help },
+  computed: mapState(["isHelping"]),
   mounted() {
+    // this.$store.dispatch("modules/user/signOut");
     this.$store.dispatch("modules/user/signInAnonymously");
   },
-  computed: mapState(["isHelping"])
 };
 </script>

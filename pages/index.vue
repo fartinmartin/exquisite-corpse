@@ -7,7 +7,7 @@
       <NavMenu />
     </nav>
     <Loading
-      v-if="isFetching !== 'done'"
+      v-if="isFetching !== 'done' && isLoggedIn"
       subtext="fetching random corpse"
       style="height: 544px;"
     />
@@ -32,15 +32,21 @@ export default {
   components: { Display, NavMenu, Loading },
   data: function () {
     return {
+      isLoggedIn: false,
       isFetching: "not yet",
       meta: null,
       sections: {},
     };
   },
   mounted() {
+    this.logIn();
     this.fetchRandomCompleted();
   },
   methods: {
+    async logIn() {
+      await this.$store.dispatch("modules/user/signInAnonymously");
+      this.isLoggedIn = true;
+    },
     async fetchRandomCompleted() {
       this.isFetching = "yes";
       const completedRef = this.$fireStore.collection("completed");
