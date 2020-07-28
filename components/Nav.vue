@@ -30,8 +30,8 @@ export default {
   methods: {
     openHelp() {
       this.$store.dispatch("setIsHelping", true);
-    }
-  }
+    },
+  },
 };
 </script>
 
@@ -61,5 +61,10 @@ nav,
   left: initial;
   right: calc(40px / 3);
   z-index: 955;
+}
+
+nav > a {
+  display: flex;
+  align-items: center;
 }
 </style>
