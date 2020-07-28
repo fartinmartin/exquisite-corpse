@@ -3,6 +3,8 @@
   font-style: normal;
   font-weight: 400;
   src: local("SpaceMono-Regular"), local("Space Mono Regular"),
+    url("../fonts/spacemono/SpaceMono-Regular.woff2") format("woff2"),
+    url("../fonts/spacemono/SpaceMono-Regular.woff") format("woff"),
     url("../fonts/spacemono/SpaceMono-Regular.ttf") format("ttf");
 }
 
@@ -11,5 +13,7 @@
   font-style: bold;
   font-weight: 700;
   src: local("Space Mono Bold"), local("SpaceMono-Bold"),
+    url("../fonts/spacemono/SpaceMono-Bold.woff2") format("woff2"),
+    url("../fonts/spacemono/SpaceMono-Bold.woff") format("woff"),
     url("../fonts/spacemono/SpaceMono-Bold.ttf") format("ttf");
 }
