@@ -7,11 +7,11 @@
       <NavMenu />
     </nav>
     <Loading
-      v-if="isFetching !== 'done' && isLoggedIn"
+      v-if="isFetching !== 'done'"
       subtext="fetching random corpse"
       style="height: 544px;"
     />
-    <Display v-if="isFetching === 'done'" :sections="sections" />
+    <Display v-if="isFetching === 'done' && isLoggedIn" :sections="sections" />
     <div class="border yellow info-panel mt mw-canvas title">
       <nuxt-link v-if="isFetching === 'done'" :to="`/gallery/${meta.docId}`">{{
         meta.title
