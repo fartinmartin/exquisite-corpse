@@ -58,12 +58,7 @@ module.exports = {
   /*
    ** Nuxt.js modules
    */
-  modules: [
-    "@nuxtjs/firebase",
-    "@nuxtjs/svg",
-    "@nuxtjs/axios",
-    "nuxt-password-protect",
-  ],
+  modules: ["@nuxtjs/firebase", "@nuxtjs/svg", "nuxt-password-protect"],
   /*
    ** Nuxt.js modules
    */
@@ -119,15 +114,6 @@ module.exports = {
       short_name: "ECC",
       lang: "en",
     },
-  },
-  /*
-   ** axios
-   ** See https://github.com/nuxt-community/axios-module#options
-   */
-  axios: {
-    baseURL: "https://api.wordnik.com/v4/words.json",
-    proxyHeaders: false,
-    credentials: false,
   },
   /*
    ** Build configuration

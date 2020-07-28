@@ -18,6 +18,7 @@ import Draw from "~/components/Draw";
 import PickSection from "~/components/PickSection";
 import { mapState } from "vuex";
 import asyncForEach from "~/assets/js/asyncForEach";
+import { twoRandomWords } from "~/assets/js/twoRandomWords";
 
 export default {
   name: "draw",
@@ -30,28 +31,8 @@ export default {
   data: function () {
     return { isFetching: "not yet" };
   },
-  async fetch({ store, $axios }) {
-    let words = [];
-    try {
-      const response = await $axios.$get("/randomWords", {
-        params: {
-          hasDictionaryDef: true,
-          includePartOfSpeech: "adjective,noun",
-          maxCorpusCount: -1,
-          minDictionaryCount: 1,
-          maxDictionaryCount: -1,
-          minLength: 5,
-          maxLength: 8,
-          limit: 2,
-          api_key: process.env.WORDNIK_API_KEY,
-        },
-      });
-      response.forEach((word) => words.push(word.word.toLowerCase()));
-    } catch (error) {
-      console.error(error);
-      words.push("untitled");
-    }
-
+  async fetch({ store }) {
+    let words = await twoRandomWords();
     store.dispatch("modules/drawing/setWords", words);
   },
   mounted() {

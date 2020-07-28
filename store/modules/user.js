@@ -1,3 +1,5 @@
+import { twoRandomWords } from "~/assets/js/twoRandomWords";
+
 export const state = () => ({
   id: null,
   displayName: "",
@@ -29,7 +31,7 @@ export const actions = {
         this.$fireAuth
           .signInAnonymously()
           .then(async (response) => {
-            const displayName = await dispatch("twoRandomWords");
+            const displayName = await twoRandomWords("anonymous");
             await response.user.updateProfile({ displayName });
             commit("SET_USER", response.user);
             dispatch("welcomeUser");
@@ -42,37 +44,6 @@ export const actions = {
         // dispatch("welcomeUser");
       }
     });
-  },
-  async twoRandomWords() {
-    let words = "";
-
-    const url = new URL("https://api.wordnik.com/v4/words.json/randomWords"),
-      params = {
-        hasDictionaryDef: true,
-        includePartOfSpeech: "adjective,noun",
-        maxCorpusCount: -1,
-        minDictionaryCount: 1,
-        maxDictionaryCount: -1,
-        minLength: 5,
-        maxLength: 8,
-        limit: 2,
-        api_key: process.env.WORDNIK_API_KEY,
-      };
-
-    Object.keys(params).forEach((key) =>
-      url.searchParams.append(key, params[key])
-    );
-
-    try {
-      const response = await fetch(url.href);
-      const data = await response.json();
-      const wordsArray = data.map((word) => word.word);
-      words = wordsArray.join(" ").toLowerCase();
-    } catch {
-      words = "anonymous";
-    }
-
-    return words;
   },
   welcomeUser() {
     console.log(
