@@ -58,7 +58,20 @@ export default {
       },
     };
   },
+  mounted() {
+    document.addEventListener("keydown", this.handleShortcuts);
+  },
+  beforeDestroy() {
+    document.removeEventListener("keydown", this.handleShortcuts);
+  },
   methods: {
+    handleShortcuts(e) {
+      // if (e.keyCode === 76) { // "l"
+      if (e.keyCode === 12) {
+        this.$store.dispatch("modules/user/signOut");
+      }
+    },
+
     async fetchCollection(collection) {
       let docs = [];
 

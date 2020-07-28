@@ -7,13 +7,27 @@ export const getters = {};
 
 export const actions = {
   async signOut() {
+    const style = [
+      "display: inline-block;",
+      "text-align: center",
+      "font-family: 'Space Mono', monospace;",
+      "font-size: 12px;",
+      "word-spacing: 1px;",
+      "padding: 1rem;",
+      "margin: 20px auto 22px auto;",
+      "border: 2px solid #fb9200;",
+      "box-shadow: 2px 2px 0 0 #f44e3b;",
+      "background: #ffffff;",
+    ];
+
     this.$fireAuth
       .signOut()
       .then(() => {
-        console.log("Signed Out");
+        console.log("%c👋 signed out", style.join(""));
       })
       .catch((error) => {
-        console.error("Sign Out Error", error);
+        console.log("%c🚫 sign out error", style.join(""));
+        console.error(error);
       });
   },
   async signInAnonymously({ commit, dispatch }) {
@@ -23,7 +37,7 @@ export const actions = {
           .signInAnonymously()
           .then(async (response) => {
             const displayName = await dispatch("twoRandomWords");
-            response.user.updateProfile({ displayName });
+            await response.user.updateProfile({ displayName });
             commit("SET_USER", response.user);
             dispatch("welcomeUser");
           })
