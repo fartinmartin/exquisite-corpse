@@ -55,50 +55,59 @@ export default {
       const query = completedRef
         .where(this.$fireStoreObj.FieldPath.documentId(), ">=", randomKey)
         .limit(1);
-      const firstResponse = await query.get();
-      if (firstResponse.size > 0) {
-        firstResponse.forEach((doc) => {
-          let completedMeta = {
-            docId: doc.id,
-            likes: doc.data().likes,
-            title: doc.data().title,
-            date: doc.data().date,
-          };
 
-          let vm = this;
+      try {
+        const firstResponse = await query.get();
+        if (firstResponse.size > 0) {
+          firstResponse.forEach((doc) => {
+            let completedMeta = {
+              docId: doc.id,
+              likes: doc.data().likes,
+              title: doc.data().title,
+              date: doc.data().date,
+            };
 
-          async function handleSections() {
-            await vm.getSections(doc.data().sections);
-          }
+            let vm = this;
 
-          handleSections();
+            async function handleSections() {
+              await vm.getSections(doc.data().sections);
+            }
 
-          return (this.meta = completedMeta);
-        });
-      } else {
-        const secondQuery = completedRef
-          .where(this.$fireStoreObj.FieldPath.documentId(), "<", randomKey)
-          .limit(1);
-        const secondResponse = await secondQuery.get();
-        secondResponse.forEach((doc) => {
-          let completedMeta = {
-            docId: doc.id,
-            likes: doc.data().likes,
-            title: doc.data().title,
-            date: doc.data().date,
-          };
+            handleSections();
 
-          let vm = this;
+            return (this.meta = completedMeta);
+          });
+        } else {
+          const secondQuery = completedRef
+            .where(this.$fireStoreObj.FieldPath.documentId(), "<", randomKey)
+            .limit(1);
+          const secondResponse = await secondQuery.get();
+          secondResponse.forEach((doc) => {
+            let completedMeta = {
+              docId: doc.id,
+              likes: doc.data().likes,
+              title: doc.data().title,
+              date: doc.data().date,
+            };
 
-          async function handleSections() {
-            await vm.getSections(doc.data().sections);
-          }
+            let vm = this;
 
-          handleSections();
+            async function handleSections() {
+              await vm.getSections(doc.data().sections);
+            }
 
-          return (this.meta = completedMeta);
-        });
+            handleSections();
+
+            return (this.meta = completedMeta);
+          });
+        }
+      } catch (error) {
+        console.error(error);
+        this.isLoggedIn = false;
+        await this.logIn();
+        this.fetchRandomCompleted();
       }
+
       return;
     },
 
