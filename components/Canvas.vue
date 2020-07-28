@@ -37,18 +37,18 @@ export default {
   props: {
     id: {
       type: String, // top, mid, or bot
-      required: true
+      required: true,
     },
     mode: {
       type: String, // draw, display, or pixelate
-      required: true
+      required: true,
     },
-    section: Object // for display
+    section: Object, // for display
   },
-  data: function() {
+  data: function () {
     return {
       canvas: null,
-      ctx: null
+      ctx: null,
     };
   },
   mounted() {
@@ -106,19 +106,15 @@ export default {
       }
     },
 
-    mouseup() {
-      this.$store.dispatch("modules/mouse/setIsDrawing", false);
-      this.$store.dispatch("modules/drawing/pushCurrentPathToDrawingHistory");
-      this.$store.dispatch("modules/drawing/incrementHistory");
+    mouseup(e) {
+      if (this.isDrawing) {
+        this.$store.dispatch("modules/drawing/completePath");
+      }
     },
 
     mouseleave() {
-      // to prevent sticky brush when leaving CANVAS
-      // TODO: this causes some history state error.. or something 🤷‍♂️
       if (this.isDrawing) {
-        this.$store.dispatch("modules/mouse/setIsDrawing", false);
-        this.$store.dispatch("modules/drawing/pushCurrentPathToDrawingHistory");
-        this.$store.dispatch("modules/drawing/incrementHistory");
+        this.$store.dispatch("modules/drawing/completePath");
       }
     },
 
@@ -137,7 +133,7 @@ export default {
           x1: this.x,
           y1: this.y,
           x2: e.offsetX,
-          y2: e.offsetY
+          y2: e.offsetY,
         };
       } else if (this.mode === "display" || this.mode === "pixelate") {
         point = e; // e = point passed from this.makeDrawing()
@@ -185,7 +181,7 @@ export default {
       let tolerance = 100;
       let dpiPoint = {
         x2: point.x2 * devicePixelRatio,
-        y2: point.y2 * devicePixelRatio
+        y2: point.y2 * devicePixelRatio,
       };
       floodFill.fill(dpiPoint.x2, dpiPoint.y2, tolerance, ctx);
     },
@@ -217,7 +213,7 @@ export default {
         handlePaths();
       } else {
         drawing.forEach((path, i) => {
-          path.forEach(point => {
+          path.forEach((point) => {
             this.handleDraw(point);
           });
         });
@@ -262,11 +258,11 @@ export default {
       );
 
       this.$refs.notAllowed.bg();
-    }
+    },
   },
   computed: {
     ...mapState("modules/mouse", ["palette", "size", "x", "y", "isDrawing"]),
-    ...mapState("modules/mouse", { mouseMode: state => state.mode }),
+    ...mapState("modules/mouse", { mouseMode: (state) => state.mode }),
     ...mapState("modules/drawing", ["sections"]),
     drawing() {
       if (this.mode === "display") {
@@ -274,8 +270,8 @@ export default {
       } else if (this.mode === "pixelate") {
         return this.sections[this.id];
       }
-    }
-  }
+    },
+  },
 };
 </script>
 

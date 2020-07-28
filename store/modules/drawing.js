@@ -66,6 +66,12 @@ export const actions = {
     commit("DECREMENT_HISTORY");
   },
 
+  completePath({ dispatch }) {
+    dispatch("modules/mouse/setIsDrawing", false, { root: true });
+    dispatch("pushCurrentPathToDrawingHistory");
+    dispatch("incrementHistory");
+  },
+
   undoCanvas({ commit, dispatch, state }) {
     if (state.history.step > 0) {
       commit("DECREMENT_HISTORY");
