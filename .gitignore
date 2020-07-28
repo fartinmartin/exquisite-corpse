@@ -94,4 +94,4 @@ public
 functions/*
 !functions/index.js
 !functions/package.json
-.firebase
+.firebase/*
