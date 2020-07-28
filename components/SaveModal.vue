@@ -10,7 +10,7 @@
       <form class="border yellow">
         <div class="loadal" v-if="isLoading !== 'not yet'">
           <Loading
-            v-if="isLoading !== 'saved'"
+            v-if="isLoading === 'saving'"
             subtext="generating your masterpiece"
             style="height: 100%;"
             class="yellow"
@@ -21,6 +21,14 @@
             subtext="your drawing was saved"
             style="height: 100%;"
             class="yellow"
+          />
+          <Loading
+            v-if="isLoading === 'error'"
+            text="oop!"
+            subtext="there was an error.. try again?"
+            style="height: 100%;"
+            class="error"
+            @click.native="closeMe"
           />
         </div>
         <div>
@@ -83,7 +91,7 @@ export default {
       artist: "",
       isTempTitle: true,
       isTempArtist: true,
-      isLoading: "yes",
+      isLoading: "not yet",
     };
   },
   computed: {
@@ -108,13 +116,16 @@ export default {
     handleShortcuts(e) {
       if (e.keyCode === 27) this.$emit("close-save"); // esc
     },
+
     closeMe(e) {
       if (e.target.className === "save-modal") {
         this.$emit("close-save");
+        this.isLoading = "not yet";
       }
     },
+
     async saveDrawing() {
-      this.isLoading = "yes";
+      this.isLoading = "saving";
 
       // TODO: should validate form and/or come up with defaults
       let timestamp = this.$fireStoreObj.Timestamp.fromDate(new Date());
@@ -192,9 +203,8 @@ export default {
           }, 1500);
         })
         .catch((error) => {
-          alert("Oops, there was an error.. try again?");
+          this.isLoading = "error";
           console.error("Error writing document: ", error);
-          // TODO: tell loading component to deal with error
         });
 
       // for each drawing that is NOT active type, push the "completedId" to their "featuredIn" array
@@ -209,6 +219,9 @@ export default {
           });
         }
       });
+
+      if (this.artist !== this.name)
+        this.$store.dispatch("modules/user/updateUserName", this.artist);
     },
   },
 };

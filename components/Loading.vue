@@ -39,6 +39,15 @@ export default {
     border: 2px solid var(--light-yellow);
   }
 
+  &.error {
+    --border-color: var(--orange);
+    --box-shadow-color: var(--red);
+
+    .text-wrap {
+      border: 2px solid var(--orange);
+    }
+  }
+
   .subtext {
     color: #7f7f7f;
   }

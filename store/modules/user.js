@@ -53,9 +53,18 @@ export const actions = {
       style.join("")
     );
   },
+  updateUserName({ commit }, displayName) {
+    this.$fireAuth.currentUser
+      .updateProfile({ displayName })
+      .then(() => commit("SET_USER_NAME", displayName))
+      .catch((error) => console.error(error));
+  },
 };
 
 export const mutations = {
+  SET_USER_NAME(state, displayName) {
+    state.name = displayName;
+  },
   SET_USER(state, user) {
     state.name = user.displayName || `anonymous-${user.uid.substr(1, 4)}`;
     state.id = user.uid;
