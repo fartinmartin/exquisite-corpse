@@ -10,9 +10,9 @@ export const state = () => ({
   sections: {
     top: null,
     mid: null,
-    bot: null
+    bot: null,
   },
-  words: []
+  title: "",
 });
 
 export const getters = {
@@ -30,12 +30,12 @@ export const getters = {
   },
   cantRedo(state) {
     return state.history.step >= state.history.paths.length;
-  }
+  },
 };
 
 export const actions = {
-  setWords({ commit }, words) {
-    commit("SET_WORDS", words);
+  setTitle({ commit }, title) {
+    commit("SET_TITLE", title);
   },
 
   setSections({ commit }, payload) {
@@ -111,7 +111,7 @@ export const actions = {
       x1: rootState.modules.mouse.x,
       y1: rootState.modules.mouse.y,
       x2: event.offsetX,
-      y2: event.offsetY
+      y2: event.offsetY,
     };
     commit("PUSH_POINT_DATA_TO_CURRENT_PATH", pointData);
   },
@@ -129,7 +129,9 @@ export const actions = {
     // handles undo scenarios that dont trigger undoCanvas() ? 🤔
     if (!paths.length) commit("CLEAR_CANVAS");
 
-    paths.forEach(path => path.forEach(point => dispatch("handleDraw", point)));
+    paths.forEach((path) =>
+      path.forEach((point) => dispatch("handleDraw", point))
+    );
   },
 
   handleDraw({ dispatch, commit }, point) {
@@ -175,15 +177,15 @@ export const actions = {
     let tolerance = 100;
     let dpiPoint = {
       x2: point.x2 * devicePixelRatio,
-      y2: point.y2 * devicePixelRatio
+      y2: point.y2 * devicePixelRatio,
     };
     floodFill.fill(dpiPoint.x2, dpiPoint.y2, tolerance, ctx);
-  }
+  },
 };
 
 export const mutations = {
-  SET_WORDS(state, words) {
-    state.words = words;
+  SET_TITLE(state, title) {
+    state.title = title;
   },
 
   CLEAR_DRAWING(state) {
@@ -262,5 +264,5 @@ export const mutations = {
     let trim = [...state.history.paths];
     trim.length = state.history.step;
     state.paths = trim;
-  }
+  },
 };

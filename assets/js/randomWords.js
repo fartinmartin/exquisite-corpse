@@ -29,3 +29,8 @@ export const twoRandomWords = async (fallback = "untitled") => {
 
   return words;
 };
+
+export const randomWordFromString = (string) => {
+  const stringAsArray = string.split(" ");
+  return stringAsArray[Math.floor(Math.random() * stringAsArray.length)];
+};

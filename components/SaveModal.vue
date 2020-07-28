@@ -8,6 +8,21 @@
         ref="previewCanvas"
       />
       <form class="border yellow">
+        <div class="loadal" v-if="isLoading !== 'not yet'">
+          <Loading
+            v-if="isLoading !== 'saved'"
+            subtext="generating your masterpiece"
+            style="height: 100%;"
+            class="yellow"
+          />
+          <Loading
+            v-if="isLoading === 'saved'"
+            text="you did it!"
+            subtext="your drawing was saved"
+            style="height: 100%;"
+            class="yellow"
+          />
+        </div>
         <div>
           <label for="title">your section's title:</label>
           <input
@@ -15,8 +30,8 @@
             v-model="title"
             id="title"
             :placeholder="title"
-            :class="{ temp: isTemp }"
-            @focus="isTemp = false"
+            :class="{ temp: isTempTitle }"
+            @focus="isTempTitle = false"
             maxlength="17"
           />
         </div>
@@ -25,7 +40,15 @@
             your *ahem* artist name:
             <span>(@s will link to your instagram)</span>
           </label>
-          <input type="text" v-model="artist" id="artist" maxlength="30" />
+          <input
+            type="text"
+            v-model="artist"
+            id="artist"
+            :placeholder="artist"
+            :class="{ temp: isTempArtist }"
+            @focus="isTempArtist = false"
+            maxlength="30"
+          />
         </div>
         <div>
           <input
@@ -46,8 +69,10 @@
 
 <script>
 import Canvas from "./Canvas.vue";
+import Loading from "./Loading.vue";
 import { mergeBase64 } from "~/assets/js/mergeImages";
 import { mapState } from "vuex";
+import { randomWordFromString } from "~/assets/js/randomWords";
 
 export default {
   name: "SaveModal",
@@ -56,17 +81,24 @@ export default {
     return {
       title: "",
       artist: "",
-      isTemp: true,
+      isTempTitle: true,
+      isTempArtist: true,
+      isLoading: "yes",
     };
   },
   computed: {
-    ...mapState("modules/drawing", ["type", "paths", "sections", "words"]),
+    ...mapState("modules/user", ["name"]),
+    ...mapState("modules/drawing", ["type", "paths", "sections"]),
+    tempTitle() {
+      return this.$store.state.modules.drawing.title;
+    },
     section() {
       return { paths: this.paths, title: this.title, artist: this.artist };
     },
   },
   mounted() {
-    this.title = this.words.join(" ");
+    this.title = this.tempTitle;
+    this.artist = this.name;
     document.addEventListener("keydown", this.handleShortcuts);
   },
   beforeDestroy() {
@@ -82,6 +114,8 @@ export default {
       }
     },
     async saveDrawing() {
+      this.isLoading = "yes";
+
       // TODO: should validate form and/or come up with defaults
       let timestamp = this.$fireStoreObj.Timestamp.fromDate(new Date());
       const completedRef = this.$fireStore.collection("completed").doc();
@@ -89,19 +123,14 @@ export default {
       const sectionsRef = this.$fireStore.collection("sections").doc();
       const sectionId = sectionsRef.id;
 
-      function randomWordFromTitle(title) {
-        const titleAsArray = title.split(" ");
-        return titleAsArray[Math.floor(Math.random() * titleAsArray.length)];
-      }
-
       let thumbsObject = {};
-      let titleArray = [randomWordFromTitle(this.title)];
+      let titleArray = [randomWordFromString(this.title)];
 
       const sectionsObj = Object.keys(this.sections);
 
       sectionsObj.forEach((key) => {
         if (key !== this.type) {
-          titleArray.push(randomWordFromTitle(this.sections[key].title));
+          titleArray.push(randomWordFromString(this.sections[key].title));
           thumbsObject[key] = this.sections[key].thumb;
         }
       });
@@ -143,23 +172,24 @@ export default {
       completedRef.set(completePaylod);
 
       let sectionPayload = {
-        artist: this.artist || "anonymous",
+        artist: this.artist.substring(0, 30).trim() || this.name || "anonymous",
         date: timestamp,
-        drawing: { ...this.paths }, // POTENTIAL WARNING 🚨 : could this be saving the drawing out of order ?!
+        drawing: { ...this.paths },
         featuredIn: [this.$fireStore.doc(`completed/${completedId}`)],
         likes: 0,
         thumb: currentThumb, // TODO: this requires the canvas to have finished animating 🤔 i could trigger it to just makeDrawing() w no timeout? ALSO: will this "file" get too big?? seems unlikely!
-        title: this.title || "untitled",
+        title:
+          this.title.substring(0, 17).trim() || this.tempTitle || "untitled",
         type: this.type,
       };
 
-      // TODO: start loading component
       sectionsRef
         .set(sectionPayload)
         .then(() => {
-          // TODO: tell loading component to show success then route to the completed drawing!
-          alert("You did it! Ur drawing was saved!");
-          this.$emit("close-save", completedId);
+          this.isLoading = "saved";
+          setTimeout(() => {
+            this.$emit("close-save", completedId);
+          }, 1500);
         })
         .catch((error) => {
           alert("Oops, there was an error.. try again?");
@@ -208,7 +238,18 @@ export default {
   display: none;
 }
 
+.loadal {
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  width: calc(100% + 4px);
+  height: calc(100% + 4px);
+  background: var(--white);
+  z-index: 5;
+}
+
 form {
+  position: relative;
   margin-top: 40px;
   padding: 1rem;
   width: 544px;

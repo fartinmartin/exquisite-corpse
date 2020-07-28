@@ -35,6 +35,10 @@ export default {
     text-align: center;
   }
 
+  &.yellow .text-wrap {
+    border: 2px solid var(--light-yellow);
+  }
+
   .subtext {
     color: #7f7f7f;
   }

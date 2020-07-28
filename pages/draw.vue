@@ -18,7 +18,7 @@ import Draw from "~/components/Draw";
 import PickSection from "~/components/PickSection";
 import { mapState } from "vuex";
 import asyncForEach from "~/assets/js/asyncForEach";
-import { twoRandomWords } from "~/assets/js/twoRandomWords";
+import { twoRandomWords } from "~/assets/js/randomWords";
 
 export default {
   name: "draw",
@@ -33,7 +33,7 @@ export default {
   },
   async fetch({ store }) {
     let words = await twoRandomWords();
-    store.dispatch("modules/drawing/setWords", words);
+    store.dispatch("modules/drawing/setTitle", words);
   },
   mounted() {
     this.$store.dispatch("modules/drawing/clearDrawing");

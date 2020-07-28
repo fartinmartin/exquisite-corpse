@@ -1,8 +1,8 @@
-import { twoRandomWords } from "~/assets/js/twoRandomWords";
+import { twoRandomWords } from "~/assets/js/randomWords";
 
 export const state = () => ({
   id: null,
-  displayName: "",
+  name: "",
 });
 
 export const getters = {};
@@ -41,7 +41,7 @@ export const actions = {
           });
       } else {
         commit("SET_USER", user);
-        // dispatch("welcomeUser");
+        dispatch("welcomeUser");
       }
     });
   },
