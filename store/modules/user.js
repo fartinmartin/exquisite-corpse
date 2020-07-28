@@ -46,7 +46,7 @@ export const actions = {
           });
       } else {
         commit("SET_USER", user);
-        dispatch("welcomeUser");
+        // dispatch("welcomeUser");
       }
     });
   },
