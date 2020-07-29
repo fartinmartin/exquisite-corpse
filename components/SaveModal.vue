@@ -97,16 +97,18 @@ export default {
   computed: {
     ...mapState("modules/user", ["name"]),
     ...mapState("modules/drawing", ["type", "paths", "sections"]),
-    tempTitle() {
-      return this.$store.state.modules.drawing.title;
-    },
-    section() {
-      return { paths: this.paths, title: this.title, artist: this.artist };
-    },
+    tempTitle: () => this.$store.state.modules.drawing.title,
+    section: () => ({
+      paths: this.paths,
+      title: this.title,
+      artist: this.artist,
+    }),
   },
   mounted() {
+    // set local state based on store state
     this.title = this.tempTitle;
     this.artist = this.name;
+
     document.addEventListener("keydown", this.handleShortcuts);
   },
   beforeDestroy() {
@@ -127,16 +129,20 @@ export default {
     async saveDrawing() {
       this.isLoading = "saving";
 
-      // TODO: should validate form and/or come up with defaults
+      // if they changed their name, update their profile + our local state
+      if (this.artist !== this.name)
+        this.$store.dispatch("modules/user/updateUserName", this.artist);
+
+      // firebase vars
       let timestamp = this.$fireStoreObj.Timestamp.fromDate(new Date());
       const completedRef = this.$fireStore.collection("completed").doc();
       const completedId = completedRef.id;
       const sectionsRef = this.$fireStore.collection("sections").doc();
       const sectionId = sectionsRef.id;
 
+      // meta info "contrustors"
       let thumbsObject = {};
       let titleArray = [randomWordFromString(this.title)];
-
       const sectionsObj = Object.keys(this.sections);
 
       sectionsObj.forEach((key) => {
@@ -146,7 +152,7 @@ export default {
         }
       });
 
-      // create thumb for completed drawing
+      // create thumb for completed drawing based on preveiwCanvas
       const currentThumb = this.$refs.previewCanvas.$refs.canvas.toDataURL();
       thumbsObject[this.type] = currentThumb;
 
@@ -180,22 +186,38 @@ export default {
         thumb: completedThumb,
       };
 
-      completedRef.set(completePaylod);
-
       let sectionPayload = {
         artist: this.artist.substring(0, 30).trim() || this.name || "anonymous",
         date: timestamp,
         drawing: { ...this.paths },
         featuredIn: [this.$fireStore.doc(`completed/${completedId}`)],
         likes: 0,
-        thumb: currentThumb, // TODO: this requires the canvas to have finished animating 🤔 i could trigger it to just makeDrawing() w no timeout? ALSO: will this "file" get too big?? seems unlikely!
+        thumb: currentThumb,
         title:
           this.title.substring(0, 17).trim() || this.tempTitle || "untitled",
         type: this.type,
       };
 
-      sectionsRef
-        .set(sectionPayload)
+      const batch = this.$fireStore.batch();
+
+      batch.set(completedRef, completedPaylod);
+      batch.set(sectionsRef, sectionPayload);
+
+      // for each drawing that is NOT active type, push the "completedId" to their "featuredIn" array
+      sectionsObj.forEach((key) => {
+        if (key !== this.type) {
+          const docId = this.sections[key].docId;
+          const docRef = this.$fireStore.collection("sections").doc(docId);
+          batch.update(docRef, {
+            featuredIn: this.$fireStoreObj.FieldValue.arrayUnion(
+              this.$fireStore.doc(`completed/${completedId}`)
+            ),
+          });
+        }
+      });
+
+      batch
+        .commit()
         .then(() => {
           this.isLoading = "saved";
           setTimeout(() => {
@@ -205,23 +227,10 @@ export default {
         .catch((error) => {
           this.isLoading = "error";
           console.error("Error writing document: ", error);
+          setTimeout(() => {
+            this.$emit("close-save");
+          }, 2000);
         });
-
-      // for each drawing that is NOT active type, push the "completedId" to their "featuredIn" array
-      sectionsObj.forEach((key) => {
-        if (key !== this.type) {
-          const docId = this.sections[key].docId;
-          const docRef = this.$fireStore.collection("sections").doc(docId);
-          docRef.update({
-            featuredIn: this.$fireStoreObj.FieldValue.arrayUnion(
-              this.$fireStore.doc(`completed/${completedId}`)
-            ),
-          });
-        }
-      });
-
-      if (this.artist !== this.name)
-        this.$store.dispatch("modules/user/updateUserName", this.artist);
     },
   },
 };
@@ -261,6 +270,7 @@ export default {
   z-index: 5;
 }
 
+/* TODO: abstract form styles to (global) SCSS file */
 form {
   position: relative;
   margin-top: 40px;
