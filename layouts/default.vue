@@ -19,6 +19,13 @@ export default {
   mounted() {
     // this.$store.dispatch("modules/user/signOut");
     this.$store.dispatch("modules/user/signInAnonymously");
+
+    // modernizr style class names for touch devices
+    if ("ontouchstart" in document.documentElement) {
+      document.documentElement.classList.add("touch");
+    } else {
+      document.documentElement.classList.add("no-touch");
+    }
   },
 };
 </script>

@@ -39,7 +39,7 @@ export default {
       x: null,
       y: null,
       state: "auto",
-      tooltip: null
+      tooltip: null,
     };
   },
   mounted() {
@@ -62,7 +62,7 @@ export default {
         ...(this.state === "grabbing" && { x: 0, y: 0 }),
         ...(this.state === "draw" && { x: 0, y: -25 }),
         ...(this.state === "erase" && { x: -13, y: -23 }),
-        ...(this.state === "fill" && { x: -2, y: -24 })
+        ...(this.state === "fill" && { x: -2, y: -24 }),
       };
 
       // cursor pos
@@ -128,14 +128,18 @@ export default {
         this.cursorMove(e);
         this.tooltip = null;
       }
-    }
-  }
+    },
+  },
 };
 </script>
 
 <style>
 * {
   cursor: none;
+}
+
+.touch #cursor {
+  display: none;
 }
 </style>
 
