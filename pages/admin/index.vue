@@ -113,26 +113,31 @@ export default {
         .where(this.$fireStoreObj.FieldPath.documentId(), ">=", randomKey)
         .where("type", "==", type)
         .limit(1);
-      const firstResponse = await query.get();
 
       let section;
 
-      if (firstResponse.size > 0) {
-        firstResponse.forEach((doc) => {
-          const { featuredIn, ...docData } = doc.data();
-          section = { docId: doc.id, ...docData };
-        });
-      } else {
-        const secondQuery = sectionsRef
-          .where(this.$fireStoreObj.FieldPath.documentId(), "<", randomKey)
-          .where("type", "==", type)
-          .limit(1);
-        const secondResponse = await secondQuery.get();
+      try {
+        const firstResponse = await query.get();
+        if (firstResponse.size > 0) {
+          firstResponse.forEach((doc) => {
+            const { featuredIn, ...docData } = doc.data();
+            section = { docId: doc.id, ...docData };
+          });
+        } else {
+          const secondQuery = sectionsRef
+            .where(this.$fireStoreObj.FieldPath.documentId(), "<", randomKey)
+            .where("type", "==", type)
+            .limit(1);
+          const secondResponse = await secondQuery.get();
 
-        secondResponse.forEach((doc) => {
-          const { featuredIn, ...docData } = doc.data();
-          section = { docId: doc.id, ...docData };
-        });
+          secondResponse.forEach((doc) => {
+            const { featuredIn, ...docData } = doc.data();
+            section = { docId: doc.id, ...docData };
+          });
+        }
+      } catch (error) {
+        console.error(error);
+        // this.getRandomSectionByType(type);
       }
 
       return section;
