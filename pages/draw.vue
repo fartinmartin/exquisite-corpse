@@ -1,15 +1,12 @@
 <template>
   <div class="wrap">
-    <PickSection
-      v-if="isFetching === 'not yet'"
-      @picked-type="handlePickedType"
-    />
-    <div v-if="isFetching === 'yes'" class="mw-canvas">
+    <PickSection v-if="isFetching === 'idle'" @picked-type="handlePickedType" />
+    <div v-if="isFetching === 'fetching'" class="mw-canvas">
       <div class="border yellow info-panel mw-canvas"></div>
       <div class="border yellow info-panel mw-canvas mt mb"></div>
       <Loading subtext="preparing your canvas" style="height: 544px;" />
     </div>
-    <Draw v-if="isFetching === 'done'" />
+    <Draw v-if="isFetching === 'success'" />
   </div>
 </template>
 
@@ -17,7 +14,6 @@
 import Draw from "~/components/Draw";
 import PickSection from "~/components/PickSection";
 import { mapState } from "vuex";
-import asyncForEach from "~/assets/js/asyncForEach";
 import { twoRandomWords } from "~/assets/js/randomWords";
 
 export default {
@@ -29,86 +25,83 @@ export default {
   },
   components: { Draw, PickSection },
   data: function () {
-    return { isFetching: "not yet" };
+    return { isFetching: "idle" }; // "idle", "fetching", "success", TODO: "error"
   },
   async fetch({ store }) {
+    // set default random title
     let words = await twoRandomWords();
     store.dispatch("modules/drawing/setTitle", words);
   },
   mounted() {
+    // fresh start
     this.$store.dispatch("modules/drawing/clearDrawing");
     this.$store.dispatch("modules/mouse/resetMouse");
   },
-  methods: {
-    async handlePickedType(type) {
-      this.isFetching = "yes";
-
-      const sectionsRef = this.$fireStore.collection("sections");
-      const $storeSectionsKeys = Object.keys(this.sections);
-
-      const fetchSectionsPerKey = async () => {
-        await asyncForEach($storeSectionsKeys, async (key) => {
-          if (key === type) {
-            this.$store.dispatch("modules/drawing/setSections", {
-              type,
-              isTemp: true,
-            });
-          } else {
-            // https://stackoverflow.com/a/54801398/8703073
-            const randomKey = sectionsRef.doc().id;
-            const query = sectionsRef
-              .where(this.$fireStoreObj.FieldPath.documentId(), ">=", randomKey)
-              .where("type", "==", key)
-              .limit(1);
-            const firstResponse = await query.get();
-
-            if (firstResponse.size > 0) {
-              firstResponse.forEach((doc) => {
-                // https://programmersought.com/article/27791951922/;jsessionid=F1AC9A35FBE8713BA67DF8D0090DE51B
-                const payload = {
-                  docId: doc.id,
-                  paths: Object.values(doc.data().drawing),
-                  type: doc.data().type,
-                  thumb: doc.data().thumb,
-                  artist: doc.data().artist,
-                  title: doc.data().title,
-                };
-                this.$store.dispatch("modules/drawing/setSections", payload);
-              });
-            } else {
-              const secondQuery = sectionsRef
-                .where(
-                  this.$fireStoreObj.FieldPath.documentId(),
-                  "<",
-                  randomKey
-                )
-                .where("type", "==", key)
-                .limit(1);
-              const secondResponse = await secondQuery.get();
-
-              secondResponse.forEach((doc) => {
-                const payload = {
-                  docId: doc.id,
-                  paths: Object.values(doc.data().drawing),
-                  type: doc.data().type,
-                  thumb: doc.data().thumb,
-                  artist: doc.data().artist,
-                  title: doc.data().title,
-                };
-                this.$store.dispatch("modules/drawing/setSections", payload);
-              });
-            }
-          }
-        });
-      };
-
-      await fetchSectionsPerKey();
-      this.$store.dispatch("modules/drawing/setType", type);
-      this.isFetching = "done";
-    },
-  },
   computed: {
     ...mapState("modules/drawing", ["sections"]),
+  },
+  methods: {
+    async handlePickedType(type) {
+      this.isFetching = "fetching";
+
+      // get other types
+      let types = ["top", "mid", "bot"];
+      types = types.filter((t) => t !== type);
+
+      // set drawing state and this section's docId as "temp" in the store
+      this.$store.dispatch("modules/drawing/setType", type);
+      this.$store.dispatch("modules/drawing/setSections", {
+        type,
+        docId: "temp",
+      });
+
+      // get and set the other two types
+      for (const type of types) {
+        let payload = await this.getRandomSectionByType(type);
+        payload.paths = Object.values(payload.drawing);
+        this.$store.dispatch("modules/drawing/setSections", payload);
+      }
+
+      this.isFetching = "success";
+    },
+
+    async getRandomSectionByType(type) {
+      // https://stackoverflow.com/a/54801398/8703073
+      const sectionsRef = this.$fireStore.collection("sections");
+      const randomKey = sectionsRef.doc().id;
+      const query = sectionsRef
+        .where(this.$fireStoreObj.FieldPath.documentId(), ">=", randomKey)
+        .where("type", "==", type)
+        .limit(1);
+
+      let section;
+
+      try {
+        const firstResponse = await query.get();
+        if (firstResponse.size > 0) {
+          firstResponse.forEach((doc) => {
+            const { featuredIn, ...docData } = doc.data();
+            section = { docId: doc.id, ...docData };
+          });
+        } else {
+          const secondQuery = sectionsRef
+            .where(this.$fireStoreObj.FieldPath.documentId(), "<", randomKey)
+            .where("type", "==", type)
+            .limit(1);
+          const secondResponse = await secondQuery.get();
+
+          secondResponse.forEach((doc) => {
+            const { featuredIn, ...docData } = doc.data();
+            section = { docId: doc.id, ...docData };
+          });
+        }
+      } catch (error) {
+        console.error(error);
+        // this.getRandomSectionByType(type);
+      }
+
+      return section;
+    },
   },
 };
 </script>
