@@ -37,7 +37,9 @@
             v-model="type"
             @click="handleTypeChoice"
           />
-          <label for="corpses"><h1 class="icon interactive">corpses</h1></label>
+          <label for="corpses" data-tooltip="filter by">
+            <h1 class="icon interactive">corpses</h1>
+          </label>
         </div>
         <div>
           <input
@@ -48,7 +50,9 @@
             v-model="type"
             @click="handleTypeChoice"
           />
-          <label for="tops"><h1 class="icon interactive">tops</h1></label>
+          <label for="tops" data-tooltip="filter by">
+            <h1 class="icon interactive">tops</h1>
+          </label>
         </div>
         <div>
           <input
@@ -59,7 +63,9 @@
             v-model="type"
             @click="handleTypeChoice"
           />
-          <label for="mids"><h1 class="icon interactive">mids</h1></label>
+          <label for="mids" data-tooltip="filter by">
+            <h1 class="icon interactive">mids</h1>
+          </label>
         </div>
         <div>
           <input
@@ -70,7 +76,9 @@
             v-model="type"
             @click="handleTypeChoice"
           />
-          <label for="bots"><h1 class="icon interactive">bots</h1></label>
+          <label for="bots" data-tooltip="filter by">
+            <h1 class="icon interactive">bots</h1>
+          </label>
         </div>
       </form>
       <form>
@@ -83,7 +91,9 @@
             v-model="field"
             @click="handleSortBy"
           />
-          <label for="date"><h1 class="icon interactive">date</h1></label>
+          <label for="date" data-tooltip="sort by">
+            <h1 class="icon interactive">date</h1>
+          </label>
         </div>
         <div>
           <input
@@ -94,7 +104,9 @@
             v-model="field"
             @click="handleSortBy"
           />
-          <label for="likes"><h1 class="icon interactive">likes</h1></label>
+          <label for="likes" data-tooltip="sort by">
+            <h1 class="icon interactive">likes</h1>
+          </label>
         </div>
       </form>
     </div>
