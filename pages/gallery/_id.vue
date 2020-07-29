@@ -1,13 +1,13 @@
 <template>
   <div class="wrap">
     <Loading
-      v-if="isFetching !== 'done'"
+      v-if="isFetching !== 'success'"
       subtext="waking up our artists"
       style="height: 544px;"
     />
-    <Display v-if="isFetching === 'done'" :sections="sections" />
+    <Display v-if="isFetching === 'success'" :sections="sections" />
     <div class="border yellow info-panel mt mw-canvas">
-      <div class="data-wrap" v-if="isFetching === 'done'">
+      <div class="data-wrap" v-if="isFetching === 'success'">
         <h1>{{ meta.title }}</h1>
         <div class="menu">
           <LikeButton collection="completed" :docId="this.$route.params.id" />
@@ -32,7 +32,7 @@ export default {
   components: { Loading, DownloadButton, LikeButton },
   data: function () {
     return {
-      isFetching: "not yet",
+      isFetching: "idle", // "idle", "fetching", "success", TODO: "error"
       meta: { title: "" },
       sections: {},
     };
@@ -42,7 +42,7 @@ export default {
   },
   methods: {
     async fetchDocById(collection, id) {
-      this.isFetching = "yes";
+      this.isFetching = "fetching";
       const query = this.$fireStore.collection(collection).doc(id);
       const doc = await query.get();
 
@@ -75,7 +75,7 @@ export default {
       this.sections.top.paths = Object.values(top.drawing);
       this.sections.mid.paths = Object.values(mid.drawing);
       this.sections.bot.paths = Object.values(bot.drawing);
-      this.isFetching = "done";
+      this.isFetching = "success";
     },
 
     async getSection(docRef) {

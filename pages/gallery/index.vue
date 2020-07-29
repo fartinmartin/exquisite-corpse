@@ -3,7 +3,9 @@
     <div class="prev-next">
       <div class="prev border yellow">
         <button
-          :disabled="isFetching !== 'done' || gallery[0].docId === firstItemId"
+          :disabled="
+            isFetching !== 'success' || gallery[0].docId === firstItemId
+          "
           @click="prevPage"
           data-tooltip="prev"
         >
@@ -12,7 +14,7 @@
       </div>
       <div class="next border yellow">
         <button
-          :disabled="isFetching !== 'done' || gallery.length < pageSize"
+          :disabled="isFetching !== 'success' || gallery.length < pageSize"
           @click="nextPage"
           data-tooltip="next"
         >
@@ -93,12 +95,12 @@
       </form>
     </div>
     <Loading
-      v-if="isFetching !== 'done'"
+      v-if="isFetching !== 'success'"
       subtext="curating masterpieces"
       style="height: 542.667px;"
     />
     <div
-      v-if="isFetching === 'done'"
+      v-if="isFetching === 'success'"
       class="gallery"
       :class="{ section: collection === 'sections' }"
     >
@@ -128,15 +130,15 @@ export default {
   },
   data: function () {
     return {
-      isFetching: "not yet",
+      isFetching: "idle", // "idle", "fetching", "success", TODO: "error"
       gallery: [{ docId: "temp" }],
       firstItemId: "",
       lastVisible: null,
       firstVisible: null,
-      collection: "completed", // switches with "sections"
-      type: "corpses", // switches with "top", "mid", and "bot"
-      field: "date", // switches with "likes"
-      pageSize: 9, // switches with 18?
+      collection: "completed", // "completed", "sections"
+      type: "corpses", // "corpses", "top", "mid", and "bot"
+      field: "date", // "date", "likes"
+      pageSize: 9, // 9, 18
     };
   },
   mounted() {
@@ -145,7 +147,7 @@ export default {
   methods: {
     // https://stackoverflow.com/questions/62639778/paginating-firestore-data-when-using-vuex-and-appending-new-data-to-the-state
     async fetchFirst() {
-      this.isFetching = "yes";
+      this.isFetching = "fetching";
       this.gallery = [{ docId: "temp" }];
 
       let query = this.$fireStore.collection(this.collection);
@@ -166,11 +168,11 @@ export default {
       this.firstItemId = firstResponse.docs[0].id;
 
       this.gallery.shift();
-      this.isFetching = "done";
+      this.isFetching = "success";
     },
 
     async nextPage() {
-      this.isFetching = "yes";
+      this.isFetching = "fetching";
       this.gallery = [{ docId: "temp" }];
 
       let query = this.$fireStore.collection(this.collection);
@@ -194,11 +196,11 @@ export default {
       this.firstVisible = nextResponse.docs[0];
 
       this.gallery.shift();
-      this.isFetching = "done";
+      this.isFetching = "success";
     },
 
     async prevPage() {
-      this.isFetching = "yes";
+      this.isFetching = "fetching";
       this.gallery = [{ docId: "temp" }];
 
       let query = this.$fireStore.collection(this.collection);
@@ -222,7 +224,7 @@ export default {
       this.firstVisible = prevResponse.docs[0];
 
       this.gallery.shift();
-      this.isFetching = "done";
+      this.isFetching = "success";
     },
 
     handleTypeChoice(e) {

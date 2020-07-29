@@ -8,22 +8,22 @@
         ref="previewCanvas"
       />
       <form class="border yellow">
-        <div class="loadal" v-if="isLoading !== 'not yet'">
+        <div class="loadal" v-if="isSaving !== 'idle'">
           <Loading
-            v-if="isLoading === 'saving'"
+            v-if="isSaving === 'success'"
             subtext="generating your masterpiece"
             style="height: 100%;"
             class="yellow"
           />
           <Loading
-            v-if="isLoading === 'saved'"
+            v-if="isSaving === 'saved'"
             text="you did it!"
             subtext="your drawing was saved"
             style="height: 100%;"
             class="yellow"
           />
           <Loading
-            v-if="isLoading === 'error'"
+            v-if="isSaving === 'error'"
             text="oop!"
             subtext="there was an error.. try again?"
             style="height: 100%;"
@@ -91,7 +91,7 @@ export default {
       artist: "",
       isTempTitle: true,
       isTempArtist: true,
-      isLoading: "not yet",
+      isSaving: "idle", // "idle", "saving", "success", "error"
     };
   },
   computed: {
@@ -122,12 +122,12 @@ export default {
     closeMe(e) {
       if (e.target.className === "save-modal") {
         this.$emit("close-save");
-        this.isLoading = "not yet";
+        this.isSaving = "idle";
       }
     },
 
     async saveDrawing() {
-      this.isLoading = "saving";
+      this.isSaving = "saving";
 
       // if they changed their name, update their profile + our local state
       if (this.artist !== this.name)
@@ -219,13 +219,13 @@ export default {
       batch
         .commit()
         .then(() => {
-          this.isLoading = "saved";
+          this.isSaving = "success";
           setTimeout(() => {
             this.$emit("close-save", completedId);
           }, 1500);
         })
         .catch((error) => {
-          this.isLoading = "error";
+          this.isSaving = "error";
           console.error("Error writing document: ", error);
           setTimeout(() => {
             this.$emit("close-save");

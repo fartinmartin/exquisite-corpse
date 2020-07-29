@@ -1,15 +1,15 @@
 <template>
   <div class="wrap">
     <Loading
-      v-if="isFetching !== 'done'"
+      v-if="isFetching !== 'success'"
       subtext="getting paint ready"
       style="height: 184px;"
     />
-    <div class="mw-canvas" v-if="isFetching === 'done'">
+    <div class="mw-canvas" v-if="isFetching === 'success'">
       <Canvas id="top" mode="display" :section="section" ref="previewCanvas" />
     </div>
     <div class="border yellow info-panel mt mw-canvas">
-      <div class="data-wrap" v-if="isFetching === 'done'">
+      <div class="data-wrap" v-if="isFetching === 'success'">
         <div>
           <h1>{{ section.title }} <span>by</span>{{ section.artist }}</h1>
         </div>
@@ -25,7 +25,7 @@
     </div>
 
     <div class="border yellow info-panel mt mb mw-canvas related">
-      <div class="data-wrap" v-if="isFetching === 'done'">
+      <div class="data-wrap" v-if="isFetching === 'success'">
         <form>
           <div>
             <input
@@ -55,12 +55,12 @@
       </div>
     </div>
     <Loading
-      v-if="isFetching !== 'done' && related.toggle === 'featuredIn'"
+      v-if="isFetching !== 'success' && related.toggle === 'featuredIn'"
       subtext="checkin out the studio"
       style="height: 172px;"
     />
     <div
-      v-if="isFetching === 'done' && related.toggle === 'featuredIn'"
+      v-if="isFetching === 'success' && related.toggle === 'featuredIn'"
       class="gallery"
       :class="{ more: related.toggle === 'moreBy' }"
     >
@@ -73,7 +73,7 @@
       </nuxt-link>
     </div>
     <div
-      v-if="isFetching === 'done' && related.toggle === 'moreBy'"
+      v-if="isFetching === 'success' && related.toggle === 'moreBy'"
       class="gallery more-by"
     >
       <div v-if="!related.moreBy.length" class="none-found">
@@ -105,7 +105,7 @@ export default {
   components: { Canvas, LikeButton, DownloadButton },
   data: function () {
     return {
-      isFetching: "not yet",
+      isFetching: "idle", // "idle", "fetching", "success", TODO: "error"
       section: {},
       related: {
         featuredIn: [],
@@ -119,7 +119,7 @@ export default {
   },
   methods: {
     async fetchDocById(collection, id) {
-      this.isFetching = "yes";
+      this.isFetching = "fetching";
       const query = this.$fireStore.collection(collection).doc(id);
       const doc = await query.get();
       this.section = { ...doc.data() };
@@ -130,7 +130,7 @@ export default {
 
     async fetchRelated() {
       if (!this.section.featuredIn) {
-        this.isFetching = "done";
+        this.isFetching = "success";
         return;
       }
 
@@ -161,7 +161,7 @@ export default {
         }
       });
 
-      this.isFetching = "done";
+      this.isFetching = "success";
     },
   },
 };

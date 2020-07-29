@@ -7,15 +7,20 @@
       <NavMenu />
     </nav>
     <Loading
-      v-if="isFetching !== 'done'"
+      v-if="isFetching !== 'success'"
       subtext="fetching random corpse"
       style="height: 544px;"
     />
-    <Display v-if="isFetching === 'done' && isLoggedIn" :sections="sections" />
+    <Display
+      v-if="isFetching === 'success' && isLoggedIn"
+      :sections="sections"
+    />
     <div class="border yellow info-panel mt mw-canvas title">
-      <nuxt-link v-if="isFetching === 'done'" :to="`/gallery/${meta.docId}`">{{
-        meta.title
-      }}</nuxt-link>
+      <nuxt-link
+        v-if="isFetching === 'success'"
+        :to="`/gallery/${meta.docId}`"
+        >{{ meta.title }}</nuxt-link
+      >
     </div>
   </div>
 </template>
@@ -32,7 +37,7 @@ export default {
   data: function () {
     return {
       isLoggedIn: false,
-      isFetching: "not yet",
+      isFetching: "idle", // "idle", "fetching", "success", TODO: "error"
       meta: null,
       sections: {},
     };
@@ -52,7 +57,7 @@ export default {
     },
 
     async getRandomCompleted() {
-      this.isFetching = "yes";
+      this.isFetching = "fetching";
 
       const completedRef = this.$fireStore.collection("completed");
       const randomKey = completedRef.doc().id;
@@ -92,7 +97,7 @@ export default {
         this.sections[type] = await this.getSection(ref);
         this.sections[type].paths = Object.values(this.sections[type].drawing);
       }
-      this.isFetching = "done";
+      this.isFetching = "success";
     },
 
     async getSection(docRef) {
