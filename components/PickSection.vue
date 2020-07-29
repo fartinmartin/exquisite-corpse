@@ -35,8 +35,8 @@ export default {
   methods: {
     openHelp() {
       this.$store.dispatch("setIsHelping", true);
-    }
-  }
+    },
+  },
 };
 </script>
 
@@ -68,6 +68,7 @@ export default {
   }
 }
 
+// TODO: abstract meta-box styles
 .meta-box {
   display: none;
   position: absolute;

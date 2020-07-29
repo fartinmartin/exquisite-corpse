@@ -7,8 +7,6 @@
   </div>
 </template>
 
-<style lang="scss" scoped></style>
-
 <script>
 import ToolBar from "./ToolBar.vue";
 import Canvas from "./Canvas.vue";
@@ -18,10 +16,10 @@ export default {
   name: "Draw",
   components: {
     ToolBar,
-    Canvas
+    Canvas,
   },
   computed: {
-    ...mapState("modules/drawing", ["type", "sections"])
-  }
+    ...mapState("modules/drawing", ["type", "sections"]),
+  },
 };
 </script>
