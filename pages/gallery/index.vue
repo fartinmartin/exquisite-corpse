@@ -158,10 +158,7 @@ export default {
       const firstResponse = await query.get();
       this.lastVisible = firstResponse.docs[firstResponse.docs.length - 1];
       firstResponse.forEach((doc) => {
-        let mydoc = {
-          docId: doc.id,
-          thumb: doc.data().thumb,
-        };
+        let mydoc = { docId: doc.id, thumb: doc.data().thumb };
         this.gallery.push(mydoc);
       });
 
@@ -185,10 +182,7 @@ export default {
 
       const nextResponse = await query.get();
       nextResponse.forEach((doc) => {
-        let mydoc = {
-          docId: doc.id,
-          thumb: doc.data().thumb,
-        };
+        let mydoc = { docId: doc.id, thumb: doc.data().thumb };
         this.gallery.push(mydoc);
       });
 
@@ -213,10 +207,7 @@ export default {
 
       const prevResponse = await query.get();
       prevResponse.forEach((doc) => {
-        let mydoc = {
-          docId: doc.id,
-          thumb: doc.data().thumb,
-        };
+        let mydoc = { docId: doc.id, thumb: doc.data().thumb };
         this.gallery.push(mydoc);
       });
 

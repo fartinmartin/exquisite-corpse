@@ -16,11 +16,9 @@
       :sections="sections"
     />
     <div class="border yellow info-panel mt mw-canvas title">
-      <nuxt-link
-        v-if="isFetching === 'success'"
-        :to="`/gallery/${meta.docId}`"
-        >{{ meta.title }}</nuxt-link
-      >
+      <nuxt-link v-if="isFetching === 'success'" :to="`/gallery/${meta.docId}`">
+        {{ meta.title }}
+      </nuxt-link>
     </div>
   </div>
 </template>

@@ -38,44 +38,26 @@ export default {
     };
   },
   mounted() {
-    this.fetchDocById("completed", this.$route.params.id);
+    this.getCompletedById(this.$route.params.id);
   },
   methods: {
-    async fetchDocById(collection, id) {
+    async getCompletedById(id) {
       this.isFetching = "fetching";
-      const query = this.$fireStore.collection(collection).doc(id);
+
+      const query = this.$fireStore.collection("completed").doc(id);
       const doc = await query.get();
 
-      let completedMeta = {
-        docId: doc.id,
-        likes: doc.data().likes,
-        title: doc.data().title,
-        date: doc.data().date,
-        thumb: doc.data().thumb,
-      };
+      this.meta = { docId: doc.id, ...doc.data() };
+      await this.getSections(doc.data().sections);
 
-      this.meta = completedMeta;
-
-      let vm = this;
-
-      async function handleSections() {
-        await vm.getSections(doc.data().sections);
-      }
-
-      handleSections();
+      this.isFetching = "success";
     },
 
     async getSections(sections) {
-      const top = await this.getSection(sections.top);
-      const mid = await this.getSection(sections.mid);
-      const bot = await this.getSection(sections.bot);
-      this.sections.top = top;
-      this.sections.mid = mid;
-      this.sections.bot = bot;
-      this.sections.top.paths = Object.values(top.drawing);
-      this.sections.mid.paths = Object.values(mid.drawing);
-      this.sections.bot.paths = Object.values(bot.drawing);
-      this.isFetching = "success";
+      for (const [type, ref] of Object.entries(sections)) {
+        this.sections[type] = await this.getSection(ref);
+        this.sections[type].paths = Object.values(this.sections[type].drawing);
+      }
     },
 
     async getSection(docRef) {

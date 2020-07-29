@@ -115,35 +115,36 @@ export default {
     };
   },
   mounted() {
-    this.fetchDocById("sections", this.$route.params.id);
+    this.getSectionById(this.$route.params.id);
   },
   methods: {
-    async fetchDocById(collection, id) {
+    async getSectionById(id) {
       this.isFetching = "fetching";
-      const query = this.$fireStore.collection(collection).doc(id);
-      const doc = await query.get();
-      this.section = { ...doc.data() };
-      this.section.paths = Object.values(doc.data().drawing);
 
-      this.fetchRelated();
+      const query = this.$fireStore.collection("sections").doc(id);
+      const doc = await query.get();
+
+      this.section = { docId: doc.id, ...doc.data() };
+      this.section.paths = Object.values(this.section.drawing);
+
+      await this.getFeaturedIn();
+      await this.getMoreBy();
+
+      this.isFetching = "success";
     },
 
-    async fetchRelated() {
-      if (!this.section.featuredIn) {
-        this.isFetching = "success";
-        return;
-      }
+    async getFeaturedIn() {
+      if (!this.section.featuredIn) return;
 
       this.section.featuredIn.slice(-3).forEach((ref) => {
         ref.get().then((doc) => {
-          const mydoc = {
-            docId: doc.id,
-            thumb: doc.data().thumb,
-          };
+          const mydoc = { docId: doc.id, thumb: doc.data().thumb };
           this.related.featuredIn.push(mydoc);
         });
       });
+    },
 
+    async getMoreBy() {
       const sectionsRef = this.$fireStore.collection("sections");
       const query = sectionsRef
         .where("artist", "==", this.section.artist)
@@ -152,16 +153,9 @@ export default {
       const moreByDocs = await query.get();
 
       moreByDocs.forEach((doc) => {
-        const mydoc = {
-          docId: doc.id,
-          thumb: doc.data().thumb,
-        };
-        if (doc.id !== this.$route.params.id) {
-          this.related.moreBy.push(mydoc);
-        }
+        const mydoc = { docId: doc.id, thumb: doc.data().thumb };
+        if (doc.id !== this.$route.params.id) this.related.moreBy.push(mydoc);
       });
-
-      this.isFetching = "success";
     },
   },
 };
