@@ -9,7 +9,9 @@
           @click="prevPage"
           data-tooltip="prev"
         >
-          <div class="icon interactive">👈</div>
+          <div class="icon interactive">
+            <img src="~/assets/img/toolbar/undo.svg" alt="" />
+          </div>
         </button>
       </div>
       <div class="next border yellow">
@@ -18,7 +20,9 @@
           @click="nextPage"
           data-tooltip="next"
         >
-          <div class="icon interactive">👉</div>
+          <div class="icon interactive">
+            <img src="~/assets/img/toolbar/redo.svg" alt="" />
+          </div>
         </button>
       </div>
     </div>

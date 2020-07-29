@@ -1,7 +1,8 @@
 <template>
   <button @click="handleClick">
     <div class="icon interactive" :data-tooltip="isLiked ? 'unlike' : 'like'">
-      <span>{{ likes }}</span> ❤️
+      <span>{{ likes }}</span>
+      <img src="~/assets/img/icons/heart.svg" alt="" />
     </div>
   </button>
 </template>
@@ -12,17 +13,17 @@ export default {
   props: {
     collection: {
       type: String,
-      required: true
+      required: true,
     },
     docId: {
       type: String,
-      required: true
-    }
+      required: true,
+    },
   },
-  data: function() {
+  data: function () {
     return {
       likes: 0,
-      isLiked: false
+      isLiked: false,
     };
   },
   mounted() {
@@ -36,7 +37,7 @@ export default {
       const likesRef = this.$fireStore
         .collection(this.collection)
         .doc(this.docId)
-        .onSnapshot(doc => {
+        .onSnapshot((doc) => {
           this.likes = doc.data().likes;
         });
       if (destory) return likesRef();
@@ -55,8 +56,8 @@ export default {
 
       this.isLiked && docRef.update({ likes: increment });
       !this.isLiked && docRef.update({ likes: decrement });
-    }
-  }
+    },
+  },
 };
 </script>
 
@@ -66,7 +67,14 @@ export default {
   padding: 0 5px;
 
   span {
-    margin-right: 0.5rem;
+    margin-right: 0.25rem;
+    font-size: 0.875rem;
+    margin-bottom: 2px;
+  }
+
+  img {
+    width: 25px;
+    height: 25px;
   }
 }
 </style>
