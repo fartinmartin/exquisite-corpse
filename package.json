@@ -15,7 +15,8 @@
     "@nuxtjs/pwa": "^3.0.0-beta.20",
     "firebase": "^7.16.0",
     "nuxt": "^2.13.0",
-    "nuxt-password-protect": "^1.0.6"
+    "nuxt-password-protect": "^1.0.6",
+    "vue2-touch-events": "^2.2.1"
   },
   "devDependencies": {
     "@nuxtjs/dotenv": "^1.4.1",

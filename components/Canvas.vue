@@ -20,6 +20,9 @@
         v-on="
           mode === 'draw' ? { mousemove, mousedown, mouseup, mouseleave } : {}
         "
+        v-touch:moving="mode === 'draw' ? mousemove : {}"
+        v-touch:start="mode === 'draw' ? mousedown : {}"
+        v-touch:end="mode === 'draw' ? mouseup : {}"
       />
     </div>
   </div>
@@ -63,6 +66,12 @@ export default {
       }
     },
   },
+  beforeDestroy() {
+    this.canvas.removeEventListener("touchstart", (e) => e.preventDefault());
+    this.canvas.removeEventListener("touchmove", (e) => e.preventDefault());
+    this.canvas.removeEventListener("touchend", (e) => e.preventDefault());
+    this.canvas.removeEventListener("touchcancel", (e) => e.preventDefault());
+  },
   mounted() {
     // init canvas
     const canvas = this.$refs.canvas;
@@ -72,6 +81,12 @@ export default {
 
     this.canvas = canvas; // set local state
     this.ctx = ctx; // set local state
+
+    // do not scroll safari window when drawing on canvas
+    this.canvas.addEventListener("touchstart", (e) => e.preventDefault());
+    this.canvas.addEventListener("touchmove", (e) => e.preventDefault());
+    this.canvas.addEventListener("touchend", (e) => e.preventDefault());
+    this.canvas.addEventListener("touchcancel", (e) => e.preventDefault());
 
     ctx.fillStyle = "#ffffff"; // set white bg (no transparency!)
     ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -106,7 +121,22 @@ export default {
       canvas.style.height = rect.height + "px";
     },
 
-    mousedown(e) {
+    handleTouchEvents(event) {
+      const parent = event.target.parentElement;
+      const e = {
+        // NOTE: event.changedTouches works for taps as well
+        offsetX: event.targetTouches
+          ? event.targetTouches[0].pageX - parent.offsetLeft - parent.scrollLeft
+          : event.offsetX,
+        offsetY: event.targetTouches
+          ? event.targetTouches[0].pageY - parent.offsetTop - parent.scrollTop
+          : event.offsetY,
+      };
+      return e;
+    },
+
+    mousedown(event) {
+      const e = this.handleTouchEvents(event);
       this.$store.dispatch("modules/mouse/setMousePosition", e);
       if (this.mouseMode !== "fill") {
         this.$store.dispatch("modules/mouse/setIsDrawing", true);
@@ -118,7 +148,8 @@ export default {
       }
     },
 
-    mousemove(e) {
+    mousemove(event) {
+      const e = this.handleTouchEvents(event);
       if (this.isDrawing && this.mouseMode !== "fill") {
         this.handleDraw(e); // for paths
         this.$store.dispatch("modules/drawing/logPathToCurrentPath", e);

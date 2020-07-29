@@ -32,7 +32,8 @@ module.exports = {
    */
   // server: {
   //   port: 8000, // default: 3000
-  //   host: "localhost" // default: localhost
+  //   // host: "localhost", // default: localhost
+  //   // host: "0.0.0.0",
   // },
   /*
    ** Global CSS
@@ -42,7 +43,7 @@ module.exports = {
    ** Plugins to load before mounting the App
    ** https://nuxtjs.org/guide/plugins
    */
-  plugins: [],
+  plugins: [{ src: "~/plugins/vue-touch", ssr: false }],
   /*
    ** Auto import components
    ** See https://nuxtjs.org/api/configuration-components
