@@ -215,11 +215,7 @@ export const mutations = {
   },
 
   SET_SECTIONS(state, payload) {
-    if (payload.isTrue) {
-      state.sections[payload.type] = { type, docId: "temp" }; // sets it to string so that Canvas component knows how to deal
-    } else {
-      state.sections[payload.type] = { ...payload };
-    }
+    state.sections[payload.type] = { ...payload };
   },
 
   INCREMENT_HISTORY(state) {
