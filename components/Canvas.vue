@@ -43,7 +43,7 @@ export default {
       type: String, // draw, display, or pixelate
       required: true,
     },
-    section: Object, // for display
+    section: Object, // for when mode === "display"
   },
   data: function () {
     return {
@@ -51,7 +51,20 @@ export default {
       ctx: null,
     };
   },
+  computed: {
+    ...mapState("modules/mouse", ["palette", "size", "x", "y", "isDrawing"]),
+    ...mapState("modules/mouse", { mouseMode: (state) => state.mode }),
+    ...mapState("modules/drawing", ["sections"]),
+    drawing() {
+      if (this.mode === "display") {
+        return this.section;
+      } else if (this.mode === "pixelate") {
+        return this.sections[this.id];
+      }
+    },
+  },
   mounted() {
+    // init canvas
     const canvas = this.$refs.canvas;
     const ctx = canvas.getContext("2d");
 
@@ -60,17 +73,23 @@ export default {
     this.canvas = canvas; // set local state
     this.ctx = ctx; // set local state
 
-    ctx.fillStyle = "#ffffff";
+    ctx.fillStyle = "#ffffff"; // set white bg (no transparency!)
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    if (this.mode === "draw") {
-      this.$store.dispatch("modules/drawing/setCanvas", canvas); // set store state
-      this.$store.dispatch("modules/drawing/setCtx", ctx);
-    } else if (this.mode === "display") {
-      this.makeDrawing(this.drawing.paths, 500);
-    } else if (this.mode === "pixelate") {
-      this.makeDrawing(this.drawing.paths);
-      this.pixelateDrawing(this.canvas, this.ctx, 75);
+    switch (this.mode) {
+      case "draw":
+        this.$store.dispatch("modules/drawing/setCanvas", canvas);
+        this.$store.dispatch("modules/drawing/setCtx", ctx);
+        break;
+      case "pixelate":
+        this.makeDrawing(this.drawing.paths);
+        this.pixelateDrawing(this.canvas, this.ctx, 75);
+        break;
+      case "display":
+        this.makeDrawing(this.drawing.paths, 500);
+        break;
+      default:
+        break;
     }
   },
   methods: {
@@ -106,7 +125,7 @@ export default {
       }
     },
 
-    mouseup(e) {
+    mouseup() {
       if (this.isDrawing) {
         this.$store.dispatch("modules/drawing/completePath");
       }
@@ -119,10 +138,7 @@ export default {
     },
 
     handleDraw(e) {
-      // this needs to work for live drawing + redrawing of paths from firebase
-      // ...and it does! for now 😬 sort of (not in safari...) 🤔
-
-      let ctx = this.ctx;
+      const ctx = this.ctx;
       let point;
 
       if (this.mode === "draw") {
@@ -135,7 +151,7 @@ export default {
           x2: e.offsetX,
           y2: e.offsetY,
         };
-      } else if (this.mode === "display" || this.mode === "pixelate") {
+      } else {
         point = e; // e = point passed from this.makeDrawing()
       }
 
@@ -179,11 +195,11 @@ export default {
     drawFill(ctx, point) {
       ctx.fillStyle = point.color;
       let tolerance = 100;
-      let dpiPoint = {
+      let dprPoint = {
         x2: point.x2 * devicePixelRatio,
         y2: point.y2 * devicePixelRatio,
       };
-      floodFill.fill(dpiPoint.x2, dpiPoint.y2, tolerance, ctx);
+      floodFill.fill(dprPoint.x2, dprPoint.y2, tolerance, ctx);
     },
 
     clearCanvas(ctx) {
@@ -221,55 +237,34 @@ export default {
     },
 
     async pixelateDrawing(canvas, ctx, value) {
+      const dpr = devicePixelRatio;
+      const w = ctx.canvas.width;
+      const h = ctx.canvas.height;
+
+      // dim output and turn off image smoothing for pixelated effect (prefixed in some browsers)
       ctx.filter = "opacity(50%)";
-      const imgData = ctx.getImageData(
-        0,
-        0,
-        ctx.canvas.width * devicePixelRatio,
-        ctx.canvas.height * devicePixelRatio
-      );
-      const img = await createImageBitmap(imgData);
-
-      var fw = (img.width / value) | 0,
-        fh = (img.height / value) | 0;
-
-      /// turn off image smoothing (prefixed in some browsers)
       ctx.imageSmoothingEnabled = ctx.mozImageSmoothingEnabled = ctx.msImageSmoothingEnabled = ctx.webkitImageSmoothingEnabled = false;
 
+      // get current image
+      const imgData = ctx.getImageData(0, 0, w * dpr, h * dpr);
+      const img = await createImageBitmap(imgData);
+
+      // scale factor
+      const fw = (img.width / value) | 0;
+      const fh = (img.height / value) | 0;
+
+      // draw current image at scaled factor (aka really small and in the top left corner)
       ctx.drawImage(img, 0, 0, fw, fh);
-      const imgData2 = ctx.getImageData(
-        0,
-        0,
-        ctx.canvas.width,
-        ctx.canvas.height
-      );
+
+      // take that small corner bit and enlarge it to full canvas size (aka pixelate it)
+      const imgData2 = ctx.getImageData(0, 0, fw, fh);
       const img2 = await createImageBitmap(imgData2);
       this.clearCanvas(ctx);
-      ctx.drawImage(
-        img2,
-        0,
-        0,
-        fw,
-        fh,
-        0,
-        0,
-        img2.width / devicePixelRatio,
-        img2.height / devicePixelRatio
-      );
+      ctx.drawImage(img2, 0, 0, fw, fh, 0, 0, w / dpr, h / dpr);
+      console.log(img2, 0, 0, fw, fh, 0, 0, w / dpr, h / dpr, w, h);
 
+      // remove white bg on meta-box div
       this.$refs.notAllowed.bg();
-    },
-  },
-  computed: {
-    ...mapState("modules/mouse", ["palette", "size", "x", "y", "isDrawing"]),
-    ...mapState("modules/mouse", { mouseMode: (state) => state.mode }),
-    ...mapState("modules/drawing", ["sections"]),
-    drawing() {
-      if (this.mode === "display") {
-        return this.section;
-      } else if (this.mode === "pixelate") {
-        return this.sections[this.id];
-      }
     },
   },
 };
