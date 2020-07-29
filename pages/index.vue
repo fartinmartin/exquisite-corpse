@@ -25,7 +25,6 @@ import Display from "~/components/Display";
 import Loading from "~/components/Loading";
 import NavMenu from "~/components/NavMenu";
 import { mapState } from "vuex";
-import asyncForEach from "~/assets/js/asyncForEach";
 
 export default {
   name: "index",
@@ -40,17 +39,22 @@ export default {
   },
   mounted() {
     this.logIn();
-    this.fetchRandomCompleted();
+    this.getRandomCompleted();
   },
   methods: {
+    openHelp() {
+      this.$store.dispatch("setIsHelping", true);
+    },
+
     async logIn() {
       await this.$store.dispatch("modules/user/signInAnonymously");
       this.isLoggedIn = true;
     },
-    async fetchRandomCompleted() {
-      this.isFetching = "yes";
-      const completedRef = this.$fireStore.collection("completed");
 
+    async getRandomCompleted() {
+      this.isFetching = "yes";
+
+      const completedRef = this.$fireStore.collection("completed");
       const randomKey = completedRef.doc().id;
       const query = completedRef
         .where(this.$fireStoreObj.FieldPath.documentId(), ">=", randomKey)
@@ -59,78 +63,41 @@ export default {
       try {
         const firstResponse = await query.get();
         if (firstResponse.size > 0) {
-          firstResponse.forEach((doc) => {
-            let completedMeta = {
-              docId: doc.id,
-              likes: doc.data().likes,
-              title: doc.data().title,
-              date: doc.data().date,
-            };
-
-            let vm = this;
-
-            async function handleSections() {
-              await vm.getSections(doc.data().sections);
-            }
-
-            handleSections();
-
-            return (this.meta = completedMeta);
+          firstResponse.forEach(async (doc) => {
+            this.meta = { docId: doc.id, ...doc.data() };
+            return await this.getSections(doc.data().sections);
           });
         } else {
           const secondQuery = completedRef
             .where(this.$fireStoreObj.FieldPath.documentId(), "<", randomKey)
             .limit(1);
           const secondResponse = await secondQuery.get();
-          secondResponse.forEach((doc) => {
-            let completedMeta = {
-              docId: doc.id,
-              likes: doc.data().likes,
-              title: doc.data().title,
-              date: doc.data().date,
-            };
-
-            let vm = this;
-
-            async function handleSections() {
-              await vm.getSections(doc.data().sections);
-            }
-
-            handleSections();
-
-            return (this.meta = completedMeta);
+          secondResponse.forEach(async (doc) => {
+            this.meta = { docId: doc.id, ...doc.data() };
+            return await this.getSections(doc.data().sections);
           });
         }
       } catch (error) {
         console.error(error);
         this.isLoggedIn = false;
         await this.logIn();
-        this.fetchRandomCompleted();
+        this.getRandomCompleted();
       }
 
       return;
     },
 
     async getSections(sections) {
-      const top = await this.getSection(sections.top);
-      const mid = await this.getSection(sections.mid);
-      const bot = await this.getSection(sections.bot);
-      this.sections.top = top;
-      this.sections.mid = mid;
-      this.sections.bot = bot;
-      this.sections.top.paths = Object.values(top.drawing);
-      this.sections.mid.paths = Object.values(mid.drawing);
-      this.sections.bot.paths = Object.values(bot.drawing);
+      for (const [type, ref] of Object.entries(sections)) {
+        this.sections[type] = await this.getSection(ref);
+        this.sections[type].paths = Object.values(this.sections[type].drawing);
+      }
       this.isFetching = "done";
     },
 
     async getSection(docRef) {
       const response = await docRef.get();
       return { docId: response.id, ...response.data() };
-    },
-
-    openHelp() {
-      this.$store.dispatch("setIsHelping", true);
     },
   },
 };
