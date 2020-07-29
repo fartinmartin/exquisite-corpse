@@ -31,4 +31,9 @@
   &.solid.yellow {
     --background-color: var(--light-yellow);
   }
+
+  &.solid.red {
+    --background-color: var(--red);
+    color: var(--white);
+  }
 }

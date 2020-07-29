@@ -14,19 +14,22 @@
       <div class="input-wrap">
         <input v-model="completed.id" placeholder="enter completedId" />
         <button
-          class="button"
+          class="button solid red"
           @click="removeCompletedAndItsReferences(completed.id)"
         >
-          remove completed
+          remove
+        </button>
+        <button class="button" @click="updateCompletedThumb">
+          update thumb
         </button>
       </div>
     </div>
     <div class="border yellow admin mw-canvas">
       <h1>section</h1>
       <div class="input-wrap">
-        <input v-model="section.id" placeholder="enter docId" />
+        <input v-model="section.id" placeholder="enter sectionId" />
         <button
-          class="button"
+          class="button solid red"
           @click="removeSectionAndItsReferences(section.id)"
         >
           remove section
@@ -103,6 +106,16 @@ export default {
       const { featuredIn, ...docData } = doc.data();
       const section = { docId: doc.id, ...docData };
       return { sectionRef, section };
+    },
+
+    async getSingleCompleted(completedId) {
+      const completedRef = this.$fireStore
+        .collection("completed")
+        .doc(completedId);
+      const doc = await completedRef.get();
+      const completed = { docId: doc.id, ...doc.data() };
+      const sectionRefs = Object.values(completed.sections);
+      return { completedRef, completed, sectionRefs };
     },
 
     async getRandomSectionByType(type) {
@@ -221,18 +234,20 @@ export default {
     },
 
     async removeCompletedAndItsReferences(completedId) {
+      if (process.client) {
+        if (!window.confirm("you sure?")) return this.$router.push("/admin");
+      }
       // 🚨 HAVE NOT TESTED
       // get ref to this completed
-      const completedRef = this.$fireStore
-        .collection("completed")
-        .doc(completedId);
-      const completed = await completedRef.get();
-      const sections = Object.values(completed.data().sections);
+      const { completedRef, sectionRefs } = await this.getSingleCompleted(
+        completedId
+      );
 
       // start batch
       const batch = this.$fireStore.batch();
 
-      sections.forEach((section) => {
+      // remove ref to completed in each section
+      sectionRefs.forEach((section) => {
         batch.update(section, {
           featuredIn: this.$fireStoreObj.FieldValue.arrayRemove(completedRef),
         });
@@ -249,6 +264,9 @@ export default {
     },
 
     async removeSectionAndItsReferences(sectionId) {
+      if (process.client) {
+        if (!window.confirm("you sure?")) return this.$router.push("/admin");
+      }
       // this section
       const sectionRef = this.$fireStore.collection("sections").doc(sectionId);
       const section = await sectionRef.get();
@@ -267,7 +285,32 @@ export default {
       // execute batch
       batch
         .commit()
-        .then(() => console.log("Removed section and its references"))
+        .then(() => console.log("removed section and its references"))
+        .catch((error) => console.error(error));
+    },
+
+    async updateCompletedThumb(completedId) {
+      // 🚨 HAVE NOT TESTED
+      const { completedRef, sectionRefs } = await this.getSingleCompleted(
+        completedId
+      );
+
+      let thumbsObject = {};
+
+      sectionRefs.forEach(async (section) => {
+        const doc = await this.getSingleSection(section.id);
+        thumbsObject[doc.type] = doc.thumb;
+      });
+
+      const completedThumb = await mergeBase64([
+        thumbsObject.top,
+        thumbsObject.mid,
+        thumbsObject.bot,
+      ]);
+
+      completedRef
+        .update({ thumb: completedThumb })
+        .then(() => console.log("it worked!", completedThumb))
         .catch((error) => console.error(error));
     },
 
