@@ -76,6 +76,7 @@ export default {
     ctx.fillStyle = "#ffffff"; // set white bg (no transparency!)
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+    // dispatch based on this.mode
     switch (this.mode) {
       case "draw":
         this.$store.dispatch("modules/drawing/setCanvas", canvas);
@@ -228,7 +229,7 @@ export default {
 
         handlePaths();
       } else {
-        drawing.forEach((path, i) => {
+        drawing.forEach((path) => {
           path.forEach((point) => {
             this.handleDraw(point);
           });
