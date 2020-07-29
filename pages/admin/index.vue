@@ -43,6 +43,7 @@
 
 <script>
 import { mergeBase64 } from "~/assets/js/mergeImages";
+import { randomWordFromString } from "~/assets/js/randomWords";
 
 export default {
   name: "admin",
@@ -151,7 +152,7 @@ export default {
 
       // meta info "contrustors"
       let thumbsObject = {};
-      let titleArray = [this.randomWordFromString(section.title)];
+      let titleArray = [randomWordFromString(section.title)];
       let idObject = {};
 
       // get random docs and push their meta info to those "constructors"
@@ -160,7 +161,7 @@ export default {
           const otherSection = await this.getRandomSectionByType(type);
           thumbsObject[type] = otherSection.thumb;
           idObject[type] = otherSection.docId;
-          titleArray.push(this.randomWordFromString(otherSection.title));
+          titleArray.push(randomWordFromString(otherSection.title));
         })
       );
 
@@ -263,11 +264,6 @@ export default {
         .commit()
         .then(() => console.log("Removed section and its references"))
         .catch((error) => console.error(error));
-    },
-
-    randomWordFromString(string) {
-      const stringAsArray = string.split(" ");
-      return stringAsArray[Math.floor(Math.random() * stringAsArray.length)];
     },
 
     signOut() {
