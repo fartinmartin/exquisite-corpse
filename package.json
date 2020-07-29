@@ -15,13 +15,13 @@
     "@nuxtjs/pwa": "^3.0.0-beta.20",
     "firebase": "^7.16.0",
     "nuxt": "^2.13.0",
-    "nuxt-password-protect": "^1.0.6",
-    "vue-draggable-resizable": "^2.2.0"
+    "nuxt-password-protect": "^1.0.6"
   },
   "devDependencies": {
     "@nuxtjs/dotenv": "^1.4.1",
     "@nuxtjs/svg": "^0.1.11",
     "node-sass": "^4.14.1",
-    "sass-loader": "^9.0.2"
+    "sass-loader": "^9.0.2",
+    "vue-draggable-resizable": "^2.2.0"
   }
 }
