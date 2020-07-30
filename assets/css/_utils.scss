@@ -2,20 +2,42 @@ html,
 body,
 #__nuxt,
 #__layout,
-#__tino,
-.wrap {
+#__tino {
   height: 100%;
 }
 
-.wrap {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
+#__tino {
   padding: calc(40px / 3);
+  @media screen and (min-width: 1040px) {
+    display: grid;
+    place-items: center;
+  }
 }
 
 .mw-canvas {
   width: 100%;
   max-width: 544px;
 }
+
+.wrap {
+  @extend .mw-canvas;
+  margin: 0 auto;
+
+  // @media screen and (max-width: calc(544px + calc(40px / 2))) {
+  @media screen and (max-width: 1040px) {
+    padding: calc(60px + calc(80px / 3)) 0;
+  }
+}
+
+// .wrap {
+//   display: flex;
+//   align-items: center;
+//   justify-content: center;
+//   flex-direction: column;
+//   padding: calc(40px / 3);
+
+//   // @media screen and (max-width: calc(544px + calc(40px / 2))) {
+//   @media screen and (max-width: 1040px) {
+//     margin: calc(60px + calc(80px / 3)) 0;
+//   }
+// }
