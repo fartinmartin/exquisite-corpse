@@ -260,6 +260,19 @@ export default {
   justify-content: space-between;
   user-select: none;
 
+  @media screen and (max-width: 544px) {
+    height: initial;
+
+    .size {
+      order: 3;
+      margin-top: 0.5rem;
+
+      > span {
+        margin: 0;
+      }
+    }
+  }
+
   &:not(:first-child) {
     margin: calc(40px / 6 * 2) 0;
   }
