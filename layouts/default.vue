@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div id="__tino">
     <Help v-if="isHelping" />
     <Nav />
     <Nuxt />

@@ -1,11 +1,13 @@
 html,
 body,
+#__nuxt,
+#__layout,
+#__tino,
 .wrap {
-  min-height: -webkit-fill-available;
+  height: 100%;
 }
 
 .wrap {
-  min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
