@@ -1,10 +1,6 @@
 <template>
   <div class="wrap">
-    <Loading
-      v-if="isFetching !== 'success'"
-      subtext="waking up our artists"
-      style="height: 544px;"
-    />
+    <Loading v-if="isFetching !== 'success'" subtext="waking up our artists" />
     <Display v-if="isFetching === 'success'" :sections="sections" />
     <div class="border yellow info-panel mt mw-canvas">
       <div class="data-wrap" v-if="isFetching === 'success'">
@@ -75,6 +71,23 @@ export default {
 
   > * {
     margin-left: 1rem;
+  }
+}
+</style>
+
+<style lang="scss" scoped>
+.loading-wrap {
+  height: 0;
+  position: relative;
+  overflow: hidden;
+  padding-top: 100%;
+
+  > * {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
   }
 }
 </style>

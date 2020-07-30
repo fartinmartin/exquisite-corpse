@@ -4,7 +4,7 @@
     <div v-if="isFetching === 'fetching'" class="mw-canvas">
       <div class="border yellow info-panel mw-canvas"></div>
       <div class="border yellow info-panel mw-canvas mt mb"></div>
-      <Loading subtext="preparing your canvas" style="height: 544px;" />
+      <Loading subtext="preparing your canvas" />
     </div>
     <Draw v-if="isFetching === 'success'" />
   </div>

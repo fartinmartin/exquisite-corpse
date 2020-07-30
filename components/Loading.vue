@@ -1,8 +1,10 @@
 <template>
-  <div class="loading border mw-canvas">
-    <div class="text-wrap">
-      <div class="text">{{ text }}</div>
-      <div class="subtext">{{ subtext }}</div>
+  <div class="loading-wrap mw-canvas">
+    <div class="loading border">
+      <div class="text-wrap">
+        <div class="text">{{ text }}</div>
+        <div class="subtext">{{ subtext }}</div>
+      </div>
     </div>
   </div>
 </template>
@@ -50,6 +52,23 @@ export default {
 
   .subtext {
     color: #7f7f7f;
+  }
+}
+</style>
+
+<style lang="scss" scoped>
+.loading-wrap {
+  height: 0;
+  position: relative;
+  overflow: hidden;
+  padding-top: 100%;
+
+  > * {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
   }
 }
 </style>

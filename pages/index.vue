@@ -6,11 +6,7 @@
       </nuxt-link>
       <NavMenu />
     </nav>
-    <Loading
-      v-if="isFetching !== 'success'"
-      subtext="fetching random corpse"
-      style="height: 544px;"
-    />
+    <Loading v-if="isFetching !== 'success'" subtext="fetching random corpse" />
     <Display
       v-if="isFetching === 'success' && isLoggedIn"
       :sections="sections"

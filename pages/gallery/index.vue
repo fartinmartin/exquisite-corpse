@@ -110,11 +110,7 @@
         </div>
       </form>
     </div>
-    <Loading
-      v-if="isFetching !== 'success'"
-      subtext="curating masterpieces"
-      style="height: 542.667px;"
-    />
+    <Loading v-if="isFetching !== 'success'" subtext="curating masterpieces" />
     <div
       v-if="isFetching === 'success'"
       class="gallery mw-canvas"
