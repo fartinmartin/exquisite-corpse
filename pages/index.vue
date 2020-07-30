@@ -109,5 +109,10 @@ export default {
 <style lang="scss" scoped>
 .title {
   justify-content: center;
+
+  a:hover {
+    text-decoration: underline;
+    color: var(--blue);
+  }
 }
 </style>
