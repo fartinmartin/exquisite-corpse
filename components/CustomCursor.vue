@@ -109,7 +109,6 @@ export default {
       if (process.client) {
         if (e.target.dataset.tooltip || e.target.parentNode.dataset.tooltip) {
           if (window.innerWidth - e.clientX < this.$refs.tooltip.offsetWidth) {
-            console.log("yup");
             this.$refs.tooltip.style.transform = `translateX(-100%) translateX(-30px)`;
           } else {
             this.$refs.tooltip.style.transform = `translateX(0)`;
