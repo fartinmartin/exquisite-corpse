@@ -1,10 +1,8 @@
 <template>
   <div class="wrap">
-    <Loading
-      v-if="isFetching !== 'success'"
-      subtext="getting paint ready"
-      style="height: 184px;"
-    />
+    <div class="loading-wrap mw-canvas" v-if="isFetching !== 'success'">
+      <Loading subtext="getting paint ready" />
+    </div>
     <div class="mw-canvas" v-if="isFetching === 'success'">
       <Canvas id="top" mode="display" :section="section" ref="previewCanvas" />
     </div>
@@ -54,11 +52,12 @@
         </form>
       </div>
     </div>
-    <Loading
+    <div
+      class="loading-wrap mw-canvas"
       v-if="isFetching !== 'success' && related.toggle === 'featuredIn'"
-      subtext="checkin out the studio"
-      style="height: 172px;"
-    />
+    >
+      <Loading subtext="checkin out the studio" />
+    </div>
     <div
       v-if="isFetching === 'success' && related.toggle === 'featuredIn'"
       class="gallery mw-canvas"
@@ -185,6 +184,10 @@ h1 {
 .related {
   margin-top: 120px;
   padding: 1rem calc(1rem - 7px);
+
+  @media screen and (max-width: calc(544px + calc(40px / 2))) {
+    margin-top: calc(40px / 3);
+  }
 }
 
 .gallery {
@@ -202,6 +205,11 @@ h1 {
 .gallery.more-by {
   grid-template-rows: repeat(2, max-content);
   min-height: 172px;
+
+  @media screen and (max-width: calc(544px + calc(40px / 2))) {
+    grid-template-rows: calc(calc(100vw - 40px) / 3);
+    min-height: initial;
+  }
 }
 
 .none-found {
@@ -238,5 +246,26 @@ form {
 input:not(:checked) + label h1 {
   font-weight: normal;
   opacity: 0.5;
+}
+</style>
+
+<style lang="scss" scoped>
+.loading-wrap {
+  height: 0;
+  position: relative;
+  overflow: hidden;
+  padding-top: calc(516px / 3);
+
+  @media screen and (max-width: calc(544px + calc(40px / 2))) {
+    padding-top: calc(calc(100vw - 40px) / 3);
+  }
+
+  > * {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+  }
 }
 </style>
