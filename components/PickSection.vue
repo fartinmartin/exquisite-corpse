@@ -8,23 +8,25 @@
         </div>
       </button>
     </div>
-    <div
-      class="section-template border pointer"
-      @click="$emit('picked-type', 'top')"
-    >
-      <div class="meta-box"><div class="info">top</div></div>
-    </div>
-    <div
-      class="section-template border pointer"
-      @click="$emit('picked-type', 'mid')"
-    >
-      <div class="meta-box"><div class="info">middle</div></div>
-    </div>
-    <div
-      class="section-template border pointer"
-      @click="$emit('picked-type', 'bot')"
-    >
-      <div class="meta-box"><div class="info">bottom</div></div>
+    <div class="mw-canvas">
+      <div
+        class="section-template border pointer"
+        @click="$emit('picked-type', 'top')"
+      >
+        <div class="meta-box"><div class="info">top</div></div>
+      </div>
+      <div
+        class="section-template border pointer"
+        @click="$emit('picked-type', 'mid')"
+      >
+        <div class="meta-box"><div class="info">middle</div></div>
+      </div>
+      <div
+        class="section-template border pointer"
+        @click="$emit('picked-type', 'bot')"
+      >
+        <div class="meta-box"><div class="info">bottom</div></div>
+      </div>
     </div>
   </div>
 </template>
@@ -50,8 +52,9 @@ export default {
 
 .section-template {
   position: relative;
-  width: 544px;
-  height: 180px;
+  width: 100%;
+  height: 0;
+  padding-top: calc(100% / 3);
   margin: calc(40px / 3) 0;
 
   transition: transform 0.1s ease, box-shadow 0.1s ease, border 0.1s ease;
