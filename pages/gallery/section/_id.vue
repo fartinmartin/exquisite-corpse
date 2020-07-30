@@ -61,7 +61,7 @@
     />
     <div
       v-if="isFetching === 'success' && related.toggle === 'featuredIn'"
-      class="gallery"
+      class="gallery mw-canvas"
       :class="{ more: related.toggle === 'moreBy' }"
     >
       <nuxt-link
@@ -192,6 +192,11 @@ h1 {
   grid-template-columns: repeat(3, calc(516px / 3));
   grid-template-rows: repeat(1, calc(516px / 3));
   grid-gap: calc(40px / 3);
+
+  @media screen and (max-width: calc(544px + calc(40px / 2))) {
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: calc(calc(100vw - 40px) / 3);
+  }
 }
 
 .gallery.more-by {

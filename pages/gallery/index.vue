@@ -117,7 +117,7 @@
     />
     <div
       v-if="isFetching === 'success'"
-      class="gallery"
+      class="gallery mw-canvas"
       :class="{ section: collection === 'sections' }"
     >
       <nuxt-link
@@ -136,6 +136,9 @@
 <script>
 import Loading from "~/components/Loading.vue";
 import Drawing from "~/components/Drawing.vue";
+
+// 🚨TODO: break into smaller components
+
 export default {
   name: "gallery",
   components: { Loading, Drawing },
@@ -265,8 +268,8 @@ export default {
 <style lang="scss" scoped>
 .gallery {
   display: grid;
-  grid-template-columns: repeat(3, calc(516px / 3));
-  grid-template-rows: repeat(3, calc(516px / 3));
+  grid-template-columns: repeat(auto-fit, minmax(calc(516px / 3), 1fr));
+  grid-template-rows: repeat(auto-fit, minmax(calc(516px / 3), 1fr));
   grid-gap: calc(40px / 3);
 }
 

@@ -1,13 +1,33 @@
 <template>
   <div class="prev-next">
-    <div class="prev border yellow"><div class="icon interactive">👈</div></div>
-    <div class="next border yellow"><div class="icon interactive">👉</div></div>
+    <div class="prev border yellow">
+      <button
+        :disabled="isFetching !== 'success' || gallery[0].docId === firstItemId"
+        @click="prevPage"
+        data-tooltip="prev"
+      >
+        <div class="icon interactive">
+          <img src="~/assets/img/toolbar/undo.svg" alt="" />
+        </div>
+      </button>
+    </div>
+    <div class="next border yellow">
+      <button
+        :disabled="isFetching !== 'success' || gallery.length < pageSize"
+        @click="nextPage"
+        data-tooltip="next"
+      >
+        <div class="icon interactive">
+          <img src="~/assets/img/toolbar/redo.svg" alt="" />
+        </div>
+      </button>
+    </div>
   </div>
 </template>
 
 <script>
 export default {
-  name: "PrevNext"
+  name: "PrevNext",
 };
 </script>
 
@@ -24,7 +44,6 @@ export default {
   z-index: 100;
   top: 50%;
   transform: translateY(-50%);
-  opacity: 0.5;
 }
 
 .prev {
