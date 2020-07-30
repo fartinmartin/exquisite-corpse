@@ -13,6 +13,7 @@
         href="https://fartinmartin.github.io/"
         target="_blank"
         rel="noopener noreferrer"
+        data-tooltip="cool guy"
       >
         <div class="icon interactive">
           <img src="~/assets/img/logo/m-light.svg" alt="" />

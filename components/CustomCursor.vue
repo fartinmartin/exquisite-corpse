@@ -27,7 +27,7 @@
       alt=""
     />
     <img v-show="state === 'fill'" src="~/assets/img/cursor/fill.svg" alt="" />
-    <div v-if="tooltip" class="tooltip">{{ tooltip }}</div>
+    <div v-show="tooltip" class="tooltip" ref="tooltip">{{ tooltip }}</div>
   </div>
 </template>
 
@@ -104,6 +104,17 @@ export default {
           e.target.dataset.tooltip || e.target.parentNode.dataset.tooltip;
       } else {
         this.tooltip = null;
+      }
+
+      if (process.client) {
+        if (e.target.dataset.tooltip || e.target.parentNode.dataset.tooltip) {
+          if (window.innerWidth - e.clientX < this.$refs.tooltip.offsetWidth) {
+            console.log("yup");
+            this.$refs.tooltip.style.transform = `translateX(-100%) translateX(-30px)`;
+          } else {
+            this.$refs.tooltip.style.transform = `translateX(0)`;
+          }
+        }
       }
 
       // TODO: check if window is not focused (dif app or diff window)
