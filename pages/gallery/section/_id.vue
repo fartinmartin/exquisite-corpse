@@ -34,7 +34,9 @@
               v-model="related.toggle"
             />
             <label for="featuredIn">
-              <h1 class="icon interactive">featured in...</h1>
+              <h1 class="icon interactive">
+                feat<span class="hom">ured in...</span>
+              </h1>
             </label>
           </div>
           <div>
@@ -46,7 +48,9 @@
               v-model="related.toggle"
             />
             <label for="moreBy">
-              <h1 class="icon interactive">more by this artist...</h1>
+              <h1 class="icon interactive">
+                more <span class="hom">&nbsp;by this artist... </span>
+              </h1>
             </label>
           </div>
         </form>
@@ -250,6 +254,11 @@ form {
   > *:not(:last-child) {
     margin-right: 1rem;
   }
+}
+
+input:checked + label * {
+  font-weight: bold;
+  opacity: 1;
 }
 
 input:not(:checked) + label h1 {

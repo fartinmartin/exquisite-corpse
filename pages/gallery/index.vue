@@ -38,7 +38,7 @@
             @click="handleTypeChoice"
           />
           <label for="corpses" data-tooltip="filter by">
-            <h1 class="icon interactive">corpses</h1>
+            <h1 class="icon interactive">c<span class="hom">orpses</span></h1>
           </label>
         </div>
         <div>
@@ -51,7 +51,7 @@
             @click="handleTypeChoice"
           />
           <label for="tops" data-tooltip="filter by">
-            <h1 class="icon interactive">tops</h1>
+            <h1 class="icon interactive">t<span class="hom">ops</span></h1>
           </label>
         </div>
         <div>
@@ -64,7 +64,7 @@
             @click="handleTypeChoice"
           />
           <label for="mids" data-tooltip="filter by">
-            <h1 class="icon interactive">mids</h1>
+            <h1 class="icon interactive">m<span class="hom">ids</span></h1>
           </label>
         </div>
         <div>
@@ -77,7 +77,7 @@
             @click="handleTypeChoice"
           />
           <label for="bots" data-tooltip="filter by">
-            <h1 class="icon interactive">bots</h1>
+            <h1 class="icon interactive">b<span class="hom">ots</span></h1>
           </label>
         </div>
       </form>
@@ -92,7 +92,7 @@
             @click="handleSortBy"
           />
           <label for="date" data-tooltip="sort by">
-            <h1 class="icon interactive">date</h1>
+            <h1 class="icon interactive">d<span class="hom">ate</span></h1>
           </label>
         </div>
         <div>
@@ -105,7 +105,7 @@
             @click="handleSortBy"
           />
           <label for="likes" data-tooltip="sort by">
-            <h1 class="icon interactive">likes</h1>
+            <h1 class="icon interactive">l<span class="hom">ikes</span></h1>
           </label>
         </div>
       </form>
@@ -296,6 +296,11 @@ form {
   > *:not(:last-child) {
     margin-right: 1rem;
   }
+}
+
+input:checked + label * {
+  font-weight: bold;
+  opacity: 1;
 }
 
 input:not(:checked) + label h1 {
