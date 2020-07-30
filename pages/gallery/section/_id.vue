@@ -178,6 +178,15 @@ h1 {
     margin-right: 1ch;
   }
 }
+
+.menu {
+  display: flex;
+  align-items: center;
+
+  > * {
+    margin-left: 1rem;
+  }
+}
 </style>
 
 <style lang="scss" scoped>
