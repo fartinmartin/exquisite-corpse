@@ -13,6 +13,7 @@
   "dependencies": {
     "@nuxtjs/firebase": "^6.1.0",
     "@nuxtjs/pwa": "^3.0.0-beta.20",
+    "body-scroll-lock": "^3.0.3",
     "firebase": "^7.16.0",
     "nuxt": "^2.13.0",
     "nuxt-password-protect": "^1.0.6",

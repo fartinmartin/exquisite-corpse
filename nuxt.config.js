@@ -30,11 +30,11 @@ module.exports = {
   /*
    ** Dev sever config, used to fix cache issues
    */
-  // server: {
-  //   port: 8000, // default: 3000
-  //   // host: "localhost", // default: localhost
-  //   // host: "0.0.0.0",
-  // },
+  server: {
+    port: 8000, // default: 3000
+    // host: "localhost", // default: localhost
+    host: "0.0.0.0",
+  },
   /*
    ** Global CSS
    */
