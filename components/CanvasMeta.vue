@@ -26,24 +26,24 @@ export default {
   props: {
     title: {
       type: String,
-      required: true
+      required: true,
     },
     artist: {
       type: String,
-      required: true
+      required: true,
     },
-    docId: String
+    docId: String,
   },
   computed: {
     isInstagram() {
       return this.artist.startsWith("@");
-    }
+    },
   },
   methods: {
     bg() {
       this.$refs.bg.style.backgroundColor = "transparent";
-    }
-  }
+    },
+  },
 };
 </script>
 
