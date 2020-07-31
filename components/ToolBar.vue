@@ -139,6 +139,8 @@
 import { mapState, mapGetters } from "vuex";
 import SaveModal from "./SaveModal";
 
+// 🚨 TODO: pencil taps are not registered.. this goes for a lot of things actually.. ugh
+
 export default {
   name: "ToolBar",
   components: { SaveModal },
