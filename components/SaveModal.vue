@@ -1,13 +1,13 @@
 <template>
   <div class="save-modal" @click="closeMe">
-    <div>
+    <div class="wrap">
       <Canvas
         id="save-preview"
-        :section="section"
+        :section="{ paths, title, artist }"
         mode="display"
         ref="previewCanvas"
       />
-      <form class="border yellow">
+      <form class="border yellow mw-canvas">
         <div class="loadal" v-if="isSaving !== 'idle'">
           <Loading
             v-if="isSaving === 'success'"
@@ -32,7 +32,9 @@
           />
         </div>
         <div>
-          <label for="title">your section's title:</label>
+          <label for="title">
+            <span class="hom">your section's </span>title:
+          </label>
           <input
             type="text"
             v-model="title"
@@ -45,8 +47,8 @@
         </div>
         <div>
           <label for="artist">
-            your *ahem* artist name:
-            <span>(@s will link to your instagram)</span>
+            <span class="hom">your *ahem* artist</span> name:
+            <span class="note">(@s will link to your instagram)</span>
           </label>
           <input
             type="text"
@@ -67,7 +69,7 @@
         </div>
         <div>
           <button @click.prevent="$emit('close-save')">
-            wait, i'm not done drawing
+            wait, i'm not done <span class="hom">drawing</span>
           </button>
         </div>
       </form>
@@ -84,7 +86,7 @@ import { randomWordFromString } from "~/assets/js/randomWords";
 
 export default {
   name: "SaveModal",
-  components: { Canvas },
+  components: { Canvas, Loading },
   data() {
     return {
       title: "",
@@ -96,17 +98,17 @@ export default {
   },
   computed: {
     ...mapState("modules/user", ["name"]),
-    ...mapState("modules/drawing", ["type", "paths", "sections"]),
-    tempTitle: () => this.$store.state.modules.drawing.title,
-    section: () => ({
-      paths: this.paths,
-      title: this.title,
-      artist: this.artist,
-    }),
+    ...mapState("modules/drawing", [
+      "type",
+      "paths",
+      "mobilePaths",
+      "sections",
+    ]),
+    isMobile: () => process.client && window.innerWidth < 571,
   },
   mounted() {
     // set local state based on store state
-    this.title = this.tempTitle;
+    this.title = this.$store.state.modules.drawing.title;
     this.artist = this.name;
 
     document.addEventListener("keydown", this.handleShortcuts);
@@ -124,6 +126,33 @@ export default {
         this.$emit("close-save");
         this.isSaving = "idle";
       }
+    },
+
+    handleResponsiveDraw(paths) {
+      const width = 1080;
+      const current = this.$refs.previewCanvas.$refs.canvas.width;
+      const f = width / current;
+
+      let newPaths = [];
+
+      for (var i = 0; i < paths.length; i++) {
+        newPaths[i] = {}; // empty object to hold properties added below
+        for (var prop in paths[i]) {
+          newPaths[i][prop] = paths[i][prop]; // copy properties from paths to newPaths
+        }
+      }
+
+      newPaths.forEach((path) => {
+        path.forEach((point) => {
+          point.x1 = Math.round(point.x1 * f);
+          point.x2 = Math.round(point.x2 * f);
+          point.y1 = Math.round(point.y1 * f);
+          point.y2 = Math.round(point.y2 * f);
+          point.size = Math.round(point.size * f);
+        });
+      });
+
+      return newPaths;
     },
 
     async saveDrawing() {
@@ -186,15 +215,19 @@ export default {
         thumb: completedThumb,
       };
 
+      let drawingPaths;
+      this.isMobile
+        ? (drawingPaths = this.handleResponsiveDraw(this.paths))
+        : (drawingPaths = this.paths);
+
       let sectionPayload = {
         artist: this.artist.substring(0, 30).trim() || this.name || "anonymous",
         date: timestamp,
-        drawing: { ...this.paths },
+        drawing: { ...drawingPaths },
         featuredIn: [this.$fireStore.doc(`completed/${completedId}`)],
         likes: 0,
         thumb: currentThumb,
-        title:
-          this.title.substring(0, 17).trim() || this.tempTitle || "untitled",
+        title: this.title.substring(0, 17).trim() || "untitled",
         type: this.type,
       };
 
@@ -254,6 +287,8 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
+
+  padding: calc(40px / 3);
 }
 
 .canvas-wrap::after {
@@ -275,7 +310,6 @@ form {
   position: relative;
   margin-top: 40px;
   padding: 1rem;
-  width: 544px;
 
   > div {
     display: flex;
@@ -302,13 +336,19 @@ form {
     border-bottom: 1px dotted var(--orange);
   }
 
+  label {
+    @media screen and (max-width: 544px) {
+      width: 25%;
+    }
+  }
+
   ::placeholder,
   input.temp {
     color: #7f7f7f;
     opacity: 1;
   }
 
-  label span {
+  label span.note {
     width: 100%;
     display: block;
 
@@ -319,6 +359,10 @@ form {
 
     font-size: 10px;
     text-align: center;
+
+    @media screen and (max-width: 544px) {
+      width: 400%;
+    }
   }
 
   button,
