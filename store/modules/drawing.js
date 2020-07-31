@@ -31,6 +31,9 @@ export const getters = {
   cantRedo(state) {
     return state.history.step >= state.history.paths.length;
   },
+  mobileFactor(state) {
+    return 1080 / state.canvas.width;
+  },
 };
 
 export const actions = {
@@ -109,8 +112,8 @@ export const actions = {
     commit("CLEAR_CANVAS");
   },
 
-  logPathToCurrentPath({ rootState, commit }, event) {
-    const pointData = {
+  logPathToCurrentPath({ rootState, commit, getters }, event) {
+    let pointData = {
       mode: rootState.modules.mouse.mode,
       color: rootState.modules.mouse.palette.current,
       size: rootState.modules.mouse.size.current,
@@ -119,6 +122,8 @@ export const actions = {
       x2: event.offsetX,
       y2: event.offsetY,
     };
+    if (process.client && window.innerWidth < 571)
+      pointData.size = Math.round(pointData.size / getters.mobileFactor);
     commit("PUSH_POINT_DATA_TO_CURRENT_PATH", pointData);
   },
 
@@ -161,7 +166,7 @@ export const actions = {
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
     ctx.strokeStyle = point.color;
-    ctx.lineWidth = point.size * 2;
+    ctx.lineWidth = point.size * devicePixelRatio;
 
     if (point.mode === "erase") {
       ctx.globalCompositeOperation = "destination-out";

@@ -57,7 +57,8 @@ export default {
   computed: {
     ...mapState("modules/mouse", ["palette", "size", "x", "y", "isDrawing"]),
     ...mapState("modules/mouse", { mouseMode: (state) => state.mode }),
-    ...mapState("modules/drawing", ["sections"]),
+    ...mapState("modules/drawing", ["sections", "paths", "history"]),
+    isMobile: () => process.client && window.innerWidth < 571,
     drawing() {
       if (this.mode === "display") {
         return this.section;
@@ -169,12 +170,33 @@ export default {
       }
     },
 
+    handleResponsiveDraw(point, option) {
+      const width = 1080;
+      const current = this.$refs.canvas.width;
+      const f = width / current;
+
+      let newPoint;
+      if (option) {
+        newPoint = point;
+        newPoint.size = Math.round(point.size / f);
+      } else {
+        newPoint = { mode: point.mode, color: point.color };
+        newPoint.x1 = Math.round(point.x1 / f);
+        newPoint.x2 = Math.round(point.x2 / f);
+        newPoint.y1 = Math.round(point.y1 / f);
+        newPoint.y2 = Math.round(point.y2 / f);
+        newPoint.size = Math.round(point.size / f);
+      }
+
+      return newPoint;
+    },
+
     handleDraw(e) {
       const ctx = this.ctx;
       let point;
 
       if (this.mode === "draw") {
-        point = {
+        const temp = {
           mode: this.mouseMode,
           color: this.palette.current,
           size: this.size.current,
@@ -183,8 +205,17 @@ export default {
           x2: e.offsetX,
           y2: e.offsetY,
         };
+        if (this.isMobile) {
+          point = this.handleResponsiveDraw(temp, "size"); // might still work, checking if pixelate() is throwing vuex erros
+        } else {
+          point = temp;
+        }
       } else {
-        point = e; // e = point passed from this.makeDrawing()
+        if (this.isMobile) {
+          point = this.handleResponsiveDraw(e);
+        } else {
+          point = e; // e = point passed from this.makeDrawing()
+        }
       }
 
       switch (point.mode) {
@@ -207,7 +238,7 @@ export default {
       ctx.lineCap = "round";
       ctx.lineJoin = "round";
       ctx.strokeStyle = point.color;
-      ctx.lineWidth = point.size * 2;
+      ctx.lineWidth = point.size * devicePixelRatio;
 
       if (point.mode === "erase") {
         ctx.globalCompositeOperation = "destination-out";
@@ -293,7 +324,6 @@ export default {
       const img2 = await createImageBitmap(imgData2);
       this.clearCanvas(ctx);
       ctx.drawImage(img2, 0, 0, fw, fh, 0, 0, w / dpr, h / dpr);
-      console.log(img2, 0, 0, fw, fh, 0, 0, w / dpr, h / dpr, w, h);
 
       // remove white bg on meta-box div
       this.$refs.notAllowed.bg();
