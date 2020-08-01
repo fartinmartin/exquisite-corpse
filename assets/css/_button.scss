@@ -1,18 +1,7 @@
-input[type="submit"],
 .button {
   width: 100%;
   padding: 0.5rem 0;
-
-  font-size: inherit;
-  font-family: inherit;
   text-align: center;
-  text-decoration: none;
-  color: var(--black);
-
-  border: none;
-  border-radius: 0;
-  background: none;
-  appearance: none;
 
   --background-color: none;
   --border-top-left: var(--yellow);
@@ -32,6 +21,7 @@ input[type="submit"],
 
   &.solid.yellow {
     --background-color: var(--light-yellow);
+    color: var(--black);
   }
 
   &.solid.red {

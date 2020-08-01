@@ -60,15 +60,13 @@
             maxlength="30"
           />
         </div>
-        <div>
-          <input
-            type="submit"
-            value="save & show me our masterpiece!"
-            @click.prevent="saveDrawing"
-          />
+        <div style="margin-top: 2rem;">
+          <button @click.prevent="saveDrawing" class="button solid yellow">
+            save & show me our masterpiece!
+          </button>
         </div>
         <div>
-          <button @click.prevent="$emit('close-save')">
+          <button @click.prevent="$emit('close-save')" class="button">
             wait, i'm not done <span class="hom">drawing</span>
           </button>
         </div>
@@ -313,6 +311,7 @@ form {
   label {
     @media screen and (max-width: 544px) {
       width: 25%;
+      padding-right: 1rem;
     }
   }
 
@@ -335,36 +334,12 @@ form {
     text-align: center;
 
     @media screen and (max-width: 544px) {
+      transform: translate3d(calc(100% - 4rem), 100%, 0);
       width: 400%;
     }
   }
 
-  button,
-  input[type="submit"] {
-    margin-top: calc(40px / 3 * 2);
-
-    background: var(--light-yellow);
-    border: 2px solid var(--yellow);
-    border-top: 2px solid var(--lighter-yellow);
-    border-left: 2px solid var(--lighter-yellow);
-
-    /* TODO: this function could/should be a global class 🤔 */
-    &:active {
-      border: 2px solid var(--lighter-yellow);
-      border-top: 2px solid var(--yellow);
-      border-left: 2px solid var(--yellow);
-      transform: translate3d(2px, 2px, 0);
-    }
-  }
-
   button {
-    margin-top: 0;
-    padding: 0.5rem;
-    width: 100%;
-    text-align: center;
-
-    background: none;
-    border: 2px solid var(--light-yellow);
     color: var(--orange);
   }
 }
