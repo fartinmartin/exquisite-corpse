@@ -43,10 +43,6 @@ export default {
       if (destory) return likesRef();
     },
     handleClick() {
-      this.isLiked = !this.isLiked;
-
-      if (this.likes === 0) return;
-
       const increment = this.$fireStoreObj.FieldValue.increment(1);
       const decrement = this.$fireStoreObj.FieldValue.increment(-1);
 
@@ -54,8 +50,10 @@ export default {
         .collection(this.collection)
         .doc(this.docId);
 
-      this.isLiked && docRef.update({ likes: increment });
-      !this.isLiked && docRef.update({ likes: decrement });
+      !this.isLiked && docRef.update({ likes: increment });
+      this.isLiked && this.likes !== 0 && docRef.update({ likes: decrement });
+
+      this.isLiked = !this.isLiked;
     },
   },
 };
