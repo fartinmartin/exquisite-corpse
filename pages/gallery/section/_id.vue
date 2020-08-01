@@ -98,6 +98,8 @@ import Canvas from "~/components/Canvas.vue";
 import LikeButton from "~/components/LikeButton.vue";
 import DownloadButton from "~/components/DownloadButton.vue";
 
+// 🚨 TODO: fix size of loading components!
+
 export default {
   name: "Section",
   head() {
