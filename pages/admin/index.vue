@@ -235,10 +235,10 @@ export default {
 
     async removeCompletedAndItsReferences(completedId) {
       if (process.client) {
-        if (!window.confirm("you sure?")) return this.$router.push("/admin");
+        if (!window.confirm("you sure you want to delete completed?"))
+          return this.$router.push("/admin");
       }
-      // 🚨 HAVE NOT TESTED
-      // get ref to this completed
+
       const { completedRef, sectionRefs } = await this.getSingleCompleted(
         completedId
       );
@@ -265,7 +265,8 @@ export default {
 
     async removeSectionAndItsReferences(sectionId) {
       if (process.client) {
-        if (!window.confirm("you sure?")) return this.$router.push("/admin");
+        if (!window.confirm("you sure you want to delete section?"))
+          return this.$router.push("/admin");
       }
       // this section
       const sectionRef = this.$fireStore.collection("sections").doc(sectionId);
@@ -275,8 +276,18 @@ export default {
       const batch = this.$fireStore.batch();
 
       // remove each completed doc this section is featured in
-      section.data().featuredIn.forEach((completedRef) => {
-        this.removeCompletedAndItsReferences(completedRef);
+      section.data().featuredIn.forEach(async (completedRef) => {
+        const doc = await completedRef.get();
+        const completed = { docId: doc.id, ...doc.data() };
+        const sectionRefs = Object.values(completed.sections);
+
+        sectionRefs.forEach((section) => {
+          batch.update(section, {
+            featuredIn: this.$fireStoreObj.FieldValue.arrayRemove(completedRef),
+          });
+        });
+
+        batch.delete(completedRef);
       });
 
       // remove section
@@ -310,6 +321,23 @@ export default {
       completedRef
         .update({ thumb: completedThumb })
         .then(() => console.log("it worked!", completedThumb))
+        .catch((error) => console.error(error));
+    },
+
+    async removeAllFeaturedInRefs() {
+      const batch = this.$fireStore.batch();
+
+      const sectionsRef = this.$fireStore.collection("sections");
+      const query = await sectionsRef.get();
+      query.forEach((doc) => {
+        batch.update(doc.ref, {
+          featuredIn: this.$fireStoreObj.FieldValue.delete(),
+        });
+      });
+
+      batch
+        .commit()
+        .then(() => console.log("removed section and its references"))
         .catch((error) => console.error(error));
     },
 
