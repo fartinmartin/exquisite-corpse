@@ -240,7 +240,7 @@ export default {
       this.type = type;
 
       if (type === "corpse") {
-        this.collection = "corpse";
+        this.collection = "corpses";
         this.pageSize = 9;
       } else {
         this.collection = "sections";
