@@ -245,7 +245,7 @@ export default {
   top: 0;
   left: 0;
   width: 100vw;
-  height: 100vh;
+  height: 100%;
 
   background: var(--lighter-blue)
     url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAAEklEQVQImWNgYGD4z0AswK4SAFXuAf8EPy+xAAAAAElFTkSuQmCC)
@@ -257,6 +257,10 @@ export default {
   justify-content: center;
 
   padding: calc(40px / 3);
+
+  @media screen and (max-width: 1040px) {
+    z-index: 955;
+  }
 }
 
 .canvas-wrap::after {

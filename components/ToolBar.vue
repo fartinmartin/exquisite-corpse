@@ -102,7 +102,7 @@
         <button
           class="tool save"
           :disabled="isDrawingEmpty"
-          @click="startSave"
+          @click="$emit('start-save')"
           data-tooltip="save"
         >
           <img src="~/assets/img/toolbar/save.svg" alt="" />
@@ -130,8 +130,6 @@
         <!-- https://github.com/xiaokaike/vue-color (mostly for safari support 🤔) -->
       </div>
     </div>
-
-    <SaveModal v-if="isSaving" @close-save="closeSave" />
   </div>
 </template>
 
@@ -165,7 +163,6 @@ export default {
       },
     },
     ...mapState("modules/mouse", ["palette", "size"]),
-    ...mapGetters(["isMobile"]),
     ...mapGetters("modules/mouse", [
       "currentSizeLessThanMax",
       "currentSizeMoreThanMin",
@@ -240,16 +237,6 @@ export default {
     },
     clearCanvas(e) {
       this.$store.dispatch("modules/drawing/clearCanvas", e);
-    },
-    startSave() {
-      if (this.isMobile) this.$store.dispatch("modules/drawing/setMobilePaths");
-      this.isSaving = true;
-    },
-    closeSave(e) {
-      this.isSaving = false;
-      if (e) {
-        this.$router.push({ path: `/gallery/${e}` });
-      }
     },
   },
 };

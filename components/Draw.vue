@@ -1,6 +1,6 @@
 <template>
   <div class="mw-canvas">
-    <tool-bar />
+    <ToolBar v-on="$listeners" />
     <Canvas id="top" :mode="sections.top.type === type ? 'draw' : 'pixelate'" />
     <Canvas id="mid" :mode="sections.mid.type === type ? 'draw' : 'pixelate'" />
     <Canvas id="bot" :mode="sections.bot.type === type ? 'draw' : 'pixelate'" />

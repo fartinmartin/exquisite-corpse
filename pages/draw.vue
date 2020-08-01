@@ -1,19 +1,25 @@
 <template>
   <div class="wrap">
+    <SaveModal v-if="isSaving" @close-save="closeSave" />
     <PickSection v-if="isFetching === 'idle'" @picked-type="handlePickedType" />
     <div v-if="isFetching === 'fetching'" class="mw-canvas">
       <div class="border yellow info-panel mw-canvas"></div>
       <div class="border yellow info-panel mw-canvas mt mb"></div>
       <Loading subtext="preparing your canvas" />
     </div>
-    <Draw v-if="isFetching === 'success'" />
+    <Draw
+      v-if="isFetching === 'success'"
+      @start-save="startSave"
+      v-show="!isSaving"
+    />
   </div>
 </template>
 
 <script>
+import SaveModal from "~/components/SaveModal";
 import Draw from "~/components/Draw";
 import PickSection from "~/components/PickSection";
-import { mapState } from "vuex";
+import { mapState, mapGetters } from "vuex";
 import { twoRandomWords } from "~/assets/js/randomWords";
 
 export default {
@@ -25,7 +31,7 @@ export default {
   },
   components: { Draw, PickSection },
   data: function () {
-    return { isFetching: "idle" }; // "idle", "fetching", "success", TODO: "error"
+    return { isFetching: "idle", isSaving: false }; // "idle", "fetching", "success", TODO: "error"
   },
   async fetch({ store }) {
     // set default random title
@@ -39,8 +45,19 @@ export default {
   },
   computed: {
     ...mapState("modules/drawing", ["sections"]),
+    ...mapGetters(["isMobile"]),
   },
   methods: {
+    startSave() {
+      if (this.isMobile) this.$store.dispatch("modules/drawing/setMobilePaths");
+      this.isSaving = true;
+    },
+    closeSave(e) {
+      this.isSaving = false;
+      if (e) {
+        this.$router.push({ path: `/gallery/${e}` });
+      }
+    },
     async handlePickedType(type) {
       this.isFetching = "fetching";
 
