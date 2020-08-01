@@ -38,7 +38,7 @@ export default {
   },
   mounted() {
     this.logIn();
-    this.getRandomCompleted();
+    this.getRandomCorpse();
   },
   methods: {
     openHelp() {
@@ -50,12 +50,12 @@ export default {
       this.isLoggedIn = true;
     },
 
-    async getRandomCompleted() {
+    async getRandomCorpse() {
       this.isFetching = "fetching";
 
-      const completedRef = this.$fireStore.collection("completed");
-      const randomKey = completedRef.doc().id;
-      const query = completedRef
+      const corpseRef = this.$fireStore.collection("corpses");
+      const randomKey = corpseRef.doc().id;
+      const query = corpseRef
         .where(this.$fireStoreObj.FieldPath.documentId(), ">=", randomKey)
         .limit(1);
 
@@ -67,7 +67,7 @@ export default {
             return await this.getSections(doc.data().sections);
           });
         } else {
-          const secondQuery = completedRef
+          const secondQuery = corpseRef
             .where(this.$fireStoreObj.FieldPath.documentId(), "<", randomKey)
             .limit(1);
           const secondResponse = await secondQuery.get();
@@ -80,7 +80,7 @@ export default {
         console.error(error);
         this.isLoggedIn = false;
         await this.logIn();
-        this.getRandomCompleted();
+        this.getRandomCorpse();
       }
 
       return;

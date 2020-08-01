@@ -6,7 +6,7 @@
       <div class="data-wrap" v-if="isFetching === 'success'">
         <h1>{{ meta.title }}</h1>
         <div class="menu">
-          <LikeButton collection="completed" :docId="this.$route.params.id" />
+          <LikeButton collection="corpse" :docId="this.$route.params.id" />
           <DownloadButton :image="meta.thumb" :title="meta.title" />
         </div>
       </div>
@@ -34,13 +34,13 @@ export default {
     };
   },
   mounted() {
-    this.getCompletedById(this.$route.params.id);
+    this.getCorpseById(this.$route.params.id);
   },
   methods: {
-    async getCompletedById(id) {
+    async getCorpseById(id) {
       this.isFetching = "fetching";
 
-      const query = this.$fireStore.collection("completed").doc(id);
+      const query = this.$fireStore.collection("corpses").doc(id);
       const doc = await query.get();
 
       this.meta = { docId: doc.id, ...doc.data() };

@@ -4,14 +4,14 @@
       <div>
         <input
           type="radio"
-          id="corpses"
+          id="corpse"
           name="collection"
-          value="corpses"
+          value="corpse"
           v-model="type"
           @click="handleTypeChoice"
         />
-        <label for="corpses" data-tooltip="filter by">
-          <h1 class="icon interactive">corpses</h1>
+        <label for="corpse" data-tooltip="filter by">
+          <h1 class="icon interactive">corpse</h1>
         </label>
       </div>
       <div>

@@ -16,7 +16,7 @@
       <nuxt-link
         v-for="drawing in gallery"
         :key="drawing.docId"
-        :to="`/${collection === 'completed' ? 'gallery' : 'gallery/section'}/${
+        :to="`/${collection === 'corpse' ? 'gallery' : 'gallery/section'}/${
           drawing.docId
         }`"
       >

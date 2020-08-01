@@ -31,13 +31,13 @@
         <div>
           <input
             type="radio"
-            id="corpses"
+            id="corpse"
             name="collection"
-            value="corpses"
+            value="corpse"
             v-model="type"
             @click="handleTypeChoice"
           />
-          <label for="corpses" data-tooltip="filter by">
+          <label for="corpse" data-tooltip="filter by">
             <h1 class="icon interactive">c<span class="hom">orpses</span></h1>
           </label>
         </div>
@@ -119,7 +119,7 @@
       <nuxt-link
         v-for="drawing in gallery"
         :key="drawing.docId"
-        :to="`/${collection === 'completed' ? 'gallery' : 'gallery/section'}/${
+        :to="`/${collection === 'corpse' ? 'gallery' : 'gallery/section'}/${
           drawing.docId
         }`"
       >
@@ -150,8 +150,8 @@ export default {
       firstItemId: "",
       lastVisible: null,
       firstVisible: null,
-      collection: "completed", // "completed", "sections"
-      type: "corpses", // "corpses", "top", "mid", and "bot"
+      collection: "corpse", // "corpse", "sections"
+      type: "corpse", // "corpse", "top", "mid", and "bot"
       field: "date", // "date", "likes"
       pageSize: 9, // 9, 18
     };
@@ -239,8 +239,8 @@ export default {
       if (type === this.type) return;
       this.type = type;
 
-      if (type === "corpses") {
-        this.collection = "completed";
+      if (type === "corpse") {
+        this.collection = "corpse";
         this.pageSize = 9;
       } else {
         this.collection = "sections";

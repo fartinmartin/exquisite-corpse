@@ -1,8 +1,8 @@
 // these aren't in use, this is just a notepad for ideas/functions
 // see: ~/components/FirestoreAdminTools.vue for more things like this
-async function findCompletedsThatContainSpecificSections() {
-  const completedsRef = this.$fireStore.collection("completed");
-  const completedsRes = await completedsRef.get();
+async function findCorpsesThatContainSpecificSections() {
+  const corpsesRef = this.$fireStore.collection("corpses");
+  const corpsesRes = await corpsesRef.get();
 
   // edit this list to contain the sections you are searching for
   const badSectionsList = [
@@ -19,35 +19,35 @@ async function findCompletedsThatContainSpecificSections() {
     "vjN8zHNXnTRlHu0FS1DH",
     "zaKS5bFFLcFnkbw1Zy6f",
     "6fmUKXArK2HZrdjKLAMw",
-    "MbCvCmPu6CnJbc2FWNKv"
+    "MbCvCmPu6CnJbc2FWNKv",
   ];
 
-  const badCompletedList = [];
+  const badCorpseList = [];
 
-  completedsRes.forEach(doc => {
-    if (badSectionsList.some(s => doc.data().sections.top.id.includes(s))) {
+  corpsesRes.forEach((doc) => {
+    if (badSectionsList.some((s) => doc.data().sections.top.id.includes(s))) {
       // console.log(doc.id, doc.data().sections);
-      badCompletedList.push(doc.id);
+      badCorpseList.push(doc.id);
     }
-    if (badSectionsList.some(s => doc.data().sections.mid.id.includes(s))) {
+    if (badSectionsList.some((s) => doc.data().sections.mid.id.includes(s))) {
       // console.log(doc.id, doc.data().sections);
-      badCompletedList.push(doc.id);
+      badCorpseList.push(doc.id);
     }
-    if (badSectionsList.some(s => doc.data().sections.bot.id.includes(s))) {
+    if (badSectionsList.some((s) => doc.data().sections.bot.id.includes(s))) {
       // console.log(doc.id, doc.data().sections);
-      badCompletedList.push(doc.id);
+      badCorpseList.push(doc.id);
     }
   });
 
-  console.log(badCompletedList);
+  console.log(badCorpseList);
 
   // then you can delete them! BE CAREFUL THO
-  badCompletedList.forEach(badDoc => {
-    completedsRef
+  badCorpseList.forEach((badDoc) => {
+    corpsesRef
       .doc(badDoc)
       .delete()
-      .then(docRef => console.log("deleted", docRef))
-      .catch(error => {
+      .then((docRef) => console.log("deleted", docRef))
+      .catch((error) => {
         console.error(error);
       });
   });

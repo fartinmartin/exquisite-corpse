@@ -138,8 +138,8 @@ export default {
 
       // firebase vars
       let timestamp = this.$fireStoreObj.Timestamp.fromDate(new Date());
-      const completedRef = this.$fireStore.collection("completed").doc();
-      const completedId = completedRef.id;
+      const corpseRef = this.$fireStore.collection("corpses").doc();
+      const corpseId = corpseRef.id;
       const sectionsRef = this.$fireStore.collection("sections").doc();
       const sectionId = sectionsRef.id;
 
@@ -155,18 +155,18 @@ export default {
         }
       });
 
-      // create thumb for completed drawing based on preveiwCanvas
+      // create thumb for corpse drawing based on preveiwCanvas
       // TODO: NOPE. this needs to be done with an offscreen canvas
       const currentThumb = this.$refs.thumbCanvas.$refs.canvasThumb.toDataURL();
       thumbsObject[this.type] = currentThumb;
 
-      const completedThumb = await mergeBase64([
+      const corpseThumb = await mergeBase64([
         thumbsObject.top,
         thumbsObject.mid,
         thumbsObject.bot,
       ]);
 
-      const completedPaylod = {
+      const corpsePaylod = {
         title: titleArray.join(" "), // jumble of all three names
         date: timestamp,
         likes: 0,
@@ -187,14 +187,14 @@ export default {
             }`
           ),
         },
-        thumb: completedThumb,
+        thumb: corpseThumb,
       };
 
       const sectionPayload = {
         artist: this.artist.substring(0, 30).trim() || this.name || "anonymous",
         date: timestamp,
         drawing: { ...this.computedPaths },
-        featuredIn: [this.$fireStore.doc(`completed/${completedId}`)],
+        featuredIn: [this.$fireStore.doc(`corpse/${corpseId}`)],
         likes: 0,
         thumb: currentThumb,
         title: this.title.substring(0, 17).trim() || "untitled",
@@ -203,17 +203,17 @@ export default {
 
       const batch = this.$fireStore.batch();
 
-      batch.set(completedRef, completedPaylod);
+      batch.set(corpseRef, corpsePaylod);
       batch.set(sectionsRef, sectionPayload);
 
-      // for each drawing that is NOT active type, push the "completedId" to their "featuredIn" array
+      // for each drawing that is NOT active type, push the "corpseId" to their "featuredIn" array
       sectionsObj.forEach((key) => {
         if (key !== this.type) {
           const docId = this.sections[key].docId;
           const docRef = this.$fireStore.collection("sections").doc(docId);
           batch.update(docRef, {
             featuredIn: this.$fireStoreObj.FieldValue.arrayUnion(
-              this.$fireStore.doc(`completed/${completedId}`)
+              this.$fireStore.doc(`corpse/${corpseId}`)
             ),
           });
         }
@@ -224,7 +224,7 @@ export default {
         .then(() => {
           this.isSaving = "success";
           setTimeout(() => {
-            this.$emit("close-save", completedId);
+            this.$emit("close-save", corpseId);
           }, 1500);
         })
         .catch((error) => {

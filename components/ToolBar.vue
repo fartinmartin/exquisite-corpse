@@ -212,7 +212,7 @@ export default {
             break;
 
           case 83: // "s"
-            this.startSave();
+            this.$emit("start-save");
             break;
         }
       }

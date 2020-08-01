@@ -1,25 +1,25 @@
 <template>
   <div class="wrap">
     <div class="border yellow admin mw-canvas">
-      <h1>completed</h1>
+      <h1>corpse</h1>
       <div class="input-wrap">
-        <input v-model="completed.section" placeholder="enter sectionId" />
+        <input v-model="corpse.section" placeholder="enter sectionId" />
         <button
           class="button"
-          @click="makeCompletedFromSingleSection(completed.section)"
+          @click="makeCorpseFromSingleSection(corpse.section)"
         >
-          make completed
+          make corpse
         </button>
       </div>
       <div class="input-wrap">
-        <input v-model="completed.id" placeholder="enter completedId" />
+        <input v-model="corpse.id" placeholder="enter corpseId" />
         <button
           class="button solid red"
-          @click="removeCompletedAndItsReferences(completed.id)"
+          @click="removeCorpseAndItsReferences(corpse.id)"
         >
           remove
         </button>
-        <button class="button" @click="updateCompletedThumb">
+        <button class="button" @click="updateCorpseThumb">
           update thumb
         </button>
       </div>
@@ -53,7 +53,7 @@ export default {
   middleware: ["password-protect"],
   data: function () {
     return {
-      completed: {
+      corpse: {
         id: null,
         section: null,
       },
@@ -76,7 +76,7 @@ export default {
       }
     },
 
-    async fetchCollection(collection) {
+    async getCollection(collection) {
       let docs = [];
 
       const ref = this.$fireStore.collection(collection);
@@ -89,17 +89,6 @@ export default {
       return { docs, ref };
     },
 
-    async pushArrayOfDocsToCollection(collection, docsArray) {
-      const ref = this.$fireStore.collection(collection);
-
-      docsArray.forEach((doc) => {
-        ref
-          .add(doc)
-          .then((docRef) => console.log(docRef.id))
-          .catch((error) => console.error(error));
-      });
-    },
-
     async getSingleSection(sectionId) {
       const sectionRef = this.$fireStore.collection("sections").doc(sectionId);
       const doc = await sectionRef.get();
@@ -108,14 +97,12 @@ export default {
       return { sectionRef, section };
     },
 
-    async getSingleCompleted(completedId) {
-      const completedRef = this.$fireStore
-        .collection("completed")
-        .doc(completedId);
-      const doc = await completedRef.get();
-      const completed = { docId: doc.id, ...doc.data() };
-      const sectionRefs = Object.values(completed.sections);
-      return { completedRef, completed, sectionRefs };
+    async getSingleCorpse(corpseId) {
+      const corpseRef = this.$fireStore.collection("corpses").doc(corpseId);
+      const doc = await corpseRef.get();
+      const corpse = { docId: doc.id, ...doc.data() };
+      const sectionRefs = Object.values(corpse.sections);
+      return { corpseRef, corpse, sectionRefs };
     },
 
     async getRandomSectionByType(type) {
@@ -156,7 +143,7 @@ export default {
       return section;
     },
 
-    async makeCompletedFromSingleSection(sectionId) {
+    async makeCorpseFromSingleSection(sectionId) {
       const { sectionRef, section } = await this.getSingleSection(sectionId);
 
       // get two other section types NOT of section.type
@@ -165,8 +152,8 @@ export default {
 
       // firestore vars
       const timestamp = this.$fireStoreObj.Timestamp.fromDate(new Date());
-      const completedRef = this.$fireStore.collection("completed").doc();
-      const completedId = completedRef.id;
+      const corpseRef = this.$fireStore.collection("corpses").doc();
+      const corpseId = corpseRef.id;
 
       // meta info "contrustors"
       let thumbsObject = {};
@@ -186,13 +173,13 @@ export default {
       // push the passed section's meta info to those "constrcutors"
       thumbsObject[section.type] = section.thumb;
 
-      const completedThumb = await mergeBase64([
+      const corpseThumb = await mergeBase64([
         thumbsObject.top,
         thumbsObject.mid,
         thumbsObject.bot,
       ]);
 
-      let completedPaylod = {
+      let corpsePaylod = {
         title: titleArray.join(" "),
         date: timestamp,
         likes: 0,
@@ -207,15 +194,15 @@ export default {
             `sections/${section.type === "bot" ? section.docId : idObject.bot}`
           ),
         },
-        thumb: completedThumb,
+        thumb: corpseThumb,
       };
 
       const batch = this.$fireStore.batch();
 
-      batch.set(completedRef, completedPaylod);
+      batch.set(corpseRef, corpsePaylod);
 
       batch.update(sectionRef, {
-        featuredIn: this.$fireStoreObj.FieldValue.arrayUnion(completedRef),
+        featuredIn: this.$fireStoreObj.FieldValue.arrayUnion(corpseRef),
       });
 
       types.forEach((type) => {
@@ -223,43 +210,58 @@ export default {
           .collection("sections")
           .doc(idObject[type]);
         batch.update(docRef, {
-          featuredIn: this.$fireStoreObj.FieldValue.arrayUnion(completedRef),
+          featuredIn: this.$fireStoreObj.FieldValue.arrayUnion(corpseRef),
         });
       });
 
       batch
         .commit()
-        .then(() => console.log("Made completed drawing"))
+        .then(() => console.log("Made corpse drawing"))
         .catch((error) => console.error(error));
     },
 
-    async removeCompletedAndItsReferences(completedId) {
-      if (process.client) {
-        if (!window.confirm("you sure you want to delete completed?"))
+    async removeCorpseAndItsReferences(corpseId, isRef, ignoreId = 1) {
+      if (process.client && !isRef) {
+        if (!window.confirm("you sure you want to delete corpse?"))
           return this.$router.push("/admin");
       }
 
-      const { completedRef, sectionRefs } = await this.getSingleCompleted(
-        completedId
-      );
+      let corpseRef, sectionRefs;
+
+      if (!isRef) {
+        const { corpseRef: cr, sectionRefs: sr } = await this.getSingleCorpse(
+          corpseId
+        );
+        corpseRef = cr;
+        sectionRefs = sr;
+      } else {
+        corpseRef = corpseId;
+        const doc = await corpseRef.get();
+        const corpse = { docId: doc.id, ...doc.data() };
+        sectionRefs = Object.values(corpse.sections);
+      }
 
       // start batch
       const batch = this.$fireStore.batch();
 
-      // remove ref to completed in each section
+      // remove ref to corpse in each section
       sectionRefs.forEach((section) => {
-        batch.update(section, {
-          featuredIn: this.$fireStoreObj.FieldValue.arrayRemove(completedRef),
-        });
+        if (section.id !== ignoreId) {
+          console.log("updating section:", section.id);
+          batch.update(section, {
+            featuredIn: this.$fireStoreObj.FieldValue.arrayRemove(corpseRef),
+          });
+        }
       });
 
-      // remove completed
-      batch.delete(completedRef);
+      // remove corpse
+      console.log("deleting corpse:", corpseRef.id);
+      batch.delete(corpseRef);
 
       // execute batch
       batch
         .commit()
-        .then(() => console.log("Removed completed drawing and its references"))
+        .then(() => console.log("Removed corpse drawing and its references"))
         .catch((error) => console.error(error));
     },
 
@@ -272,38 +274,77 @@ export default {
       const sectionRef = this.$fireStore.collection("sections").doc(sectionId);
       const section = await sectionRef.get();
 
-      // start batch
-      const batch = this.$fireStore.batch();
+      const corpseRefs = Object.values(section.data().featuredIn);
 
-      // remove each completed doc this section is featured in
-      section.data().featuredIn.forEach(async (completedRef) => {
-        const doc = await completedRef.get();
-        const completed = { docId: doc.id, ...doc.data() };
-        const sectionRefs = Object.values(completed.sections);
-
-        sectionRefs.forEach((section) => {
-          batch.update(section, {
-            featuredIn: this.$fireStoreObj.FieldValue.arrayRemove(completedRef),
-          });
-        });
-
-        batch.delete(completedRef);
-      });
-
-      // remove section
-      batch.delete(sectionRef);
-
-      // execute batch
-      batch
-        .commit()
-        .then(() => console.log("removed section and its references"))
+      sectionRef
+        .delete()
+        .then(() =>
+          corpseRefs.forEach(async (corpseRef) => {
+            await this.removeCorpseAndItsReferences(
+              corpseRef,
+              true,
+              sectionRef.id
+            );
+          })
+        )
         .catch((error) => console.error(error));
+
+      // // start batch
+      // const batch = this.$fireStore.batch();
+
+      // // for each corpse this section is featured in:
+      // //   1. update "featuredIn" array for all sections that reference this corpse
+      // //   2. remove the corpse doc
+      // section.data().featuredIn.forEach(async (corpseRef) => {
+      //   const corpse = await corpseRef.get();
+      //   const sectionRefs = Object.values(corpse.data().sections);
+      //   // remove ref to corpse in each section
+      //   sectionRefs.forEach((section) => {
+      //     batch.update(section, {
+      //       featuredIn: this.$fireStoreObj.FieldValue.arrayRemove(corpseRef),
+      //     });
+      //   });
+      //   // remove corpse
+      //   batch.delete(corpseRef);
+      // });
+
+      // batch.delete(sectionRef);
+
+      // // remove section
+      // batch
+      //   .commit()
+      //   .then(() => console.log("removed section and its references"))
+      //   .catch((error) => console.error(error));
+
+      // // start transaction
+      // this.$fireStore
+      //   .runTransaction((transaction) => {
+      //     // get this section
+      //     transaction.get(sectionRef).then((section) => {
+      //       // // for each corpse referenced in featuredIn array
+      //       // section.data().featuredIn.forEach(async (corpseRef) => {
+      //       //   const doc = await corpseRef.get();
+      //       //   const data = { ...doc.data() };
+      //       //   const sectionRefs = Object.values(data.sections);
+      //       //   // remove ref to corpse in each section
+      //       //   sectionRefs.forEach((section) => {
+      //       //     transaction.update(section, {
+      //       //       featuredIn: this.$fireStoreObj.FieldValue.arrayRemove(
+      //       //         corpseRef
+      //       //       ),
+      //       //     });
+      //       //   });
+      //       //   transaction.delete(corpseRef);
+      //       // });
+      //       // transaction.delete(sectionRef);
+      //     });
+      //   })
+      //   .then(() => console.log("Transaction successfully committed!"))
+      //   .catch((error) => console.log("Transaction failed: ", error));
     },
 
-    async updateCompletedThumb(completedId) {
-      const { completedRef, sectionRefs } = await this.getSingleCompleted(
-        completedId
-      );
+    async updateCorpseThumb(corpseId) {
+      const { corpseRef, sectionRefs } = await this.getSingleCorpse(corpseId);
 
       let thumbsObject = {};
 
@@ -312,15 +353,15 @@ export default {
         thumbsObject[doc.type] = doc.thumb;
       });
 
-      const completedThumb = await mergeBase64([
+      const corpseThumb = await mergeBase64([
         thumbsObject.top,
         thumbsObject.mid,
         thumbsObject.bot,
       ]);
 
-      completedRef
-        .update({ thumb: completedThumb })
-        .then(() => console.log("it worked!", completedThumb))
+      corpseRef
+        .update({ thumb: corpseThumb })
+        .then(() => console.log("it worked!", corpseThumb))
         .catch((error) => console.error(error));
     },
 
@@ -339,6 +380,17 @@ export default {
         .commit()
         .then(() => console.log("removed section and its references"))
         .catch((error) => console.error(error));
+    },
+
+    async pushArrayOfDocsToCollection(collection, docsArray) {
+      const ref = this.$fireStore.collection(collection);
+
+      docsArray.forEach((doc) => {
+        ref
+          .add(doc)
+          .then((docRef) => console.log(docRef.id))
+          .catch((error) => console.error(error));
+      });
     },
 
     signOut() {
