@@ -6,7 +6,7 @@
       <div class="data-wrap" v-if="isFetching === 'success'">
         <h1>{{ meta.title }}</h1>
         <div class="menu">
-          <LikeButton collection="corpse" :docId="this.$route.params.id" />
+          <LikeButton collection="corpses" :docId="this.$route.params.id" />
           <DownloadButton :image="meta.thumb" :title="meta.title" />
         </div>
       </div>

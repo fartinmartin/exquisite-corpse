@@ -33,7 +33,7 @@
             type="radio"
             id="corpse"
             name="collection"
-            value="corpse"
+            value="corpses"
             v-model="type"
             @click="handleTypeChoice"
           />
@@ -151,7 +151,7 @@ export default {
       lastVisible: null,
       firstVisible: null,
       collection: "corpses", // "corpses", "sections"
-      type: "corpse", // "corpse", "top", "mid", and "bot"
+      type: "corpses", // "corpses", "top", "mid", and "bot"
       field: "date", // "date", "likes"
       pageSize: 9, // 9, 18
     };
@@ -239,7 +239,7 @@ export default {
       if (type === this.type) return;
       this.type = type;
 
-      if (type === "corpse") {
+      if (type === "corpses") {
         this.collection = "corpses";
         this.pageSize = 9;
       } else {
