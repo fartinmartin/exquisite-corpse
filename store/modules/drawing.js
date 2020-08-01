@@ -6,6 +6,7 @@ export const state = () => ({
   type: null,
   currentPath: [],
   paths: [],
+  mobilePaths: [],
   history: { step: 0, paths: [] },
   sections: {
     top: null,
@@ -33,6 +34,10 @@ export const getters = {
   },
   mobileFactor(state) {
     return 1080 / state.canvas.width;
+  },
+  isMobile: () => process.client && window.innerWidth < 571,
+  computedPaths(state, getters) {
+    return getters.isMobile ? state.mobilePaths : state.paths;
   },
 };
 
@@ -192,6 +197,26 @@ export const actions = {
     };
     floodFill.fill(dpiPoint.x2, dpiPoint.y2, tolerance, ctx);
   },
+
+  setMobilePaths({ state, getters, commit }) {
+    const f = getters.mobileFactor;
+
+    const newPaths = state.paths.map((path) => {
+      return path.map((point) => {
+        const newPoint = { ...point };
+
+        newPoint.x1 = Math.round(newPoint.x1 * f);
+        newPoint.x2 = Math.round(newPoint.x2 * f);
+        newPoint.y1 = Math.round(newPoint.y1 * f);
+        newPoint.y2 = Math.round(newPoint.y2 * f);
+        newPoint.size = Math.round(newPoint.size * f);
+
+        return newPoint;
+      });
+    });
+
+    commit("SET_MOBILE_PATHS", newPaths);
+  },
 };
 
 export const mutations = {
@@ -271,5 +296,9 @@ export const mutations = {
     let trim = [...state.history.paths];
     trim.length = state.history.step;
     state.paths = trim;
+  },
+
+  SET_MOBILE_PATHS(state, mobilePaths) {
+    state.mobilePaths = mobilePaths;
   },
 };

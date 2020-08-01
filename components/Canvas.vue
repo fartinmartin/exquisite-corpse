@@ -31,7 +31,7 @@
 <script>
 import floodFill from "~/assets/js/floodFill";
 import asyncForEach, { waitFor } from "~/assets/js/asyncForEach";
-import { mapState } from "vuex";
+import { mapState, mapGetters } from "vuex";
 import CanvasMeta from "~/components/CanvasMeta.vue";
 
 export default {
@@ -58,7 +58,7 @@ export default {
     ...mapState("modules/mouse", ["palette", "size", "x", "y", "isDrawing"]),
     ...mapState("modules/mouse", { mouseMode: (state) => state.mode }),
     ...mapState("modules/drawing", ["sections", "paths", "history"]),
-    isMobile: () => process.client && window.innerWidth < 571,
+    ...mapGetters(["isMobile"]),
     drawing() {
       if (this.mode === "display") {
         return this.section;

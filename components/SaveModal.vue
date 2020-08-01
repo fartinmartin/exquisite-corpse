@@ -3,20 +3,20 @@
     <div class="wrap">
       <Canvas
         id="save-preview"
-        :section="{ paths, title, artist }"
+        :section="{ paths: computedPaths, title, artist }"
         mode="display"
         ref="previewCanvas"
       />
       <form class="border yellow mw-canvas">
         <div class="loadal" v-if="isSaving !== 'idle'">
           <Loading
-            v-if="isSaving === 'success'"
+            v-if="isSaving === 'saving'"
             subtext="generating your masterpiece"
             style="height: 100%;"
             class="yellow"
           />
           <Loading
-            v-if="isSaving === 'saved'"
+            v-if="isSaving === 'success'"
             text="you did it!"
             subtext="your drawing was saved"
             style="height: 100%;"
@@ -81,7 +81,7 @@
 import Canvas from "./Canvas.vue";
 import Loading from "./Loading.vue";
 import { mergeBase64 } from "~/assets/js/mergeImages";
-import { mapState } from "vuex";
+import { mapState, mapGetters } from "vuex";
 import { randomWordFromString } from "~/assets/js/randomWords";
 
 export default {
@@ -98,13 +98,9 @@ export default {
   },
   computed: {
     ...mapState("modules/user", ["name"]),
-    ...mapState("modules/drawing", [
-      "type",
-      "paths",
-      "mobilePaths",
-      "sections",
-    ]),
-    isMobile: () => process.client && window.innerWidth < 571,
+    ...mapState("modules/drawing", ["type", "sections"]),
+    ...mapGetters(["isMobile"]),
+    ...mapGetters("modules/drawing", ["computedPaths"]),
   },
   mounted() {
     // set local state based on store state
@@ -122,37 +118,13 @@ export default {
     },
 
     closeMe(e) {
-      if (e.target.className === "save-modal") {
+      if (
+        e.target.className === "save-modal" ||
+        e.target.parentNode.className === "save-modal"
+      ) {
         this.$emit("close-save");
         this.isSaving = "idle";
       }
-    },
-
-    handleResponsiveDraw(paths) {
-      const width = 1080;
-      const current = this.$refs.previewCanvas.$refs.canvas.width;
-      const f = width / current;
-
-      let newPaths = [];
-
-      for (var i = 0; i < paths.length; i++) {
-        newPaths[i] = {}; // empty object to hold properties added below
-        for (var prop in paths[i]) {
-          newPaths[i][prop] = paths[i][prop]; // copy properties from paths to newPaths
-        }
-      }
-
-      newPaths.forEach((path) => {
-        path.forEach((point) => {
-          point.x1 = Math.round(point.x1 * f);
-          point.x2 = Math.round(point.x2 * f);
-          point.y1 = Math.round(point.y1 * f);
-          point.y2 = Math.round(point.y2 * f);
-          point.size = Math.round(point.size * f);
-        });
-      });
-
-      return newPaths;
     },
 
     async saveDrawing() {
@@ -191,7 +163,7 @@ export default {
         thumbsObject.bot,
       ]);
 
-      let completePaylod = {
+      const completedPaylod = {
         title: titleArray.join(" "), // jumble of all three names
         date: timestamp,
         likes: 0,
@@ -215,15 +187,10 @@ export default {
         thumb: completedThumb,
       };
 
-      let drawingPaths;
-      this.isMobile
-        ? (drawingPaths = this.handleResponsiveDraw(this.paths))
-        : (drawingPaths = this.paths);
-
-      let sectionPayload = {
+      const sectionPayload = {
         artist: this.artist.substring(0, 30).trim() || this.name || "anonymous",
         date: timestamp,
-        drawing: { ...drawingPaths },
+        drawing: { ...this.computedPaths },
         featuredIn: [this.$fireStore.doc(`completed/${completedId}`)],
         likes: 0,
         thumb: currentThumb,
@@ -303,6 +270,10 @@ export default {
   height: calc(100% + 4px);
   background: var(--white);
   z-index: 5;
+
+  .loading-wrap {
+    padding-top: initial !important;
+  }
 }
 
 /* TODO: abstract form styles to (global) SCSS file */

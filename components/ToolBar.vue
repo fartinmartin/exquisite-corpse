@@ -139,7 +139,7 @@
 import { mapState, mapGetters } from "vuex";
 import SaveModal from "./SaveModal";
 
-// 🚨 TODO: pencil taps are not registered.. this goes for a lot of things actually.. ugh
+// 🚨 TODO: apple pencil taps are not registered on AT LEAST undo/redo.. this goes for a lot of things actually.. ugh
 
 export default {
   name: "ToolBar",
@@ -165,6 +165,7 @@ export default {
       },
     },
     ...mapState("modules/mouse", ["palette", "size"]),
+    ...mapGetters(["isMobile"]),
     ...mapGetters("modules/mouse", [
       "currentSizeLessThanMax",
       "currentSizeMoreThanMin",
@@ -241,6 +242,7 @@ export default {
       this.$store.dispatch("modules/drawing/clearCanvas", e);
     },
     startSave() {
+      if (this.isMobile) this.$store.dispatch("modules/drawing/setMobilePaths");
       this.isSaving = true;
     },
     closeSave(e) {

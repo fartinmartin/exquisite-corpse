@@ -2,7 +2,9 @@ export const state = () => ({
   isHelping: false,
 });
 
-export const getters = {};
+export const getters = {
+  isMobile: () => process.client && window.innerWidth < 571,
+};
 
 export const actions = {
   setIsHelping({ commit }, bool) {
