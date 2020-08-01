@@ -7,6 +7,7 @@
         mode="display"
         ref="previewCanvas"
       />
+      <CanvasThumb :section="paths" ref="thumbCanvas" />
       <form class="border yellow mw-canvas">
         <div class="loadal" v-if="isSaving !== 'idle'">
           <Loading
@@ -76,8 +77,9 @@
 </template>
 
 <script>
-import Canvas from "./Canvas.vue";
-import Loading from "./Loading.vue";
+import Canvas from "~/components/Canvas.vue";
+import CanvasThumb from "~/components/CanvasThumb.vue";
+import Loading from "~/components/Loading.vue";
 import { mergeBase64 } from "~/assets/js/mergeImages";
 import { mapState, mapGetters } from "vuex";
 import { randomWordFromString } from "~/assets/js/randomWords";
@@ -86,7 +88,7 @@ import { randomWordFromString } from "~/assets/js/randomWords";
 
 export default {
   name: "SaveModal",
-  components: { Canvas, Loading },
+  components: { Canvas, CanvasThumb, Loading },
   data() {
     return {
       title: "",
@@ -98,7 +100,7 @@ export default {
   },
   computed: {
     ...mapState("modules/user", ["name"]),
-    ...mapState("modules/drawing", ["type", "sections"]),
+    ...mapState("modules/drawing", ["type", "sections", "paths"]),
     ...mapGetters(["isMobile"]),
     ...mapGetters("modules/drawing", ["computedPaths"]),
   },
@@ -155,7 +157,7 @@ export default {
 
       // create thumb for completed drawing based on preveiwCanvas
       // TODO: NOPE. this needs to be done with an offscreen canvas
-      const currentThumb = this.$refs.previewCanvas.$refs.canvas.toDataURL();
+      const currentThumb = this.$refs.thumbCanvas.$refs.canvasThumb.toDataURL();
       thumbsObject[this.type] = currentThumb;
 
       const completedThumb = await mergeBase64([

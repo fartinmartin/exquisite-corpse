@@ -70,7 +70,7 @@ export default {
   },
   methods: {
     handleShortcuts(e) {
-      // if (e.keyCode === 76) { // "l"
+      // keyCode === 12 = "clear"
       if (e.keyCode === 12) {
         this.$store.dispatch("modules/user/signOut");
       }
@@ -290,7 +290,6 @@ export default {
     },
 
     async updateCompletedThumb(completedId) {
-      // 🚨 HAVE NOT TESTED
       const { completedRef, sectionRefs } = await this.getSingleCompleted(
         completedId
       );
