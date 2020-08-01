@@ -86,7 +86,7 @@ export default {
         docs.push(doc.data());
       });
 
-      return docs;
+      return { docs, ref };
     },
 
     async pushArrayOfDocsToCollection(collection, docsArray) {
@@ -276,7 +276,7 @@ export default {
 
       // remove each completed doc this section is featured in
       section.data().featuredIn.forEach((completedRef) => {
-        batch.delete(completedRef);
+        this.removeCompletedAndItsReferences(completedRef);
       });
 
       // remove section
