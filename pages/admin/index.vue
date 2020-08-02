@@ -220,26 +220,13 @@ export default {
         .catch((error) => console.error(error));
     },
 
-    async removeCorpseAndItsReferences(corpseId, isRef, ignoreId = 1) {
-      if (process.client && !isRef) {
+    async removeCorpseAndItsReferences(corpseId, ignoreId = 1) {
+      if (process.client) {
         if (!window.confirm("you sure you want to delete corpse?"))
           return this.$router.push("/admin");
       }
 
-      let corpseRef, sectionRefs;
-
-      if (!isRef) {
-        const { corpseRef: cr, sectionRefs: sr } = await this.getSingleCorpse(
-          corpseId
-        );
-        corpseRef = cr;
-        sectionRefs = sr;
-      } else {
-        corpseRef = corpseId;
-        const doc = await corpseRef.get();
-        const corpse = { docId: doc.id, ...doc.data() };
-        sectionRefs = Object.values(corpse.sections);
-      }
+      const { corpseRef, sectionRefs } = await this.getSingleCorpse(corpseId);
 
       // start batch
       const batch = this.$fireStore.batch();
@@ -278,15 +265,15 @@ export default {
 
       sectionRef
         .delete()
-        .then(() =>
+        .then(() => {
+          console.log(corpseRefs, sectionRef.id);
           corpseRefs.forEach(async (corpseRef) => {
             await this.removeCorpseAndItsReferences(
-              corpseRef,
-              true,
+              corpseRef.id,
               sectionRef.id
             );
-          })
-        )
+          });
+        })
         .catch((error) => console.error(error));
 
       // // start batch
