@@ -41,7 +41,7 @@ export default {
   },
   methods: {
     bg() {
-      this.$refs.bg.style.backgroundColor = "transparent";
+      this.$refs.bg.style.backgroundColor = "rgba(255, 255, 255, 0)";
     },
   },
 };
