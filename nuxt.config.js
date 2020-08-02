@@ -108,7 +108,7 @@ module.exports = {
     meta: {
       title: "Exquisite Corpse Club",
       author: "Martin Lindberg",
-      description: "An online collaborative drawing game. 🔪",
+      description: "An online collaborative drawing game. ✏️",
     },
     manifest: {
       name: "Exquisite Corpse Club",
