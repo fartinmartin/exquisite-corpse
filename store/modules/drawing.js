@@ -171,7 +171,7 @@ export const actions = {
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
     ctx.strokeStyle = point.color;
-    ctx.lineWidth = point.size * devicePixelRatio;
+    ctx.lineWidth = point.size * 2;
 
     if (point.mode === "erase") {
       ctx.globalCompositeOperation = "destination-out";
