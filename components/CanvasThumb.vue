@@ -1,10 +1,5 @@
 <template>
-  <canvas
-    ref="canvasThumb"
-    width="1080"
-    height="360"
-    style="width: 540px; height: 180px;"
-  />
+  <canvas ref="canvasThumb" width="540" height="180" />
 </template>
 
 <script>
@@ -39,10 +34,10 @@ export default {
     highDPI(canvas, ctx) {
       let rect = canvas.getBoundingClientRect();
 
-      canvas.width = rect.width * devicePixelRatio;
-      canvas.height = rect.height * devicePixelRatio;
+      canvas.width = rect.width * 2;
+      canvas.height = rect.height * 2;
 
-      ctx.scale(devicePixelRatio, devicePixelRatio);
+      ctx.scale(2, 2);
 
       canvas.style.width = rect.width + "px";
       canvas.style.height = rect.height + "px";
@@ -115,8 +110,9 @@ export default {
 
 <style lang="scss" scoped>
 canvas {
-  position: absolute;
-  top: -100%;
-  left: -100%;
+  width: 540px;
+  height: 180px;
+  opacity: 0;
+  pointer-events: none;
 }
 </style>

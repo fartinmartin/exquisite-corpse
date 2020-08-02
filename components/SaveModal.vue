@@ -7,7 +7,7 @@
         mode="display"
         ref="previewCanvas"
       />
-      <CanvasThumb :section="paths" ref="thumbCanvas" />
+      <CanvasThumb :section="computedPaths" ref="thumbCanvas" />
       <form class="border yellow mw-canvas">
         <div class="loadal" v-if="isSaving !== 'idle'">
           <Loading
@@ -84,8 +84,6 @@ import { mergeBase64 } from "~/assets/js/mergeImages";
 import { mapState, mapGetters } from "vuex";
 import { randomWordFromString } from "~/assets/js/randomWords";
 
-// 🚨 TODO: thumbnail needs to be generated from offscreen canvas at 1080 x 360 res using this.$store.modules.drawing.paths
-
 export default {
   name: "SaveModal",
   components: { Canvas, CanvasThumb, Loading },
@@ -156,7 +154,6 @@ export default {
       });
 
       // create thumb for corpse drawing based on preveiwCanvas
-      // TODO: NOPE. this needs to be done with an offscreen canvas
       const currentThumb = this.$refs.thumbCanvas.$refs.canvasThumb.toDataURL();
       thumbsObject[this.type] = currentThumb;
 

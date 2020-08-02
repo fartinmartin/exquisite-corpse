@@ -32,8 +32,8 @@ module.exports = {
    */
   server: {
     port: 8000, // default: 3000
-    host: "localhost", // default: localhost
-    // host: "0.0.0.0",
+    // host: "localhost", // default: localhost
+    host: "0.0.0.0",
   },
   /*
    ** Global CSS
