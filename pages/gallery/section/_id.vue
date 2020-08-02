@@ -190,7 +190,7 @@ h1 {
   align-items: center;
 
   > * {
-    margin-left: 1rem;
+    margin-left: 0.25rem;
   }
 }
 </style>
