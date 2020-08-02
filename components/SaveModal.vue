@@ -191,7 +191,7 @@ export default {
         artist: this.artist.substring(0, 30).trim() || this.name || "anonymous",
         date: timestamp,
         drawing: { ...this.computedPaths },
-        featuredIn: [this.$fireStore.doc(`corpse/${corpseId}`)],
+        featuredIn: [corpseRef],
         likes: 0,
         thumb: currentThumb,
         title: this.title.substring(0, 17).trim() || "untitled",
@@ -209,9 +209,7 @@ export default {
           const docId = this.sections[key].docId;
           const docRef = this.$fireStore.collection("sections").doc(docId);
           batch.update(docRef, {
-            featuredIn: this.$fireStoreObj.FieldValue.arrayUnion(
-              this.$fireStore.doc(`corpse/${corpseId}`)
-            ),
+            featuredIn: this.$fireStoreObj.FieldValue.arrayUnion(corpseRef),
           });
         }
       });
