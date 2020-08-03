@@ -30,6 +30,7 @@ export default {
   components: { Display, NavMenu, Loading },
   data: function () {
     return {
+      logInAttempts: 3,
       isLoggedIn: false,
       isFetching: "idle", // "idle", "fetching", "success", TODO: "error"
       meta: null,
@@ -79,8 +80,12 @@ export default {
       } catch (error) {
         console.error(error);
         this.isLoggedIn = false;
-        await this.logIn();
-        this.getRandomCorpse();
+
+        this.logInAttempts--;
+        if (this.logInAttempts > 0) {
+          await this.logIn();
+          this.getRandomCorpse();
+        }
       }
 
       return;
