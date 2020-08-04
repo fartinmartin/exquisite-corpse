@@ -125,7 +125,7 @@ export default {
     handleTouchEvents(event) {
       const parent = event.target.parentElement;
       const e = {
-        // NOTE: event.changedTouches works for taps as well
+        type: event.type, // for taps on mobile
         offsetX: event.targetTouches
           ? event.targetTouches[0].pageX - parent.offsetLeft - parent.scrollLeft
           : event.offsetX,
@@ -200,8 +200,8 @@ export default {
           mode: this.mouseMode,
           color: this.palette.current,
           size: this.size.current,
-          x1: this.x,
-          y1: this.y,
+          x1: e.type === "touchstart" ? this.x - 1 : this.x, // for taps on mobile
+          y1: e.type === "touchstart" ? this.y - 1 : this.y, // for taps on mobile
           x2: e.offsetX,
           y2: e.offsetY,
         };
