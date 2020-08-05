@@ -1,7 +1,7 @@
 <template>
   <div
     class="panel mw-canvas"
-    :class="[color, noPadding && 'np']"
+    :class="[color, interactive && 'i', noPadding && 'np']"
     :style="{ width, minHeight }"
   >
     <div class="content"><slot /></div>
@@ -13,7 +13,7 @@ export default {
   name: "Panel",
   props: {
     color: { type: String, default: "yellow" }, // "yellow", "blue", "red", "green"
-    hover: { type: Boolean, default: false },
+    interactive: { type: Boolean, default: false },
     noPadding: { type: Boolean, default: false },
     width: { type: String },
     minHeight: { type: String },
@@ -37,6 +37,8 @@ export default {
   box-shadow: var(--bx-s-size) var(--bx-s-size) 0 0 var(--bx-s-color);
   background: var(--white);
 
+  transition: transform 0.1s ease, box-shadow 0.1s ease, border 0.1s ease;
+
   &.yellow {
     --brdr-color: var(--light-yellow);
     --bx-s-color: var(--orange);
@@ -55,6 +57,13 @@ export default {
   &.green {
     --brdr-color: var(--green);
     --bx-s-color: var(--dark-green);
+  }
+
+  &.i:hover {
+    --brdr-color: var(--light-yellow);
+    --bx-s-color: var(--orange);
+    --bx-s-size: 6px;
+    transform: translate3d(-4px, -4px, 0);
   }
 }
 

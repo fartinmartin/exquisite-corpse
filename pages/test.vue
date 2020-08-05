@@ -3,6 +3,7 @@
     <Panel>Hello</Panel>
     <Panel color="red" class="mt mb" />
     <Panel color="blue" width="60px" no-padding />
+    <Panel color="blue" width="60px" interactive no-padding />
     <Panel color="green" class="mt" min-height="initial" />
   </div>
 </template>
