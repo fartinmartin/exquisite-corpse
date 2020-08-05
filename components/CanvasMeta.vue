@@ -24,14 +24,8 @@
 <script>
 export default {
   props: {
-    title: {
-      type: String,
-      required: true,
-    },
-    artist: {
-      type: String,
-      required: true,
-    },
+    title: { type: String, required: true },
+    artist: { type: String, required: true },
     docId: String,
   },
   computed: {
@@ -88,7 +82,7 @@ a {
   }
 }
 
-.drawing-meta.not-allowed {
+.drawing-meta.disabled {
   display: block;
   background-color: var(--white);
   /* background-blend-mode: multiply; */

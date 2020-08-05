@@ -6,14 +6,12 @@
   </div>
 </template>
 
-<style lang="scss" scoped></style>
-
 <script>
 import Canvas from "./Canvas.vue";
 
 export default {
   name: "Display",
   props: { sections: Object },
-  components: { Canvas }
+  components: { Canvas },
 };
 </script>

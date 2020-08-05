@@ -10,7 +10,7 @@
       />
       <CanvasMeta
         v-if="mode === 'pixelate'"
-        class="drawing-meta not-allowed"
+        class="drawing-meta disabled"
         :title="drawing.title"
         :artist="drawing.artist"
         ref="notAllowed"
@@ -48,12 +48,7 @@ export default {
     },
     section: Object, // for when mode === "display"
   },
-  data: function () {
-    return {
-      canvas: null,
-      ctx: null,
-    };
-  },
+  data: () => ({ canvas: null, ctx: null }),
   computed: {
     ...mapState("modules/mouse", ["palette", "size", "x", "y", "isDrawing"]),
     ...mapState("modules/mouse", { mouseMode: (state) => state.mode }),

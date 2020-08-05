@@ -1,32 +1,12 @@
 <template>
   <div id="cursor" ref="cursorRef">
-    <img
-      v-show="state === 'auto'"
-      src="~/assets/img/cursor/cursor-auto.svg"
-      alt=""
-    />
-    <img
-      v-show="state === 'pointer'"
-      src="~/assets/img/cursor/cursor-pointer.svg"
-      alt=""
-    />
-    <img
-      v-show="state === 'notAllowed'"
-      src="~/assets/img/cursor/cursor-not-allowed.svg"
-      alt=""
-    />
-    <img
-      v-show="state === 'grabbing'"
-      src="~/assets/img/cursor/cursor-grabbing.svg"
-      alt=""
-    />
-    <img v-show="state === 'draw'" src="~/assets/img/cursor/draw.svg" alt="" />
-    <img
-      v-show="state === 'erase'"
-      src="~/assets/img/cursor/erase.svg"
-      alt=""
-    />
-    <img v-show="state === 'fill'" src="~/assets/img/cursor/fill.svg" alt="" />
+    <img v-show="state === 'auto'" src="~/assets/img/cursor/auto.svg" />
+    <img v-show="state === 'pointer'" src="~/assets/img/cursor/pointer.svg" />
+    <img v-show="state === 'disabled'" src="~/assets/img/cursor/disabled.svg" />
+    <img v-show="state === 'grab'" src="~/assets/img/cursor/grab.svg" />
+    <img v-show="state === 'draw'" src="~/assets/img/cursor/draw.svg" />
+    <img v-show="state === 'erase'" src="~/assets/img/cursor/erase.svg" />
+    <img v-show="state === 'fill'" src="~/assets/img/cursor/fill.svg" />
     <div v-show="tooltip" class="tooltip" ref="tooltip">{{ tooltip }}</div>
   </div>
 </template>
@@ -34,23 +14,24 @@
 <script>
 export default {
   name: "CustomCursor",
-  data() {
-    return {
-      x: null,
-      y: null,
-      state: "auto",
-      tooltip: null,
-    };
-  },
+  data: () => ({ x: null, y: null, state: "auto", tooltip: null }),
   mounted() {
     window.addEventListener("mousemove", this.cursorMove);
     window.addEventListener("mousedown", this.cursorDown);
     window.addEventListener("mouseup", this.cursorUp);
+
+    // window.addEventListener("focus", this.checkFocus);
+    // window.addEventListener("blur", this.checkFocus);
+
+    // this.checkFocus();
   },
   beforeDestroy() {
     window.removeEventListener("mousemove", this.cursorMove);
-    window.addEventListener("mousedown", this.cursorDown);
-    window.addEventListener("mouseup", this.cursorUp);
+    window.removeEventListener("mousedown", this.cursorDown);
+    window.removeEventListener("mouseup", this.cursorUp);
+
+    // window.removeEventListener("focus", this.checkFocus);
+    // window.removeEventListener("blur", this.checkFocus);
   },
   methods: {
     cursorMove(e) {
@@ -58,8 +39,8 @@ export default {
       let offset = {
         ...(this.state === "auto" && { x: -3, y: 0 }),
         ...(this.state === "pointer" && { x: 0, y: 0 }),
-        ...(this.state === "notAllowed" && { x: -5, y: -5 }),
-        ...(this.state === "grabbing" && { x: 0, y: 0 }),
+        ...(this.state === "disabled" && { x: -5, y: -5 }),
+        ...(this.state === "grab" && { x: 0, y: 0 }),
         ...(this.state === "draw" && { x: 0, y: -25 }),
         ...(this.state === "erase" && { x: -13, y: -23 }),
         ...(this.state === "fill" && { x: -2, y: -24 }),
@@ -69,45 +50,42 @@ export default {
       this.x = e.clientX + offset.x;
       this.y = e.clientY + offset.y;
 
+      //move custom cursor
+      const cursor = this.$refs.cursorRef;
+      if (cursor) cursor.style.transform = `translate(${this.x}px,${this.y}px)`;
+
       //change state based on hovered targets
-      if (
-        e.target.disabled ||
-        e.target.parentNode.disabled ||
-        e.target.classList.contains("not-allowed") ||
-        e.target.parentNode.classList.contains("not-allowed")
-      ) {
-        this.state = "notAllowed";
-      } else if (e.target.tagName === "CANVAS") {
+      const hasTooltip = (t) => t.dataset.tooltip;
+      const isDisabled = (t) => t.disabled || t.classList.contains("disabled");
+      const isCanvas = (t) => t.tagName === "CANVAS";
+      const isClickable = (t) =>
+        t.tagName === "BUTTON" ||
+        t.tagName === "LABEL" ||
+        t.tagName === "INPUT" ||
+        t.tagName === "A" ||
+        t.classList.contains("pointer");
+
+      const targets = [e.target, e.target.parentNode];
+
+      if (targets.some(isDisabled)) {
+        this.state = "disabled";
+      } else if (targets.some(isCanvas)) {
         this.state = this.$store.state.modules.mouse.mode;
-      } else if (
-        // https://css-tricks.com/snippets/css/give-clickable-elements-a-pointer-cursor/
-        e.target.tagName === "BUTTON" ||
-        e.target.tagName === "LABEL" ||
-        e.target.tagName === "INPUT" ||
-        e.target.tagName === "A" ||
-        e.target.parentNode.tagName === "BUTTON" ||
-        e.target.parentNode.tagName === "LABEL" ||
-        e.target.parentNode.tagName === "INPUT" ||
-        e.target.parentNode.tagName === "A" ||
-        e.target.classList.contains("pointer") ||
-        e.target.parentNode.classList.contains("pointer")
-      ) {
+      } else if (targets.some(isClickable)) {
         this.state = "pointer";
       } else {
         this.state = "auto";
       }
 
-      // console.log(e);
       // tooltip state:
-      if (e.target.dataset.tooltip || e.target.parentNode.dataset.tooltip) {
-        this.tooltip =
-          e.target.dataset.tooltip || e.target.parentNode.dataset.tooltip;
+      if (targets.some(hasTooltip)) {
+        this.tooltip = targets[0].dataset.tooltip || targets[1].dataset.tooltip;
       } else {
         this.tooltip = null;
       }
 
       if (process.client) {
-        if (e.target.dataset.tooltip || e.target.parentNode.dataset.tooltip) {
+        if (targets.some(hasTooltip)) {
           if (window.innerWidth - e.clientX < this.$refs.tooltip.offsetWidth) {
             this.$refs.tooltip.style.transform = `translateX(-100%) translateX(-30px)`;
           } else {
@@ -115,28 +93,25 @@ export default {
           }
         }
       }
-
-      // TODO: check if window is not focused (dif app or diff window)
-      //       AND/OR check if mouse has left the window
-      //       in those cases: hide the cursor entirely? 🤔
-
-      //move custom cursor
-      const cursor = this.$refs.cursorRef;
-      if (cursor) cursor.style.transform = `translate(${this.x}px,${this.y}px)`;
     },
     cursorDown(e) {
-      if (e.target.tagName === "CANVAS") {
-        return;
-      } else {
-        this.state = "grabbing";
-      }
+      if (e.target.tagName !== "CANVAS") this.state = "grab";
     },
     cursorUp(e) {
-      if (e.target.tagName === "CANVAS") {
-        return;
-      } else {
+      if (e.target.tagName !== "CANVAS") {
         this.cursorMove(e);
         this.tooltip = null;
+      }
+    },
+    checkFocus() {
+      // 🚨 cursor var throws errors sometimes.. doesn't seem worth dealing with right now
+      if (process.client) {
+        const cursor = this.$refs.cursorRef;
+        if (document.hasFocus()) {
+          cursor.style.display = "initial";
+        } else {
+          cursor.style.display = "none";
+        }
       }
     },
   },

@@ -9,12 +9,7 @@ import asyncForEach, { waitFor } from "~/assets/js/asyncForEach";
 export default {
   name: "CanvasThumb",
   props: { section: Array },
-  data: function () {
-    return {
-      canvas: null,
-      ctx: null,
-    };
-  },
+  data: () => ({ canvas: null, ctx: null }),
   mounted() {
     // init canvas
     const canvas = this.$refs.canvasThumb;
