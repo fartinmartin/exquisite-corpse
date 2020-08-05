@@ -17,6 +17,7 @@ import Panel from "~/components/TODO/Panel.vue";
 
 export default {
   name: "test",
+  middleware: ["password-protect"],
   components: { Button, Gallery, Input, Panel },
 };
 </script>
