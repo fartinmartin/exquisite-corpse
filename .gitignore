@@ -92,6 +92,7 @@ sw.*
 # firebase hosting/functions
 public
 functions/*
+!functions/.gitignore
 !functions/index.js
 !functions/package.json
 .firebase/*
