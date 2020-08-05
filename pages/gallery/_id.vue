@@ -26,13 +26,11 @@ export default {
     };
   },
   components: { Loading, DownloadButton, LikeButton },
-  data: function () {
-    return {
-      isFetching: "idle", // "idle", "fetching", "success", TODO: "error"
-      meta: { title: "" },
-      sections: {},
-    };
-  },
+  data: () => ({
+    isFetching: "idle", // "idle", "fetching", "success", TODO: "error"
+    meta: { title: "" },
+    sections: {},
+  }),
   mounted() {
     this.getCorpseById(this.$route.params.id);
   },

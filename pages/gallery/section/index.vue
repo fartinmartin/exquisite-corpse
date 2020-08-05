@@ -1,9 +1,3 @@
 <script>
-export default {
-  middleware: [
-    function({ redirect }) {
-      redirect("/gallery");
-    }
-  ]
-};
+export default { middleware: [({ redirect }) => redirect("/gallery")] };
 </script>

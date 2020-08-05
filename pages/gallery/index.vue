@@ -143,19 +143,17 @@ export default {
       title: "exquisite corpse club • gallery",
     };
   },
-  data: function () {
-    return {
-      isFetching: "idle", // "idle", "fetching", "success", TODO: "error"
-      gallery: [{ docId: "temp" }],
-      firstItemId: "",
-      lastVisible: null,
-      firstVisible: null,
-      collection: "corpses", // "corpses", "sections"
-      type: "corpses", // "corpses", "top", "mid", and "bot"
-      field: "date", // "date", "likes"
-      pageSize: 9, // 9, 18
-    };
-  },
+  data: () => ({
+    isFetching: "idle", // "idle", "fetching", "success", TODO: "error"
+    gallery: [{ docId: "temp" }],
+    firstItemId: "",
+    lastVisible: null,
+    firstVisible: null,
+    collection: "corpses", // "corpses", "sections"
+    type: "corpses", // "corpses", "top", "mid", and "bot"
+    field: "date", // "date", "likes"
+    pageSize: 9, // 9, 18
+  }),
   mounted() {
     this.fetchFirst();
   },

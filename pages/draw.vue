@@ -30,9 +30,7 @@ export default {
     };
   },
   components: { Draw, PickSection },
-  data: function () {
-    return { isFetching: "idle", isSaving: false }; // "idle", "fetching", "success", TODO: "error"
-  },
+  data: () => ({ isFetching: "idle", isSaving: false }), // "idle", "fetching", "success", TODO: "error"
   async fetch({ store }) {
     // set default random title
     let words = await twoRandomWords();

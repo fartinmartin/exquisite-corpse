@@ -28,15 +28,13 @@ import { mapState } from "vuex";
 export default {
   name: "index",
   components: { Display, NavMenu, Loading },
-  data: function () {
-    return {
-      logInAttempts: 3,
-      isLoggedIn: false,
-      isFetching: "idle", // "idle", "fetching", "success", TODO: "error"
-      meta: null,
-      sections: {},
-    };
-  },
+  data: () => ({
+    logInAttempts: 3,
+    isLoggedIn: false,
+    isFetching: "idle", // "idle", "fetching", "success", TODO: "error"
+    meta: null,
+    sections: {},
+  }),
   mounted() {
     this.logIn();
     this.getRandomCorpse();

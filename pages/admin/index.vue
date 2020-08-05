@@ -51,17 +51,7 @@ import { randomWordFromString } from "~/assets/js/randomWords";
 export default {
   name: "admin",
   middleware: ["password-protect"],
-  data: function () {
-    return {
-      corpse: {
-        id: null,
-        section: null,
-      },
-      section: {
-        id: null,
-      },
-    };
-  },
+  data: () => ({ corpse: { id: null, section: null }, section: { id: null } }),
   mounted() {
     document.addEventListener("keydown", this.handleShortcuts);
   },

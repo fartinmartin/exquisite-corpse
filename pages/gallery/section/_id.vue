@@ -108,17 +108,16 @@ export default {
     };
   },
   components: { Canvas, LikeButton, DownloadButton },
-  data: function () {
-    return {
-      isFetching: "idle", // "idle", "fetching", "success", TODO: "error"
-      section: {},
-      related: {
-        featuredIn: [],
-        moreBy: [],
-        toggle: "featuredIn",
-      },
-    };
-  },
+  data: () => ({
+    isFetching: "idle", // "idle", "fetching", "success", TODO: "error"
+    section: {},
+    related: {
+      featuredIn: [],
+      moreBy: [],
+      toggle: "featuredIn",
+    },
+  }),
+
   mounted() {
     this.getSectionById(this.$route.params.id);
   },

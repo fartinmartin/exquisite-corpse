@@ -19,9 +19,7 @@
 <script>
 export default {
   name: "login",
-  data: function () {
-    return { password: "", isAuthorised: false };
-  },
+  data: () => ({ password: "", isAuthorised: false }),
   mounted() {
     this.isAuthorised = this.$passwordProtect.isAuthorised();
   },
