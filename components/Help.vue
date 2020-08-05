@@ -2,7 +2,7 @@
   <div class="help-modal" @click="closeMe">
     <div>
       <div class="help-wrap">
-        <div>
+        <div class="hom">
           <div class="border section" id="top-h">
             <img src="~/assets/img/tutorial/top.png" alt="" />
           </div>
@@ -14,7 +14,7 @@
           </div>
         </div>
 
-        <div class="steps">
+        <div class="steps mw-canvas">
           <div class="step one border yellow">
             <p>
               an exquisite corpse is a collaborative drawing made up of three
@@ -51,7 +51,7 @@
 <script>
 export default {
   name: "Help",
-  data: function() {
+  data: function () {
     return { step: 1 };
   },
   mounted() {
@@ -79,8 +79,8 @@ export default {
     },
     closeAndDraw() {
       this.$store.dispatch("setIsHelping", false);
-    }
-  }
+    },
+  },
 };
 </script>
 
@@ -88,6 +88,7 @@ export default {
 .help-wrap {
   display: flex;
   flex-wrap: wrap;
+  padding: calc(40px / 3);
 }
 
 .nav {
@@ -111,9 +112,13 @@ export default {
   margin-left: 0;
 }
 
+.steps {
+  flex: 1;
+}
+
 .step {
   text-align: center;
-  width: 544px;
+  width: 100%;
   padding: 1rem;
   margin-right: 0;
   p {
@@ -125,6 +130,11 @@ export default {
     > * {
       width: 50%;
     }
+  }
+
+  @media screen and (max-width: 544px) {
+    height: initial;
+    margin-left: 0;
   }
 }
 
