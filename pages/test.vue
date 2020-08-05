@@ -1,8 +1,9 @@
 <template>
   <div class="wrap">
-    <Panel />
-    <Panel color="red" />
-    <Panel no-padding />
+    <Panel>Hello</Panel>
+    <Panel color="red" class="mt mb" />
+    <Panel color="blue" width="60px" no-padding />
+    <Panel color="green" class="mt" min-height="initial" />
   </div>
 </template>
 

@@ -1,5 +1,9 @@
 <template>
-  <div class="panel border mw-canvas">
+  <div
+    class="panel mw-canvas"
+    :class="[color, noPadding && 'np']"
+    :style="{ width, minHeight }"
+  >
     <div class="content"><slot /></div>
   </div>
 </template>
@@ -10,7 +14,9 @@ export default {
   props: {
     color: { type: String, default: "yellow" }, // "yellow", "blue", "red", "green"
     hover: { type: Boolean, default: false },
-    padding: { type: Boolean, default: true },
+    noPadding: { type: Boolean, default: false },
+    width: { type: String },
+    minHeight: { type: String },
   },
 };
 </script>
@@ -19,6 +25,10 @@ export default {
 .panel {
   min-height: 60px;
   padding: 1rem;
+
+  &.np {
+    padding: 0;
+  }
 
   --brdr-size: 2px;
   --bx-s-size: 2px;
@@ -38,13 +48,13 @@ export default {
   }
 
   &.red {
-    --brdr-color: var(--light-yellow);
-    --bx-s-color: var(--orange);
+    --brdr-color: var(--orange);
+    --bx-s-color: var(--red);
   }
 
   &.green {
-    --brdr-color: var(--light-yellow);
-    --bx-s-color: var(--orange);
+    --brdr-color: var(--green);
+    --bx-s-color: var(--dark-green);
   }
 }
 
