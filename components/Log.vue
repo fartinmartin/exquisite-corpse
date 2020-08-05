@@ -3,16 +3,15 @@
     :x="0"
     :y="0"
     :w="350"
-    style="position: absolute; z-index: 1000"
+    style="position: absolute; z-index: 1000;"
     v-show="!isHidden"
   >
     <div class="log">
-      <div style="display: flex; justify-content: space-between">
+      <div style="display: flex; justify-content: space-between;">
         <span>
           {{ drawing.history.step }} / {{ drawing.history.paths.length }} /
           {{ drawing.paths.length }}
         </span>
-        <!-- <span>{{ isDrawingEmpty ? "empty" : "not empty" }}</span> -->
         <span>{{ isDrawingEmpty }}</span>
       </div>
 
@@ -51,11 +50,7 @@ import { mapState, mapGetters } from "vuex";
 export default {
   name: "Log",
   components: { Draggable },
-  data: function() {
-    return {
-      isHidden: true
-    };
-  },
+  data: () => ({ isHidden: true }),
   mounted() {
     document.addEventListener("keydown", this.handleShortcuts);
   },
@@ -64,19 +59,13 @@ export default {
   },
   methods: {
     handleShortcuts(e) {
-      // if (e.keyCode === 76) { // "l"
-      if (e.keyCode === 12) {
-        // 12 = "clear"
-        this.isHidden = !this.isHidden;
-      }
-    }
+      if (e.keyCode === 12) this.isHidden = !this.isHidden; // 12 = "clear" || 76 = "l"
+    },
   },
   computed: {
     ...mapGetters({ isDrawingEmpty: "modules/drawing/isDrawingEmpty" }),
-    ...mapState({
-      drawing: state => state.modules.drawing
-    })
-  }
+    ...mapState({ drawing: (state) => state.modules.drawing }),
+  },
 };
 </script>
 

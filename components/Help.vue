@@ -51,9 +51,6 @@
 <script>
 export default {
   name: "Help",
-  data: function () {
-    return { step: 1 };
-  },
   mounted() {
     document.addEventListener("keydown", this.handleShortcuts);
   },
@@ -62,20 +59,11 @@ export default {
   },
   methods: {
     handleShortcuts(e) {
-      if (e.keyCode === 27) {
-        // esc
-        this.step = 1;
-        this.$store.dispatch("setIsHelping", false);
-      }
+      if (e.keyCode === 27) this.$store.dispatch("setIsHelping", false);
     },
     closeMe(e) {
-      if (
-        e.target.className === "help-modal" ||
-        e.target.className === "we-done"
-      ) {
-        this.step = 1;
+      if (e.target.className === "help-modal")
         this.$store.dispatch("setIsHelping", false);
-      }
     },
     closeAndDraw() {
       this.$store.dispatch("setIsHelping", false);

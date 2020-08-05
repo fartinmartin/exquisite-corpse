@@ -26,9 +26,7 @@
 </template>
 
 <script>
-export default {
-  name: "PrevNext",
-};
+export default { name: "PrevNext" };
 </script>
 
 <style lang="scss" scoped>

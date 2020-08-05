@@ -38,14 +38,8 @@ export default {
   name: "Canvas",
   components: { CanvasMeta },
   props: {
-    id: {
-      type: String, // top, mid, or bot
-      required: true,
-    },
-    mode: {
-      type: String, // draw, display, or pixelate
-      required: true,
-    },
+    id: { type: String, required: true }, // top, mid, or bot
+    mode: { type: String, required: true }, // draw, display, or pixelate
     section: Object, // for when mode === "display"
   },
   data: () => ({ canvas: null, ctx: null }),

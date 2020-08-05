@@ -6,9 +6,8 @@
 
 <script>
 export default {
-  props: {
-    drawing: Object
-  }
+  name: "Drawing",
+  props: { drawing: Object },
 };
 </script>
 

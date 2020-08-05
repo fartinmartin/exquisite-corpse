@@ -10,14 +10,8 @@
 export default {
   name: "DownloadButton",
   props: {
-    image: {
-      type: String,
-      required: true,
-    },
-    title: {
-      type: String,
-      required: true,
-    },
+    image: { type: String, required: true },
+    title: { type: String, required: true },
     artist: String,
   },
   methods: {

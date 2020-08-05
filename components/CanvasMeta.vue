@@ -23,6 +23,7 @@
 
 <script>
 export default {
+  name: "CanvasMeta",
   props: {
     title: { type: String, required: true },
     artist: { type: String, required: true },

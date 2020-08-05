@@ -87,15 +87,13 @@ import { randomWordFromString } from "~/assets/js/randomWords";
 export default {
   name: "SaveModal",
   components: { Canvas, CanvasThumb, Loading },
-  data() {
-    return {
-      title: "",
-      artist: "",
-      isTempTitle: true,
-      isTempArtist: true,
-      isSaving: "idle", // "idle", "saving", "success", "error"
-    };
-  },
+  data: () => ({
+    title: "",
+    artist: "",
+    isTempTitle: true,
+    isTempArtist: true,
+    isSaving: "idle", // "idle", "saving", "success", "error"
+  }),
   computed: {
     ...mapState("modules/user", ["name"]),
     ...mapState("modules/drawing", ["type", "sections", "paths"]),
@@ -118,10 +116,10 @@ export default {
     },
 
     closeMe(e) {
-      if (
-        e.target.className === "save-modal" ||
-        e.target.parentNode.className === "save-modal"
-      ) {
+      const targets = [e.target, e.target.parentNode];
+      const isSaveModal = (t) => t.classList.contains("save-modal");
+
+      if (targets.some(isSaveModal)) {
         this.$emit("close-save");
         this.isSaving = "idle";
       }

@@ -11,21 +11,10 @@
 export default {
   name: "LikeButton",
   props: {
-    collection: {
-      type: String,
-      required: true,
-    },
-    docId: {
-      type: String,
-      required: true,
-    },
+    collection: { type: String, required: true },
+    docId: { type: String, required: true },
   },
-  data: function () {
-    return {
-      likes: 0,
-      isLiked: false,
-    };
-  },
+  data: () => ({ likes: 0, isLiked: false }),
   mounted() {
     this.subscribeToLikes();
   },
@@ -42,6 +31,7 @@ export default {
         });
       if (destory) return likesRef();
     },
+
     handleClick() {
       const increment = this.$fireStoreObj.FieldValue.increment(1);
       const decrement = this.$fireStoreObj.FieldValue.increment(-1);

@@ -142,11 +142,7 @@ import SaveModal from "./SaveModal";
 export default {
   name: "ToolBar",
   components: { SaveModal },
-  data: function () {
-    return {
-      isSaving: false,
-    };
-  },
+  data: () => ({ isSaving: false }),
   mounted() {
     document.addEventListener("keydown", this.handleShortcuts);
   },
