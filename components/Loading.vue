@@ -1,5 +1,5 @@
 <template>
-  <div class="loading-wrap mw-canvas">
+  <div class="loading-wrap mw-canvas transparent" ref="loadingWrap">
     <Panel
       class="loading body-bg"
       :color="color"
@@ -24,12 +24,24 @@ export default {
     text: { type: String, required: false, default: "plz hold" },
     subtext: { type: String, required: false },
     color: { type: String, default: "blue" },
+    throttle: { type: Number, default: 0 },
+  },
+  mounted() {
+    setTimeout(() => {
+      this.$refs.loadingWrap.classList.remove("transparent");
+    }, this.throttle);
   },
 };
 </script>
 
 <style lang="scss" scoped>
+.transparent {
+  opacity: 0;
+}
+
 .loading-wrap {
+  transition: opacity 0.1s ease;
+
   height: 0;
   position: relative;
   padding-top: 100%;

@@ -15,6 +15,7 @@
             subtext="generating your masterpiece"
             style="height: 100%;"
             color="yellow"
+            :throttle="0"
           />
           <Loading
             v-if="isSaving === 'success'"
@@ -22,6 +23,7 @@
             subtext="your drawing was saved"
             style="height: 100%;"
             color="green"
+            :throttle="0"
           />
           <Loading
             v-if="isSaving === 'error'"
@@ -29,6 +31,7 @@
             subtext="there was an error.. try again?"
             style="height: 100%;"
             color="red"
+            :throttle="0"
             @click.native="closeMe"
           />
         </div>

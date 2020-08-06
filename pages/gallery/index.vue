@@ -110,7 +110,11 @@
         </div>
       </form>
     </div>
-    <Loading v-if="isFetching !== 'success'" subtext="curating masterpieces" />
+    <Loading
+      v-if="isFetching !== 'success'"
+      subtext="curating masterpieces"
+      :throttle="500"
+    />
     <div
       v-if="isFetching === 'success'"
       class="gallery mw-canvas"
