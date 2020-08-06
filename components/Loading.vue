@@ -28,7 +28,8 @@ export default {
   },
   mounted() {
     setTimeout(() => {
-      this.$refs.loadingWrap.classList.remove("transparent");
+      this.$refs.loadingWrap &&
+        this.$refs.loadingWrap.classList.remove("transparent");
     }, this.throttle);
   },
 };
