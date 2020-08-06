@@ -99,10 +99,6 @@ export const actions = {
   },
 
   clearCanvas({ commit, getters }, event) {
-    // TODO: it is confusing that I call the commit directly half the time
-    //       ...I think it has to do with this getters check, as in ~20% of the
-    //       ...instances in which I'm forced to call it directly fail this check
-    //       ...what's going on there? this next line *does* seem necessary 🤔
     if (getters.isDrawingEmpty) return;
 
     // if triggered by user we need to log it to history

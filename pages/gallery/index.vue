@@ -119,8 +119,6 @@ import Loading from "~/components/Loading.vue";
 import Drawing from "~/components/Drawing.vue";
 import PrevNext from "~/components/PrevNext.vue";
 
-// 🚨TODO: break into smaller components
-
 export default {
   name: "gallery",
   components: { Panel, Loading, Drawing, PrevNext },
