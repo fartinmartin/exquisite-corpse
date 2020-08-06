@@ -1,6 +1,6 @@
 <template>
   <div class="wrap">
-    <div class="border yellow admin mw-canvas">
+    <Panel class="admin-index">
       <h1>corpse</h1>
       <div class="input-wrap">
         <input v-model="corpse.section" placeholder="enter sectionId" />
@@ -23,8 +23,9 @@
           update thumb
         </button>
       </div>
-    </div>
-    <div class="border yellow admin mw-canvas">
+    </Panel>
+
+    <Panel class="admin-index">
       <h1>section</h1>
       <div class="input-wrap">
         <input v-model="section.id" placeholder="enter sectionId" />
@@ -35,21 +36,24 @@
           remove section
         </button>
       </div>
-    </div>
-    <div class="border yellow admin mw-canvas">
+    </Panel>
+
+    <Panel class="admin-index">
       <button class="button" @click="signOut">
         sign out
       </button>
-    </div>
+    </Panel>
   </div>
 </template>
 
 <script>
+import Panel from "~/components/Panel.vue";
 import { mergeBase64 } from "~/assets/js/mergeImages";
 import { randomWordFromString } from "~/assets/js/randomWords";
 
 export default {
   name: "admin",
+  components: { Panel },
   middleware: ["password-protect"],
   data: () => ({ corpse: { id: null, section: null }, section: { id: null } }),
   mounted() {
@@ -329,23 +333,23 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
-.admin {
-  padding: 1rem;
+<style lang="scss">
+.admin-index {
+  > .content {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
   &:not(:first-child) {
     margin-top: 2rem;
   }
-}
 
-.input-wrap {
-  display: flex;
+  .input-wrap {
+    display: flex;
 
-  > * {
-    width: 50%;
-  }
-
-  &:not(:first-child) {
-    margin-top: 1rem;
+    &:not(:first-child) {
+      margin-top: 1rem;
+    }
   }
 }
 

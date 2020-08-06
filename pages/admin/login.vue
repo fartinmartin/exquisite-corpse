@@ -1,24 +1,25 @@
 <template>
   <div class="wrap">
-    <div class="border yellow admin mw-canvas">
-      <div class="input-wrap">
-        <input
-          v-model="password"
-          type="password"
-          placeholder="password"
-          ref="pwInput"
-        />
-        <button class="button" @click.prevent="logIn">
-          log in
-        </button>
-      </div>
-    </div>
+    <Panel class="admin">
+      <input
+        v-model="password"
+        type="password"
+        placeholder="password"
+        ref="pwInput"
+      />
+      <button class="button" @click.prevent="logIn">
+        log in
+      </button>
+    </Panel>
   </div>
 </template>
 
 <script>
+import Panel from "~/components/Panel.vue";
+
 export default {
   name: "login",
+  components: { Panel },
   data: () => ({ password: "", isAuthorised: false }),
   mounted() {
     this.isAuthorised = this.$passwordProtect.isAuthorised();
@@ -40,21 +41,8 @@ export default {
 
 <style lang="scss" scoped>
 .admin {
-  padding: 1rem;
-  &:not(:first-child) {
-    margin-top: 2rem;
-  }
-}
-
-.input-wrap {
-  display: flex;
-
-  > * {
-    width: 50%;
-  }
-
-  &:not(:first-child) {
-    margin-top: 1rem;
+  > .content {
+    justify-content: stretch;
   }
 }
 
