@@ -56,8 +56,8 @@ export default {
   }
 
   &.green {
-    --brdr-color: var(--green);
-    --bx-s-color: var(--dark-green);
+    --brdr-color: var(--light-green);
+    --bx-s-color: var(--green);
   }
 
   &.i:hover {
