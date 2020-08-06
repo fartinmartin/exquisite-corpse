@@ -53,6 +53,7 @@
       v-if="isFetching !== 'success' && related.toggle === 'featuredIn'"
       style="padding-top: 31.6176471% !important;"
     />
+
     <div
       v-if="isFetching === 'success' && related.toggle === 'featuredIn'"
       class="gallery mw-canvas"

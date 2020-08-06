@@ -2,6 +2,7 @@
   <div class="wrap">
     <Loading v-if="isFetching !== 'success'" subtext="waking up our artists" />
     <Display v-if="isFetching === 'success'" :sections="sections" />
+
     <Panel class="mt corpse-meta" :is-loading="isFetching">
       <h1>{{ meta.title }}</h1>
       <MetaMenu collection="corpses" :doc="meta" />

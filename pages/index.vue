@@ -6,8 +6,10 @@
       </nuxt-link>
       <NavMenu />
     </Panel>
+
     <Loading v-if="isFetching !== 'success'" subtext="fetching random corpse" />
     <Display v-if="isFetching === 'success'" :sections="sections" />
+
     <Panel class="mt index-title">
       <nuxt-link v-if="isFetching === 'success'" :to="`/gallery/${meta.docId}`">
         {{ meta.title }}

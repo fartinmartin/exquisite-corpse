@@ -6,6 +6,7 @@
       @prev="prevPage"
       @next="nextPage"
     />
+
     <Panel class="mb filters">
       <form>
         <div>
@@ -90,11 +91,13 @@
         </div>
       </form>
     </Panel>
+
     <Loading
       v-if="isFetching !== 'success'"
       subtext="curating masterpieces"
       :throttle="500"
     />
+
     <div
       v-if="isFetching === 'success'"
       class="gallery mw-canvas"

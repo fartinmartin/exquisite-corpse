@@ -1,12 +1,15 @@
 <template>
   <div class="wrap">
     <SaveModal v-if="isSaving" @close-save="closeSave" />
+
     <PickSection v-if="isFetching === 'idle'" @picked-type="handlePickedType" />
+
     <div v-if="isFetching === 'fetching'" class="mw-canvas">
       <Panel class="mb" />
       <Panel class="mb" />
       <Loading subtext="preparing your canvas" />
     </div>
+
     <Draw
       v-if="isFetching === 'success'"
       @start-save="startSave"
