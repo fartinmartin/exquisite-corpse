@@ -8,6 +8,7 @@
     "README.md": true,
     "package-lock.json": true,
     ".gitignore": true,
+    "functions/.gitignore": true,
     ".firebaserc": true,
     ".firebase": true,
     ".env": true
