@@ -39,7 +39,7 @@
     mix-blend-mode: screen;
     pointer-events: none;
 
-    animation: diagonal 2.5s infinite ease-in-out;
+    animation: diagonal-shimmer 2.5s infinite ease-in-out;
   }
   &::before {
     width: 4px;
@@ -58,7 +58,7 @@
   }
 }
 
-@keyframes diagonal {
+@keyframes diagonal-shimmer {
   0% {
     transform: rotate(45deg) translateX(-30px);
   }
