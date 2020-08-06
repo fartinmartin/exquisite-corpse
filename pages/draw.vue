@@ -3,8 +3,8 @@
     <SaveModal v-if="isSaving" @close-save="closeSave" />
     <PickSection v-if="isFetching === 'idle'" @picked-type="handlePickedType" />
     <div v-if="isFetching === 'fetching'" class="mw-canvas">
-      <div class="border yellow info-panel mw-canvas"></div>
-      <div class="border yellow info-panel mw-canvas mt mb"></div>
+      <Panel class="mb" />
+      <Panel class="mb" />
       <Loading subtext="preparing your canvas" />
     </div>
     <Draw
@@ -16,9 +16,10 @@
 </template>
 
 <script>
-import SaveModal from "~/components/SaveModal";
-import Draw from "~/components/Draw";
-import PickSection from "~/components/PickSection";
+import Panel from "~/components/Panel.vue";
+import SaveModal from "~/components/SaveModal.vue";
+import Draw from "~/components/Draw.vue";
+import PickSection from "~/components/PickSection.vue";
 import { mapState, mapGetters } from "vuex";
 import { twoRandomWords } from "~/assets/js/randomWords";
 
@@ -29,7 +30,7 @@ export default {
       title: "exquisite corpse club • draw",
     };
   },
-  components: { Draw, PickSection },
+  components: { Panel, SaveModal, Draw, PickSection },
   data: () => ({ isFetching: "idle", isSaving: false }), // "idle", "fetching", "success", TODO: "error"
   async fetch({ store }) {
     // set default random title

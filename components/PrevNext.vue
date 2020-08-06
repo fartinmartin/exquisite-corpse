@@ -2,8 +2,8 @@
   <div class="prev-next">
     <Panel class="prev">
       <button
-        :disabled="isFetching !== 'success' || gallery[0].docId === firstItemId"
-        @click="prevPage"
+        :disabled="isFirstPage"
+        @click="$emit('prev')"
         data-tooltip="prev"
       >
         <div class="icon interactive">
@@ -12,11 +12,7 @@
       </button>
     </Panel>
     <Panel class="next">
-      <button
-        :disabled="isFetching !== 'success' || gallery.length < pageSize"
-        @click="nextPage"
-        data-tooltip="next"
-      >
+      <button :disabled="isLastPage" @click="$emit('next')" data-tooltip="next">
         <div class="icon interactive">
           <img src="~/assets/img/toolbar/redo.svg" alt="" />
         </div>
@@ -27,7 +23,11 @@
 
 <script>
 import Panel from "~/components/Panel.vue";
-export default { name: "PrevNext", components: { Panel } };
+export default {
+  name: "PrevNext",
+  components: { Panel },
+  props: { isFirstPage: Boolean, isLastPage: Boolean },
+};
 </script>
 
 <style lang="scss" scoped>
@@ -35,10 +35,7 @@ export default { name: "PrevNext", components: { Panel } };
 .next {
   width: 60px;
   height: 60px;
-  padding: 1rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+
   position: absolute;
   z-index: 100;
   top: 50%;

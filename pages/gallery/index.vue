@@ -1,32 +1,12 @@
 <template>
   <div class="wrap">
-    <div class="prev-next">
-      <div class="prev border yellow">
-        <button
-          :disabled="
-            isFetching !== 'success' || gallery[0].docId === firstItemId
-          "
-          @click="prevPage"
-          data-tooltip="prev"
-        >
-          <div class="icon interactive">
-            <img src="~/assets/img/toolbar/undo.svg" alt="" />
-          </div>
-        </button>
-      </div>
-      <div class="next border yellow">
-        <button
-          :disabled="isFetching !== 'success' || gallery.length < pageSize"
-          @click="nextPage"
-          data-tooltip="next"
-        >
-          <div class="icon interactive">
-            <img src="~/assets/img/toolbar/redo.svg" alt="" />
-          </div>
-        </button>
-      </div>
-    </div>
-    <div class="border yellow info-panel mb mw-canvas filters">
+    <PrevNext
+      :isFirstPage="isFirstPage"
+      :isLastPage="isLastPage"
+      @prev="prevPage"
+      @next="nextPage"
+    />
+    <Panel class="mb filters">
       <form>
         <div>
           <input
@@ -109,7 +89,7 @@
           </label>
         </div>
       </form>
-    </div>
+    </Panel>
     <Loading
       v-if="isFetching !== 'success'"
       subtext="curating masterpieces"
@@ -134,14 +114,16 @@
 </template>
 
 <script>
+import Panel from "~/components/Panel.vue";
 import Loading from "~/components/Loading.vue";
 import Drawing from "~/components/Drawing.vue";
+import PrevNext from "~/components/PrevNext.vue";
 
 // 🚨TODO: break into smaller components
 
 export default {
   name: "gallery",
-  components: { Loading, Drawing },
+  components: { Panel, Loading, Drawing, PrevNext },
   head() {
     return {
       title: "exquisite corpse club • gallery",
@@ -158,6 +140,19 @@ export default {
     field: "date", // "date", "likes"
     pageSize: 9, // 9, 18
   }),
+  computed: {
+    isFirstPage() {
+      return (
+        this.isFetching !== "success" ||
+        this.gallery[0].docId === this.firstItemId
+      );
+    },
+    isLastPage() {
+      return (
+        this.isFetching !== "success" || this.gallery.length < this.pageSize
+      );
+    },
+  },
   mounted() {
     this.fetchFirst();
   },
@@ -263,6 +258,27 @@ export default {
 };
 </script>
 
+<style lang="scss">
+.filters {
+  height: 60px;
+
+  .content {
+    justify-content: space-between;
+
+    > *:nth-child(1) {
+      margin-left: calc(-1rem + 8px);
+    }
+    > *:nth-child(2) {
+      margin-right: calc(-1rem + 8px);
+    }
+  }
+}
+</style>
+
+<style lang="scss">
+// TODO: below sections should be components
+</style>
+
 <style lang="scss" scoped>
 .gallery {
   display: grid;
@@ -279,10 +295,6 @@ export default {
 </style>
 
 <style lang="scss" scoped>
-.filters {
-  padding: 1rem calc(1rem - 7px);
-}
-
 form {
   display: flex;
 
@@ -308,29 +320,5 @@ input:checked + label * {
 input:not(:checked) + label h1 {
   font-weight: normal;
   opacity: 0.5;
-}
-</style>
-
-<style lang="scss" scoped>
-.prev,
-.next {
-  width: 60px;
-  height: 60px;
-  padding: 1rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: absolute;
-  z-index: 100;
-  top: 50%;
-  transform: translateY(-50%);
-}
-
-.prev {
-  left: calc(40px / 3);
-}
-
-.next {
-  right: calc(40px / 3);
 }
 </style>

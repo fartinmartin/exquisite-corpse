@@ -3,7 +3,7 @@
     class="panel mw-canvas"
     :class="[color, interactive && 'i pointer', noPadding && 'np']"
   >
-    <div class="content"><slot /></div>
+    <div class="content" v-if="isLoading === 'success'"><slot /></div>
   </div>
 </template>
 
@@ -14,6 +14,7 @@ export default {
     color: { type: String, default: "yellow" }, // "yellow", "blue", "red", "green"
     interactive: { type: Boolean, default: false },
     noPadding: { type: Boolean, default: false },
+    isLoading: { type: String, default: "success" },
   },
 };
 </script>

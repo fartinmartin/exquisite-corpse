@@ -2,22 +2,17 @@
   <div class="wrap">
     <Loading v-if="isFetching !== 'success'" subtext="waking up our artists" />
     <Display v-if="isFetching === 'success'" :sections="sections" />
-    <div class="border yellow info-panel mt mw-canvas">
-      <div class="data-wrap" v-if="isFetching === 'success'">
-        <h1>{{ meta.title }}</h1>
-        <div class="menu">
-          <LikeButton collection="corpses" :docId="this.$route.params.id" />
-          <DownloadButton :image="meta.thumb" :title="meta.title" />
-        </div>
-      </div>
-    </div>
+    <Panel class="mt corpse-meta" :is-loading="isFetching">
+      <h1>{{ meta.title }}</h1>
+      <MetaMenu collection="corpses" :doc="meta" />
+    </Panel>
   </div>
 </template>
 
 <script>
+import Panel from "~/components/Panel.vue";
 import Loading from "~/components/Loading.vue";
-import DownloadButton from "~/components/DownloadButton.vue";
-import LikeButton from "~/components/LikeButton.vue";
+import MetaMenu from "~/components/MetaMenu.vue";
 
 export default {
   head() {
@@ -25,7 +20,7 @@ export default {
       title: `exquisite corpse club • ${this.meta.title}`,
     };
   },
-  components: { Loading, DownloadButton, LikeButton },
+  components: { Panel, Loading, MetaMenu },
   data: () => ({
     isFetching: "idle", // "idle", "fetching", "success", TODO: "error"
     meta: { title: "" },
@@ -62,30 +57,12 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
-.menu {
-  display: flex;
-  align-items: center;
+<style lang="scss">
+.corpse-meta {
+  height: 60px;
 
-  > * {
-    margin-left: 0.25rem;
-  }
-}
-</style>
-
-<style lang="scss" scoped>
-.loading-wrap {
-  height: 0;
-  position: relative;
-  overflow: hidden;
-  padding-top: 100%;
-
-  > * {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
+  > .content {
+    justify-content: space-between;
   }
 }
 </style>

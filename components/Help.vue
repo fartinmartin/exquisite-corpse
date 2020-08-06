@@ -31,7 +31,7 @@
             sound fun?
           </p>
           <nuxt-link
-            to="draw"
+            to="/draw"
             class="button solid yellow"
             @click.native="closeAndDraw"
           >

@@ -6,6 +6,7 @@
     url("../fonts/spacemono/SpaceMono-Regular.woff2") format("woff2"),
     url("../fonts/spacemono/SpaceMono-Regular.woff") format("woff"),
     url("../fonts/spacemono/SpaceMono-Regular.ttf") format("ttf");
+  font-display: swap;
 }
 
 @font-face {
@@ -16,4 +17,5 @@
     url("../fonts/spacemono/SpaceMono-Bold.woff2") format("woff2"),
     url("../fonts/spacemono/SpaceMono-Bold.woff") format("woff"),
     url("../fonts/spacemono/SpaceMono-Bold.ttf") format("ttf");
+  font-display: swap;
 }

@@ -55,8 +55,11 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.info-panel span {
-  margin-right: 0.5rem;
+.info-panel {
+  height: 60px;
+  span {
+    margin-right: 0.5rem;
+  }
 }
 
 .section-template {

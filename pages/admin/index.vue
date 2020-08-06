@@ -265,59 +265,6 @@ export default {
           });
         })
         .catch((error) => console.error(error));
-
-      // // start batch
-      // const batch = this.$fireStore.batch();
-
-      // // for each corpse this section is featured in:
-      // //   1. update "featuredIn" array for all sections that reference this corpse
-      // //   2. remove the corpse doc
-      // section.data().featuredIn.forEach(async (corpseRef) => {
-      //   const corpse = await corpseRef.get();
-      //   const sectionRefs = Object.values(corpse.data().sections);
-      //   // remove ref to corpse in each section
-      //   sectionRefs.forEach((section) => {
-      //     batch.update(section, {
-      //       featuredIn: this.$fireStoreObj.FieldValue.arrayRemove(corpseRef),
-      //     });
-      //   });
-      //   // remove corpse
-      //   batch.delete(corpseRef);
-      // });
-
-      // batch.delete(sectionRef);
-
-      // // remove section
-      // batch
-      //   .commit()
-      //   .then(() => console.log("removed section and its references"))
-      //   .catch((error) => console.error(error));
-
-      // // start transaction
-      // this.$fireStore
-      //   .runTransaction((transaction) => {
-      //     // get this section
-      //     transaction.get(sectionRef).then((section) => {
-      //       // // for each corpse referenced in featuredIn array
-      //       // section.data().featuredIn.forEach(async (corpseRef) => {
-      //       //   const doc = await corpseRef.get();
-      //       //   const data = { ...doc.data() };
-      //       //   const sectionRefs = Object.values(data.sections);
-      //       //   // remove ref to corpse in each section
-      //       //   sectionRefs.forEach((section) => {
-      //       //     transaction.update(section, {
-      //       //       featuredIn: this.$fireStoreObj.FieldValue.arrayRemove(
-      //       //         corpseRef
-      //       //       ),
-      //       //     });
-      //       //   });
-      //       //   transaction.delete(corpseRef);
-      //       // });
-      //       // transaction.delete(sectionRef);
-      //     });
-      //   })
-      //   .then(() => console.log("Transaction successfully committed!"))
-      //   .catch((error) => console.log("Transaction failed: ", error));
     },
 
     async updateCorpseThumb(corpseId) {
@@ -368,6 +315,10 @@ export default {
           .then((docRef) => console.log(docRef.id))
           .catch((error) => console.error(error));
       });
+    },
+
+    async removeAllSectionsFromDate() {
+      // TODO: make this 😈
     },
 
     signOut() {

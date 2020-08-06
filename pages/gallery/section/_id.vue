@@ -1,67 +1,58 @@
 <template>
   <div class="wrap">
-    <div class="loading-wrap mw-canvas" v-if="isFetching !== 'success'">
-      <Loading subtext="getting paint ready" />
-    </div>
-    <div class="mw-canvas" v-if="isFetching === 'success'">
-      <Canvas mode="display" :section="section" ref="previewCanvas" />
-    </div>
-    <div class="border yellow info-panel mt mw-canvas">
-      <div class="data-wrap" v-if="isFetching === 'success'">
-        <div>
-          <h1>{{ section.title }} <span>by</span>{{ section.artist }}</h1>
-        </div>
-        <div class="menu">
-          <LikeButton collection="sections" :docId="this.$route.params.id" />
-          <DownloadButton
-            :image="section.thumb"
-            :title="section.title"
-            :artist="section.artist"
-          />
-        </div>
-      </div>
-    </div>
+    <Loading subtext="getting paint ready" v-if="isFetching !== 'success'" />
+    <Canvas
+      mode="display"
+      :section="section"
+      ref="previewCanvas"
+      v-if="isFetching === 'success'"
+    />
 
-    <div class="border yellow info-panel mt mb mw-canvas related">
-      <div class="data-wrap" v-if="isFetching === 'success'">
-        <form>
-          <div>
-            <input
-              type="radio"
-              id="featuredIn"
-              name="toggle"
-              value="featuredIn"
-              v-model="related.toggle"
-            />
-            <label for="featuredIn">
-              <h1 class="icon interactive">
-                feat<span class="hom">ured in...</span>
-              </h1>
-            </label>
-          </div>
-          <div>
-            <input
-              type="radio"
-              id="moreBy"
-              name="toggle"
-              value="moreBy"
-              v-model="related.toggle"
-            />
-            <label for="moreBy">
-              <h1 class="icon interactive">
-                more <span class="hom">&nbsp;by this artist... </span>
-              </h1>
-            </label>
-          </div>
-        </form>
+    <Panel class="mt meta" :is-loading="isFetching">
+      <div>
+        <h1>{{ section.title }} <span>by</span> {{ section.artist }}</h1>
       </div>
-    </div>
-    <div
-      class="loading-wrap mw-canvas"
+      <MetaMenu collection="sections" :doc="section" />
+    </Panel>
+
+    <Panel class="mt mb related" :is-loading="isFetching">
+      <form>
+        <div>
+          <input
+            type="radio"
+            id="featuredIn"
+            name="toggle"
+            value="featuredIn"
+            v-model="related.toggle"
+          />
+          <label for="featuredIn">
+            <h1 class="icon interactive">
+              feat<span class="hom">ured in...</span>
+            </h1>
+          </label>
+        </div>
+        <div>
+          <input
+            type="radio"
+            id="moreBy"
+            name="toggle"
+            value="moreBy"
+            v-model="related.toggle"
+          />
+          <label for="moreBy">
+            <h1 class="icon interactive">
+              more <span class="hom">&nbsp;by this artist... </span>
+            </h1>
+          </label>
+        </div>
+      </form>
+    </Panel>
+
+    <Loading
+      subtext="checkin out the studio"
       v-if="isFetching !== 'success' && related.toggle === 'featuredIn'"
-    >
-      <Loading subtext="checkin out the studio" />
-    </div>
+      style="padding-top: 31.6176471% !important;"
+    />
     <div
       v-if="isFetching === 'success' && related.toggle === 'featuredIn'"
       class="gallery mw-canvas"
@@ -75,6 +66,7 @@
         <Drawing :drawing="drawing" />
       </nuxt-link>
     </div>
+
     <div
       v-if="isFetching === 'success' && related.toggle === 'moreBy'"
       class="gallery more-by"
@@ -94,11 +86,9 @@
 </template>
 
 <script>
+import Panel from "~/components/Panel.vue";
 import Canvas from "~/components/Canvas.vue";
-import LikeButton from "~/components/LikeButton.vue";
-import DownloadButton from "~/components/DownloadButton.vue";
-
-// 🚨 TODO: fix size of loading components!
+import MetaMenu from "~/components/MetaMenu.vue";
 
 export default {
   name: "Section",
@@ -107,7 +97,7 @@ export default {
       title: `exquisite corpse club • ${this.section.title} by ${this.section.artist}`,
     };
   },
-  components: { Canvas, LikeButton, DownloadButton },
+  components: { Panel, Canvas, MetaMenu },
   data: () => ({
     isFetching: "idle", // "idle", "fetching", "success", TODO: "error"
     section: {},
@@ -117,7 +107,6 @@ export default {
       toggle: "featuredIn",
     },
   }),
-
   mounted() {
     this.getSectionById(this.$route.params.id);
   },
@@ -166,10 +155,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-#top,
-#mid,
-#bot {
-  border: var(--border-size) solid var(--border-color);
+.loading-wrap {
+  padding-top: calc(calc(100% + 8px) / 3) !important;
 }
 
 h1 {
@@ -180,30 +167,39 @@ h1 {
 
   span {
     font-weight: normal;
-    margin-right: 1ch;
-  }
-}
-
-.menu {
-  display: flex;
-  align-items: center;
-
-  > * {
-    margin-left: 0.25rem;
   }
 }
 </style>
 
-<style lang="scss" scoped>
+<style lang="scss">
+.meta,
+.related {
+  height: 60px;
+}
+
+.meta > .content {
+  justify-content: space-between;
+}
+
+.related > .content {
+  justify-content: flex-start;
+  margin-left: calc(-1rem - 7px);
+}
+
 .related {
   margin-top: 120px;
-  padding: 1rem calc(1rem - 7px);
 
   @media screen and (max-width: calc(544px + calc(40px / 2))) {
     margin-top: calc(40px / 3);
   }
 }
+</style>
 
+<style lang="scss">
+// TODO: below sections should be made into components
+</style>
+
+<style lang="scss" scoped>
 .gallery {
   display: grid;
   grid-template-columns: repeat(3, calc(516px / 3));
@@ -265,26 +261,5 @@ input:checked + label * {
 input:not(:checked) + label h1 {
   font-weight: normal;
   opacity: 0.5;
-}
-</style>
-
-<style lang="scss" scoped>
-.loading-wrap {
-  height: 0;
-  position: relative;
-  overflow: hidden;
-  padding-top: calc(516px / 3);
-
-  @media screen and (max-width: calc(544px + calc(40px / 2))) {
-    padding-top: calc(calc(100vw - 40px) / 3);
-  }
-
-  > * {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-  }
 }
 </style>

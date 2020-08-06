@@ -29,7 +29,7 @@
 <script>
 import Loading from "~/components/Loading.vue";
 import Drawing from "~/components/Drawing.vue";
-import PrevNext from "~/components/TODO/PrevNext.vue";
+import PrevNext from "~/components/PrevNext.vue";
 
 export default {
   name: "Gallery",

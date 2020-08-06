@@ -243,10 +243,12 @@ export default {
 .toolbar {
   user-select: none;
 
-  .content {
+  > .content {
     justify-content: space-between;
     flex-wrap: wrap;
   }
+
+  height: 60px;
 
   @media screen and (max-width: 544px) {
     height: initial;

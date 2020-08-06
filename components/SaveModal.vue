@@ -8,46 +8,48 @@
         ref="previewCanvas"
       />
       <CanvasThumb :section="computedPaths" ref="thumbCanvas" />
-      <form class="border yellow mw-canvas">
-        <div>
-          <label for="title">
-            <span class="hom">your section's </span>title:
-          </label>
-          <input
-            type="text"
-            v-model="title"
-            id="title"
-            :placeholder="title"
-            :class="{ temp: isTempTitle }"
-            @focus="isTempTitle = false"
-            maxlength="17"
-          />
-        </div>
-        <div class="mt">
-          <label for="artist">
-            <span class="hom">your *ahem* artist</span> name:
-            <span class="note">(@s will link to your instagram)</span>
-          </label>
-          <input
-            type="text"
-            v-model="artist"
-            id="artist"
-            :placeholder="artist"
-            :class="{ temp: isTempArtist }"
-            @focus="isTempArtist = false"
-            maxlength="30"
-          />
-        </div>
-        <div class="mt" style="margin-top: 2rem;">
-          <button @click.prevent="saveDrawing" class="button solid yellow">
-            save & show me our masterpiece!
-          </button>
-        </div>
-        <div class="mt">
-          <button @click.prevent="$emit('close-save')" class="button">
-            wait, i'm not done <span class="hom">drawing</span>
-          </button>
-        </div>
+      <Panel class="save-form">
+        <form>
+          <div>
+            <label for="title">
+              <span class="hom">your section's </span>title:
+            </label>
+            <input
+              type="text"
+              v-model="title"
+              id="title"
+              :placeholder="title"
+              :class="{ temp: isTempTitle }"
+              @focus="isTempTitle = false"
+              maxlength="17"
+            />
+          </div>
+          <div class="mt">
+            <label for="artist">
+              <span class="hom">your *ahem* artist</span> name:
+              <span class="note">(@s will link to your instagram)</span>
+            </label>
+            <input
+              type="text"
+              v-model="artist"
+              id="artist"
+              :placeholder="artist"
+              :class="{ temp: isTempArtist }"
+              @focus="isTempArtist = false"
+              maxlength="30"
+            />
+          </div>
+          <div class="mt" style="margin-top: 2rem;">
+            <button @click.prevent="saveDrawing" class="button solid yellow">
+              save & show me our masterpiece!
+            </button>
+          </div>
+          <div class="mt">
+            <button @click.prevent="$emit('close-save')" class="button">
+              wait, i'm not done <span class="hom">drawing</span>
+            </button>
+          </div>
+        </form>
         <div class="loadal" v-show="isSaving !== 'idle'">
           <Loading
             v-if="isSaving === 'saving'"
@@ -74,7 +76,7 @@
             @click.native="closeMe"
           />
         </div>
-      </form>
+      </Panel>
     </div>
   </div>
 </template>
@@ -235,6 +237,17 @@ export default {
 };
 </script>
 
+<style lang="scss">
+.save-form {
+  position: relative;
+  margin-top: 40px;
+
+  > .content {
+    display: block;
+  }
+}
+</style>
+
 <style lang="scss" scoped>
 .save-modal {
   z-index: 951 !important;
@@ -260,10 +273,6 @@ export default {
 
 /* TODO: abstract form elements into their own components */
 form {
-  position: relative;
-  margin-top: 40px;
-  padding: 1rem;
-
   > div {
     display: flex;
     align-items: baseline;

@@ -1,33 +1,37 @@
 <template>
   <div class="wrap">
-    <nav class="border yellow info-panel mb mw-canvas">
+    <Panel class="mb index-nav">
       <nuxt-link to="/">
         <h1>exquisite corpse club</h1>
       </nuxt-link>
       <NavMenu />
-    </nav>
+    </Panel>
     <Loading v-if="isFetching !== 'success'" subtext="fetching random corpse" />
     <Display
       v-if="isFetching === 'success' && isLoggedIn"
       :sections="sections"
     />
-    <div class="border yellow info-panel mt mw-canvas title">
+    <Panel class="mt index-title">
       <nuxt-link v-if="isFetching === 'success'" :to="`/gallery/${meta.docId}`">
         {{ meta.title }}
       </nuxt-link>
-    </div>
+    </Panel>
   </div>
 </template>
 
 <script>
-import Display from "~/components/Display";
-import Loading from "~/components/Loading";
-import NavMenu from "~/components/NavMenu";
+import Panel from "~/components/Panel.vue";
+import Display from "~/components/Display.vue";
+import Loading from "~/components/Loading.vue";
+import NavMenu from "~/components/NavMenu.vue";
 import { mapState } from "vuex";
+
+// TODO: make all data fetches from pages asyncData() methods???
+// TODO: move "loggedIn" logic to layouts/defauft.vue!
 
 export default {
   name: "index",
-  components: { Display, NavMenu, Loading },
+  components: { Panel, Display, NavMenu, Loading },
   data: () => ({
     logInAttempts: 3,
     isLoggedIn: false,
@@ -105,13 +109,18 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
-.title {
-  justify-content: center;
+<style lang="scss">
+.index-nav,
+.index-title {
+  height: 60px;
+}
 
-  a:hover {
-    text-decoration: underline;
-    color: var(--blue);
-  }
+.index-nav > .content {
+  justify-content: space-between;
+}
+
+.index-title a:hover {
+  text-decoration: underline;
+  color: var(--blue);
 }
 </style>
