@@ -66,6 +66,12 @@ export default {
     --bx-s-size: 6px;
     transform: translate3d(-4px, -4px, 0);
   }
+
+  &.i:active {
+    --bx-s-size: 4px;
+    transform: translate3d(-2px, -2px, 0);
+    transition: transform 0.05s ease, box-shadow 0.05s ease, border 0.05s ease;
+  }
 }
 
 .content {
