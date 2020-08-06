@@ -5,10 +5,12 @@
   --light-blue: #81b2ff;
   --lighter-blue: #deebff;
   --red: #f44e3b;
+  --lighter-red: #fab4ac;
   --orange: #fb9200;
   --yellow: #fcba03;
   --light-yellow: #fcda00;
   --lighter-yellow: #fff29d;
+  --lighter-green: #d1ee7f;
   --green: #a4dd00;
   --dark-green: #86b500;
   // TODO: scale notes (nothing has been implemented with this...) 🤔
@@ -18,7 +20,13 @@
   // 40px is 1/3rd 120px
 }
 
-// @import url("https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap");
+.body-bg {
+  // http://www.patternify.com/
+  background: var(--lighter-blue)
+    url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAAEklEQVQImWNgYGD4z0AswK4SAFXuAf8EPy+xAAAAAElFTkSuQmCC)
+    repeat !important;
+  background-blend-mode: overlay !important;
+}
 
 html {
   font-family: "Space Mono", monospace;
@@ -30,11 +38,7 @@ html {
   -webkit-font-smoothing: antialiased;
 
   color: var(--black);
-  // http://www.patternify.com/
-  background: var(--lighter-blue)
-    url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAAEklEQVQImWNgYGD4z0AswK4SAFXuAf8EPy+xAAAAAElFTkSuQmCC)
-    repeat;
-  background-blend-mode: overlay;
+  @extend .body-bg;
 
   box-sizing: border-box;
 }

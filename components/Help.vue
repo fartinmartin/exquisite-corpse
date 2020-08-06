@@ -1,56 +1,57 @@
 <template>
-  <div class="help-modal" @click="closeMe">
-    <div>
-      <div class="help-wrap">
-        <div class="hom">
-          <div class="border section" id="top-h">
-            <img src="~/assets/img/tutorial/top.png" alt="" />
-          </div>
-          <div class="border section" id="mid-h">
-            <img src="~/assets/img/tutorial/mid.png" alt="" />
-          </div>
-          <div class="border section" id="bot-h">
-            <img src="~/assets/img/tutorial/bot.png" alt="" />
-          </div>
-        </div>
+  <div class="fs-modal help-modal" @click="closeMe">
+    <div class="help-wrap">
+      <div class="example">
+        <Panel class="section" color="blue" no-padding>
+          <img src="~/assets/img/tutorial/top.png" alt="" />
+        </Panel>
+        <Panel class="section mt mb" color="blue" no-padding>
+          <img src="~/assets/img/tutorial/mid.png" alt="" />
+        </Panel>
+        <Panel class="section" color="blue" no-padding>
+          <img src="~/assets/img/tutorial/bot.png" alt="" />
+        </Panel>
+      </div>
 
-        <div class="steps mw-canvas">
-          <div class="step one border yellow">
-            <p>
-              an exquisite corpse is a collaborative drawing made up of three
-              sections...
-            </p>
-          </div>
-          <div class="step two border yellow">
-            <p>
-              each section is drawn by a different artist who can't see the
-              other sections!
-            </p>
-          </div>
-          <div class="step three border yellow">
-            <p>
-              sound fun?
-            </p>
-            <nuxt-link
-              to="draw"
-              class="button solid yellow"
-              @click.native="closeAndDraw"
-            >
-              <span class="icon">
-                <img src="~/assets/img/toolbar/draw.svg" />
-              </span>
-              start drawing!
-            </nuxt-link>
-          </div>
-        </div>
+      <div class="steps mw-canvas">
+        <Panel class="step">
+          <p>
+            an exquisite corpse is a collaborative drawing made up of three
+            sections...
+          </p>
+        </Panel>
+        <Panel class="step mt mb">
+          <p>
+            each section is drawn by a different artist who can't see the other
+            sections!
+          </p>
+        </Panel>
+        <Panel class="step">
+          <p>
+            sound fun?
+          </p>
+          <nuxt-link
+            to="draw"
+            class="button solid yellow"
+            @click.native="closeAndDraw"
+          >
+            <span class="icon">
+              <img src="~/assets/img/toolbar/draw.svg" />
+            </span>
+            start drawing!
+          </nuxt-link>
+        </Panel>
       </div>
     </div>
   </div>
 </template>
 
 <script>
+import Panel from "~/components/Panel.vue";
+
 export default {
   name: "Help",
+  components: { Panel },
   mounted() {
     document.addEventListener("keydown", this.handleShortcuts);
   },
@@ -62,7 +63,7 @@ export default {
       if (e.keyCode === 27) this.$store.dispatch("setIsHelping", false);
     },
     closeMe(e) {
-      if (e.target.className === "help-modal")
+      if (e.target.classList.contains("help-modal"))
         this.$store.dispatch("setIsHelping", false);
     },
     closeAndDraw() {
@@ -74,92 +75,66 @@ export default {
 
 <style lang="scss" scoped>
 .help-wrap {
-  display: flex;
-  flex-wrap: wrap;
   padding: calc(40px / 3);
-}
-
-.nav {
-  width: 100%;
-}
-
-.step,
-.section {
-  background: var(--white);
-  width: 272px;
-  height: 91px;
-  overflow: hidden;
-  margin: calc(40px / 3);
+  max-width: initial;
+  width: auto;
+  margin: 0 auto;
 
   display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
-.section {
-  margin-left: 0;
+.example {
+  margin-right: calc(40px / 3);
+
+  @media screen and (max-width: 765px) {
+    display: none;
+  }
 }
 
 .steps {
-  flex: 1;
-}
+  margin-left: calc(40px / 3);
 
-.step {
-  text-align: center;
-  width: 100%;
-  padding: 1rem;
-  margin-right: 0;
-  p {
-    max-width: 46ch;
-  }
-
-  &.three {
-    display: flex;
-    > * {
-      width: 50%;
-    }
-  }
-
-  @media screen and (max-width: 544px) {
-    height: initial;
+  @media screen and (max-width: 765px) {
     margin-left: 0;
   }
 }
 
-.close-me {
-  position: absolute;
-  z-index: 950;
-  background: green;
+.section,
+.step {
+  height: 91px;
 
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
+  @media screen and (max-width: 765px) {
+    height: auto;
+  }
 }
 
-.help-modal {
-  position: absolute;
-  z-index: 951;
+.section {
+  width: 272px;
+  overflow: hidden;
+}
 
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
+.step {
+  display: grid;
+  place-items: center;
+  text-align: center;
 
-  background: var(--lighter-blue)
-    url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAAEklEQVQImWNgYGD4z0AswK4SAFXuAf8EPy+xAAAAAElFTkSuQmCC)
-    repeat;
-  background-blend-mode: overlay;
+  &:last-child {
+    justify-content: stretch;
+    .content > * {
+      width: 50%;
+    }
+  }
+}
 
-  display: flex;
-  align-items: center;
-  justify-content: center;
+p {
+  max-width: 46ch;
 }
 
 .button {
   display: flex;
   align-items: center;
   justify-content: center;
+
   span {
     margin-right: 0.5rem;
   }

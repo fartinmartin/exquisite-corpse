@@ -2,7 +2,6 @@
   <div
     class="panel mw-canvas"
     :class="[color, interactive && 'i pointer', noPadding && 'np']"
-    :style="{ width, minHeight }"
   >
     <div class="content"><slot /></div>
   </div>
@@ -15,8 +14,6 @@ export default {
     color: { type: String, default: "yellow" }, // "yellow", "blue", "red", "green"
     interactive: { type: Boolean, default: false },
     noPadding: { type: Boolean, default: false },
-    width: { type: String },
-    minHeight: { type: String },
   },
 };
 </script>
@@ -25,6 +22,10 @@ export default {
 .panel {
   min-height: 60px;
   padding: 1rem;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
   &.np {
     padding: 0;
@@ -71,5 +72,6 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 100%;
 }
 </style>

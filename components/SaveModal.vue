@@ -1,5 +1,5 @@
 <template>
-  <div class="save-modal" @click="closeMe">
+  <div class="fs-modal save-modal" @click="closeMe">
     <div class="wrap">
       <Canvas
         id="save-preview"
@@ -9,26 +9,26 @@
       />
       <CanvasThumb :section="computedPaths" ref="thumbCanvas" />
       <form class="border yellow mw-canvas">
-        <div class="loadal" v-if="isSaving !== 'idle'">
+        <div class="loadal" v-show="isSaving !== 'idle'">
           <Loading
             v-if="isSaving === 'saving'"
             subtext="generating your masterpiece"
             style="height: 100%;"
-            class="yellow"
+            color="yellow"
           />
           <Loading
             v-if="isSaving === 'success'"
             text="you did it!"
             subtext="your drawing was saved"
             style="height: 100%;"
-            class="yellow"
+            color="green"
           />
           <Loading
             v-if="isSaving === 'error'"
             text="oop!"
             subtext="there was an error.. try again?"
             style="height: 100%;"
-            class="error"
+            color="red"
             @click.native="closeMe"
           />
         </div>
@@ -234,32 +234,11 @@ export default {
 
 <style lang="scss" scoped>
 .save-modal {
-  position: absolute;
-  z-index: 951;
-
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100%;
-
-  background: var(--lighter-blue)
-    url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAAEklEQVQImWNgYGD4z0AswK4SAFXuAf8EPy+xAAAAAElFTkSuQmCC)
-    repeat;
-  background-blend-mode: overlay;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  padding: calc(40px / 3);
+  z-index: 951 !important;
 
   @media screen and (max-width: 1040px) {
     z-index: 955;
   }
-}
-
-.canvas-wrap::after {
-  display: none;
 }
 
 .loadal {
@@ -271,12 +250,14 @@ export default {
   background: var(--white);
   z-index: 5;
 
+  margin-top: 0 !important;
+
   .loading-wrap {
     padding-top: initial !important;
   }
 }
 
-/* TODO: abstract form styles to (global) SCSS file */
+/* TODO: abstract form elements into their own components */
 form {
   position: relative;
   margin-top: 40px;
@@ -286,7 +267,7 @@ form {
     display: flex;
     align-items: baseline;
 
-    &:not(:first-child) {
+    &:not(:nth-child(2)) {
       margin-top: calc(40px / 3);
     }
   }

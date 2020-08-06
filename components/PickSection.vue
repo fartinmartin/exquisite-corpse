@@ -1,39 +1,51 @@
 <template>
   <div>
-    <div class="border yellow info-panel">
+    <Panel class="info-panel">
       <span>pick a section to start drawing!</span>
       <button @click.prevent="openHelp">
         <div class="icon interactive">
           <img src="~/assets/img/icons/info.svg" />
         </div>
       </button>
-    </div>
+    </Panel>
     <div class="mw-canvas">
-      <div
-        class="section-template border pointer"
-        @click="$emit('picked-type', 'top')"
+      <Panel
+        class="section-template mt"
+        @click.native="$emit('picked-type', 'top')"
+        color="blue"
+        interactive
+        no-padding
       >
         <div class="meta-box"><div class="info">top</div></div>
-      </div>
-      <div
-        class="section-template border pointer"
-        @click="$emit('picked-type', 'mid')"
+      </Panel>
+      <Panel
+        class="section-template mt"
+        @click.native="$emit('picked-type', 'mid')"
+        color="blue"
+        interactive
+        no-padding
       >
         <div class="meta-box"><div class="info">middle</div></div>
-      </div>
-      <div
-        class="section-template border pointer"
-        @click="$emit('picked-type', 'bot')"
+      </Panel>
+      <Panel
+        class="section-template mt"
+        @click.native="$emit('picked-type', 'bot')"
+        color="blue"
+        interactive
+        no-padding
       >
         <div class="meta-box"><div class="info">bottom</div></div>
-      </div>
+      </Panel>
     </div>
   </div>
 </template>
 
 <script>
+import Panel from "~/components/Panel.vue";
+
 export default {
   name: "PickSection",
+  components: { Panel },
   methods: {
     openHelp() {
       this.$store.dispatch("setIsHelping", true);
@@ -43,31 +55,20 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.info-panel {
-  justify-content: center;
-  span {
-    margin-right: 0.5rem;
-  }
+.info-panel span {
+  margin-right: 0.5rem;
 }
 
 .section-template {
   position: relative;
   width: 100%;
   height: 0;
-  padding-top: calc(100% / 3);
-  margin: calc(40px / 3) 0;
 
-  transition: transform 0.1s ease, box-shadow 0.1s ease, border 0.1s ease;
+  min-height: initial;
+  padding-top: calc(100% / 3) !important;
 
-  &:hover {
-    --border-color: var(--light-yellow);
-    --box-shadow-color: var(--orange);
-    --box-shadow-size: 6px;
-    transform: translate3d(-4px, -4px, 0);
-
-    .meta-box {
-      display: block;
-    }
+  &:hover .meta-box {
+    display: block;
   }
 }
 

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="toolbar border yellow mw-canvas canvas-tools">
+    <Panel class="toolbar canvas-tools">
       <div class="tool-group mode">
         <div
           class="tool draw"
@@ -108,9 +108,9 @@
           <img src="~/assets/img/toolbar/save.svg" alt="" />
         </button>
       </div>
-    </div>
+    </Panel>
 
-    <div class="toolbar border yellow color-palette">
+    <Panel class="toolbar mt mb">
       <div class="tool-group palette">
         <button
           class="swatch"
@@ -127,21 +127,22 @@
           @change="addColor($event)"
         />
         <label for="addColor" class="add-color">+</label>
-        <!-- https://github.com/xiaokaike/vue-color (mostly for safari support 🤔) -->
+        <!-- TODO: https://github.com/xiaokaike/vue-color (mostly for safari support 🤔) -->
       </div>
-    </div>
+    </Panel>
   </div>
 </template>
 
 <script>
 import { mapState, mapGetters } from "vuex";
-import SaveModal from "./SaveModal";
+import Panel from "~/components/Panel.vue";
+import SaveModal from "~/components/SaveModal.vue";
 
 // 🚨 TODO: apple pencil taps are not registered on AT LEAST undo/redo.. this goes for a lot of things actually.. ugh
 
 export default {
   name: "ToolBar",
-  components: { SaveModal },
+  components: { Panel, SaveModal },
   data: () => ({ isSaving: false }),
   mounted() {
     document.addEventListener("keydown", this.handleShortcuts);
@@ -238,14 +239,14 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .toolbar {
-  height: 60px;
-  display: flex;
-  padding: 1rem;
-  flex-wrap: wrap;
-  justify-content: space-between;
   user-select: none;
+
+  .content {
+    justify-content: space-between;
+    flex-wrap: wrap;
+  }
 
   @media screen and (max-width: 544px) {
     height: initial;
@@ -258,15 +259,6 @@ export default {
         margin: 0;
       }
     }
-  }
-
-  &:not(:first-child) {
-    margin: calc(40px / 6 * 2) 0;
-  }
-
-  /* label, */
-  img {
-    pointer-events: none;
   }
 }
 
@@ -283,6 +275,7 @@ export default {
   }
 }
 
+// TODO: this will eventually live in Button.vue or its sister component 🤷‍♂️
 $icon-size: 25px;
 
 .tool {
@@ -307,7 +300,7 @@ $icon-size: 25px;
   svg,
   img {
     width: 100%;
-    display: block;
+    pointer-events: none;
   }
 }
 
@@ -371,7 +364,6 @@ $icon-size: 25px;
 }
 
 .add-color {
-  /* cursor: pointer; */
   display: flex;
   align-items: center;
   justify-content: center;

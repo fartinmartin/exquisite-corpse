@@ -1,6 +1,6 @@
 <template>
   <div class="prev-next">
-    <div class="prev border yellow">
+    <Panel class="prev">
       <button
         :disabled="isFetching !== 'success' || gallery[0].docId === firstItemId"
         @click="prevPage"
@@ -10,8 +10,8 @@
           <img src="~/assets/img/toolbar/undo.svg" alt="" />
         </div>
       </button>
-    </div>
-    <div class="next border yellow">
+    </Panel>
+    <Panel class="next">
       <button
         :disabled="isFetching !== 'success' || gallery.length < pageSize"
         @click="nextPage"
@@ -21,12 +21,13 @@
           <img src="~/assets/img/toolbar/redo.svg" alt="" />
         </div>
       </button>
-    </div>
+    </Panel>
   </div>
 </template>
 
 <script>
-export default { name: "PrevNext" };
+import Panel from "~/components/Panel.vue";
+export default { name: "PrevNext", components: { Panel } };
 </script>
 
 <style lang="scss" scoped>

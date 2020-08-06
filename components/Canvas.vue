@@ -1,5 +1,5 @@
 <template>
-  <div class="border" :id="id">
+  <Panel :id="id" color="blue" no-padding>
     <div class="canvas-wrap">
       <CanvasMeta
         v-if="mode === 'display'"
@@ -25,7 +25,7 @@
         v-touch:end="mode === 'draw' ? mouseup : {}"
       />
     </div>
-  </div>
+  </Panel>
 </template>
 
 <script>
@@ -33,10 +33,11 @@ import floodFill from "~/assets/js/floodFill";
 import asyncForEach, { waitFor } from "~/assets/js/asyncForEach";
 import { mapState, mapGetters } from "vuex";
 import CanvasMeta from "~/components/CanvasMeta.vue";
+import Panel from "~/components/Panel.vue";
 
 export default {
   name: "Canvas",
-  components: { CanvasMeta },
+  components: { CanvasMeta, Panel },
   props: {
     id: { type: String, required: true }, // top, mid, or bot
     mode: { type: String, required: true }, // draw, display, or pixelate

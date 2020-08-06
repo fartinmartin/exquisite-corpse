@@ -5,9 +5,7 @@
         {{ title }}
       </nuxt-link>
       <span v-if="!docId">{{ title }}</span>
-      <span>&nbsp;</span>
-      <span>by</span>
-      <span>&nbsp;</span>
+      <span style="width: 4ch; text-align: center;">by</span>
       <a
         v-if="isInstagram"
         :href="`https://www.instagram.com/${artist.substr(1)}/`"

@@ -4,7 +4,7 @@
       <Loading subtext="getting paint ready" />
     </div>
     <div class="mw-canvas" v-if="isFetching === 'success'">
-      <Canvas id="top" mode="display" :section="section" ref="previewCanvas" />
+      <Canvas mode="display" :section="section" ref="previewCanvas" />
     </div>
     <div class="border yellow info-panel mt mw-canvas">
       <div class="data-wrap" v-if="isFetching === 'success'">

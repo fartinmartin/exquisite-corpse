@@ -1,14 +1,16 @@
 <template>
   <div class="nav-wrap">
-    <nav v-show="this.$route.name !== 'index'" class="border yellow">
-      <nuxt-link to="/">
-        <h1 v-show="this.$route.name === 'index'">exquisite corpse club</h1>
-        <h1 v-show="this.$route.name !== 'index'" data-tooltip="home">ecc</h1>
-      </nuxt-link>
-      <NavMenu />
-    </nav>
+    <Panel v-show="this.$route.name !== 'index'" class="nav" no-padding>
+      <nav>
+        <nuxt-link to="/" class="logo">
+          <h1 v-show="this.$route.name === 'index'">exquisite corpse club</h1>
+          <h1 v-show="this.$route.name !== 'index'" data-tooltip="home">ecc</h1>
+        </nuxt-link>
+        <NavMenu />
+      </nav>
+    </Panel>
 
-    <div class="border yellow me">
+    <Panel class="me" no-padding>
       <a
         href="https://fartinmartin.github.io/"
         target="_blank"
@@ -19,16 +21,17 @@
           <img src="~/assets/img/logo/m-light.svg" alt="" />
         </div>
       </a>
-    </div>
+    </Panel>
   </div>
 </template>
 
 <script>
 import NavMenu from "~/components/NavMenu.vue";
+import Panel from "~/components/Panel.vue";
 
 export default {
   name: "Nav",
-  components: { NavMenu },
+  components: { NavMenu, Panel },
   methods: {
     openHelp() {
       this.$store.dispatch("setIsHelping", true);
@@ -39,34 +42,41 @@ export default {
 
 <style lang="scss" scoped>
 .nav-wrap {
-  display: contents;
+  position: absolute;
+  width: 100%;
+  top: 0;
+  left: 0;
 }
 
-nav,
+.nav,
 .me {
   position: absolute;
   top: calc(40px / 3);
-  left: calc(40px / 3);
   z-index: 950;
 
-  padding: 1rem;
-  height: 60px;
-
   display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
-  > *:not(:last-child) {
+.nav {
+  left: calc(40px / 3);
+  width: auto;
+  padding: 0 1rem !important;
+
+  .logo {
     margin-right: 1rem;
+  }
+
+  nav {
+    display: flex;
+    align-items: center;
   }
 }
 
 .me {
-  left: initial;
   right: calc(40px / 3);
+  width: 60px;
   z-index: 955;
-}
-
-nav > a {
-  display: flex;
-  align-items: center;
 }
 </style>
