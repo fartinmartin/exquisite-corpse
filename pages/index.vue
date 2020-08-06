@@ -7,10 +7,7 @@
       <NavMenu />
     </Panel>
     <Loading v-if="isFetching !== 'success'" subtext="fetching random corpse" />
-    <Display
-      v-if="isFetching === 'success' && isLoggedIn"
-      :sections="sections"
-    />
+    <Display v-if="isFetching === 'success'" :sections="sections" />
     <Panel class="mt index-title">
       <nuxt-link v-if="isFetching === 'success'" :to="`/gallery/${meta.docId}`">
         {{ meta.title }}
@@ -24,33 +21,23 @@ import Panel from "~/components/Panel.vue";
 import Display from "~/components/Display.vue";
 import Loading from "~/components/Loading.vue";
 import NavMenu from "~/components/NavMenu.vue";
-import { mapState } from "vuex";
 
 // TODO: make all data fetches from pages asyncData() methods???
-// TODO: move "loggedIn" logic to layouts/defauft.vue!
 
 export default {
   name: "index",
   components: { Panel, Display, NavMenu, Loading },
   data: () => ({
-    logInAttempts: 3,
-    isLoggedIn: false,
     isFetching: "idle", // "idle", "fetching", "success", TODO: "error"
     meta: null,
     sections: {},
   }),
   mounted() {
-    this.logIn();
     this.getRandomCorpse();
   },
   methods: {
     openHelp() {
       this.$store.dispatch("setIsHelping", true);
-    },
-
-    async logIn() {
-      await this.$store.dispatch("modules/user/signInAnonymously");
-      this.isLoggedIn = true;
     },
 
     async getRandomCorpse() {
@@ -81,13 +68,6 @@ export default {
         }
       } catch (error) {
         console.error(error);
-        this.isLoggedIn = false;
-
-        this.logInAttempts--;
-        if (this.logInAttempts > 0) {
-          await this.logIn();
-          this.getRandomCorpse();
-        }
       }
 
       return;

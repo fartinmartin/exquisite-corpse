@@ -2,7 +2,11 @@
   <div id="__tino" ref="tino">
     <Help v-if="isHelping" />
     <Nav />
-    <Nuxt />
+
+    <transition name="fade">
+      <Nuxt v-if="isLoggedIn" />
+    </transition>
+
     <CustomCursor />
   </div>
 </template>
@@ -16,14 +20,17 @@ import { disableBodyScroll, clearAllBodyScrollLocks } from "body-scroll-lock";
 
 export default {
   components: { Nav, CustomCursor, Help },
-  computed: mapState(["isHelping"]),
+  computed: {
+    ...mapState(["isHelping"]),
+    ...mapState("modules/user", ["isLoggedIn"]),
+  },
   beforeDestroy() {
     clearAllBodyScrollLocks();
   },
+  beforeMount() {
+    this.$store.dispatch("modules/user/onEnter");
+  },
   mounted() {
-    // this.$store.dispatch("modules/user/signOut");
-    this.$store.dispatch("modules/user/signInAnonymously");
-
     // modernizr style class names for touch devices
     if ("ontouchstart" in document.documentElement) {
       document.documentElement.classList.add("touch");

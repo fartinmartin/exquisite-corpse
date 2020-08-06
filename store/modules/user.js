@@ -3,11 +3,24 @@ import { twoRandomWords } from "~/assets/js/randomWords";
 export const state = () => ({
   id: null,
   name: "",
+  logInAttempts: 3,
+  isLoggedIn: false,
 });
 
 export const getters = {};
 
 export const actions = {
+  async onEnter({ state, commit, dispatch }) {
+    commit("DECREMENT_LOGIN_ATTEMPT");
+    try {
+      if (state.logInAttempts > 0) {
+        await dispatch("signInAnonymously");
+      }
+    } catch {
+      commit("SET_IS_LOGGED_IN", false);
+      dispatch("onEnter");
+    }
+  },
   async signOut() {
     const errStyle = [
       ...style,
@@ -33,14 +46,17 @@ export const actions = {
           .then(async (response) => {
             const displayName = await twoRandomWords("anonymous");
             await response.user.updateProfile({ displayName });
-            commit("SET_USER", response.user);
+            await commit("SET_USER", response.user);
+            await commit("SET_IS_LOGGED_IN", true);
             dispatch("welcomeUser");
           })
-          .catch((error) => {
+          .catch(async (error) => {
+            await commit("SET_IS_LOGGED_IN", false);
             console.error(error);
           });
       } else {
         commit("SET_USER", user);
+        commit("SET_IS_LOGGED_IN", true);
         dispatch("welcomeUser");
       }
     });
@@ -68,6 +84,12 @@ export const mutations = {
   SET_USER(state, user) {
     state.name = user.displayName || `anonymous-${user.uid.substr(1, 4)}`;
     state.id = user.uid;
+  },
+  DECREMENT_LOGIN_ATTEMPT(state) {
+    state.logInAttempts--;
+  },
+  SET_IS_LOGGED_IN(state, bool) {
+    state.isLoggedIn = bool;
   },
 };
 
