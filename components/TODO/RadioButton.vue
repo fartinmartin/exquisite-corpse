@@ -1,5 +1,5 @@
 <template>
-  <input type="text" />
+  <input type="radio" />
 </template>
 
 <script>

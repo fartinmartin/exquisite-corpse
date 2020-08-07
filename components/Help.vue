@@ -30,15 +30,13 @@
           <p>
             sound fun?
           </p>
-          <nuxt-link
-            to="/draw"
-            class="button solid yellow"
-            @click.native="closeAndDraw"
-          >
-            <span class="icon">
-              <img src="~/assets/img/toolbar/draw.svg" />
-            </span>
-            start drawing!
+          <nuxt-link to="/draw" @click.native="closeAndDraw">
+            <Button color="yellow">
+              <span class="icon">
+                <img src="~/assets/img/toolbar/draw.svg" />
+              </span>
+              start drawing!
+            </Button>
           </nuxt-link>
         </Panel>
       </div>
@@ -48,10 +46,11 @@
 
 <script>
 import Panel from "~/components/Panel.vue";
+import Button from "~/components/Button.vue";
 
 export default {
   name: "Help",
-  components: { Panel },
+  components: { Panel, Button },
   mounted() {
     document.addEventListener("keydown", this.handleShortcuts);
   },
@@ -130,13 +129,7 @@ p {
   max-width: 46ch;
 }
 
-.button {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  span {
-    margin-right: 0.5rem;
-  }
+span.icon {
+  margin-right: 0.5rem;
 }
 </style>

@@ -3,57 +3,51 @@
     <Panel class="admin-index">
       <h1>corpse</h1>
       <div class="input-wrap">
-        <input v-model="corpse.section" placeholder="enter sectionId" />
-        <button
-          class="button"
+        <Input v-model="corpse.section" placeholder="enter sectionId" />
+        <Button
           @click="makeCorpseFromSingleSection(corpse.section)"
-        >
-          make corpse
-        </button>
+          text="make corpse"
+        />
       </div>
       <div class="input-wrap">
-        <input v-model="corpse.id" placeholder="enter corpseId" />
-        <button
-          class="button solid red"
+        <Input v-model="corpse.id" placeholder="enter corpseId" />
+        <Button
+          color="red"
           @click="removeCorpseAndItsReferences(corpse.id)"
-        >
-          remove
-        </button>
-        <button class="button" @click="updateCorpseThumb">
-          update thumb
-        </button>
+          text="remove"
+        />
+        <Button @click="updateCorpseThumb" text="update thumb" />
       </div>
     </Panel>
 
     <Panel class="admin-index">
       <h1>section</h1>
       <div class="input-wrap">
-        <input v-model="section.id" placeholder="enter sectionId" />
-        <button
-          class="button solid red"
+        <Input v-model="section.id" placeholder="enter sectionId" />
+        <Button
+          color="red"
           @click="removeSectionAndItsReferences(section.id)"
-        >
-          remove section
-        </button>
+          text="remove section"
+        />
       </div>
     </Panel>
 
     <Panel class="admin-index">
-      <button class="button" @click="signOut">
-        sign out
-      </button>
+      <Button @click="signOut" text="sign out" />
     </Panel>
   </div>
 </template>
 
 <script>
 import Panel from "~/components/Panel.vue";
+import Input from "~/components/Input.vue";
+import Button from "~/components/Button.vue";
 import { mergeBase64 } from "~/assets/js/mergeImages";
 import { randomWordFromString } from "~/assets/js/randomWords";
 
 export default {
   name: "admin",
-  components: { Panel },
+  components: { Panel, Input, Button },
   middleware: ["password-protect"],
   data: () => ({ corpse: { id: null, section: null }, section: { id: null } }),
   mounted() {
@@ -351,26 +345,5 @@ export default {
       margin-top: 1rem;
     }
   }
-}
-
-input {
-  position: relative;
-  width: 100%;
-  padding: 0.5rem 0;
-
-  font-size: inherit;
-  font-family: inherit;
-
-  border: none;
-  border-radius: 0;
-  background: none;
-
-  border-bottom: 1px dotted var(--orange);
-}
-
-::placeholder,
-input.temp {
-  color: #7f7f7f;
-  opacity: 1;
 }
 </style>

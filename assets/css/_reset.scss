@@ -7,6 +7,15 @@
   user-select: none;
 }
 
+input {
+  font-size: inherit;
+  font-family: inherit;
+
+  border: none;
+  border-radius: 0;
+  background: none;
+}
+
 input[type="text"] {
   user-select: initial;
 }

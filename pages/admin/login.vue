@@ -1,25 +1,25 @@
 <template>
   <div class="wrap">
     <Panel class="admin">
-      <input
+      <Input
         v-model="password"
         type="password"
         placeholder="password"
         ref="pwInput"
       />
-      <button class="button" @click.prevent="logIn">
-        log in
-      </button>
+      <Button @click="logIn" text="log in" />
     </Panel>
   </div>
 </template>
 
 <script>
 import Panel from "~/components/Panel.vue";
+import Input from "~/components/Input.vue";
+import Button from "~/components/Button.vue";
 
 export default {
   name: "login",
-  components: { Panel },
+  components: { Panel, Input, Button },
   data: () => ({ password: "", isAuthorised: false }),
   mounted() {
     this.isAuthorised = this.$passwordProtect.isAuthorised();
@@ -32,7 +32,7 @@ export default {
         this.$router.push("/admin");
       } else {
         this.password = "";
-        this.$refs.pwInput.placeholder = "sry, wrong";
+        this.$refs.pwInput.$refs.inputRef.placeholder = "sry, wrong";
       }
     },
   },
@@ -44,26 +44,5 @@ export default {
   > .content {
     justify-content: stretch;
   }
-}
-
-input {
-  position: relative;
-  width: 100%;
-  padding: 0.5rem 0;
-
-  font-size: inherit;
-  font-family: inherit;
-
-  border: none;
-  border-radius: 0;
-  background: none;
-
-  border-bottom: 1px dotted var(--orange);
-}
-
-::placeholder,
-input.temp {
-  color: #7f7f7f;
-  opacity: 1;
 }
 </style>

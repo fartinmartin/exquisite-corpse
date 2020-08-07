@@ -10,44 +10,40 @@
       <CanvasThumb :section="computedPaths" ref="thumbCanvas" />
       <Panel class="save-form">
         <form>
-          <div>
-            <label for="title">
-              <span class="hom">your section's </span>title:
-            </label>
-            <input
-              type="text"
-              v-model="title"
-              id="title"
-              :placeholder="title"
-              :class="{ temp: isTempTitle }"
-              @focus="isTempTitle = false"
-              maxlength="17"
+          <Input
+            id="title"
+            v-model="title"
+            label="your section's title:"
+            :placeholder="title"
+            :class="{ temp: isTempTitle }"
+            @focus="isTempTitle = false"
+            :maxlength="17"
+          />
+          <Input
+            class="mt"
+            id="artist"
+            v-model="artist"
+            label="your *ahem* artist name:"
+            note="(@s will link to your instagram)"
+            :placeholder="artist"
+            :class="{ temp: isTempArtist }"
+            @focus="isTempArtist = false"
+            :maxlength="30"
+          />
+
+          <div style="margin-top: 2rem;">
+            <Button
+              @click="saveDrawing"
+              color="yellow"
+              text="save & show me our masterpiece!"
             />
           </div>
           <div class="mt">
-            <label for="artist">
-              <span class="hom">your *ahem* artist</span> name:
-              <span class="note">(@s will link to your instagram)</span>
-            </label>
-            <input
-              type="text"
-              v-model="artist"
-              id="artist"
-              :placeholder="artist"
-              :class="{ temp: isTempArtist }"
-              @focus="isTempArtist = false"
-              maxlength="30"
+            <Button
+              @click="$emit('close-save')"
+              text="wait, i'm not done drawing"
+              style="color: var(--orange);"
             />
-          </div>
-          <div class="mt" style="margin-top: 2rem;">
-            <button @click.prevent="saveDrawing" class="button solid yellow">
-              save & show me our masterpiece!
-            </button>
-          </div>
-          <div class="mt">
-            <button @click.prevent="$emit('close-save')" class="button">
-              wait, i'm not done <span class="hom">drawing</span>
-            </button>
           </div>
         </form>
         <div class="loadal" v-show="isSaving !== 'idle'">
@@ -268,65 +264,6 @@ export default {
 
   .loading-wrap {
     padding-top: initial !important;
-  }
-}
-
-/* TODO: abstract form elements into their own components */
-form {
-  > div {
-    display: flex;
-    align-items: baseline;
-  }
-
-  label,
-  input {
-    position: relative;
-    width: 100%;
-    padding: 0.5rem 0;
-
-    font-size: inherit;
-    font-family: inherit;
-
-    border: none;
-    border-radius: 0;
-    background: none;
-
-    border-bottom: 1px dotted var(--orange);
-  }
-
-  label {
-    @media screen and (max-width: 544px) {
-      width: 25%;
-      padding-right: 1rem;
-    }
-  }
-
-  ::placeholder,
-  input.temp {
-    color: #7f7f7f;
-    opacity: 1;
-  }
-
-  label span.note {
-    width: 100%;
-    display: block;
-
-    position: absolute;
-    right: 0;
-    bottom: 0;
-    transform: translate3d(100%, 100%, 0);
-
-    font-size: 10px;
-    text-align: center;
-
-    @media screen and (max-width: 544px) {
-      transform: translate3d(calc(100% - 4rem), 100%, 0);
-      width: 400%;
-    }
-  }
-
-  button {
-    color: var(--orange);
   }
 }
 </style>
