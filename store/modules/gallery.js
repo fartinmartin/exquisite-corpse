@@ -1,3 +1,4 @@
+// pretty sure none of this does anything right now (8/6/2020) 🤷‍♂️
 export const state = () => ({
   corpse: {},
   sections: {},
