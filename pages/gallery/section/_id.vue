@@ -1,11 +1,23 @@
 <template>
   <div class="wrap">
-    <Loading subtext="getting paint ready" v-if="isFetching !== 'success'" />
+    <Loading
+      v-if="isFetching === 'error'"
+      text="oh dear"
+      subtext="we could not find this section!"
+      color="red"
+    />
+
+    <Loading
+      subtext="preparing our canvas"
+      v-else-if="isFetching !== 'success'"
+    />
+
     <Canvas
+      :id="section.docId"
       mode="display"
       :section="section"
       ref="previewCanvas"
-      v-if="isFetching === 'success'"
+      v-else-if="isFetching === 'success'"
     />
 
     <Panel class="mt meta" :is-loading="isFetching">
@@ -49,13 +61,20 @@
     </Panel>
 
     <Loading
+      v-if="isFetching === 'error'"
+      text="srsy, sry"
+      color="red"
+      style="padding-top: 31.6176471% !important;"
+    />
+
+    <Loading
       subtext="checkin out the studio"
-      v-if="isFetching !== 'success' && related.toggle === 'featuredIn'"
+      v-else-if="isFetching !== 'success' && related.toggle === 'featuredIn'"
       style="padding-top: 31.6176471% !important;"
     />
 
     <div
-      v-if="isFetching === 'success' && related.toggle === 'featuredIn'"
+      v-else-if="isFetching === 'success' && related.toggle === 'featuredIn'"
       class="gallery mw-canvas"
       :class="{ more: related.toggle === 'moreBy' }"
     >
@@ -73,7 +92,9 @@
       class="gallery more-by"
     >
       <div v-if="!related.moreBy.length" class="none-found">
-        <span class="border">no drawings found!</span>
+        <Panel color="blue" style="width: max-content; margin: 0 auto;">
+          no drawings found!
+        </Panel>
       </div>
       <nuxt-link
         v-for="drawing in related.moreBy"
@@ -115,16 +136,21 @@ export default {
     async getSectionById(id) {
       this.isFetching = "fetching";
 
-      const query = this.$fireStore.collection("sections").doc(id);
-      const doc = await query.get();
+      try {
+        const query = this.$fireStore.collection("sections").doc(id);
+        const doc = await query.get();
 
-      this.section = { docId: doc.id, ...doc.data() };
-      this.section.paths = Object.values(this.section.drawing);
+        this.section = { docId: doc.id, ...doc.data() };
+        this.section.paths = Object.values(this.section.drawing);
 
-      await this.getFeaturedIn();
-      await this.getMoreBy();
+        await this.getFeaturedIn();
+        await this.getMoreBy();
 
-      this.isFetching = "success";
+        this.isFetching = "success";
+      } catch (error) {
+        console.error(error);
+        this.isFetching = "error";
+      }
     },
 
     async getFeaturedIn() {
@@ -216,6 +242,7 @@ h1 {
 .gallery.more-by {
   grid-template-rows: repeat(2, max-content);
   min-height: 172px;
+  position: relative;
 
   @media screen and (max-width: calc(544px + calc(40px / 2))) {
     grid-template-rows: calc(calc(100vw - 40px) / 3);
@@ -224,15 +251,10 @@ h1 {
 }
 
 .none-found {
-  text-align: center;
-  grid-column: 1 / -1;
-  margin-top: 60px;
-
-  span {
-    padding: 1rem;
-    background: var(--white);
-    border: 2px solid var(--light-blue);
-  }
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate3d(-50%, -50%, 0);
 }
 </style>
 

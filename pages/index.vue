@@ -7,7 +7,10 @@
       <NavMenu />
     </Panel>
 
-    <Loading v-if="isFetching !== 'success'" subtext="fetching random corpse" />
+    <Loading
+      v-if="isFetching !== 'success'"
+      subtext="digging up a random corpse"
+    />
     <Display v-if="isFetching === 'success'" :sections="sections" />
 
     <Panel class="mt index-title">

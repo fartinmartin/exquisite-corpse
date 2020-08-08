@@ -1,7 +1,18 @@
 <template>
   <div class="wrap">
-    <Loading v-if="isFetching !== 'success'" subtext="waking up our artists" />
-    <Display v-if="isFetching === 'success'" :sections="sections" />
+    <Loading
+      v-if="isFetching === 'error'"
+      text="oh dear"
+      subtext="we could not find this corpse!"
+      color="red"
+    />
+
+    <Loading
+      v-else-if="isFetching !== 'success'"
+      subtext="waking up our artists"
+    />
+
+    <Display v-else-if="isFetching === 'success'" :sections="sections" />
 
     <Panel class="mt corpse-meta" :is-loading="isFetching">
       <h1>{{ meta.title }}</h1>
@@ -16,6 +27,7 @@ import Loading from "~/components/Loading.vue";
 import MetaMenu from "~/components/MetaMenu.vue";
 
 export default {
+  name: "Corpse",
   head() {
     return {
       title: `exquisite corpse club • ${this.meta.title}`,
@@ -34,13 +46,18 @@ export default {
     async getCorpseById(id) {
       this.isFetching = "fetching";
 
-      const query = this.$fireStore.collection("corpses").doc(id);
-      const doc = await query.get();
+      try {
+        const query = this.$fireStore.collection("corpses").doc(id);
+        const doc = await query.get();
 
-      this.meta = { docId: doc.id, ...doc.data() };
-      await this.getSections(doc.data().sections);
+        this.meta = { docId: doc.id, ...doc.data() };
+        await this.getSections(doc.data().sections);
 
-      this.isFetching = "success";
+        this.isFetching = "success";
+      } catch (error) {
+        console.error(error);
+        this.isFetching = "error";
+      }
     },
 
     async getSections(sections) {
