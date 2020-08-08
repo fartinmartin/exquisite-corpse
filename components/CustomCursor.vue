@@ -104,8 +104,8 @@ export default {
       }
     },
     checkFocus() {
-      // 🚨 cursor var throws errors sometimes.. doesn't seem worth dealing with right now
-      if (process.client) {
+      // 🚨 currently not executing right now, will check on this later
+      if (process.client && this.$refs.cursorRef) {
         const cursor = this.$refs.cursorRef;
         if (document.hasFocus()) {
           cursor.style.display = "initial";
