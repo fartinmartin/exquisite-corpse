@@ -1,7 +1,7 @@
 <template>
   <button @click="saveImage" data-tooltip="download">
     <div class="icon interactive">
-      <img src="~/assets/img/toolbar/save.svg" alt="" />
+      <img src="~/assets/img/icons/download.svg" alt="" />
     </div>
   </button>
 </template>

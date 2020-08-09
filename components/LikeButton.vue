@@ -2,7 +2,7 @@
   <button @click="handleClick">
     <div class="icon interactive" :data-tooltip="isLiked ? 'unlike' : 'like'">
       <span>{{ likes }}</span>
-      <div style="width: 25px; height: 25px;">
+      <div style="width: 25px; height: 25px; pointer-events: none;">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 60">
           <defs>
             <style>
