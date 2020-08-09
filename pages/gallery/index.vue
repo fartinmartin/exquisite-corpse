@@ -9,7 +9,7 @@
 
     <Panel class="mb filters">
       <form>
-        <div>
+        <div class="radio" :class="{ active: type === 'corpses' }">
           <input
             type="radio"
             id="corpse"
@@ -18,11 +18,15 @@
             v-model="type"
             @click="handleTypeChoice"
           />
-          <label for="corpse" data-tooltip="filter by">
-            <h1 class="icon interactive">c<span class="hom">orpses</span></h1>
+          <label
+            class="icon interactive"
+            for="corpse"
+            data-tooltip="filter by full corpses"
+          >
+            <img src="~/assets/img/icons/corpses.svg" />
           </label>
         </div>
-        <div>
+        <div class="radio" :class="{ active: type === 'top' }">
           <input
             type="radio"
             id="tops"
@@ -31,11 +35,15 @@
             v-model="type"
             @click="handleTypeChoice"
           />
-          <label for="tops" data-tooltip="filter by">
-            <h1 class="icon interactive">t<span class="hom">ops</span></h1>
+          <label
+            class="icon interactive"
+            for="tops"
+            data-tooltip="filter by tops"
+          >
+            <img src="~/assets/img/icons/tops.svg" />
           </label>
         </div>
-        <div>
+        <div class="radio" :class="{ active: type === 'mid' }">
           <input
             type="radio"
             id="mids"
@@ -44,11 +52,15 @@
             v-model="type"
             @click="handleTypeChoice"
           />
-          <label for="mids" data-tooltip="filter by">
-            <h1 class="icon interactive">m<span class="hom">ids</span></h1>
+          <label
+            class="icon interactive"
+            for="mids"
+            data-tooltip="filter by middles"
+          >
+            <img src="~/assets/img/icons/mids.svg" />
           </label>
         </div>
-        <div>
+        <div class="radio" :class="{ active: type === 'bot' }">
           <input
             type="radio"
             id="bots"
@@ -57,13 +69,17 @@
             v-model="type"
             @click="handleTypeChoice"
           />
-          <label for="bots" data-tooltip="filter by">
-            <h1 class="icon interactive">b<span class="hom">ots</span></h1>
+          <label
+            class="icon interactive"
+            for="bots"
+            data-tooltip="filter by bottoms"
+          >
+            <img src="~/assets/img/icons/bots.svg" />
           </label>
         </div>
       </form>
       <form>
-        <div>
+        <div class="radio" :class="{ active: field === 'date' }">
           <input
             type="radio"
             id="date"
@@ -72,11 +88,15 @@
             v-model="field"
             @click="handleSortBy"
           />
-          <label for="date" data-tooltip="sort by">
-            <h1 class="icon interactive">d<span class="hom">ate</span></h1>
+          <label
+            class="icon interactive"
+            for="date"
+            data-tooltip="sort by date"
+          >
+            <Date />
           </label>
         </div>
-        <div>
+        <div class="radio" :class="{ active: field === 'likes' }">
           <input
             type="radio"
             id="likes"
@@ -85,8 +105,12 @@
             v-model="field"
             @click="handleSortBy"
           />
-          <label for="likes" data-tooltip="sort by">
-            <h1 class="icon interactive">l<span class="hom">ikes</span></h1>
+          <label
+            class="icon interactive"
+            for="likes"
+            data-tooltip="sort by likes"
+          >
+            <img src="~/assets/img/icons/heart.svg" alt="" />
           </label>
         </div>
       </form>
@@ -121,10 +145,11 @@ import Panel from "~/components/Panel.vue";
 import Loading from "~/components/Loading.vue";
 import Drawing from "~/components/Drawing.vue";
 import PrevNext from "~/components/PrevNext.vue";
+import Date from "~/components/Date.vue";
 
 export default {
   name: "gallery",
-  components: { Panel, Loading, Drawing, PrevNext },
+  components: { Panel, Loading, Drawing, PrevNext, Date },
   head() {
     return {
       title: "exquisite corpse club • gallery",
@@ -265,13 +290,6 @@ export default {
 
   .content {
     justify-content: space-between;
-
-    > *:nth-child(1) {
-      margin-left: calc(-1rem + 8px);
-    }
-    > *:nth-child(2) {
-      margin-right: calc(-1rem + 8px);
-    }
   }
 }
 </style>
@@ -299,11 +317,6 @@ export default {
 form {
   display: flex;
 
-  .icon {
-    width: auto;
-    padding: 0 5px;
-  }
-
   input {
     display: none;
   }
@@ -313,13 +326,8 @@ form {
   }
 }
 
-input:checked + label * {
-  font-weight: bold;
-  opacity: 1;
-}
-
-input:not(:checked) + label h1 {
-  font-weight: normal;
-  opacity: 0.5;
+.radio:not(.active) {
+  filter: grayscale(1);
+  opacity: 0.6;
 }
 </style>

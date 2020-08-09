@@ -79,7 +79,8 @@ export default {
     this.canvas.addEventListener("touchend", (e) => e.preventDefault());
     this.canvas.addEventListener("touchcancel", (e) => e.preventDefault());
 
-    ctx.fillStyle = "#ffffff"; // set white bg (no transparency!)
+    // set white bg (no transparency!) TODO: should this happen in "draw" mode? its probably not a big deal, but if a user's first path is "erase" and second is "fill" this bug becomes apparent.
+    ctx.fillStyle = "#ffffff";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     // dispatch based on this.mode

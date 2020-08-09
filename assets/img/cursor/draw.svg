@@ -1,15 +1,25 @@
-<svg viewBox="0 0 44.83 44.84" xmlns="http://www.w3.org/2000/svg">
-    <path d="m42 22.83-8.01 7.99-4.99-4.99-10-10-5-5 8-8z" fill="#ee74a7"/>
-    <path d="m33.99 30.82-12.03 12.01h-1.97l-.03-7.98h.02l9.02-9.02z" fill="#f7941d"/>
-    <path d="m29 25.83-9.02 9.02h-.02v-.02h-9.96v-10l9-9z" fill="#fbb040"/>
-    <path d="m19.96 34.85.03 7.98h-12.99l-5-5v-13h8v10h9.96z" fill="#fff3b5"/>
-    <path d="m19 15.83-9 9h-8v-2l12-12z" fill="#ffc840"/>
-    <g fill="none" stroke="#231f20" stroke-miterlimit="10" stroke-width="4">
-        <path d="m14 10.83 8-8 20 20-8.01 7.99-12.03 12.01h-1.97-12.99-5v-5-13-2z"/>
-        <path d="m14 10.83 5 5 10 10 4.99 4.99.01.01"/>
-        <path d="m2 37.83 5 5"/>
-        <path d="m20 44.83-.01-2-.03-7.98v-.02h-9.96v-10h-8-2"/>
-        <path d="m19 15.83-9 9"/>
-        <path d="m19.98 34.85 9.02-9.02"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 44.83 44.84">
+  <defs>
+    <style>
+      .cls-7 {
+        fill: none;
+        stroke: #231f20;
+        stroke-miterlimit: 10;
+        stroke-width: 4px
+      }
+    </style>
+  </defs>
+  <g id="Layer_2" data-name="Layer 2">
+    <g id="Draw">
+      <path fill="#ee74a7" d="M42 22.83l-8.01 7.99L29 25.83l-10-10-5-5 8-8 20 20z" />
+      <path fill="#f7941d" d="M33.99 30.82L21.96 42.83h-1.97l-.03-7.98h.02L29 25.83l4.99 4.99z" />
+      <path fill="#fbb040" d="M29 25.83l-9.02 9.02h-.02v-.02H10v-10l9-9 10 10z" />
+      <path fill="#fff3b5" d="M19.96 34.85l.03 7.98H7l-5-5v-13h8v10h9.96v.02z" />
+      <path fill="#ffc840" d="M19 15.83l-9 9H2v-2l12-12 5 5z" />
+      <path fill="#d96c9d" d="M29 25.83l8.01-7.99L42 22.83l-8 8-5-5z" />
+      <path class="cls-7"
+        d="M14 10.83l8-8 20 20-8.01 7.99-12.03 12.01H2v-20l12-12zM14 10.83l5 5 10 10 4.99 4.99.01.01M2 37.83l5 5" />
+      <path class="cls-7" d="M20 44.83l-.01-2-.03-7.98v-.02H10v-10H0" />
     </g>
+  </g>
 </svg>

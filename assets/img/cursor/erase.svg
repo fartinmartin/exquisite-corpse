@@ -1,15 +1,25 @@
-<svg viewBox="0 0 45.79 40.01" xmlns="http://www.w3.org/2000/svg">
-    <path d="m2.83 23.01 8.01-7.99 4.99 4.99 10 10 5 5-3 3h-5-5z" fill="#ee74a7"/>
-    <path d="m10.84 15.02 12.99-13.01h1.97l.03 7.98h-.02l-9.98 10.02z" fill="#ffc840"/>
-    <path d="m15.83 20.01 9.98-10.02h.02v.02h9.96v10l-9.96 10z" fill="#fbb040"/>
-    <path d="m25.83 9.99-.03-7.98h12.99l5 5v13h-8v-10h-9.96z" fill="#fff3b5"/>
-    <path d="m25.83 30.01 9.96-10h8v2l-12.96 13z" fill="#f7941d"/>
-    <g fill="none" stroke="#231f20" stroke-miterlimit="10" stroke-width="4">
-        <path d="m30.83 35.01-3 3h-5-5l-15-15 8.01-7.99 12.99-13.01h1.97 12.99 5v5 13 2z"/>
-        <path d="m30.83 35.01-5-5-10-10-4.99-4.99-.01-.01"/>
-        <path d="m43.79 7.01-5-5"/>
-        <path d="m25.79.01.01 2 .03 7.98v.02h9.96v10h8 2"/>
-        <path d="m25.83 30.01 9.96-10"/>
-        <path d="m25.81 9.99-9.98 10.02"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 45.79 40.01">
+  <defs>
+    <style>
+      .cls-7 {
+        fill: none;
+        stroke: #231f20;
+        stroke-miterlimit: 10;
+        stroke-width: 4px
+      }
+    </style>
+  </defs>
+  <g id="Layer_2" data-name="Layer 2">
+    <g id="Erase">
+      <path fill="#ee74a7" d="M2.83 23.01l8.01-7.99 4.99 4.99 10 10 5 5-3 3h-10l-15-15z" />
+      <path fill="#ffc840" d="M10.84 15.02L23.83 2.01h1.97l.03 7.98h-.02l-9.98 10.02-4.99-4.99z" />
+      <path fill="#fbb040" d="M15.83 20.01l9.98-10.02h.02v.02h9.96v10l-9.96 10-10-10z" />
+      <path fill="#fff3b5" d="M25.83 9.99l-.03-7.98h12.99l5 5v13h-8v-10h-9.96v-.02z" />
+      <path fill="#f7941d" d="M25.83 30.01l9.96-10h8v2l-12.96 13-5-5z" />
+      <path fill="#d96c9d" d="M17.79 38.01l8.04-8 5 5-3 3H17.79z" />
+      <path class="cls-7"
+        d="M30.83 35.01l-3 3h-10l-15-15 8.01-7.99L23.83 2.01h19.96v20l-12.96 13zM30.83 35.01l-5-5-10-10-4.99-4.99-.01-.01M43.79 7.01l-5-5" />
+      <path class="cls-7" d="M25.79.01l.01 2 .03 7.98v.02h9.96v10h10" />
     </g>
+  </g>
 </svg>
