@@ -37,6 +37,8 @@
 </template>
 
 <script>
+import { mapState } from "vuex";
+
 export default {
   name: "LikeButton",
   props: {
@@ -44,6 +46,7 @@ export default {
     docId: { type: String, required: true },
   },
   data: () => ({ likes: 0, isLiked: false }),
+  computed: mapState("modules/user/", ["id"]),
   mounted() {
     this.subscribeToLikes();
   },
@@ -57,6 +60,7 @@ export default {
         .doc(this.docId)
         .onSnapshot((doc) => {
           this.likes = doc.data().likes;
+          this.isLiked = doc.data().likedBy.includes(this.id);
         });
       if (destory) return likesRef();
     },
@@ -64,15 +68,27 @@ export default {
     handleClick() {
       const increment = this.$fireStoreObj.FieldValue.increment(1);
       const decrement = this.$fireStoreObj.FieldValue.increment(-1);
+      const likedBy = this.$fireStoreObj.FieldValue.arrayUnion(this.id);
+      const dislikedBy = this.$fireStoreObj.FieldValue.arrayRemove(this.id);
 
       const docRef = this.$fireStore
         .collection(this.collection)
         .doc(this.docId);
 
-      !this.isLiked && docRef.update({ likes: increment });
-      this.isLiked && this.likes !== 0 && docRef.update({ likes: decrement });
+      const batch = this.$fireStore.batch();
 
-      this.isLiked = !this.isLiked;
+      if (!this.isLiked) {
+        batch.update(docRef, { likes: increment });
+        batch.update(docRef, { likedBy });
+      } else if (this.isLiked && this.likes !== 0) {
+        batch.update(docRef, { likes: decrement });
+        batch.update(docRef, { likedBy: dislikedBy });
+      }
+
+      batch
+        .commit()
+        .then(() => console.log("we did it!"))
+        .catch((error) => console.error(error));
     },
   },
 };
