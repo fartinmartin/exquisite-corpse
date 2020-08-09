@@ -110,7 +110,7 @@
             for="likes"
             data-tooltip="sort by likes"
           >
-            <img src="~/assets/img/icons/heart.svg" alt="" />
+            <img src="~/assets/img/icons/heart_.svg" alt="" />
           </label>
         </div>
       </form>
@@ -290,6 +290,14 @@ export default {
 
   .content {
     justify-content: space-between;
+
+    > *:nth-child(1) {
+      margin-left: -6px;
+    }
+
+    > *:nth-child(2) {
+      margin-right: -6px;
+    }
   }
 }
 </style>

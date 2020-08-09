@@ -206,6 +206,10 @@ h1 {
 
 .meta > .content {
   justify-content: space-between;
+
+  > *:nth-child(2) {
+    margin-right: -6px;
+  }
 }
 
 .related > .content {

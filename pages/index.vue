@@ -4,7 +4,7 @@
       <nuxt-link to="/">
         <h1>exquisite corpse club</h1>
       </nuxt-link>
-      <NavMenu />
+      <NavMenu style="margin-right: -6px;" />
     </Panel>
 
     <Loading

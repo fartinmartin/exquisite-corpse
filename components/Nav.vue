@@ -6,7 +6,7 @@
           <h1 v-show="this.$route.name === 'index'">exquisite corpse club</h1>
           <h1 v-show="this.$route.name !== 'index'" data-tooltip="home">ecc</h1>
         </nuxt-link>
-        <NavMenu />
+        <NavMenu style="margin-right: -6px;" />
       </nav>
     </Panel>
 

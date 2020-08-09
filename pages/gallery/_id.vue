@@ -81,6 +81,10 @@ export default {
 
   > .content {
     justify-content: space-between;
+
+    > *:nth-child(2) {
+      margin-right: -6px;
+    }
   }
 }
 </style>
