@@ -2,7 +2,36 @@
   <button @click="handleClick">
     <div class="icon interactive" :data-tooltip="isLiked ? 'unlike' : 'like'">
       <span>{{ likes }}</span>
-      <img src="~/assets/img/icons/heart.svg" alt="" />
+      <div style="width: 25px; height: 25px;">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 60">
+          <defs>
+            <style>
+              .cls-1 {
+                fill: none;
+              }
+              .cls-2 {
+                fill: none;
+                stroke: #f54e3b;
+                stroke-miterlimit: 10;
+                stroke-width: 4px;
+              }
+              .cls-2.liked {
+                fill: #ee74a7;
+              }
+            </style>
+          </defs>
+          <g id="Layer_2" data-name="Layer 2">
+            <g id="Heart">
+              <rect class="cls-1" width="60" height="60" />
+              <polygon
+                class="cls-2"
+                :class="{ liked: isLiked }"
+                points="30 46.76 40 39 47 31 49 23 47 15.76 42 12.76 36 13.76 30 18.75 24 13.76 18 12.76 13 15.76 11 23 13 31 20 39 30 46.76"
+              />
+            </g>
+          </g>
+        </svg>
+      </div>
     </div>
   </button>
 </template>
