@@ -6,7 +6,7 @@
         <span v-if="error.statusCode === 404">this page does not exist!</span>
         <span v-else>an error occurred!</span>
       </h1>
-      <span>check out our <nuxt-link to="/gallery">gallery</nuxt-link></span>
+      <span>best head back <nuxt-link to="/">home</nuxt-link></span>
     </Panel>
   </div>
 </template>
