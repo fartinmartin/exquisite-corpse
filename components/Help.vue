@@ -32,7 +32,7 @@
           </p>
           <nuxt-link to="/draw" @click.native="closeAndDraw">
             <Button color="yellow">
-              <span class="icon">
+              <span class="icon hom">
                 <img src="~/assets/img/toolbar/draw.svg" />
               </span>
               start drawing!
@@ -74,7 +74,6 @@ export default {
 
 <style lang="scss" scoped>
 .help-wrap {
-  padding: calc(40px / 3);
   max-width: initial;
   width: auto;
   margin: 0 auto;

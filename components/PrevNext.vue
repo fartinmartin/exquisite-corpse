@@ -36,7 +36,7 @@ export default {
   width: 60px;
   height: 60px;
 
-  position: absolute;
+  position: fixed;
   z-index: 100;
   top: 50%;
   transform: translateY(-50%);

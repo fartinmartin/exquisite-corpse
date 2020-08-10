@@ -24,7 +24,7 @@ body,
   margin: 0 auto;
 
   @media screen and (max-width: 1040px) {
-    padding: calc(60px + calc(80px / 3)) 0; // could this be a percentage of height so that it is at minimum below menu and at best vertically centered?
+    padding: calc(60px + calc(40px / 3)) 0; // could this be a percentage of height so that it is at minimum below menu and at best vertically centered?
   }
 }
 
