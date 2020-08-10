@@ -154,6 +154,9 @@ import Drawing from "~/components/Drawing.vue";
 import PrevNext from "~/components/PrevNext.vue";
 import Date from "~/components/Date.vue";
 
+import { mapGetters } from "vuex";
+import { disableBodyScroll, enableBodyScroll } from "body-scroll-lock";
+
 export default {
   name: "gallery",
   components: { Panel, Loading, Drawing, PrevNext, Date },
@@ -185,9 +188,19 @@ export default {
     isLastPage() {
       return this.emptyNextResults || this.gallery.length < this.pageSize;
     },
+    ...mapGetters(["isMobile"]),
   },
   mounted() {
     this.fetchFirst();
+
+    const tino = document.getElementById("__tino");
+    enableBodyScroll(tino);
+  },
+  beforeDestroy() {
+    const tino = document.getElementById("__tino");
+    disableBodyScroll(tino, {
+      allowTouchMove: (el) => el.tagName === "CANVAS",
+    });
   },
   methods: {
     // https://stackoverflow.com/questions/62639778/paginating-firestore-data-when-using-vuex-and-appending-new-data-to-the-state

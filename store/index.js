@@ -3,7 +3,7 @@ export const state = () => ({
 });
 
 export const getters = {
-  isMobile: () => process.client && window.innerWidth < 571,
+  isMobile: () => process.client && window.innerWidth < 571, // 571 is when .gallery starts to shrink!
 };
 
 export const actions = {
