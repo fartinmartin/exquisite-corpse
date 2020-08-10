@@ -35,6 +35,8 @@ export default {
 
 <style lang="scss">
 .calendar-icon {
+  width: 100%;
+
   .cls-1,
   .cls-3 {
     fill: none;
