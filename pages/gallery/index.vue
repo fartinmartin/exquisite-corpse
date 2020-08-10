@@ -1,13 +1,14 @@
 <template>
   <div class="wrap">
     <PrevNext
+      v-if="!isMobile"
       :isFirstPage="isFirstPage"
       :isLastPage="isLastPage"
       @prev="prevPage"
       @next="nextPage"
     />
 
-    <Panel class="mb filters">
+    <Panel class="mb filters" :class="{ sticky: isMobile }">
       <form>
         <div class="radio" :class="{ active: type === 'corpses' }">
           <input
@@ -133,6 +134,7 @@
       v-else-if="isFetching === 'success'"
       class="gallery mw-canvas"
       :class="{ section: collection === 'sections' }"
+      ref="gallery"
     >
       <nuxt-link
         v-for="drawing in gallery"
@@ -144,6 +146,7 @@
         <Drawing :drawing="drawing" />
       </nuxt-link>
     </div>
+    <Observer v-if="isMobile" @intersect="nextPage" />
   </div>
 </template>
 
@@ -153,13 +156,14 @@ import Loading from "~/components/Loading.vue";
 import Drawing from "~/components/Drawing.vue";
 import PrevNext from "~/components/PrevNext.vue";
 import Date from "~/components/Date.vue";
+import Observer from "~/components/Observer.vue";
 
 import { mapGetters } from "vuex";
 import { disableBodyScroll, enableBodyScroll } from "body-scroll-lock";
 
 export default {
   name: "gallery",
-  components: { Panel, Loading, Drawing, PrevNext, Date },
+  components: { Panel, Loading, Drawing, PrevNext, Date, Observer },
   head() {
     return {
       title: "exquisite corpse club • gallery",
@@ -177,6 +181,7 @@ export default {
     pageSize: 9, // 9, 18
     emptyNextResults: null,
     emptyPrevResults: null,
+    scrollY: 0,
   }),
   computed: {
     isFirstPage() {
@@ -236,6 +241,8 @@ export default {
     async nextPage() {
       try {
         this.isFetching = "fetching";
+        // if (this.isMobile)
+        //   this.$refs.gallery.style.minHeight = this.$refs.gallery.offsetHeight;
 
         let query = this.$fireStore.collection(this.collection);
         if (this.collection === "sections")
@@ -247,7 +254,7 @@ export default {
 
         const nextResponse = await query.get();
         if (!nextResponse.empty) {
-          this.gallery = [];
+          if (!this.isMobile) this.gallery = [];
           this.emptyPrevResults = false;
 
           this.lastVisible = nextResponse.docs[nextResponse.docs.length - 1];
@@ -262,6 +269,7 @@ export default {
         }
 
         this.isFetching = "success";
+        // if (this.isMobile) this.$refs.gallery.style.minHeight = "initial";
       } catch (error) {
         console.error(error);
         this.isFetching = "error";
@@ -334,6 +342,11 @@ export default {
 <style lang="scss">
 .filters {
   height: 60px;
+
+  &.sticky {
+    position: sticky;
+    top: calc(40px / 3);
+  }
 
   .content {
     justify-content: space-between;
