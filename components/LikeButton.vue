@@ -1,7 +1,9 @@
 <template>
   <button @click="handleClick">
     <div class="icon interactive" :data-tooltip="isLiked ? 'unlike' : 'like'">
-      <span>{{ likes }}</span>
+      <transition name="slide-fade">
+        <span v-show="likes > 0">{{ likes }}</span>
+      </transition>
       <div
         style="width: 25px; height: 25px; pointer-events: none;"
         :class="{ liked: isLiked }"
@@ -73,6 +75,20 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.slide-fade-enter-active {
+  transition: all 0.3s ease;
+}
+
+.slide-fade-leave-active {
+  transition: all 0.3s cubic-bezier(1, 0.5, 0.8, 1);
+}
+
+.slide-fade-enter,
+.slide-fade-leave-to {
+  transform: translateY(10px);
+  opacity: 0;
+}
+
 .icon {
   width: auto;
   padding: 0 5px;
