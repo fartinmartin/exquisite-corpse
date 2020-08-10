@@ -22,7 +22,10 @@
 
     <Panel class="mt meta" :is-loading="isFetching">
       <div>
-        <h1>{{ section.title }} <span>by</span> {{ section.artist }}</h1>
+        <h1>
+          {{ section.title }} <span><br class="br" />by</span>
+          {{ section.artist }}
+        </h1>
       </div>
       <MetaMenu collection="sections" :doc="section" />
     </Panel>
@@ -195,6 +198,10 @@ h1 {
   span {
     font-weight: normal;
   }
+
+  @media screen and (max-width: calc(544px + calc(40px / 2))) {
+    white-space: normal;
+  }
 }
 </style>
 
@@ -202,6 +209,18 @@ h1 {
 .meta,
 .related {
   height: 60px;
+}
+
+.meta {
+  @media screen and (max-width: calc(544px + calc(40px / 2))) {
+    height: auto;
+  }
+
+  .br {
+    @media screen and (min-width: 444px) {
+      display: none;
+    }
+  }
 }
 
 .meta > .content {
