@@ -37,7 +37,8 @@ export default {
         .doc(this.docId)
         .onSnapshot((doc) => {
           this.likes = doc.data().likes;
-          this.isLiked = doc.data().likedBy.includes(this.id);
+          this.isLiked =
+            doc.data().likedBy && doc.data().likedBy.includes(this.id);
         });
       if (destory) return likesRef();
     },
