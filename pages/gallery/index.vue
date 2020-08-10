@@ -194,11 +194,14 @@ export default {
     async fetchFirst() {
       try {
         this.isFetching = "fetching";
+        this.gallery = [];
+        this.emptyPrevResults = false;
+        this.emptyNextResults = false;
 
-        let query = this.$fireStore
-          .collection(this.collection)
-          .orderBy(this.field, "desc")
-          .limit(this.pageSize);
+        let query = this.$fireStore.collection(this.collection);
+        if (this.collection === "sections")
+          query = query.where("type", "==", this.type);
+        query = query.orderBy(this.field, "desc").limit(this.pageSize);
 
         const firstResponse = await query.get();
         this.firstVisible = firstResponse.docs[0];
