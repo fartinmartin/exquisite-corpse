@@ -55,10 +55,10 @@ export default {
       this.isSaving = true;
     },
     closeSave(e) {
-      this.isSaving = false;
       if (e) {
         this.$router.push({ path: `/gallery/${e}` });
       }
+      this.isSaving = false;
     },
     async handlePickedType(type) {
       this.isFetching = "fetching";
