@@ -117,13 +117,20 @@
     </Panel>
 
     <Loading
-      v-if="isFetching !== 'success'"
+      v-if="isFetching === 'error'"
+      color="red"
+      text="oh no"
+      subtext="we have misplaced our corpses!"
+    />
+
+    <Loading
+      v-else-if="isFetching !== 'success'"
       subtext="curating masterpieces"
       :throttle="500"
     />
 
     <div
-      v-if="isFetching === 'success'"
+      v-else-if="isFetching === 'success'"
       class="gallery mw-canvas"
       :class="{ section: collection === 'sections' }"
     >
@@ -157,7 +164,7 @@ export default {
   },
   data: () => ({
     isFetching: "idle", // "idle", "fetching", "success", TODO: "error"
-    gallery: [{ docId: "temp" }],
+    gallery: [],
     firstItemId: "",
     lastVisible: null,
     firstVisible: null,
@@ -165,18 +172,18 @@ export default {
     type: "corpses", // "corpses", "top", "mid", and "bot"
     field: "date", // "date", "likes"
     pageSize: 9, // 9, 18
+    emptyNextResults: null,
+    emptyPrevResults: null,
   }),
   computed: {
     isFirstPage() {
-      return (
-        this.isFetching !== "success" ||
-        this.gallery[0].docId === this.firstItemId
-      );
+      if (this.gallery.length > 0)
+        return (
+          this.emptyPrevResults || this.gallery[0].docId === this.firstItemId
+        );
     },
     isLastPage() {
-      return (
-        this.isFetching !== "success" || this.gallery.length < this.pageSize
-      );
+      return this.emptyNextResults || this.gallery.length < this.pageSize;
     },
   },
   mounted() {
@@ -185,75 +192,99 @@ export default {
   methods: {
     // https://stackoverflow.com/questions/62639778/paginating-firestore-data-when-using-vuex-and-appending-new-data-to-the-state
     async fetchFirst() {
-      this.isFetching = "fetching";
-      this.gallery = [{ docId: "temp" }];
+      try {
+        this.isFetching = "fetching";
 
-      let query = this.$fireStore.collection(this.collection);
-      if (this.collection === "sections")
-        query = query.where("type", "==", this.type);
-      query = query.orderBy(this.field, "desc").limit(this.pageSize);
+        let query = this.$fireStore
+          .collection(this.collection)
+          .orderBy(this.field, "desc")
+          .limit(this.pageSize);
 
-      const firstResponse = await query.get();
-      this.lastVisible = firstResponse.docs[firstResponse.docs.length - 1];
-      firstResponse.forEach((doc) => {
-        let mydoc = { docId: doc.id, thumb: doc.data().thumb };
-        this.gallery.push(mydoc);
-      });
+        const firstResponse = await query.get();
+        this.firstVisible = firstResponse.docs[0];
+        this.lastVisible = firstResponse.docs[firstResponse.docs.length - 1];
 
-      this.firstItemId = firstResponse.docs[0].id;
+        firstResponse.forEach((doc) => {
+          let mydoc = { docId: doc.id, thumb: doc.data().thumb };
+          this.gallery.push(mydoc);
+        });
 
-      this.gallery.shift();
-      this.isFetching = "success";
+        this.firstItemId = firstResponse.docs[0].id; // how necessary is this 🤔
+        this.isFetching = "success";
+      } catch (error) {
+        console.error(error);
+        this.isFetching = "error";
+      }
     },
 
     async nextPage() {
-      this.isFetching = "fetching";
-      this.gallery = [{ docId: "temp" }];
+      try {
+        this.isFetching = "fetching";
 
-      let query = this.$fireStore.collection(this.collection);
-      if (this.collection === "sections")
-        query = query.where("type", "==", this.type);
-      query = query
-        .orderBy(this.field, "desc")
-        .startAfter(this.lastVisible)
-        .limit(this.pageSize);
+        let query = this.$fireStore.collection(this.collection);
+        if (this.collection === "sections")
+          query = query.where("type", "==", this.type);
+        query = query
+          .orderBy(this.field, "desc")
+          .startAfter(this.lastVisible)
+          .limit(this.pageSize);
 
-      const nextResponse = await query.get();
-      nextResponse.forEach((doc) => {
-        let mydoc = { docId: doc.id, thumb: doc.data().thumb };
-        this.gallery.push(mydoc);
-      });
+        const nextResponse = await query.get();
+        if (!nextResponse.empty) {
+          this.gallery = [];
+          this.emptyPrevResults = false;
 
-      this.lastVisible = nextResponse.docs[nextResponse.docs.length - 1];
-      this.firstVisible = nextResponse.docs[0];
+          this.lastVisible = nextResponse.docs[nextResponse.docs.length - 1];
+          this.firstVisible = nextResponse.docs[0];
 
-      this.gallery.shift();
-      this.isFetching = "success";
+          nextResponse.forEach((doc) => {
+            let mydoc = { docId: doc.id, thumb: doc.data().thumb };
+            this.gallery.push(mydoc);
+          });
+        } else {
+          this.emptyNextResults = true;
+        }
+
+        this.isFetching = "success";
+      } catch (error) {
+        console.error(error);
+        this.isFetching = "error";
+      }
     },
 
     async prevPage() {
-      this.isFetching = "fetching";
-      this.gallery = [{ docId: "temp" }];
+      try {
+        this.isFetching = "fetching";
 
-      let query = this.$fireStore.collection(this.collection);
-      if (this.collection === "sections")
-        query = query.where("type", "==", this.type);
-      query = query
-        .orderBy(this.field, "desc")
-        .endBefore(this.firstVisible)
-        .limitToLast(this.pageSize);
+        let query = this.$fireStore.collection(this.collection);
+        if (this.collection === "sections")
+          query = query.where("type", "==", this.type);
+        query = query
+          .orderBy(this.field, "desc")
+          .endBefore(this.firstVisible)
+          .limitToLast(this.pageSize);
 
-      const prevResponse = await query.get();
-      prevResponse.forEach((doc) => {
-        let mydoc = { docId: doc.id, thumb: doc.data().thumb };
-        this.gallery.push(mydoc);
-      });
+        const prevResponse = await query.get();
+        if (!prevResponse.empty) {
+          this.gallery = [];
+          this.emptyNextResults = false;
 
-      this.lastVisible = prevResponse.docs[prevResponse.docs.length - 1];
-      this.firstVisible = prevResponse.docs[0];
+          this.lastVisible = prevResponse.docs[prevResponse.docs.length - 1];
+          this.firstVisible = prevResponse.docs[0];
 
-      this.gallery.shift();
-      this.isFetching = "success";
+          prevResponse.forEach((doc) => {
+            let mydoc = { docId: doc.id, thumb: doc.data().thumb };
+            this.gallery.push(mydoc);
+          });
+        } else {
+          this.emptyPrevResults = true;
+        }
+
+        this.isFetching = "success";
+      } catch (error) {
+        console.error(error);
+        this.isFetching = "error";
+      }
     },
 
     handleTypeChoice(e) {
