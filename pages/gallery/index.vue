@@ -239,6 +239,8 @@ export default {
     },
 
     async nextPage() {
+      if (this.isMobile && this.emptyNextResults) return;
+
       try {
         this.isFetching = "fetching";
         // if (this.isMobile)
@@ -369,7 +371,7 @@ export default {
 <style lang="scss" scoped>
 .gallery {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(calc(516px / 3), 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(calc(516px / 3), 1fr));
   grid-template-rows: repeat(auto-fill, minmax(calc(516px / 3), 1fr));
   grid-gap: calc(40px / 3);
   min-height: 542.667px;
