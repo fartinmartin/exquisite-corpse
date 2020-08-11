@@ -3,14 +3,12 @@
     <div class="canvas-wrap">
       <CanvasMeta
         v-if="mode === 'display'"
-        class="drawing-meta"
         :title="section.title"
         :artist="section.artist"
         :docId="section.docId"
       />
       <CanvasMeta
         v-if="mode === 'pixelate'"
-        class="drawing-meta disabled"
         :title="drawing.title"
         :artist="drawing.artist"
         ref="notAllowed"
@@ -343,10 +341,6 @@ export default {
   max-width: 540px;
   height: 0;
   padding-top: calc(100% / 3);
-
-  &:hover .drawing-meta {
-    display: block;
-  }
 }
 
 canvas {

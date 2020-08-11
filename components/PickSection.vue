@@ -58,6 +58,10 @@ export default {
   span {
     margin-right: 0.5rem;
   }
+
+  @media screen and (max-width: 418px) {
+    height: auto;
+  }
 }
 
 .section-template {

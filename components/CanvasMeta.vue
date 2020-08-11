@@ -1,11 +1,11 @@
 <template>
-  <div ref="bg">
-    <div class="info">
-      <nuxt-link v-if="docId" :to="`/gallery/section/${docId}`">
-        {{ title }}
-      </nuxt-link>
+  <div class="drawing-meta" :class="{ disabled: !docId }" ref="bg">
+    <div class="info" :class="{ disabled: !docId }">
+      <nuxt-link v-if="docId" :to="`/gallery/section/${docId}`">{{
+        title
+      }}</nuxt-link>
       <span v-if="!docId">{{ title }}</span>
-      <span style="width: 4ch; text-align: center;">by</span>
+      <span>by</span>
       <a
         v-if="isInstagram"
         :href="`https://www.instagram.com/${artist.substr(1)}/`"
@@ -55,22 +55,17 @@ export default {
     repeat;
 
   .info {
-    position: absolute;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 101;
-    top: 50%;
-    left: 50%;
-    transform: translate3d(-50%, -50%, 0);
+    text-align: center;
     background: var(--white);
-    height: 60px;
+    padding: 1rem;
     min-width: 33%;
-    width: 100%;
-    max-width: max-content;
     border: 2px solid var(--orange);
-    padding: 0 1rem;
   }
+}
+
+.canvas-wrap:hover .drawing-meta {
+  display: grid;
+  place-items: center;
 }
 
 a {
@@ -82,16 +77,15 @@ a {
 }
 
 .drawing-meta.disabled {
-  display: block;
-  background-color: var(--white);
-  /* background-blend-mode: multiply; */
+  display: grid;
+  place-items: center;
 
   .info {
     display: none;
   }
 
   &:hover .info {
-    display: flex;
+    display: block;
   }
 }
 </style>
