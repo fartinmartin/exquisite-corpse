@@ -6,9 +6,6 @@
 </template>
 
 <script>
-import DownloadButton from "~/components/DownloadButton.vue";
-import LikeButton from "~/components/LikeButton.vue";
-
 export default {
   name: "MetaMenu",
   props: {

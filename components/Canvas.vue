@@ -32,12 +32,10 @@
 import floodFill from "~/assets/js/floodFill";
 import asyncForEach, { waitFor } from "~/assets/js/asyncForEach";
 import { mapState, mapGetters } from "vuex";
-import CanvasMeta from "~/components/CanvasMeta.vue";
-import Panel from "~/components/Panel.vue";
 
 export default {
   name: "Canvas",
-  components: { CanvasMeta, Panel },
+
   props: {
     id: { type: String, required: true }, // top, mid, or bot
     mode: { type: String, required: true }, // draw, display, or pixelate

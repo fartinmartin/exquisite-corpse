@@ -39,15 +39,12 @@
 </template>
 
 <script>
-import Panel from "~/components/Panel.vue";
-import Input from "~/components/Input.vue";
-import Button from "~/components/Button.vue";
 import { mergeBase64 } from "~/assets/js/mergeImages";
 import { randomWordFromString } from "~/assets/js/randomWords";
 
 export default {
   name: "admin",
-  components: { Panel, Input, Button },
+
   middleware: ["password-protect"],
   data: () => ({ corpse: { id: null, section: null }, section: { id: null } }),
   mounted() {

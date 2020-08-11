@@ -12,14 +12,10 @@
 </template>
 
 <script>
-import Nav from "~/components/Nav.vue";
-import Help from "~/components/Help.vue";
-import CustomCursor from "~/components/CustomCursor.vue";
 import { mapState } from "vuex";
 import { disableBodyScroll, clearAllBodyScrollLocks } from "body-scroll-lock";
 
 export default {
-  components: { Nav, CustomCursor, Help },
   computed: {
     ...mapState(["isHelping"]),
     ...mapState("modules/user", ["isLoggedIn"]),

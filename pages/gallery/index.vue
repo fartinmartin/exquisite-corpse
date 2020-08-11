@@ -151,19 +151,12 @@
 </template>
 
 <script>
-import Panel from "~/components/Panel.vue";
-import Loading from "~/components/Loading.vue";
-import Drawing from "~/components/Drawing.vue";
-import PrevNext from "~/components/PrevNext.vue";
-import Date from "~/components/Date.vue";
-import Observer from "~/components/Observer.vue";
-
 import { mapGetters } from "vuex";
 import { disableBodyScroll, enableBodyScroll } from "body-scroll-lock";
 
 export default {
   name: "gallery",
-  components: { Panel, Loading, Drawing, PrevNext, Date, Observer },
+
   head() {
     return {
       title: "exquisite corpse club • gallery",

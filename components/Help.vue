@@ -45,12 +45,9 @@
 </template>
 
 <script>
-import Panel from "~/components/Panel.vue";
-import Button from "~/components/Button.vue";
-
 export default {
   name: "Help",
-  components: { Panel, Button },
+
   mounted() {
     document.addEventListener("keydown", this.handleShortcuts);
   },

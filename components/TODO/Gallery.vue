@@ -27,13 +27,9 @@
 </template>
 
 <script>
-import Loading from "~/components/Loading.vue";
-import Drawing from "~/components/Drawing.vue";
-import PrevNext from "~/components/PrevNext.vue";
-
 export default {
   name: "Gallery",
-  components: { Loading, Drawing, PrevNext },
+
   props: {
     gallery: {
       type: Object,

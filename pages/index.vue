@@ -22,16 +22,11 @@
 </template>
 
 <script>
-import Panel from "~/components/Panel.vue";
-import Display from "~/components/Display.vue";
-import Loading from "~/components/Loading.vue";
-import NavMenu from "~/components/NavMenu.vue";
-
 // TODO: make all data fetches from pages asyncData() methods???
 
 export default {
   name: "index",
-  components: { Panel, Display, NavMenu, Loading },
+
   data: () => ({
     isFetching: "idle", // "idle", "fetching", "success", TODO: "error"
     meta: null,

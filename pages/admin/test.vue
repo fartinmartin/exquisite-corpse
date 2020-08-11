@@ -18,15 +18,9 @@
 </template>
 
 <script>
-import Panel from "~/components/Panel.vue";
-import Button from "~/components/Button.vue";
-import Gallery from "~/components/TODO/Gallery.vue";
-import Input from "~/components/Input.vue";
-
 export default {
   name: "test",
   middleware: ["password-protect"],
-  components: { Panel, Button, Gallery, Input },
 };
 </script>
 

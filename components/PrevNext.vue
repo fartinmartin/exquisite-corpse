@@ -22,10 +22,9 @@
 </template>
 
 <script>
-import Panel from "~/components/Panel.vue";
 export default {
   name: "PrevNext",
-  components: { Panel },
+
   props: { isFirstPage: Boolean, isLastPage: Boolean },
 };
 </script>

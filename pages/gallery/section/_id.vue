@@ -111,10 +111,6 @@
 </template>
 
 <script>
-import Panel from "~/components/Panel.vue";
-import Canvas from "~/components/Canvas.vue";
-import MetaMenu from "~/components/MetaMenu.vue";
-
 export default {
   name: "Section",
   head() {
@@ -122,7 +118,7 @@ export default {
       title: `exquisite corpse club • ${this.section.title} by ${this.section.artist}`,
     };
   },
-  components: { Panel, Canvas, MetaMenu },
+
   data: () => ({
     isFetching: "idle", // "idle", "fetching", "success", TODO: "error"
     section: {},

@@ -15,11 +15,9 @@
 </template>
 
 <script>
-import Panel from "~/components/Panel.vue";
-
 export default {
   name: "Loading",
-  components: { Panel },
+
   props: {
     text: { type: String, required: false, default: "plz hold" },
     subtext: { type: String, required: false },

@@ -26,12 +26,9 @@
 </template>
 
 <script>
-import NavMenu from "~/components/NavMenu.vue";
-import Panel from "~/components/Panel.vue";
-
 export default {
   name: "Nav",
-  components: { NavMenu, Panel },
+
   methods: {
     openHelp() {
       this.$store.dispatch("setIsHelping", true);

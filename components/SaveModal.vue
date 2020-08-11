@@ -78,16 +78,13 @@
 </template>
 
 <script>
-import Canvas from "~/components/Canvas.vue";
-import CanvasThumb from "~/components/CanvasThumb.vue";
-import Loading from "~/components/Loading.vue";
 import { mergeBase64 } from "~/assets/js/mergeImages";
 import { mapState, mapGetters } from "vuex";
 import { randomWordFromString } from "~/assets/js/randomWords";
 
 export default {
   name: "SaveModal",
-  components: { Canvas, CanvasThumb, Loading },
+
   data: () => ({
     title: "",
     artist: "",

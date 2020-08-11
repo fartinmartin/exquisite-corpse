@@ -13,13 +13,9 @@
 </template>
 
 <script>
-import Panel from "~/components/Panel.vue";
-import Input from "~/components/Input.vue";
-import Button from "~/components/Button.vue";
-
 export default {
   name: "login",
-  components: { Panel, Input, Button },
+
   data: () => ({ password: "", isAuthorised: false }),
   mounted() {
     this.isAuthorised = this.$passwordProtect.isAuthorised();

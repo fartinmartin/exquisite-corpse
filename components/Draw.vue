@@ -14,7 +14,7 @@ import { mapState } from "vuex";
 
 export default {
   name: "Draw",
-  components: { ToolBar, Canvas },
+
   computed: mapState("modules/drawing", ["type", "sections"]),
 };
 </script>

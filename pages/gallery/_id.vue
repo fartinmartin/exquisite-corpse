@@ -22,10 +22,6 @@
 </template>
 
 <script>
-import Panel from "~/components/Panel.vue";
-import Loading from "~/components/Loading.vue";
-import MetaMenu from "~/components/MetaMenu.vue";
-
 export default {
   name: "Corpse",
   head() {
@@ -33,7 +29,7 @@ export default {
       title: `exquisite corpse club • ${this.meta.title}`,
     };
   },
-  components: { Panel, Loading, MetaMenu },
+
   data: () => ({
     isFetching: "idle", // "idle", "fetching", "success", TODO: "error"
     meta: { title: "" },

@@ -12,11 +12,8 @@
 </template>
 
 <script>
-import Panel from "~/components/Panel.vue";
-
 export default {
   props: ["error"],
-  components: { Panel },
 };
 </script>
 

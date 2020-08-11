@@ -135,14 +135,12 @@
 
 <script>
 import { mapState, mapGetters } from "vuex";
-import Panel from "~/components/Panel.vue";
-import SaveModal from "~/components/SaveModal.vue";
 
 // 🚨 TODO: apple pencil taps are not registered on AT LEAST undo/redo.. this goes for a lot of things actually.. ugh
 
 export default {
   name: "ToolBar",
-  components: { Panel, SaveModal },
+
   data: () => ({ isSaving: false }),
   mounted() {
     document.addEventListener("keydown", this.handleShortcuts);

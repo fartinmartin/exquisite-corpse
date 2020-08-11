@@ -41,11 +41,9 @@
 </template>
 
 <script>
-import Panel from "~/components/Panel.vue";
-
 export default {
   name: "PickSection",
-  components: { Panel },
+
   methods: {
     openHelp() {
       this.$store.dispatch("setIsHelping", true);
