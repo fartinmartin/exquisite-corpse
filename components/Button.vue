@@ -7,10 +7,7 @@
 <script>
 export default {
   name: "Button",
-  props: {
-    text: { type: String },
-    color: { type: String },
-  },
+  props: { text: { type: String }, color: { type: String } },
   methods: {
     handleClick() {
       this.$emit("click");

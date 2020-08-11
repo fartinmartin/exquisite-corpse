@@ -30,14 +30,12 @@
           <p>
             sound fun?
           </p>
-          <nuxt-link to="/draw" @click.native="closeAndDraw">
-            <Button color="yellow">
-              <span class="icon hom">
-                <img src="~/assets/img/toolbar/draw.svg" />
-              </span>
-              start drawing!
-            </Button>
-          </nuxt-link>
+          <Button color="yellow" @click="closeAndDraw">
+            <span class="icon hom">
+              <img src="~/assets/img/toolbar/draw.svg" />
+            </span>
+            start drawing!
+          </Button>
         </Panel>
       </div>
     </div>
@@ -63,6 +61,7 @@ export default {
         this.$store.dispatch("setIsHelping", false);
     },
     closeAndDraw() {
+      this.$router.push("/draw");
       this.$store.dispatch("setIsHelping", false);
     },
   },
