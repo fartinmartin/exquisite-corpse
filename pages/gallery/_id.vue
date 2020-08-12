@@ -41,6 +41,18 @@ export default {
     this.getCorpseById(this.$route.params.id);
   },
   methods: {
+    async adminLog() {
+      var dataStr =
+        "data:text/json;charset=utf-8," +
+        encodeURIComponent(JSON.stringify(this.section.paths));
+      var downloadAnchorNode = document.createElement("a");
+      downloadAnchorNode.setAttribute("href", dataStr);
+      downloadAnchorNode.setAttribute("download", this.section.docId + ".json");
+      document.body.appendChild(downloadAnchorNode); // required for firefox
+      downloadAnchorNode.click();
+      downloadAnchorNode.remove();
+    },
+
     async getCorpseById(id) {
       this.isFetching = "fetching";
 
@@ -51,7 +63,7 @@ export default {
         this.meta = { docId: doc.id, ...doc.data() };
         await this.getSections(doc.data().sections);
 
-        this.isAdmin && console.log("hello admin:", this.meta);
+        this.isAdmin && this.adminLog();
 
         this.isFetching = "success";
       } catch (error) {

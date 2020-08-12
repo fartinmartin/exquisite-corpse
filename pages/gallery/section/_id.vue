@@ -134,6 +134,18 @@ export default {
     this.getSectionById(this.$route.params.id);
   },
   methods: {
+    async adminLog() {
+      var dataStr =
+        "data:text/json;charset=utf-8," +
+        encodeURIComponent(JSON.stringify(this.section.paths));
+      var downloadAnchorNode = document.createElement("a");
+      downloadAnchorNode.setAttribute("href", dataStr);
+      downloadAnchorNode.setAttribute("download", this.section.docId + ".json");
+      document.body.appendChild(downloadAnchorNode); // required for firefox
+      downloadAnchorNode.click();
+      downloadAnchorNode.remove();
+    },
+
     async getSectionById(id) {
       this.isFetching = "fetching";
 
@@ -147,7 +159,7 @@ export default {
         await this.getFeaturedIn();
         await this.getMoreBy();
 
-        this.isAdmin && console.log("hello admin:", this.section);
+        this.isAdmin && this.adminLog();
 
         this.isFetching = "success";
       } catch (error) {
