@@ -330,13 +330,17 @@ export default {
     },
 
     async fixTimestamp(sectionId) {
-      const { sectionRef, section } = await this.getSingleSection(sectionId);
-      sectionRef.update({
-        date: this.$fireStoreObj.Timestamp(
-          section.date.seconds,
-          section.date.nanoseconds
-        ),
-      });
+      try {
+        const { sectionRef, section } = await this.getSingleSection(sectionId);
+        sectionRef.update({
+          date: this.$fireStoreObj.Timestamp.fromMillis(
+            section.date.seconds * 1000 + section.date.nanoseconds * 1e-6
+          ),
+        });
+        console.log(`${section.docId}'s date updated`);
+      } catch (error) {
+        console.error(error);
+      }
     },
 
     signOut() {
