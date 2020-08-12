@@ -111,6 +111,8 @@
 </template>
 
 <script>
+import { mapState } from "vuex";
+
 export default {
   name: "Section",
   head() {
@@ -118,7 +120,6 @@ export default {
       title: `exquisite corpse club • ${this.section.title} by ${this.section.artist}`,
     };
   },
-
   data: () => ({
     isFetching: "idle", // "idle", "fetching", "success", TODO: "error"
     section: {},
@@ -128,6 +129,7 @@ export default {
       toggle: "featuredIn",
     },
   }),
+  computed: mapState(["isAdmin"]),
   mounted() {
     this.getSectionById(this.$route.params.id);
   },
@@ -144,6 +146,8 @@ export default {
 
         await this.getFeaturedIn();
         await this.getMoreBy();
+
+        this.isAdmin && console.log("hello admin:", this.section);
 
         this.isFetching = "success";
       } catch (error) {

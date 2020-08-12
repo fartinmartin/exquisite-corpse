@@ -49,7 +49,7 @@ import { mapState, mapGetters } from "vuex";
 
 export default {
   name: "Log",
-
+  components: { Draggable },
   data: () => ({ isHidden: true }),
   mounted() {
     document.addEventListener("keydown", this.handleShortcuts);

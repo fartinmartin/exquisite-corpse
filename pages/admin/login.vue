@@ -2,6 +2,7 @@
   <div class="wrap">
     <Panel class="admin">
       <Input
+        id="admin-password"
         v-model="password"
         type="password"
         placeholder="password"
@@ -26,6 +27,7 @@ export default {
       this.isAuthorised = this.$passwordProtect.isAuthorised();
       if (this.isAuthorised) {
         this.$router.push("/admin");
+        this.$store.dispatch("setIsAdmin", true);
       } else {
         this.password = "";
         this.$refs.pwInput.$refs.inputRef.placeholder = "sry, wrong";

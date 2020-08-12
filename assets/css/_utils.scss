@@ -8,6 +8,7 @@ body,
 
 #__tino {
   padding: calc(40px / 3);
+
   @media screen and (min-width: 1040px) {
     display: grid;
     place-items: center;

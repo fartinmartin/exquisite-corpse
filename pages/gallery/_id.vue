@@ -22,6 +22,8 @@
 </template>
 
 <script>
+import { mapState } from "vuex";
+
 export default {
   name: "Corpse",
   head() {
@@ -29,12 +31,12 @@ export default {
       title: `exquisite corpse club • ${this.meta.title}`,
     };
   },
-
   data: () => ({
     isFetching: "idle", // "idle", "fetching", "success", TODO: "error"
     meta: { title: "" },
     sections: {},
   }),
+  computed: mapState(["isAdmin"]),
   mounted() {
     this.getCorpseById(this.$route.params.id);
   },
@@ -48,6 +50,8 @@ export default {
 
         this.meta = { docId: doc.id, ...doc.data() };
         await this.getSections(doc.data().sections);
+
+        this.isAdmin && console.log("hello admin:", this.meta);
 
         this.isFetching = "success";
       } catch (error) {

@@ -3,14 +3,22 @@
     <Panel class="admin-index">
       <h1>corpse</h1>
       <div class="input-wrap">
-        <Input v-model="corpse.section" placeholder="enter sectionId" />
+        <Input
+          id="section-id-for-corpse"
+          v-model="corpse.section"
+          placeholder="enter sectionId"
+        />
         <Button
           @click="makeCorpseFromSingleSection(corpse.section)"
           text="make corpse"
         />
       </div>
       <div class="input-wrap">
-        <Input v-model="corpse.id" placeholder="enter corpseId" />
+        <Input
+          id="corpse-id"
+          v-model="corpse.id"
+          placeholder="enter corpseId"
+        />
         <Button
           color="red"
           @click="removeCorpseAndItsReferences(corpse.id)"
@@ -23,12 +31,17 @@
     <Panel class="admin-index">
       <h1>section</h1>
       <div class="input-wrap">
-        <Input v-model="section.id" placeholder="enter sectionId" />
+        <Input
+          id="section-id"
+          v-model="section.id"
+          placeholder="enter sectionId"
+        />
         <Button
           color="red"
           @click="removeSectionAndItsReferences(section.id)"
           text="remove section"
         />
+        <Button @click="fixTimestamp(section.id)" text="fix timestamp" />
       </div>
     </Panel>
 
@@ -316,7 +329,18 @@ export default {
       // TODO: make this 😈
     },
 
+    async fixTimestamp(sectionId) {
+      const { sectionRef, section } = await this.getSingleSection(sectionId);
+      sectionRef.update({
+        date: this.$fireStoreObj.Timestamp(
+          section.date.seconds,
+          section.date.nanoseconds
+        ),
+      });
+    },
+
     signOut() {
+      this.$store.dispatch("setIsAdmin", false);
       this.$passwordProtect.removeAuthorisation();
       this.$router.push("/");
     },
