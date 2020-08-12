@@ -2,15 +2,17 @@
   <div class="wrap">
     <Panel class="admin-index">
       <h1>corpse</h1>
-      <div class="input-wrap">
+      <div class="input-wrap" style="flex-wrap: initial; margin-bottom: 1rem;">
         <Input
           id="section-id-for-corpse"
           v-model="corpse.section"
           placeholder="enter sectionId"
+          style="flex: initial;"
         />
         <Button
           @click="makeCorpseFromSingleSection(corpse.section)"
           text="make corpse"
+          style="flex: initial;"
         />
       </div>
       <div class="input-wrap">
@@ -35,6 +37,7 @@
           id="section-id"
           v-model="section.id"
           placeholder="enter sectionId"
+          style="width: 100%;"
         />
         <Button
           color="red"
@@ -42,6 +45,10 @@
           text="remove section"
         />
         <Button @click="fixTimestamp(section.id)" text="fix timestamp" />
+        <Button
+          @click="downloadSectionPaths(section.id)"
+          text="download paths"
+        />
       </div>
     </Panel>
 
@@ -343,6 +350,23 @@ export default {
       }
     },
 
+    async downloadSectionPaths(sectionId) {
+      try {
+        const { sectionRef, section } = await this.getSingleSection(sectionId);
+        const dataStr =
+          "data:text/json;charset=utf-8," +
+          encodeURIComponent(JSON.stringify(section.paths));
+        const downloadAnchorNode = document.createElement("a");
+        downloadAnchorNode.setAttribute("href", dataStr);
+        downloadAnchorNode.setAttribute("download", section.docId + ".json");
+        document.body.appendChild(downloadAnchorNode); // required for firefox
+        downloadAnchorNode.click();
+        downloadAnchorNode.remove();
+      } catch (error) {
+        console.error(error);
+      }
+    },
+
     signOut() {
       this.$store.dispatch("setIsAdmin", false);
       this.$passwordProtect.removeAuthorisation();
@@ -365,6 +389,16 @@ export default {
 
   .input-wrap {
     display: flex;
+    flex-wrap: wrap;
+
+    input {
+      flex: 1 0 50%;
+    }
+
+    button {
+      flex: 1;
+      margin-top: 1rem;
+    }
 
     &:not(:first-child) {
       margin-top: 1rem;

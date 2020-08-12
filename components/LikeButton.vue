@@ -65,10 +65,7 @@ export default {
         batch.update(docRef, { likedBy: dislikedBy });
       }
 
-      batch
-        .commit()
-        .then(() => console.log("we did it!"))
-        .catch((error) => console.error(error));
+      batch.commit().catch((error) => console.error(error));
     },
   },
 };
