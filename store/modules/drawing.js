@@ -118,8 +118,14 @@ export const actions = {
       mode: rootState.modules.mouse.mode,
       color: rootState.modules.mouse.palette.current,
       size: rootState.modules.mouse.size.current,
-      x1: rootState.modules.mouse.x,
-      y1: rootState.modules.mouse.y,
+      x1:
+        event.type === "touchstart"
+          ? rootState.modules.mouse.x - 1
+          : rootState.modules.mouse.x, // for taps on mobile ,
+      y1:
+        event.type === "touchstart"
+          ? rootState.modules.mouse.y - 1
+          : rootState.modules.mouse.y, // for taps on mobile ,
       x2: event.offsetX,
       y2: event.offsetY,
     };
