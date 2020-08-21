@@ -6,6 +6,8 @@
  *
  * From: https://dev.to/nektro/createimagebitmap-polyfill-for-safari-and-edge-228
  * Updated by Yoan Tournade <yoan@ytotech.com>
+ *
+ * Note: I use this so that pixelateDrawing() doesn't fail!
  */
 if (!("createImageBitmap" in window)) {
   window.createImageBitmap = async function (data) {

@@ -53,6 +53,10 @@
     </Panel>
 
     <Panel class="admin-index">
+      <Button @click="runOneTimeFunction" text="run function" />
+    </Panel>
+
+    <Panel class="admin-index">
       <Button @click="signOut" text="sign out" />
     </Panel>
   </div>
@@ -79,6 +83,10 @@ export default {
       if (e.keyCode === 12) {
         this.$store.dispatch("modules/user/signOut");
       }
+    },
+
+    runOneTimeFunction() {
+      // this.resetAllLikes();
     },
 
     async getCollection(collection) {
@@ -365,6 +373,22 @@ export default {
       } catch (error) {
         console.error(error);
       }
+    },
+
+    async resetAllLikes() {
+      const corpsesRef = this.$fireStore.collection("corpses");
+      const corpseResponse = await corpsesRef.get();
+
+      corpseResponse.forEach((doc) => {
+        doc.ref.update({ likes: 0, likedBy: [] });
+      });
+
+      const sectionsRef = this.$fireStore.collection("sections");
+      const sectionsResponse = await sectionsRef.get();
+
+      sectionsResponse.forEach((doc) => {
+        doc.ref.update({ likes: 0, likedBy: [] });
+      });
     },
 
     signOut() {

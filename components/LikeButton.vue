@@ -8,14 +8,14 @@
         style="width: 25px; height: 25px; pointer-events: none;"
         :class="{ liked: isLiked }"
       >
-        <div v-html="rawHeart" />
+        <div v-html="rawHeartSVG" />
       </div>
     </div>
   </button>
 </template>
 
 <script>
-import rawHeart from "~/assets/img/icons/heart.svg?raw";
+import rawHeartSVG from "~/assets/img/icons/heart.svg?raw";
 import { mapState } from "vuex";
 
 export default {
@@ -24,16 +24,16 @@ export default {
     collection: { type: String, required: true },
     docId: { type: String, required: true },
   },
-  data: () => ({ rawHeart, likes: 0, isLiked: false }),
+  data: () => ({ rawHeartSVG, likes: 0, isLiked: false }),
   computed: mapState("modules/user/", ["id"]),
   mounted() {
-    this.subscribeToLikes();
+    this.subscribeToLikes(true);
   },
   beforeDestroy() {
-    this.subscribeToLikes("destory");
+    this.subscribeToLikes(false);
   },
   methods: {
-    subscribeToLikes(destory) {
+    subscribeToLikes(subscribe) {
       const likesRef = this.$fireStore
         .collection(this.collection)
         .doc(this.docId)
@@ -42,7 +42,7 @@ export default {
           this.isLiked =
             doc.data().likedBy && doc.data().likedBy.includes(this.id);
         });
-      if (destory) return likesRef();
+      if (!subscribe) return likesRef();
     },
 
     handleClick() {
