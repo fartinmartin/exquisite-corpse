@@ -28,12 +28,10 @@
 
 <script>
 import floodFill from "~/assets/js/floodFill";
-import asyncForEach, { waitFor } from "~/assets/js/asyncForEach";
 import { mapState, mapGetters } from "vuex";
 
 export default {
   name: "Canvas",
-
   props: {
     id: { type: String, required: true }, // top, mid, or bot
     mode: { type: String, required: true }, // draw, display, or pixelate
@@ -275,33 +273,24 @@ export default {
       ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
     },
 
-    makeDrawing(drawing, timeout) {
-      if (timeout) {
-        const handlePaths = async () => {
-          await asyncForEach(drawing, async (path, i) => {
-            let newTimeout;
-            i > 0
-              ? (newTimeout = timeout / drawing[i - 1].length / 100)
-              : (newTimeout = timeout);
-            await waitFor(newTimeout);
-            await handlePoints(path, i);
-          });
-        };
+    async makeDrawing(drawing, duration) {
+      if (duration) {
+        const waitFor = (ms) => new Promise((r) => setTimeout(r, ms));
+        const totalPoints = drawing.reduce((c, p) => (c += p.length), 0);
+        const delay = duration / totalPoints;
 
-        const handlePoints = async (path, i) => {
-          await asyncForEach(path, async (point, i) => {
-            await waitFor(5);
+        for (const path of drawing) {
+          for (const point of path) {
+            await waitFor(delay);
             this.handleDraw(point);
-          });
-        };
-
-        handlePaths();
+          }
+        }
       } else {
-        drawing.forEach((path) => {
-          path.forEach((point) => {
+        for (const path of drawing) {
+          for (const point of path) {
             this.handleDraw(point);
-          });
-        });
+          }
+        }
       }
     },
 
