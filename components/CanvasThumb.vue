@@ -10,17 +10,16 @@ export default {
   props: { section: Array },
   data: () => ({ canvas: null, ctx: null }),
   mounted() {
-    // init canvas
-    const canvas = this.$refs.canvasThumb;
-    const ctx = canvas.getContext("2d");
+    // set state
+    this.canvas = this.$refs.canvasThumb;
+    this.ctx = this.canvas.getContext("2d");
 
-    this.highDPI(canvas, ctx);
+    // set canvas to match DPR
+    this.highDPI(this.canvas, this.ctx);
 
-    this.canvas = canvas; // set local state
-    this.ctx = ctx; // set local state
-
-    ctx.fillStyle = "#ffffff"; // set white bg (no transparency!)
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    // set white bg (no transparency!) TODO: should this happen in "draw" mode? its probably not a big deal, but if a user's first path is "erase" and second is "fill" this bug becomes apparent.
+    this.ctx.fillStyle = "#ffffff";
+    this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
     this.makeDrawing(this.section);
   },
@@ -111,11 +110,11 @@ export default {
     },
 
     makeDrawing(drawing) {
-      drawing.forEach((path) => {
-        path.forEach((point) => {
+      for (const path of drawing) {
+        for (const point of path) {
           this.handleDraw(point);
-        });
-      });
+        }
+      }
     },
   },
 };

@@ -58,14 +58,12 @@ export default {
     this.canvas.removeEventListener("touchcancel", (e) => e.preventDefault());
   },
   mounted() {
-    // init canvas
-    const canvas = this.$refs.canvas;
-    const ctx = canvas.getContext("2d");
+    // set state
+    this.canvas = this.$refs.canvas;
+    this.ctx = this.canvas.getContext("2d");
 
-    this.highDPI(canvas, ctx);
-
-    this.canvas = canvas; // set local state
-    this.ctx = ctx; // set local state
+    // set canvas to match DPR
+    this.highDPI(this.canvas, this.ctx);
 
     // do not scroll safari window when drawing on canvas
     this.canvas.addEventListener("touchstart", (e) => e.preventDefault());
@@ -74,14 +72,14 @@ export default {
     this.canvas.addEventListener("touchcancel", (e) => e.preventDefault());
 
     // set white bg (no transparency!) TODO: should this happen in "draw" mode? its probably not a big deal, but if a user's first path is "erase" and second is "fill" this bug becomes apparent.
-    ctx.fillStyle = "#ffffff";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    this.ctx.fillStyle = "#ffffff";
+    this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
     // dispatch based on this.mode
     switch (this.mode) {
       case "draw":
-        this.$store.dispatch("modules/drawing/setCanvas", canvas);
-        this.$store.dispatch("modules/drawing/setCtx", ctx);
+        this.$store.dispatch("modules/drawing/setCanvas", this.canvas);
+        this.$store.dispatch("modules/drawing/setCtx", this.ctx);
         break;
       case "pixelate":
         this.makeDrawing(this.drawing.paths);
