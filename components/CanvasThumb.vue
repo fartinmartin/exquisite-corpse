@@ -44,7 +44,11 @@ export default {
       switch (point.mode) {
         case "draw":
         case "erase":
-          this.drawPath(ctx, point);
+          if (point.x1 === point.x2 && point.y1 === point.y2) {
+            this.drawCircle(ctx, point);
+          } else {
+            this.drawPath(ctx, point);
+          }
           break;
         case "fill":
           this.drawFill(ctx, point);
@@ -54,6 +58,21 @@ export default {
           break;
         default:
           break;
+      }
+    },
+
+    drawCircle(ctx, point) {
+      if (point.mode === "erase") {
+        ctx.globalCompositeOperation = "destination-out";
+      }
+
+      ctx.beginPath();
+      ctx.arc(point.x1, point.y1, point.size, 0, 2 * Math.PI, true);
+      ctx.fillStyle = point.color;
+      ctx.fill();
+
+      if (point.mode === "erase") {
+        ctx.globalCompositeOperation = "source-over";
       }
     },
 

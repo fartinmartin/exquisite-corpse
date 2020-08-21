@@ -118,14 +118,8 @@ export const actions = {
       mode: rootState.modules.mouse.mode,
       color: rootState.modules.mouse.palette.current,
       size: rootState.modules.mouse.size.current,
-      x1:
-        event.type === "touchstart"
-          ? rootState.modules.mouse.x - 1
-          : rootState.modules.mouse.x, // for taps on mobile ,
-      y1:
-        event.type === "touchstart"
-          ? rootState.modules.mouse.y - 1
-          : rootState.modules.mouse.y, // for taps on mobile ,
+      x1: rootState.modules.mouse.x,
+      y1: rootState.modules.mouse.y,
       x2: event.offsetX,
       y2: event.offsetY,
     };
@@ -156,7 +150,11 @@ export const actions = {
     switch (point.mode) {
       case "draw":
       case "erase":
-        dispatch("drawPath", point);
+        if (point.x1 === point.x2 && point.y1 === point.y2) {
+          dispatch("drawCircle", point);
+        } else {
+          dispatch("drawPath", point);
+        }
         break;
       case "fill":
         dispatch("drawFill", point);
@@ -166,6 +164,21 @@ export const actions = {
         break;
       default:
         break;
+    }
+  },
+
+  drawCircle({ state: { ctx } }, point) {
+    if (point.mode === "erase") {
+      ctx.globalCompositeOperation = "destination-out";
+    }
+
+    ctx.beginPath();
+    ctx.arc(point.x1, point.y1, point.size, 0, 2 * Math.PI, true);
+    ctx.fillStyle = point.color;
+    ctx.fill();
+
+    if (point.mode === "erase") {
+      ctx.globalCompositeOperation = "source-over";
     }
   },
 
