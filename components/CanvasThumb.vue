@@ -4,7 +4,6 @@
 
 <script>
 import floodFill from "~/assets/js/floodFill";
-import asyncForEach, { waitFor } from "~/assets/js/asyncForEach";
 
 export default {
   name: "CanvasThumb",
