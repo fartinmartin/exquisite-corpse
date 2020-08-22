@@ -122,8 +122,9 @@ export default {
     mousedown(event) {
       const e = this.handleTouchEvents(event);
       this.$store.dispatch("modules/mouse/setMousePosition", e);
+      this.$store.dispatch("modules/mouse/setIsDrawing", true);
+
       if (this.mouseMode !== "fill") {
-        this.$store.dispatch("modules/mouse/setIsDrawing", true);
         this.handleDraw(e); // for dots
         this.$store.dispatch("modules/drawing/logPathToCurrentPath", e);
       } else {
