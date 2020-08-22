@@ -205,12 +205,12 @@ export const actions = {
 
   drawFill({ state: { ctx } }, point) {
     ctx.fillStyle = point.color;
-    let tolerance = 100;
-    let dpiPoint = {
+    let tolerance = 50;
+    let dprPoint = {
       x2: point.x2 * devicePixelRatio,
       y2: point.y2 * devicePixelRatio,
     };
-    floodFill.fill(dpiPoint.x2, dpiPoint.y2, tolerance, ctx);
+    floodFill.fill(dprPoint.x2, dprPoint.y2, tolerance, ctx);
   },
 
   setMobilePaths({ state, getters, commit }) {

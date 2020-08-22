@@ -260,7 +260,7 @@ export default {
 
     drawFill(ctx, point) {
       ctx.fillStyle = point.color;
-      let tolerance = 100;
+      let tolerance = 50;
       let dprPoint = {
         x2: point.x2 * devicePixelRatio,
         y2: point.y2 * devicePixelRatio,

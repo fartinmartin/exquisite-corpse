@@ -144,7 +144,7 @@ function drawPath(ctx, point) {
 
 function drawFill(ctx, point) {
   ctx.fillStyle = point.color;
-  const tolerance = 100;
+  const tolerance = 50;
   const dprPoint = {
     x2: point.x2 * devicePixelRatio,
     y2: point.y2 * devicePixelRatio,
