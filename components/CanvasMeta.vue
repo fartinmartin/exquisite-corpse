@@ -41,6 +41,16 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+#save-preview .drawing-meta {
+  background: none;
+
+  &:hover {
+    background: transparent
+      url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAkAAAAJCAYAAADgkQYQAAAAFUlEQVQYlWNgoAb4N4HhP2UKhoUVAL3oD0/YmVPIAAAAAElFTkSuQmCC)
+      repeat;
+  }
+}
+
 .drawing-meta {
   display: none;
   position: absolute;
