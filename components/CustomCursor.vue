@@ -41,9 +41,9 @@ export default {
         ...(this.state === "pointer" && { x: 0, y: 0 }),
         ...(this.state === "disabled" && { x: -5, y: -5 }),
         ...(this.state === "grab" && { x: 0, y: 0 }),
-        ...(this.state === "draw" && { x: 0, y: -25 }),
-        ...(this.state === "erase" && { x: -13, y: -23 }),
-        ...(this.state === "fill" && { x: -2, y: -24 }),
+        ...(this.state === "draw" && { x: 1, y: -24 }),
+        ...(this.state === "erase" && { x: -12, y: -21 }),
+        ...(this.state === "fill" && { x: -1, y: -22 }),
       };
 
       // cursor pos
