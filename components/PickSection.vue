@@ -43,7 +43,6 @@
 <script>
 export default {
   name: "PickSection",
-
   methods: {
     openHelp() {
       this.$store.dispatch("setIsHelping", true);
@@ -78,6 +77,10 @@ export default {
 }
 
 // TODO: abstract meta-box styles
+.touch .meta-box {
+  display: block;
+}
+
 .meta-box {
   display: none;
   position: absolute;
