@@ -2,7 +2,7 @@
   <Draggable
     :x="0"
     :y="0"
-    :w="350"
+    :w="850"
     style="position: absolute; z-index: 1000;"
     v-show="!isHidden"
   >
@@ -32,7 +32,7 @@
         <pre
           v-for="(path, i) in drawing.history.paths"
           :key="i"
-          style="text-align: left;"
+          style="text-align: left; overflow: scroll;"
           class="log-item"
           :class="{ active: i + 1 === drawing.history.step }"
         >
