@@ -81,7 +81,7 @@ export default {
     handleShortcuts(e) {
       // keyCode === 12 = "clear"
       if (e.keyCode === 12) {
-        this.$store.dispatch("modules/user/signOut");
+        this.$store.dispatch("user/signOut");
       }
     },
 

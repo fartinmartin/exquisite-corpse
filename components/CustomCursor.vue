@@ -70,7 +70,7 @@ export default {
       if (targets.some(isDisabled)) {
         this.state = "disabled";
       } else if (targets.some(isCanvas)) {
-        this.state = this.$store.state.modules.mouse.mode;
+        this.state = this.$store.state.mouse.mode;
       } else if (targets.some(isClickable)) {
         this.state = "pointer";
       } else {

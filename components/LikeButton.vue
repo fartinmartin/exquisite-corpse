@@ -25,7 +25,7 @@ export default {
     docId: { type: String, required: true },
   },
   data: () => ({ rawHeartSVG, likes: 0, isLiked: false }),
-  computed: mapState("modules/user/", ["id"]),
+  computed: mapState("user/", ["id"]),
   mounted() {
     this.subscribeToLikes(true);
   },

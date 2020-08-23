@@ -151,22 +151,18 @@ export default {
   computed: {
     mode: {
       get() {
-        return this.$store.state.modules.mouse.mode;
+        return this.$store.state.mouse.mode;
       },
       set(value) {
-        this.$store.dispatch("modules/mouse/setMode", value);
+        this.$store.dispatch("mouse/setMode", value);
       },
     },
-    ...mapState("modules/mouse", ["palette", "size"]),
-    ...mapGetters("modules/mouse", [
+    ...mapState("mouse", ["palette", "size"]),
+    ...mapGetters("mouse", [
       "currentSizeLessThanMax",
       "currentSizeMoreThanMin",
     ]),
-    ...mapGetters("modules/drawing", [
-      "cantUndo",
-      "cantRedo",
-      "isDrawingEmpty",
-    ]),
+    ...mapGetters("drawing", ["cantUndo", "cantRedo", "isDrawingEmpty"]),
   },
   methods: {
     handleShortcuts(e) {
@@ -213,25 +209,25 @@ export default {
       }
     },
     addColor(e) {
-      this.$store.dispatch("modules/mouse/addColor", e.target.value);
+      this.$store.dispatch("mouse/addColor", e.target.value);
     },
     setColor(e) {
-      this.$store.dispatch("modules/mouse/setColor", e);
+      this.$store.dispatch("mouse/setColor", e);
     },
     decrementSize() {
-      this.$store.dispatch("modules/mouse/decrementSize");
+      this.$store.dispatch("mouse/decrementSize");
     },
     incrementSize() {
-      this.$store.dispatch("modules/mouse/incrementSize");
+      this.$store.dispatch("mouse/incrementSize");
     },
     undoCanvas() {
-      this.$store.dispatch("modules/drawing/undoCanvas");
+      this.$store.dispatch("drawing/undoCanvas");
     },
     redoCanvas() {
-      this.$store.dispatch("modules/drawing/redoCanvas");
+      this.$store.dispatch("drawing/redoCanvas");
     },
     clearCanvas(e) {
-      this.$store.dispatch("modules/drawing/clearCanvas", e);
+      this.$store.dispatch("drawing/clearCanvas", e);
     },
   },
 };

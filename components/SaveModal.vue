@@ -93,14 +93,14 @@ export default {
     isSaving: "idle", // "idle", "saving", "success", "error"
   }),
   computed: {
-    ...mapState("modules/user", ["name"]),
-    ...mapState("modules/drawing", ["type", "sections", "paths"]),
+    ...mapState("user", ["name"]),
+    ...mapState("drawing", ["type", "sections", "paths"]),
     ...mapGetters(["isMobile"]),
-    ...mapGetters("modules/drawing", ["computedPaths"]),
+    ...mapGetters("drawing", ["computedPaths"]),
   },
   mounted() {
     // set local state based on store state
-    this.title = this.$store.state.modules.drawing.title;
+    this.title = this.$store.state.drawing.title;
     this.artist = this.name;
 
     document.addEventListener("keydown", this.handleShortcuts);
@@ -128,7 +128,7 @@ export default {
 
       // if they changed their name, update their profile + our local state
       if (this.artist !== this.name)
-        this.$store.dispatch("modules/user/updateUserName", this.artist);
+        this.$store.dispatch("user/updateUserName", this.artist);
 
       // firebase vars
       let timestamp = this.$fireStoreObj.Timestamp.fromDate(new Date());

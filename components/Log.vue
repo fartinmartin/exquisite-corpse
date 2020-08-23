@@ -63,8 +63,8 @@ export default {
     },
   },
   computed: {
-    ...mapGetters({ isDrawingEmpty: "modules/drawing/isDrawingEmpty" }),
-    ...mapState({ drawing: (state) => state.modules.drawing }),
+    ...mapGetters({ isDrawingEmpty: "drawing/isDrawingEmpty" }),
+    ...mapState({ drawing: (state) => state.drawing }),
   },
 };
 </script>

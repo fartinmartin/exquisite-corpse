@@ -75,7 +75,7 @@ export const actions = {
   },
 
   completePath({ dispatch }) {
-    dispatch("modules/mouse/setIsDrawing", false, { root: true });
+    dispatch("mouse/setIsDrawing", false, { root: true });
     dispatch("pushCurrentPathToDrawingHistory");
     dispatch("incrementHistory");
   },
@@ -115,11 +115,11 @@ export const actions = {
 
   logPathToCurrentPath({ rootState, commit, getters }, event) {
     let pointData = {
-      mode: rootState.modules.mouse.mode,
-      color: rootState.modules.mouse.palette.current,
-      size: rootState.modules.mouse.size.current,
-      x1: rootState.modules.mouse.x,
-      y1: rootState.modules.mouse.y,
+      mode: rootState.mouse.mode,
+      color: rootState.mouse.palette.current,
+      size: rootState.mouse.size.current,
+      x1: rootState.mouse.x,
+      y1: rootState.mouse.y,
       x2: event.offsetX,
       y2: event.offsetY,
     };

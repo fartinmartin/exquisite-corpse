@@ -18,13 +18,13 @@ import { disableBodyScroll, clearAllBodyScrollLocks } from "body-scroll-lock";
 export default {
   computed: {
     ...mapState(["isHelping"]),
-    ...mapState("modules/user", ["isLoggedIn"]),
+    ...mapState("user", ["isLoggedIn"]),
   },
   beforeDestroy() {
     clearAllBodyScrollLocks();
   },
   beforeMount() {
-    this.$store.dispatch("modules/user/onEnter");
+    this.$store.dispatch("user/onEnter");
   },
   mounted() {
     // modernizr style class names for touch devices

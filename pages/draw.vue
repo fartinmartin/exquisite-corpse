@@ -34,20 +34,20 @@ export default {
   async fetch({ store }) {
     // set default random title
     let words = await twoRandomWords();
-    store.dispatch("modules/drawing/setTitle", words);
+    store.dispatch("drawing/setTitle", words);
   },
   mounted() {
     // fresh start
-    this.$store.dispatch("modules/drawing/clearDrawing");
-    this.$store.dispatch("modules/mouse/resetMouse");
+    this.$store.dispatch("drawing/clearDrawing");
+    this.$store.dispatch("mouse/resetMouse");
   },
   computed: {
-    ...mapState("modules/drawing", ["sections"]),
+    ...mapState("drawing", ["sections"]),
     ...mapGetters(["isMobile"]),
   },
   methods: {
     startSave() {
-      if (this.isMobile) this.$store.dispatch("modules/drawing/setMobilePaths");
+      if (this.isMobile) this.$store.dispatch("drawing/setMobilePaths");
       this.isSaving = true;
     },
     closeSave(e) {
@@ -64,8 +64,8 @@ export default {
       types = types.filter((t) => t !== type);
 
       // set drawing state and this section's docId as "temp" in the store
-      this.$store.dispatch("modules/drawing/setType", type);
-      this.$store.dispatch("modules/drawing/setSections", {
+      this.$store.dispatch("drawing/setType", type);
+      this.$store.dispatch("drawing/setSections", {
         type,
         docId: "temp",
       });
@@ -74,7 +74,7 @@ export default {
       for (const type of types) {
         let payload = await this.getRandomSectionByType(type);
         payload.paths = Object.values(payload.drawing);
-        this.$store.dispatch("modules/drawing/setSections", payload);
+        this.$store.dispatch("drawing/setSections", payload);
       }
 
       this.isFetching = "success";

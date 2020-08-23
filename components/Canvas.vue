@@ -44,9 +44,9 @@ export default {
   },
   data: () => ({ canvas: null, ctx: null }),
   computed: {
-    ...mapState("modules/mouse", ["palette", "size", "x", "y", "isDrawing"]),
-    ...mapState("modules/mouse", { mouseMode: (state) => state.mode }),
-    ...mapState("modules/drawing", ["sections", "paths", "history"]),
+    ...mapState("mouse", ["palette", "size", "x", "y", "isDrawing"]),
+    ...mapState("mouse", { mouseMode: (state) => state.mode }),
+    ...mapState("drawing", ["sections", "paths", "history"]),
     ...mapGetters(["isMobile"]),
     drawing() {
       if (this.mode === "display") {
@@ -76,8 +76,8 @@ export default {
     // dispatch based on this.mode
     switch (this.mode) {
       case "draw":
-        this.$store.dispatch("modules/drawing/setCanvas", this.canvas);
-        this.$store.dispatch("modules/drawing/setCtx", this.ctx);
+        this.$store.dispatch("drawing/setCanvas", this.canvas);
+        this.$store.dispatch("drawing/setCtx", this.ctx);
         break;
       case "pixelate":
         makeDrawing(this.ctx, this.drawing.paths);
@@ -108,11 +108,11 @@ export default {
     mousedown(event) {
       const e = this.handleTouchEvents(event);
 
-      this.$store.dispatch("modules/mouse/setMousePosition", e);
-      this.$store.dispatch("modules/mouse/setIsDrawing", true);
+      this.$store.dispatch("mouse/setMousePosition", e);
+      this.$store.dispatch("mouse/setIsDrawing", true);
 
       handleDraw(this.ctx, this.makePoint(e), "draw");
-      this.$store.dispatch("modules/drawing/logPathToCurrentPath", e);
+      this.$store.dispatch("drawing/logPathToCurrentPath", e);
     },
 
     mousemove(event) {
@@ -121,17 +121,17 @@ export default {
 
         handleDraw(this.ctx, this.makePoint(e), "draw"); // for paths
 
-        this.$store.dispatch("modules/drawing/logPathToCurrentPath", e);
-        this.$store.dispatch("modules/mouse/setMousePosition", e);
+        this.$store.dispatch("drawing/logPathToCurrentPath", e);
+        this.$store.dispatch("mouse/setMousePosition", e);
       }
     },
 
     mouseup() {
-      this.isDrawing && this.$store.dispatch("modules/drawing/completePath");
+      this.isDrawing && this.$store.dispatch("drawing/completePath");
     },
 
     mouseleave() {
-      this.isDrawing && this.$store.dispatch("modules/drawing/completePath");
+      this.isDrawing && this.$store.dispatch("drawing/completePath");
     },
 
     makePoint(e) {
