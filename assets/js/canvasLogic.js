@@ -1,24 +1,25 @@
 import floodFill from "~/assets/js/floodFill";
 
-function initCanvas(canvas, whiteBG) {
-  let rect = canvas.getBoundingClientRect();
+const dpr = process.client && window.devicePixelRatio;
+const isMobile = () => process.client && window.innerWidth < 571;
 
-  canvas.width = rect.width * devicePixelRatio;
-  canvas.height = rect.height * devicePixelRatio;
+export function initCanvas(canvas, { scale = dpr, bg = "#ffffff" } = {}) {
+  const rect = canvas.getBoundingClientRect();
+  const ctx = canvas.getContext("2d");
 
-  ctx.scale(devicePixelRatio, devicePixelRatio);
+  canvas.width = rect.width * scale;
+  canvas.height = rect.height * scale;
+
+  ctx.scale(scale, scale);
 
   canvas.style.width = rect.width + "px";
   canvas.style.height = rect.height + "px";
 
-  // white background (?) 🚨 MAYBE: this should just happen on save to PNG
-  if (whiteBG) {
-    ctx.fillStyle = "#ffffff";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-  }
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
 }
 
-export async function makeDrawing(drawing, callback, duration) {
+export async function makeDrawing(ctx, drawing, duration) {
   if (duration) {
     const waitFor = (ms) => new Promise((r) => setTimeout(r, ms));
     const totalPoints = drawing.reduce((c, p) => (c += p.length), 0);
@@ -27,98 +28,64 @@ export async function makeDrawing(drawing, callback, duration) {
     for (const path of drawing) {
       for (const point of path) {
         await waitFor(delay);
-        callback(point);
+        handleDraw(ctx, point);
       }
     }
   } else {
     for (const path of drawing) {
       for (const point of path) {
-        callback(point);
+        handleDraw(ctx, point);
       }
     }
   }
 }
 
-function handleDraw(ctx, p) {
-  let point;
+export function handleDraw(ctx, point, mode) {
+  let p;
+  isMobile() ? (p = scalePoint(ctx, point, mode)) : (p = point);
 
-  if (this.mode === "draw") {
-    const temp = {
-      mode: this.mouseMode,
-      color: this.palette.current,
-      size: this.size.current,
-      x1: this.x,
-      y1: this.y,
-      x2: e.offsetX,
-      y2: e.offsetY,
-    };
-    if (this.isMobile) {
-      point = this.handleResponsiveDraw(temp, "size"); // might still work, checking if pixelate() is throwing vuex erros
-    } else {
-      point = temp;
-    }
-  } else {
-    if (this.isMobile) {
-      point = this.handleResponsiveDraw(e);
-    } else {
-      point = e; // e = point passed from this.makeDrawing()
-    }
-  }
-
-  switch (point.mode) {
+  switch (p.mode) {
     case "draw":
+      p.x1 === p.x2 && p.y1 === p.y2 ? drawCircle(ctx, p) : drawPath(ctx, p);
+      break;
     case "erase":
-      if (point.x1 === point.x2 && point.y1 === point.y2) {
-        drawCircle(ctx, point);
-      } else {
-        drawPath(ctx, point);
-      }
+      ctx.globalCompositeOperation = "destination-out";
+      p.x1 === p.x2 && p.y1 === p.y2 ? drawCircle(ctx, p) : drawPath(ctx, p);
+      ctx.globalCompositeOperation = "source-over";
       break;
     case "fill":
-      // drawFill(ctx, point);
+      drawFill(ctx, p);
       break;
     case "clear":
-      // clearCanvas(ctx);
+      clearCanvas(ctx);
       break;
     default:
       break;
   }
 }
 
-function scalePoint(point, justSize = false) {
-  const width = 1080;
-  const current = this.$refs.canvas.width;
-  const f = width / current;
+export function scalePoint(ctx, point, mode) {
+  let p = { ...point };
+  const f = 1080 / ctx.canvas.width;
 
-  let newPoint;
-  if (justSize) {
-    newPoint = point;
-    newPoint.size = Math.round(point.size / f);
+  if (mode === "draw") {
+    p.size = Math.round(point.size / f);
   } else {
-    newPoint = { mode: point.mode, color: point.color };
-    newPoint.x1 = Math.round(point.x1 / f);
-    newPoint.x2 = Math.round(point.x2 / f);
-    newPoint.y1 = Math.round(point.y1 / f);
-    newPoint.y2 = Math.round(point.y2 / f);
-    newPoint.size = Math.round(point.size / f);
+    p.x1 = Math.round(point.x1 / f);
+    p.x2 = Math.round(point.x2 / f);
+    p.y1 = Math.round(point.y1 / f);
+    p.y2 = Math.round(point.y2 / f);
+    p.size = Math.round(point.size / f);
   }
 
-  return newPoint;
+  return p;
 }
 
 function drawCircle(ctx, point) {
-  if (point.mode === "erase") {
-    ctx.globalCompositeOperation = "destination-out";
-  }
-
   ctx.beginPath();
   ctx.arc(point.x1, point.y1, point.size, 0, 2 * Math.PI, true);
   ctx.fillStyle = point.color;
   ctx.fill();
-
-  if (point.mode === "erase") {
-    ctx.globalCompositeOperation = "source-over";
-  }
 }
 
 function drawPath(ctx, point) {
@@ -127,38 +94,24 @@ function drawPath(ctx, point) {
   ctx.strokeStyle = point.color;
   ctx.lineWidth = point.size * 2;
 
-  if (point.mode === "erase") {
-    ctx.globalCompositeOperation = "destination-out";
-  }
-
   ctx.beginPath();
   ctx.moveTo(point.x1, point.y1);
   ctx.lineTo(point.x2, point.y2);
   ctx.stroke();
   ctx.closePath();
-
-  if (point.mode === "erase") {
-    ctx.globalCompositeOperation = "source-over";
-  }
 }
 
 function drawFill(ctx, point) {
   ctx.fillStyle = point.color;
-  const tolerance = 50;
-  const dprPoint = {
-    x2: point.x2 * devicePixelRatio,
-    y2: point.y2 * devicePixelRatio,
-  };
-  floodFill.fill(dprPoint.x2, dprPoint.y2, tolerance, ctx);
+  floodFill.fill(point.x2 * dpr, point.y2 * dpr, 50, ctx);
 }
 
 function clearCanvas(ctx) {
   ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 }
 
-async function pixelateDrawing(ctx, v = 75) {
-  const dpr = devicePixelRatio;
-  const value = v * dpr;
+export async function pixelateDrawing(ctx, size = 75) {
+  const s = size * dpr;
   const w = ctx.canvas.width;
   const h = ctx.canvas.height;
 
@@ -167,28 +120,19 @@ async function pixelateDrawing(ctx, v = 75) {
   ctx.imageSmoothingEnabled = ctx.mozImageSmoothingEnabled = ctx.msImageSmoothingEnabled = ctx.webkitImageSmoothingEnabled = false;
 
   // get current image
-  const imgData = ctx.getImageData(0, 0, w * dpr, h * dpr);
-  const img = await createImageBitmap(imgData);
+  const currentImgData = ctx.getImageData(0, 0, w * dpr, h * dpr);
+  const currentImg = await createImageBitmap(currentImgData);
 
   // scale factor
-  const fw = (img.width / value) | 0;
-  const fh = (img.height / value) | 0;
+  const fw = (currentImg.width / s) | 0;
+  const fh = (currentImg.height / s) | 0;
 
   // draw current image at scaled factor (aka really small and in the top left corner)
-  ctx.drawImage(img, 0, 0, fw, fh);
+  ctx.drawImage(currentImg, 0, 0, fw, fh);
 
   // take that small corner bit and enlarge it to full canvas size (aka pixelate it)
-  const imgData2 = ctx.getImageData(0, 0, fw, fh);
-  const img2 = await createImageBitmap(imgData2);
+  const smallImgData = ctx.getImageData(0, 0, fw, fh);
+  const smallImg = await createImageBitmap(smallImgData);
   clearCanvas(ctx);
-  ctx.drawImage(img2, 0, 0, fw, fh, 0, 0, w / dpr, h / dpr);
-
-  // remove white bg on meta-box div
-  // $refs.notAllowed.bg();
-  //
-  // 🚨 NOTE:
-  //  this seems like separate functionality.
-  //  i think it should be called from the same function that calls pixelateDrawing()
-  //  this might require pixelateDrawing() to return a promise
-  //  that way it would ensure that pixelateDrawing() was a success before removing bg
+  ctx.drawImage(smallImg, 0, 0, fw, fh, 0, 0, w / dpr, h / dpr);
 }
