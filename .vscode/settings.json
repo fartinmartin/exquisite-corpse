@@ -4,6 +4,7 @@
     ".nuxt": true,
     ".vscode": true,
     "dist/": true,
+    "public/": true,
     ".editorconfig": true,
     "README.md": true,
     "package-lock.json": true,
