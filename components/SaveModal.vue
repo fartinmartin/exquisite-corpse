@@ -1,5 +1,9 @@
 <template>
-  <div class="fs-modal save-modal" @click="closeMe">
+  <div
+    class="fs-modal save-modal"
+    @click="closeMe"
+    v-touch="(e) => e.changedTouches[0].touchType === 'stylus' && closeMe(e)"
+  >
     <div class="wrap">
       <Canvas
         id="save-preview"
