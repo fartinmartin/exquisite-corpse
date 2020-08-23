@@ -162,8 +162,6 @@
 <script>
 import { mapState, mapGetters } from "vuex";
 
-// 🚨 TODO: apple pencil taps are not registered on AT LEAST undo/redo.. this goes for a lot of things actually.. ugh
-
 export default {
   name: "ToolBar",
 
