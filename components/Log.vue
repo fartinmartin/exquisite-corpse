@@ -59,7 +59,7 @@ export default {
   },
   methods: {
     handleShortcuts(e) {
-      if (e.keyCode === 12) this.isHidden = !this.isHidden; // 12 = "clear" || 76 = "l"
+      if (e.key === "Clear") this.isHidden = !this.isHidden; // 12 = "clear" || 76 = "l"
     },
   },
   computed: {

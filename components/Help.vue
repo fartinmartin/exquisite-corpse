@@ -54,7 +54,7 @@ export default {
   },
   methods: {
     handleShortcuts(e) {
-      if (e.keyCode === 27) this.$store.dispatch("setIsHelping", false);
+      if (e.code === "Escape") this.$store.dispatch("setIsHelping", false);
     },
     closeMe(e) {
       if (e.target.classList.contains("help-modal"))

@@ -109,7 +109,7 @@ export default {
   },
   methods: {
     handleShortcuts(e) {
-      if (e.keyCode === 27) this.$emit("close-save"); // esc
+      if (e.code === "Escape") this.$emit("close-save"); // esc
     },
 
     closeMe(e) {
