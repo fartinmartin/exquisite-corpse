@@ -46,7 +46,7 @@
             />
           </div>
         </form>
-        <div class="loadal" v-show="isSaving !== 'idle'">
+        <div class="loadal" v-show="isSaving !== 'modal-open'">
           <Loading
             v-if="isSaving === 'saving'"
             subtext="generating your masterpiece"
@@ -90,7 +90,6 @@ export default {
     artist: "",
     isTempTitle: true,
     isTempArtist: true,
-    // isSaving: "idle", // "idle", "saving", "success", "error"
   }),
   computed: {
     ...mapState("user", ["name"]),

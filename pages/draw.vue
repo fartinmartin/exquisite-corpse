@@ -1,6 +1,6 @@
 <template>
   <div class="wrap">
-    <SaveModal v-if="isSaving" @close-save="closeSave" />
+    <SaveModal v-if="isSaving !== 'idle'" @close-save="closeSave" />
 
     <PickSection v-if="isFetching === 'idle'" @picked-type="handlePickedType" />
 
@@ -13,7 +13,7 @@
     <Draw
       v-if="isFetching === 'success'"
       @start-save="startSave"
-      v-show="!isSaving"
+      v-show="isSaving === 'idle'"
     />
   </div>
 </template>
@@ -30,7 +30,7 @@ export default {
     };
   },
 
-  data: () => ({ isFetching: "idle", isSaving: false }), // "idle", "fetching", "success", TODO: "error"
+  data: () => ({ isFetching: "idle" }), // "idle", "fetching", "success", TODO: "error"
   async fetch({ store }) {
     // set default random title
     let words = await twoRandomWords();
@@ -42,19 +42,17 @@ export default {
     this.$store.dispatch("mouse/resetMouse");
   },
   computed: {
-    ...mapState("drawing", ["sections"]),
+    ...mapState("drawing", ["isSaving", "sections"]),
     ...mapGetters(["isMobile"]),
   },
   methods: {
     startSave() {
       if (this.isMobile) this.$store.dispatch("drawing/setMobilePaths");
-      this.isSaving = true;
+      this.$store.dispatch("drawing/setIsSaving", "modal-open");
     },
     closeSave(e) {
-      if (e) {
-        this.$router.push({ path: `/gallery/${e}` });
-      }
-      this.isSaving = false;
+      if (e) this.$router.push({ path: `/gallery/${e}` });
+      this.$store.dispatch("drawing/setIsSaving", "idle");
     },
     async handlePickedType(type) {
       this.isFetching = "fetching";

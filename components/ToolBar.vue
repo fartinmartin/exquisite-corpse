@@ -163,46 +163,45 @@ export default {
   },
   methods: {
     handleShortcuts(e) {
-      // console.log("keydown", e.key, e.keyCode);
-      if (this.isSaving !== "saving") {
-        if (!isNaN(e.key)) {
-          this.setColor(this.palette.colors[e.key - 1]);
-        }
+      if (this.isSaving === "modal-open") return;
 
-        switch (e.keyCode) {
-          case 68: // "d"
-            this.mode = "draw";
-            break;
-          case 69: // "e"
-            this.mode = "erase";
-            break;
-          case 70: // "e"
-            this.mode = "fill";
-            break;
+      if (!isNaN(e.key)) {
+        this.setColor(this.palette.colors[e.key - 1]);
+      }
 
-          case 219: // "["
-            this.decrementSize();
-            break;
-          case 221: // "]"
-            this.incrementSize();
-            break;
+      switch (e.code) {
+        case "KeyD":
+          this.mode = "draw";
+          break;
+        case "KeyE":
+          this.mode = "erase";
+          break;
+        case "KeyF":
+          this.mode = "fill";
+          break;
 
-          case 90: // "z"
-            this.undoCanvas();
-            break;
-          case 88: // "x"
-            this.redoCanvas();
-            break;
+        case "BracketLeft":
+          this.decrementSize();
+          break;
+        case "BracketRight":
+          this.incrementSize();
+          break;
 
-          case 67: // "c" OR
-          case 8: // "backspace"
-            this.clearCanvas(e); // sent with event in order to log in history
-            break;
+        case "KeyZ":
+          this.undoCanvas();
+          break;
+        case "KeyX":
+          this.redoCanvas();
+          break;
 
-          case 83: // "s"
-            this.$emit("start-save");
-            break;
-        }
+        case "KeyC":
+        case "Delete":
+          this.clearCanvas(e); // sent with event in order to log in history
+          break;
+
+        case "KeyS": // "s"
+          this.$emit("start-save");
+          break;
       }
     },
     addColor(e) {

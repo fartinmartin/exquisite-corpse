@@ -1,10 +1,13 @@
 <template>
-  <div class="icon interactive">
-    <slot />
-  </div>
+  <button>
+    <div class="icon interactive">
+      <slot />
+    </div>
+  </button>
 </template>
 
 <script>
+// 🚨 this is NOT meant to replace Button.vue
 export default {};
 </script>
 
