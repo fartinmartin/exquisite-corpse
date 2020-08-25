@@ -146,7 +146,7 @@
         <Drawing :drawing="drawing" />
       </nuxt-link>
     </div>
-    <Observer v-if="isMobile" @intersect="nextPage" />
+    <Observer v-if="isMobile" @intersect="appendNextPage" />
   </div>
 </template>
 
@@ -157,7 +157,6 @@ import { handleBodyScroll } from "~/assets/js/handleBodyScroll";
 
 export default {
   name: "gallery",
-
   head() {
     return {
       title: "exquisite corpse club • gallery",
@@ -230,13 +229,38 @@ export default {
       }
     },
 
-    async nextPage() {
-      if (this.isMobile && this.emptyNextResults) return;
+    async appendNextPage() {
+      try {
+        let query = this.$fireStore.collection(this.collection);
+        if (this.collection === "sections")
+          query = query.where("type", "==", this.type);
+        query = query
+          .orderBy(this.field, "desc")
+          .startAfter(this.lastVisible)
+          .limit(this.pageSize);
 
+        const nextResponse = await query.get();
+        if (!nextResponse.empty) {
+          this.emptyPrevResults = false;
+
+          this.lastVisible = nextResponse.docs[nextResponse.docs.length - 1];
+          this.firstVisible = nextResponse.docs[0];
+
+          nextResponse.forEach((doc) => {
+            let mydoc = { docId: doc.id, thumb: doc.data().thumb };
+            this.gallery.push(mydoc);
+          });
+        } else {
+          this.emptyNextResults = true;
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    },
+
+    async nextPage() {
       try {
         this.isFetching = "fetching";
-        // if (this.isMobile)
-        //   this.$refs.gallery.style.minHeight = this.$refs.gallery.offsetHeight;
 
         let query = this.$fireStore.collection(this.collection);
         if (this.collection === "sections")
@@ -248,7 +272,7 @@ export default {
 
         const nextResponse = await query.get();
         if (!nextResponse.empty) {
-          if (!this.isMobile) this.gallery = [];
+          this.gallery = [];
           this.emptyPrevResults = false;
 
           this.lastVisible = nextResponse.docs[nextResponse.docs.length - 1];
@@ -263,7 +287,6 @@ export default {
         }
 
         this.isFetching = "success";
-        // if (this.isMobile) this.$refs.gallery.style.minHeight = "initial";
       } catch (error) {
         console.error(error);
         this.isFetching = "error";
