@@ -14,6 +14,7 @@ export const state = () => ({
     bot: null,
   },
   title: "",
+  isSaving: "idle",
 });
 
 export const getters = {
@@ -42,6 +43,10 @@ export const getters = {
 };
 
 export const actions = {
+  setIsSaving({ commit }, saveState) {
+    commit("SET_IS_SAVING", saveState);
+  },
+
   setTitle({ commit }, title) {
     commit("SET_TITLE", title);
   },
@@ -245,6 +250,7 @@ export const mutations = {
     state.history.step = 0;
     state.currentPath = []; // probs unecessary but oh well
     state.type = null;
+    state.isSaving = "idle";
   },
 
   SET_CANVAS(state, canvas) {
@@ -315,5 +321,9 @@ export const mutations = {
 
   SET_MOBILE_PATHS(state, mobilePaths) {
     state.mobilePaths = mobilePaths;
+  },
+
+  SET_IS_SAVING(state, saveState) {
+    state.isSaving = saveState;
   },
 };

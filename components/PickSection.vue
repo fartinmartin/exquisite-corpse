@@ -16,7 +16,7 @@
         interactive
         no-padding
       >
-        <div class="meta-box"><div class="info">top</div></div>
+        <div class="meta-box pointer"><div class="info pointer">top</div></div>
       </Panel>
       <Panel
         class="section-template mt"
@@ -25,7 +25,9 @@
         interactive
         no-padding
       >
-        <div class="meta-box"><div class="info">middle</div></div>
+        <div class="meta-box pointer">
+          <div class="info pointer">middle</div>
+        </div>
       </Panel>
       <Panel
         class="section-template mt"
@@ -34,7 +36,9 @@
         interactive
         no-padding
       >
-        <div class="meta-box"><div class="info">bottom</div></div>
+        <div class="meta-box pointer">
+          <div class="info pointer">bottom</div>
+        </div>
       </Panel>
     </div>
   </div>

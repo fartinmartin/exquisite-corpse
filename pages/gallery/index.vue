@@ -152,7 +152,8 @@
 
 <script>
 import { mapGetters } from "vuex";
-import { disableBodyScroll, enableBodyScroll } from "body-scroll-lock";
+import { enableBodyScroll } from "body-scroll-lock";
+import { handleBodyScroll } from "~/assets/js/handleBodyScroll";
 
 export default {
   name: "gallery",
@@ -175,6 +176,7 @@ export default {
     emptyNextResults: null,
     emptyPrevResults: null,
     scrollY: 0,
+    container: null,
   }),
   computed: {
     isFirstPage() {
@@ -191,14 +193,11 @@ export default {
   mounted() {
     this.fetchFirst();
 
-    const tino = document.getElementById("__tino");
-    enableBodyScroll(tino);
+    this.container = document.getElementById("__tino");
+    enableBodyScroll(this.container);
   },
   beforeDestroy() {
-    const tino = document.getElementById("__tino");
-    disableBodyScroll(tino, {
-      allowTouchMove: (el) => el.tagName === "CANVAS",
-    });
+    handleBodyScroll(this.container);
   },
   methods: {
     // https://stackoverflow.com/questions/62639778/paginating-firestore-data-when-using-vuex-and-appending-new-data-to-the-state

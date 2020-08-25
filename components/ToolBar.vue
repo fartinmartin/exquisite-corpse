@@ -14,7 +14,7 @@
             value="draw"
             v-model="mode"
           />
-          <label for="draw" v-touch="(e) => (mode = e.target.control.value)">
+          <label for="draw">
             <img src="~/assets/img/toolbar/draw.svg" />
           </label>
         </div>
@@ -31,7 +31,7 @@
             value="erase"
             v-model="mode"
           />
-          <label for="erase" v-touch="(e) => (mode = e.target.control.value)">
+          <label for="erase">
             <img src="~/assets/img/toolbar/erase.svg" />
           </label>
         </div>
@@ -48,7 +48,7 @@
             value="fill"
             v-model="mode"
           />
-          <label for="fill" v-touch="(e) => (mode = e.target.control.value)">
+          <label for="fill">
             <img src="~/assets/img/toolbar/fill.svg" />
           </label>
         </div>
@@ -59,9 +59,6 @@
           class="tool size-down"
           :disabled="!currentSizeMoreThanMin"
           @click="decrementSize"
-          v-touch="
-            (e) => e.changedTouches[0].touchType === 'stylus' && decrementSize()
-          "
           data-tooltip="smaller"
         >
           <img src="~/assets/img/toolbar/size-down.svg" alt="" />
@@ -71,9 +68,6 @@
           class="tool size-up"
           :disabled="!currentSizeLessThanMax"
           @click="incrementSize"
-          v-touch="
-            (e) => e.changedTouches[0].touchType === 'stylus' && incrementSize()
-          "
           data-tooltip="bigger"
         >
           <img src="~/assets/img/toolbar/size-up.svg" alt="" />
@@ -85,9 +79,6 @@
           class="tool undo"
           :disabled="cantUndo"
           @click="undoCanvas"
-          v-touch="
-            (e) => e.changedTouches[0].touchType === 'stylus' && undoCanvas()
-          "
           data-tooltip="undo"
         >
           <img src="~/assets/img/toolbar/undo.svg" alt="" />
@@ -96,9 +87,6 @@
           class="tool redo"
           :disabled="cantRedo"
           @click="redoCanvas"
-          v-touch="
-            (e) => e.changedTouches[0].touchType === 'stylus' && redoCanvas()
-          "
           data-tooltip="redo"
         >
           <img src="~/assets/img/toolbar/redo.svg" alt="" />
@@ -107,9 +95,6 @@
           class="tool clear"
           :disabled="isDrawingEmpty"
           @click="clearCanvas"
-          v-touch="
-            (e) => e.changedTouches[0].touchType === 'stylus' && clearCanvas()
-          "
           data-tooltip="clear"
         >
           <img src="~/assets/img/toolbar/clear.svg" alt="" />
@@ -118,10 +103,6 @@
           class="tool save"
           :disabled="isDrawingEmpty"
           @click="$emit('start-save')"
-          v-touch="
-            (e) =>
-              e.changedTouches[0].touchType === 'stylus' && $emit('start-save')
-          "
           data-tooltip="save"
         >
           <img src="~/assets/img/toolbar/save.svg" alt="" />
@@ -138,19 +119,12 @@
           :class="{ active: color === palette.current }"
           :style="{ backgroundColor: color }"
           @click="setColor(color)"
-          v-touch="
-            (e) => e.changedTouches[0].touchType === 'stylus' && setColor(color)
-          "
         ></button>
         <input
           style="display: none;"
           type="color"
           id="addColor"
           @change="addColor($event)"
-          v-touch="
-            (e) =>
-              e.changedTouches[0].touchType === 'stylus' && addColor($event)
-          "
         />
         <label for="addColor" class="add-color">+</label>
         <!-- TODO: https://github.com/xiaokaike/vue-color (mostly for safari support 🤔) -->
@@ -164,8 +138,6 @@ import { mapState, mapGetters } from "vuex";
 
 export default {
   name: "ToolBar",
-
-  data: () => ({ isSaving: false }),
   mounted() {
     document.addEventListener("keydown", this.handleShortcuts);
   },
@@ -181,6 +153,7 @@ export default {
         this.$store.dispatch("mouse/setMode", value);
       },
     },
+    ...mapState("drawing", ["isSaving"]),
     ...mapState("mouse", ["palette", "size"]),
     ...mapGetters("mouse", [
       "currentSizeLessThanMax",
@@ -189,14 +162,9 @@ export default {
     ...mapGetters("drawing", ["cantUndo", "cantRedo", "isDrawingEmpty"]),
   },
   methods: {
-    debug(e) {
-      console.log(e.changedTouches[0].touchType);
-      if (e.changedTouches[0].touchType === "stylus") this.decrementSize();
-      // console.log(e.touches[0].touchType);
-    },
     handleShortcuts(e) {
       // console.log("keydown", e.key, e.keyCode);
-      if (!this.isSaving) {
+      if (this.isSaving !== "saving") {
         if (!isNaN(e.key)) {
           this.setColor(this.palette.colors[e.key - 1]);
         }

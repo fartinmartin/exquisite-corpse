@@ -94,11 +94,11 @@ export default {
     artist: "",
     isTempTitle: true,
     isTempArtist: true,
-    isSaving: "idle", // "idle", "saving", "success", "error"
+    // isSaving: "idle", // "idle", "saving", "success", "error"
   }),
   computed: {
     ...mapState("user", ["name"]),
-    ...mapState("drawing", ["type", "sections", "paths"]),
+    ...mapState("drawing", ["isSaving", "type", "sections", "paths"]),
     ...mapGetters(["isMobile"]),
     ...mapGetters("drawing", ["computedPaths"]),
   },
@@ -123,12 +123,12 @@ export default {
 
       if (targets.some(isSaveModal)) {
         this.$emit("close-save");
-        this.isSaving = "idle";
+        this.$store.dispatch("drawing/setIsSaving", "idle");
       }
     },
 
     async saveDrawing() {
-      this.isSaving = "saving";
+      this.$store.dispatch("drawing/setIsSaving", "saving");
 
       // if they changed their name, update their profile + our local state
       if (this.artist !== this.name)
@@ -217,13 +217,13 @@ export default {
       batch
         .commit()
         .then(() => {
-          this.isSaving = "success";
+          this.$store.dispatch("drawing/setIsSaving", "success");
           setTimeout(() => {
             this.$emit("close-save", corpseId);
           }, 1500);
         })
         .catch((error) => {
-          this.isSaving = "error";
+          this.$store.dispatch("drawing/setIsSaving", "error");
           console.error("Error writing document: ", error);
           setTimeout(() => {
             this.$emit("close-save");
