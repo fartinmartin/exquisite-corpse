@@ -26,7 +26,6 @@
 
 export default {
   name: "index",
-
   data: () => ({
     isFetching: "idle", // "idle", "fetching", "success", TODO: "error"
     meta: null,

@@ -5,9 +5,5 @@
 </template>
 
 <script>
-export default {
-  name: "Drawing",
-
-  props: { drawing: Object },
-};
+export default { name: "Drawing", props: { drawing: Object } };
 </script>

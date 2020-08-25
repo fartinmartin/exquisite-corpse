@@ -17,7 +17,6 @@
 <script>
 export default {
   name: "Loading",
-
   props: {
     text: { type: String, required: false, default: "plz hold" },
     subtext: { type: String, required: false },

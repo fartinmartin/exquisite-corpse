@@ -45,7 +45,6 @@
 <script>
 export default {
   name: "Help",
-
   mounted() {
     document.addEventListener("keydown", this.handleShortcuts);
   },

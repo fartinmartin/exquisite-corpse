@@ -18,6 +18,8 @@
 </template>
 
 <script>
+// 🚨 TODO: "mobile label prop?"
+
 export default {
   name: "Input",
   props: {

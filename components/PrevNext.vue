@@ -24,7 +24,6 @@
 <script>
 export default {
   name: "PrevNext",
-
   props: { isFirstPage: Boolean, isLastPage: Boolean },
 };
 </script>

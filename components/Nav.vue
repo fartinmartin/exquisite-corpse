@@ -28,7 +28,6 @@
 <script>
 export default {
   name: "Nav",
-
   methods: {
     openHelp() {
       this.$store.dispatch("setIsHelping", true);

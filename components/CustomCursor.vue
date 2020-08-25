@@ -19,19 +19,11 @@ export default {
     window.addEventListener("mousemove", this.cursorMove);
     window.addEventListener("mousedown", this.cursorDown);
     window.addEventListener("mouseup", this.cursorUp);
-
-    // window.addEventListener("focus", this.checkFocus);
-    // window.addEventListener("blur", this.checkFocus);
-
-    // this.checkFocus();
   },
   beforeDestroy() {
     window.removeEventListener("mousemove", this.cursorMove);
     window.removeEventListener("mousedown", this.cursorDown);
     window.removeEventListener("mouseup", this.cursorUp);
-
-    // window.removeEventListener("focus", this.checkFocus);
-    // window.removeEventListener("blur", this.checkFocus);
   },
   methods: {
     cursorMove(e) {
@@ -101,17 +93,6 @@ export default {
       if (e.target.tagName !== "CANVAS") {
         this.cursorMove(e);
         this.tooltip = null;
-      }
-    },
-    checkFocus() {
-      // 🚨 currently not executing right now, will check on this later
-      if (process.client && this.$refs.cursorRef) {
-        const cursor = this.$refs.cursorRef;
-        if (document.hasFocus()) {
-          cursor.style.display = "initial";
-        } else {
-          cursor.style.display = "none";
-        }
       }
     },
   },

@@ -199,7 +199,7 @@ export default {
           this.clearCanvas(e); // sent with event in order to log in history
           break;
 
-        case "KeyS": // "s"
+        case "KeyS":
           this.$emit("start-save");
           break;
       }

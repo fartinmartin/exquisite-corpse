@@ -84,7 +84,6 @@ import { randomWordFromString } from "~/assets/js/randomWords";
 
 export default {
   name: "SaveModal",
-
   data: () => ({
     title: "",
     artist: "",
