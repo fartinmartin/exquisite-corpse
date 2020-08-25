@@ -3,7 +3,7 @@ import { disableBodyScroll } from "body-scroll-lock";
 export function handleBodyScroll(container) {
   disableBodyScroll(container, {
     allowTouchMove: (el) => {
-      console.log(el);
+      // console.log(el);
       return (
         el.tagName === "CANVAS" ||
         el.tagName === "BUTTON" ||
@@ -11,7 +11,8 @@ export function handleBodyScroll(container) {
         el.tagName === "INPUT" ||
         el.tagName === "A" ||
         el.classList.contains("pointer") ||
-        el.classList.contains("interactive")
+        el.classList.contains("interactive") ||
+        el.classList.contains("fs-modal")
       );
     },
   });
