@@ -99,6 +99,9 @@
         >
           <img src="~/assets/img/toolbar/clear.svg" alt="" />
         </button>
+      </div>
+
+      <div class="tool-group save">
         <button
           class="tool save"
           :disabled="isDrawingEmpty"
@@ -121,7 +124,7 @@
           @click="setColor(color)"
         ></button>
         <input
-          style="display: none;"
+          style="display: none"
           type="color"
           id="addColor"
           @change="addColor($event)"
@@ -240,15 +243,34 @@ export default {
 
   height: 60px;
 
-  @media screen and (max-width: 544px) {
+  @media screen and (max-width: 508px) {
     height: initial;
 
-    .size {
-      order: 3;
-      margin-top: 0.5rem;
+    .tool-group:not(.palette) {
+      width: 50%;
+      margin: 0 !important;
 
-      > span {
-        margin: 0;
+      &.size,
+      &.save {
+        margin-top: 1rem !important;
+      }
+
+      &.edits,
+      &.save {
+        justify-content: flex-end;
+      }
+
+      &.mode {
+        order: 1;
+      }
+      &.size {
+        order: 3;
+      }
+      &.edits {
+        order: 2;
+      }
+      &.save {
+        order: 4;
       }
     }
   }
@@ -261,6 +283,10 @@ export default {
 .tool-group {
   display: flex;
   align-items: center;
+
+  &:not(:first-child) {
+    margin-left: 2rem;
+  }
 
   > *:not(:first-child) {
     margin-left: 0.5rem;
