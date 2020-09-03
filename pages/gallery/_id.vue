@@ -26,13 +26,13 @@ export default {
   name: "Corpse",
   head() {
     return {
-      title: `exquisite corpse club • ${this.meta.title}`,
+      title: `exquisite corpse club ▪ ${this.meta.title}`
     };
   },
   data: () => ({
     isFetching: "idle", // "idle", "fetching", "success", TODO: "error"
     meta: { title: "" },
-    sections: {},
+    sections: {}
   }),
   mounted() {
     this.getCorpseById(this.$route.params.id);
@@ -69,8 +69,8 @@ export default {
     async getSection(docRef) {
       const response = await docRef.get();
       return { docId: response.id, ...response.data() };
-    },
-  },
+    }
+  }
 };
 </script>
 

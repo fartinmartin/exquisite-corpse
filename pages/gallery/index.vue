@@ -139,9 +139,11 @@
       <nuxt-link
         v-for="drawing in gallery"
         :key="drawing.docId"
-        :to="`/${collection === 'corpses' ? 'gallery' : 'gallery/section'}/${
-          drawing.docId
-        }`"
+        :to="
+          `/${collection === 'corpses' ? 'gallery' : 'gallery/section'}/${
+            drawing.docId
+          }`
+        "
       >
         <Drawing :drawing="drawing" />
       </nuxt-link>
@@ -159,7 +161,7 @@ export default {
   name: "gallery",
   head() {
     return {
-      title: "exquisite corpse club • gallery",
+      title: "exquisite corpse club ▪ gallery"
     };
   },
   data: () => ({
@@ -175,7 +177,7 @@ export default {
     emptyNextResults: null,
     emptyPrevResults: null,
     scrollY: 0,
-    container: null,
+    container: null
   }),
   computed: {
     isFirstPage() {
@@ -187,7 +189,7 @@ export default {
     isLastPage() {
       return this.emptyNextResults || this.gallery.length < this.pageSize;
     },
-    ...mapGetters(["isMobile"]),
+    ...mapGetters(["isMobile"])
   },
   mounted() {
     this.fetchFirst();
@@ -218,7 +220,7 @@ export default {
         this.firstVisible = firstResponse.docs[0];
         this.lastVisible = firstResponse.docs[firstResponse.docs.length - 1];
 
-        firstResponse.forEach((doc) => {
+        firstResponse.forEach(doc => {
           let mydoc = { docId: doc.id, thumb: doc.data().thumb };
           this.gallery.push(mydoc);
         });
@@ -250,7 +252,7 @@ export default {
           this.lastVisible = nextResponse.docs[nextResponse.docs.length - 1];
           this.firstVisible = nextResponse.docs[0];
 
-          nextResponse.forEach((doc) => {
+          nextResponse.forEach(doc => {
             let mydoc = { docId: doc.id, thumb: doc.data().thumb };
             this.gallery.push(mydoc);
           });
@@ -283,7 +285,7 @@ export default {
           this.lastVisible = nextResponse.docs[nextResponse.docs.length - 1];
           this.firstVisible = nextResponse.docs[0];
 
-          nextResponse.forEach((doc) => {
+          nextResponse.forEach(doc => {
             let mydoc = { docId: doc.id, thumb: doc.data().thumb };
             this.gallery.push(mydoc);
           });
@@ -321,7 +323,7 @@ export default {
           this.lastVisible = prevResponse.docs[prevResponse.docs.length - 1];
           this.firstVisible = prevResponse.docs[0];
 
-          prevResponse.forEach((doc) => {
+          prevResponse.forEach(doc => {
             let mydoc = { docId: doc.id, thumb: doc.data().thumb };
             this.gallery.push(mydoc);
           });
@@ -361,8 +363,8 @@ export default {
 
       this.field = field;
       this.fetchFirst();
-    },
-  },
+    }
+  }
 };
 </script>
 

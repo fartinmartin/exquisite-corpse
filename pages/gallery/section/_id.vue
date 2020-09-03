@@ -115,7 +115,7 @@ export default {
   name: "Section",
   head() {
     return {
-      title: `exquisite corpse club • ${this.section.title} by ${this.section.artist}`,
+      title: `exquisite corpse club ▪ ${this.section.title} by ${this.section.artist}`
     };
   },
   data: () => ({
@@ -124,8 +124,8 @@ export default {
     related: {
       featuredIn: [],
       moreBy: [],
-      toggle: "featuredIn",
-    },
+      toggle: "featuredIn"
+    }
   }),
   mounted() {
     this.getSectionById(this.$route.params.id);
@@ -157,8 +157,8 @@ export default {
     async getFeaturedIn() {
       if (!this.section.featuredIn) return;
 
-      this.section.featuredIn.slice(-3).forEach((ref) => {
-        ref.get().then((doc) => {
+      this.section.featuredIn.slice(-3).forEach(ref => {
+        ref.get().then(doc => {
           const mydoc = { docId: doc.id, thumb: doc.data().thumb };
           this.related.featuredIn.push(mydoc);
         });
@@ -173,12 +173,12 @@ export default {
         .limit(6);
       const moreByDocs = await query.get();
 
-      moreByDocs.forEach((doc) => {
+      moreByDocs.forEach(doc => {
         const mydoc = { docId: doc.id, thumb: doc.data().thumb };
         if (doc.id !== this.$route.params.id) this.related.moreBy.push(mydoc);
       });
-    },
-  },
+    }
+  }
 };
 </script>
 

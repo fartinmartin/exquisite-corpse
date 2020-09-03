@@ -26,7 +26,7 @@ export default {
   name: "draw",
   head() {
     return {
-      title: "exquisite corpse club • draw",
+      title: "exquisite corpse club ▪ draw"
     };
   },
   data: () => ({ isFetching: "idle" }), // "idle", "fetching", "success", TODO: "error"
@@ -42,7 +42,7 @@ export default {
   },
   computed: {
     ...mapState("drawing", ["isSaving", "sections"]),
-    ...mapGetters(["isMobile"]),
+    ...mapGetters(["isMobile"])
   },
   methods: {
     startSave() {
@@ -59,13 +59,13 @@ export default {
 
       // get other types
       let types = ["top", "mid", "bot"];
-      types = types.filter((t) => t !== type);
+      types = types.filter(t => t !== type);
 
       // set drawing state and this section's docId as "temp" in the store
       this.$store.dispatch("drawing/setType", type);
       this.$store.dispatch("drawing/setSections", {
         type,
-        docId: "temp",
+        docId: "temp"
       });
 
       // get and set the other two types
@@ -93,7 +93,7 @@ export default {
       try {
         const firstResponse = await query.get();
         if (firstResponse.size > 0) {
-          firstResponse.forEach((doc) => {
+          firstResponse.forEach(doc => {
             const { featuredIn, ...docData } = doc.data();
             section = { docId: doc.id, ...docData };
           });
@@ -104,7 +104,7 @@ export default {
             .limit(1);
           const secondResponse = await secondQuery.get();
 
-          secondResponse.forEach((doc) => {
+          secondResponse.forEach(doc => {
             const { featuredIn, ...docData } = doc.data();
             section = { docId: doc.id, ...docData };
           });
@@ -115,7 +115,7 @@ export default {
       }
 
       return section;
-    },
-  },
+    }
+  }
 };
 </script>
