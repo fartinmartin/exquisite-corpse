@@ -24,9 +24,9 @@ module.exports = {
       {
         hid: "description",
         name: "description",
-        content: `an online collaborative drawing game. ✏️` || "",
-      },
-    ],
+        content: `an online collaborative drawing game. ✏️` || ""
+      }
+    ]
   },
   /*
    ** Dev sever config, used to fix cache issues
@@ -34,7 +34,7 @@ module.exports = {
   server: {
     port: 8000, // default: 3000
     // host: "localhost", // default: localhost
-    host: "0.0.0.0",
+    host: "0.0.0.0"
   },
   /*
    ** Global CSS
@@ -72,8 +72,8 @@ module.exports = {
     cookieName: "_password",
     cookie: {
       prefix: "",
-      expires: 5,
-    },
+      expires: 5
+    }
   },
   /*
    ** Firebase config
@@ -91,7 +91,7 @@ module.exports = {
         storageBucket: process.env.FIREBASE_STORAGEBUCKET,
         messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
         appId: process.env.FIREBASE_APP_ID,
-        measurementId: process.env.FIREBASE_MEASUREMENT_ID,
+        measurementId: process.env.FIREBASE_MEASUREMENT_ID
       },
       development: {
         apiKey: process.env.FIREBASE_API_KEY_DEV,
@@ -101,17 +101,17 @@ module.exports = {
         storageBucket: process.env.FIREBASE_STORAGEBUCKET_DEV,
         messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID_DEV,
         appId: process.env.FIREBASE_APP_ID_DEV,
-        measurementId: process.env.FIREBASE_MEASUREMENT_ID_DEV,
-      },
+        measurementId: process.env.FIREBASE_MEASUREMENT_ID_DEV
+      }
     },
     services: {
       auth: {
-        ssr: true,
+        ssr: true
       },
       firestore: true,
-      analytics: true,
+      analytics: true
     },
-    onFirebaseHosting: true,
+    onFirebaseHosting: true
   },
   /*
    ** @nuxtjs/pwa configuration
@@ -119,15 +119,15 @@ module.exports = {
    */
   pwa: {
     meta: {
-      title: "Exquisite Corpse Club",
+      title: "exquisite corpse club",
       author: "Martin Lindberg",
-      description: "An online collaborative drawing game. ✏️",
+      description: "an online collaborative drawing game. ✏️"
     },
     manifest: {
-      name: "Exquisite Corpse Club",
-      short_name: "ECC",
-      lang: "en",
-    },
+      name: "exquisite corpse club",
+      short_name: "ecc",
+      lang: "en"
+    }
   },
   /*
    ** Build configuration
@@ -140,6 +140,6 @@ module.exports = {
    */
   loading: {
     color: "#fcda00",
-    failedColor: "#f44e3b",
-  },
+    failedColor: "#f44e3b"
+  }
 };
