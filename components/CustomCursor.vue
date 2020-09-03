@@ -1,12 +1,34 @@
 <template>
   <div id="cursor" ref="cursorRef">
-    <img v-show="state === 'auto'" src="~/assets/img/cursor/auto.svg" />
-    <img v-show="state === 'pointer'" src="~/assets/img/cursor/pointer.svg" />
-    <img v-show="state === 'disabled'" src="~/assets/img/cursor/disabled.svg" />
-    <img v-show="state === 'grab'" src="~/assets/img/cursor/grab.svg" />
-    <img v-show="state === 'draw'" src="~/assets/img/cursor/draw.svg" />
-    <img v-show="state === 'erase'" src="~/assets/img/cursor/erase.svg" />
-    <img v-show="state === 'fill'" src="~/assets/img/cursor/fill.svg" />
+    <img v-show="isLoading" src="~/assets/img/cursor/loading.svg" />
+    <img
+      v-show="!isLoading && state === 'auto'"
+      src="~/assets/img/cursor/auto.svg"
+    />
+    <img
+      v-show="!isLoading && state === 'pointer'"
+      src="~/assets/img/cursor/pointer.svg"
+    />
+    <img
+      v-show="!isLoading && state === 'disabled'"
+      src="~/assets/img/cursor/disabled.svg"
+    />
+    <img
+      v-show="!isLoading && state === 'grab'"
+      src="~/assets/img/cursor/grab.svg"
+    />
+    <img
+      v-show="!isLoading && state === 'draw'"
+      src="~/assets/img/cursor/draw.svg"
+    />
+    <img
+      v-show="!isLoading && state === 'erase'"
+      src="~/assets/img/cursor/erase.svg"
+    />
+    <img
+      v-show="!isLoading && state === 'fill'"
+      src="~/assets/img/cursor/fill.svg"
+    />
     <div v-show="tooltip" class="tooltip" ref="tooltip">{{ tooltip }}</div>
   </div>
 </template>
@@ -15,6 +37,11 @@
 export default {
   name: "CustomCursor",
   data: () => ({ x: null, y: null, state: "auto", tooltip: null }),
+  computed: {
+    isLoading() {
+      return this.$store.state.isLoading;
+    },
+  },
   mounted() {
     window.addEventListener("mousemove", this.cursorMove);
     window.addEventListener("mousedown", this.cursorDown);
@@ -29,6 +56,7 @@ export default {
     cursorMove(e) {
       // hotspot offsets based on state
       let offset = {
+        ...(this.state === "loading" && { x: 0, y: 0 }),
         ...(this.state === "auto" && { x: -3, y: 0 }),
         ...(this.state === "pointer" && { x: 0, y: 0 }),
         ...(this.state === "disabled" && { x: -5, y: -5 }),
@@ -59,7 +87,9 @@ export default {
 
       const targets = [e.target, e.target.parentNode];
 
-      if (targets.some(isDisabled)) {
+      if (this.isLoading) {
+        this.state = "loading";
+      } else if (targets.some(isDisabled)) {
         this.state = "disabled";
       } else if (targets.some(isCanvas)) {
         this.state = this.$store.state.mouse.mode;

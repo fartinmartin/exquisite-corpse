@@ -1,1 +1,61 @@
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 32 39.98"><defs><style>.cls-1,.cls-3,.cls-5,.cls-6{fill:none;}.cls-2{fill:#e6e6e6;}.cls-3{stroke:#f2f2f2;}.cls-3,.cls-5,.cls-6{stroke-miterlimit:10;stroke-width:4px;}.cls-4{clip-path:url(#clip-path);}.cls-5{stroke:#ccc;}.cls-6{stroke:#231f20;}.cls-7{fill:gray;}</style><clipPath id="clip-path"><polygon class="cls-1" points="29 36.98 24 31.98 7 31.98 14 24.98 14 12.98 7 6.98 2 2 3 36.98 29 36.98"/></clipPath></defs><g id="Layer_2" data-name="Layer 2"><g id="Loading"><g id="Frame"><polygon class="cls-2" points="30 37.98 30 30.98 23 23.98 23 15.98 30 8.98 30 2 2 2 2 8.98 9 15.98 9 23.98 2 30.98 2 37.98 30 37.98"/><g id="Light"><polyline class="cls-3" points="28 37.98 28 31.81 21 24.81 21 15.15 28 8.15 28 3.98 4 3.98"/><g class="cls-4"><polyline class="cls-5" points="4 1.98 4 8.15 11 15.15 11 24.81 4 31.81 4 35.98 28 35.98"/></g></g><polygon id="Stroke" class="cls-6" points="30 37.98 30 30.98 23 23.98 23 15.98 30 8.98 30 2 2 2 2 8.98 9 15.98 9 23.98 2 30.98 2 37.98 30 37.98"/></g><rect class="cls-7" x="15" y="18.98" width="2" height="2"/><rect class="cls-7" x="15" y="24.98" width="2" height="2"/><rect class="cls-7" x="15" y="30.98" width="2" height="2"/><rect class="cls-7" x="9" y="30.98" width="2" height="2"/><rect class="cls-7" x="21" y="30.98" width="2" height="2"/><rect class="cls-7" x="12" y="27.98" width="2" height="2"/><rect class="cls-7" x="18" y="27.98" width="2" height="2"/><rect class="cls-7" x="15" y="13" width="2" height="2"/><rect class="cls-7" x="15" y="7" width="2" height="2"/><rect class="cls-7" x="9" y="7" width="2" height="2"/><rect class="cls-7" x="21" y="7" width="2" height="2"/><rect class="cls-7" x="12" y="10" width="2" height="2"/><rect class="cls-7" x="18" y="10" width="2" height="2"/></g></g></svg>
+<svg class="loading-cursor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" style="width: 25px;
+  height: 25px;
+  position: absolute;
+  top: 0;
+  left: 0;">
+  <defs>
+    <style>
+      .skeleton,
+      .skin {
+        fill: #e6e6e6;
+        stroke-miterlimit: 10;
+        stroke-width: 4px;
+      }
+
+      .skeleton {
+        stroke: #ccc;
+      }
+
+      .skin {
+        stroke: #231f20;
+      }
+
+      .bounding-box {
+        fill: none;
+      }
+    </style>
+  </defs>
+  <g>
+    <g>
+      <rect class="skeleton" x="2" y="2" width="36" height="12" />
+      <rect class="skeleton" x="2" y="14" width="36" height="12" />
+      <rect class="skeleton" x="2" y="26" width="36" height="12" />
+    </g>
+    <g>
+      <rect class="skin" x="2" y="2" width="36" height="12">
+        <animate begin="0" attributeName="x" values="2;2;2;38;2" dur="2s" keyTimes="0;0.2;0.4;0.6;1"
+          repeatCount="indefinite"
+          keySplines="0.35 0 0.08 0.99 ; 0.35 0 0.08 0.99 ; 0.35 0 0.08 0.99 ; 0.35 0 0.08 0.99 " calcMode="spline" />
+        <animate begin="0" attributeName="width" values="0;36;36;0;0" dur="2s" keyTimes="0;0.2;0.4;0.6;1"
+          repeatCount="indefinite"
+          keySplines="0.35 0 0.08 0.99 ; 0.35 0 0.08 0.99 ; 0.35 0 0.08 0.99 ; 0.35 0 0.08 0.99 " calcMode="spline" />
+      </rect>
+      <rect class="skin" x="2" y="14" width="36" height="12">
+        <animate begin="0.25" attributeName="x" values="2;2;2;38;2" dur="2s" keyTimes="0;0.2;0.4;0.6;1"
+          repeatCount="indefinite"
+          keySplines="0.35 0 0.08 0.99 ; 0.35 0 0.08 0.99 ; 0.35 0 0.08 0.99 ; 0.35 0 0.08 0.99 " calcMode="spline" />
+        <animate begin="0.25" attributeName="width" values="0;36;36;0;0" dur="2s" keyTimes="0;0.2;0.4;0.6;1"
+          repeatCount="indefinite"
+          keySplines="0.35 0 0.08 0.99 ; 0.35 0 0.08 0.99 ; 0.35 0 0.08 0.99 ; 0.35 0 0.08 0.99 " calcMode="spline" />
+      </rect>
+      <rect class="skin" x="2" y="26" width="36" height="12">
+        <animate begin="0.45" attributeName="x" values="2;2;2;38;2" dur="2s" keyTimes="0;0.2;0.4;0.6;1"
+          repeatCount="indefinite"
+          keySplines="0.35 0 0.08 0.99 ; 0.35 0 0.08 0.99 ; 0.35 0 0.08 0.99 ; 0.35 0 0.08 0.99 " calcMode="spline" />
+        <animate begin="0.45" attributeName="width" values="0;36;36;0;0" dur="2s" keyTimes="0;0.2;0.4;0.6;1"
+          repeatCount="indefinite"
+          keySplines="0.35 0 0.08 0.99 ; 0.35 0 0.08 0.99 ; 0.35 0 0.08 0.99 ; 0.35 0 0.08 0.99 " calcMode="spline" />
+      </rect>
+    </g>
+  </g>
+</svg>

@@ -203,6 +203,8 @@ export default {
     async fetchFirst() {
       try {
         this.isFetching = "fetching";
+        this.$store.dispatch("setIsLoading", true);
+
         this.gallery = [];
         this.emptyPrevResults = false;
         this.emptyNextResults = false;
@@ -223,9 +225,11 @@ export default {
 
         this.firstItemId = firstResponse.docs[0].id; // how necessary is this 🤔
         this.isFetching = "success";
+        this.$store.dispatch("setIsLoading", false);
       } catch (error) {
         console.error(error);
         this.isFetching = "error";
+        this.$store.dispatch("setIsLoading", false);
       }
     },
 
@@ -261,6 +265,7 @@ export default {
     async nextPage() {
       try {
         this.isFetching = "fetching";
+        this.$store.dispatch("setIsLoading", true);
 
         let query = this.$fireStore.collection(this.collection);
         if (this.collection === "sections")
@@ -287,15 +292,18 @@ export default {
         }
 
         this.isFetching = "success";
+        this.$store.dispatch("setIsLoading", false);
       } catch (error) {
         console.error(error);
         this.isFetching = "error";
+        this.$store.dispatch("setIsLoading", false);
       }
     },
 
     async prevPage() {
       try {
         this.isFetching = "fetching";
+        this.$store.dispatch("setIsLoading", true);
 
         let query = this.$fireStore.collection(this.collection);
         if (this.collection === "sections")
@@ -322,9 +330,11 @@ export default {
         }
 
         this.isFetching = "success";
+        this.$store.dispatch("setIsLoading", false);
       } catch (error) {
         console.error(error);
         this.isFetching = "error";
+        this.$store.dispatch("setIsLoading", false);
       }
     },
 

@@ -67,13 +67,13 @@
       v-if="isFetching === 'error'"
       text="srsy, sry"
       color="red"
-      style="padding-top: 31.6176471% !important;"
+      style="padding-top: 31.6176471% !important"
     />
 
     <Loading
       subtext="checkin out the studio"
       v-else-if="isFetching !== 'success' && related.toggle === 'featuredIn'"
-      style="padding-top: 31.6176471% !important;"
+      style="padding-top: 31.6176471% !important"
     />
 
     <div
@@ -95,7 +95,7 @@
       class="gallery more-by"
     >
       <div v-if="!related.moreBy.length" class="none-found">
-        <Panel color="blue" style="width: max-content; margin: 0 auto;">
+        <Panel color="blue" style="width: max-content; margin: 0 auto">
           no drawings found!
         </Panel>
       </div>
@@ -133,6 +133,7 @@ export default {
   methods: {
     async getSectionById(id) {
       this.isFetching = "fetching";
+      this.$store.dispatch("setIsLoading", true);
 
       try {
         const query = this.$fireStore.collection("sections").doc(id);
@@ -145,9 +146,11 @@ export default {
         await this.getMoreBy();
 
         this.isFetching = "success";
+        this.$store.dispatch("setIsLoading", false);
       } catch (error) {
         console.error(error);
         this.isFetching = "error";
+        this.$store.dispatch("setIsLoading", false);
       }
     },
 

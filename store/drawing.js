@@ -43,7 +43,12 @@ export const getters = {
 };
 
 export const actions = {
-  setIsSaving({ commit }, saveState) {
+  setIsSaving({ commit, dispatch }, saveState) {
+    if (saveState === "saving") {
+      dispatch("setIsLoading", true, { root: true });
+    } else {
+      dispatch("setIsLoading", false, { root: true });
+    }
     commit("SET_IS_SAVING", saveState);
   },
 

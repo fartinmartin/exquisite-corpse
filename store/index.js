@@ -1,6 +1,7 @@
 export const state = () => ({
   isHelping: false,
   isAdmin: false,
+  isLoading: false,
 });
 
 export const getters = {
@@ -14,6 +15,9 @@ export const actions = {
   setIsAdmin({ commit }, bool) {
     commit("SET_IS_ADMIN", bool);
   },
+  setIsLoading({ commit }, bool) {
+    commit("SET_IS_LOADING", bool);
+  },
 };
 
 export const mutations = {
@@ -22,5 +26,8 @@ export const mutations = {
   },
   SET_IS_ADMIN(state, bool) {
     state.isAdmin = bool;
+  },
+  SET_IS_LOADING(state, bool) {
+    state.isLoading = bool;
   },
 };

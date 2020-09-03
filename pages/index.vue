@@ -4,7 +4,7 @@
       <nuxt-link to="/">
         <h1>exquisite corpse club</h1>
       </nuxt-link>
-      <NavMenu style="margin-right: -6px;" />
+      <NavMenu style="margin-right: -6px" />
     </Panel>
 
     <Loading
@@ -41,6 +41,7 @@ export default {
 
     async getRandomCorpse() {
       this.isFetching = "fetching";
+      this.$store.dispatch("setIsLoading", true);
 
       const corpseRef = this.$fireStore.collection("corpses");
       const randomKey = corpseRef.doc().id;
@@ -67,6 +68,8 @@ export default {
         }
       } catch (error) {
         console.error(error);
+        this.isFetching = "error";
+        this.$store.dispatch("setIsLoading", false);
       }
 
       return;
@@ -78,6 +81,7 @@ export default {
         this.sections[type].paths = Object.values(this.sections[type].drawing);
       }
       this.isFetching = "success";
+      this.$store.dispatch("setIsLoading", false);
     },
 
     async getSection(docRef) {

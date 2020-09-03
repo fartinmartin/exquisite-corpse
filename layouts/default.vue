@@ -4,7 +4,7 @@
     <Nav />
 
     <transition name="fade">
-      <Nuxt v-if="isLoggedIn" />
+      <Nuxt />
     </transition>
 
     <CustomCursor />
@@ -17,10 +17,7 @@ import { clearAllBodyScrollLocks } from "body-scroll-lock";
 import { handleBodyScroll } from "~/assets/js/handleBodyScroll";
 
 export default {
-  computed: {
-    ...mapState(["isHelping"]),
-    ...mapState("user", ["isLoggedIn"]),
-  },
+  computed: { ...mapState(["isHelping"]) },
   beforeDestroy() {
     clearAllBodyScrollLocks();
   },

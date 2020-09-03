@@ -29,7 +29,6 @@ export default {
       title: "exquisite corpse club • draw",
     };
   },
-
   data: () => ({ isFetching: "idle" }), // "idle", "fetching", "success", TODO: "error"
   async fetch({ store }) {
     // set default random title
@@ -56,6 +55,7 @@ export default {
     },
     async handlePickedType(type) {
       this.isFetching = "fetching";
+      this.$store.dispatch("setIsLoading", true);
 
       // get other types
       let types = ["top", "mid", "bot"];
@@ -76,6 +76,7 @@ export default {
       }
 
       this.isFetching = "success";
+      this.$store.dispatch("setIsLoading", false);
     },
 
     async getRandomSectionByType(type) {

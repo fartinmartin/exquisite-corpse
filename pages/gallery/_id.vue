@@ -40,6 +40,7 @@ export default {
   methods: {
     async getCorpseById(id) {
       this.isFetching = "fetching";
+      this.$store.dispatch("setIsLoading", true);
 
       try {
         const query = this.$fireStore.collection("corpses").doc(id);
@@ -49,9 +50,12 @@ export default {
         await this.getSections(doc.data().sections);
 
         this.isFetching = "success";
+
+        this.$store.dispatch("setIsLoading", false);
       } catch (error) {
         console.error(error);
         this.isFetching = "error";
+        this.$store.dispatch("setIsLoading", true);
       }
     },
 
