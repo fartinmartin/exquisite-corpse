@@ -138,8 +138,5 @@ module.exports = {
    ** Loading bar
    ** See https://nuxtjs.org/api/configuration-loading/
    */
-  loading: {
-    color: "#fcda00",
-    failedColor: "#f44e3b"
-  }
+  loading: "~/components/LoadingBar.vue"
 };
