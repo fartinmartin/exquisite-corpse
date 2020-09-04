@@ -25,7 +25,7 @@ export default {
     margin-left: 0.5rem;
   }
 
-  > [data-tooltip*="share link"] {
+  > [data-tooltip*="link"] {
     margin-left: 0.375rem;
   }
 }
