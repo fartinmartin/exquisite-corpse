@@ -1,6 +1,7 @@
 <template>
   <div class="menu">
     <LikeButton :collection="collection" :docId="doc.docId" />
+    <PermalinkButton :collection="collection" :docId="doc.docId" />
     <DownloadButton :image="doc.thumb" :title="doc.title" />
   </div>
 </template>
@@ -10,8 +11,8 @@ export default {
   name: "MetaMenu",
   props: {
     collection: { type: String, required: true },
-    doc: { type: Object, required: true },
-  },
+    doc: { type: Object, required: true }
+  }
 };
 </script>
 
@@ -21,7 +22,11 @@ export default {
   align-items: center;
 
   > * {
-    margin-left: 0.25rem;
+    margin-left: 0.5rem;
+  }
+
+  > [data-tooltip*="share link"] {
+    margin-left: 0.375rem;
   }
 }
 </style>

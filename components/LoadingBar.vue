@@ -1,7 +1,6 @@
 <script>
 // 🚨 this is pretty much stock with the exception of
-// me trying to dispatch "setIsLoading" during the start() and finish() methods..
-// this would technically update the cursor to the loading state, but it doesn't seem to work though
+// it dispatchs "setIsLoading" during the start() and finish() methods..
 export default {
   name: "NuxtLoading",
   data() {

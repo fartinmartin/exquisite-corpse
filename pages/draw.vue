@@ -50,7 +50,7 @@ export default {
       this.$store.dispatch("drawing/setIsSaving", "modal-open");
     },
     closeSave(e) {
-      if (e) this.$router.push({ path: `/gallery/${e}` });
+      if (e) this.$router.push({ path: `/gallery/corpse/${e}` });
       this.$store.dispatch("drawing/setIsSaving", "idle");
     },
     async handlePickedType(type) {

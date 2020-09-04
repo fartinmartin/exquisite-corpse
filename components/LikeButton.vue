@@ -1,13 +1,14 @@
 <template>
   <button @click="handleClick">
-    <div class="icon interactive" :data-tooltip="isLiked ? 'unlike' : 'like'">
+    <div
+      class="icon interactive"
+      :class="{ liked: isLiked }"
+      :data-tooltip="isLiked ? 'unlike' : 'like'"
+    >
       <transition name="slide-fade">
         <span v-show="likes > 0">{{ likes }}</span>
       </transition>
-      <div
-        style="width: 25px; height: 25px; pointer-events: none;"
-        :class="{ liked: isLiked }"
-      >
+      <div style="width: 25px; height: 25px; pointer-events: none;">
         <div v-html="rawHeartSVG" />
       </div>
     </div>
@@ -22,7 +23,7 @@ export default {
   name: "LikeButton",
   props: {
     collection: { type: String, required: true },
-    docId: { type: String, required: true },
+    docId: { type: String, required: true }
   },
   data: () => ({ rawHeartSVG, likes: 0, isLiked: false }),
   computed: mapState("user/", ["id"]),
@@ -37,7 +38,7 @@ export default {
       const likesRef = this.$fireStore
         .collection(this.collection)
         .doc(this.docId)
-        .onSnapshot((doc) => {
+        .onSnapshot(doc => {
           this.likes = doc.data().likes;
           this.isLiked =
             doc.data().likedBy && doc.data().likedBy.includes(this.id);
@@ -65,9 +66,9 @@ export default {
         batch.update(docRef, { likedBy: dislikedBy });
       }
 
-      batch.commit().catch((error) => console.error(error));
-    },
-  },
+      batch.commit().catch(error => console.error(error));
+    }
+  }
 };
 </script>
 
@@ -88,7 +89,11 @@ export default {
 
 .icon {
   width: auto;
-  padding: 0 5px;
+  min-width: 25px;
+
+  &.liked {
+    padding: 0 0 0 5px;
+  }
 
   span {
     margin-right: 0.25rem;

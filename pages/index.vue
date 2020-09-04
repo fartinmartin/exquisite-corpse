@@ -14,7 +14,10 @@
     <Display v-if="isFetching === 'success'" :sections="sections" />
 
     <Panel class="mt index-title">
-      <nuxt-link v-if="isFetching === 'success'" :to="`/gallery/${meta.docId}`">
+      <nuxt-link
+        v-if="isFetching === 'success'"
+        :to="`/gallery/corpse/${meta.docId}`"
+      >
         {{ meta.title }}
       </nuxt-link>
     </Panel>
@@ -29,7 +32,7 @@ export default {
   data: () => ({
     isFetching: "idle", // "idle", "fetching", "success", TODO: "error"
     meta: null,
-    sections: {},
+    sections: {}
   }),
   mounted() {
     this.getRandomCorpse();
@@ -52,7 +55,7 @@ export default {
       try {
         const firstResponse = await query.get();
         if (firstResponse.size > 0) {
-          firstResponse.forEach(async (doc) => {
+          firstResponse.forEach(async doc => {
             this.meta = { docId: doc.id, ...doc.data() };
             return await this.getSections(doc.data().sections);
           });
@@ -61,7 +64,7 @@ export default {
             .where(this.$fireStoreObj.FieldPath.documentId(), "<", randomKey)
             .limit(1);
           const secondResponse = await secondQuery.get();
-          secondResponse.forEach(async (doc) => {
+          secondResponse.forEach(async doc => {
             this.meta = { docId: doc.id, ...doc.data() };
             return await this.getSections(doc.data().sections);
           });
@@ -87,8 +90,8 @@ export default {
     async getSection(docRef) {
       const response = await docRef.get();
       return { docId: response.id, ...response.data() };
-    },
-  },
+    }
+  }
 };
 </script>
 

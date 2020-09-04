@@ -139,11 +139,7 @@
       <nuxt-link
         v-for="drawing in gallery"
         :key="drawing.docId"
-        :to="
-          `/${collection === 'corpses' ? 'gallery' : 'gallery/section'}/${
-            drawing.docId
-          }`
-        "
+        :to="`/gallery/${galleryType}/${drawing.docId}`"
       >
         <Drawing :drawing="drawing" />
       </nuxt-link>
@@ -180,6 +176,9 @@ export default {
     container: null
   }),
   computed: {
+    galleryType() {
+      return this.collection.slice(0, -1);
+    },
     isFirstPage() {
       if (this.gallery.length > 0)
         return (

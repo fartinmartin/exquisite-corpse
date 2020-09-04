@@ -84,7 +84,7 @@
       <nuxt-link
         v-for="drawing in related.featuredIn"
         :key="drawing.docId"
-        :to="`/gallery/${drawing.docId}`"
+        :to="`/gallery/corpse/${drawing.docId}`"
       >
         <Drawing :drawing="drawing" />
       </nuxt-link>
