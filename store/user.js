@@ -4,7 +4,7 @@ export const state = () => ({
   id: null,
   name: "",
   logInAttempts: 3,
-  isLoggedIn: false,
+  isLoggedIn: false
 });
 
 export const getters = {};
@@ -25,7 +25,7 @@ export const actions = {
     const errStyle = [
       ...style,
       "border: 2px solid #fb9200;",
-      "box-shadow: 2px 2px 0 0 #f44e3b;",
+      "box-shadow: 2px 2px 0 0 #f44e3b;"
     ];
 
     this.$fireAuth
@@ -33,24 +33,27 @@ export const actions = {
       .then(() => {
         console.log("%c👋 signed out", errStyle.join(""));
       })
-      .catch((error) => {
+      .catch(error => {
         console.log("%c🚫 sign out error", errStyle.join(""));
         console.error(error);
       });
   },
   async signInAnonymously({ commit, dispatch }) {
-    this.$fireAuth.onAuthStateChanged((user) => {
+    this.$fireAuth.onAuthStateChanged(user => {
       if (!user) {
+        dispatch("setIsLoading", true, { root: true });
         this.$fireAuth
           .signInAnonymously()
-          .then(async (response) => {
+          .then(async response => {
             const displayName = await twoRandomWords("anonymous");
             await response.user.updateProfile({ displayName });
             await commit("SET_USER", response.user);
             await commit("SET_IS_LOGGED_IN", true);
+            dispatch("setIsLoading", false, { root: true });
             dispatch("welcomeUser");
           })
-          .catch(async (error) => {
+          .catch(async error => {
+            dispatch("setIsLoading", false, { root: true });
             await commit("SET_IS_LOGGED_IN", false);
             console.error(error);
           });
@@ -63,9 +66,8 @@ export const actions = {
   },
   welcomeUser() {
     console.log(
-      `%c🎨 welcome ${
-        this.$fireAuth.currentUser.displayName || this.$fireAuth.currentUser.id
-      }!`,
+      `%c🎨 welcome ${this.$fireAuth.currentUser.displayName ||
+        this.$fireAuth.currentUser.id}!`,
       style.join("")
     );
   },
@@ -73,8 +75,8 @@ export const actions = {
     this.$fireAuth.currentUser
       .updateProfile({ displayName })
       .then(() => commit("SET_USER_NAME", displayName))
-      .catch((error) => console.error(error));
-  },
+      .catch(error => console.error(error));
+  }
 };
 
 export const mutations = {
@@ -90,7 +92,7 @@ export const mutations = {
   },
   SET_IS_LOGGED_IN(state, bool) {
     state.isLoggedIn = bool;
-  },
+  }
 };
 
 const style = [
@@ -103,5 +105,5 @@ const style = [
   "margin: 20px auto 22px auto;",
   "border: 2px solid #fcda00;",
   "box-shadow: 2px 2px 0 0 #fb9200;",
-  "background: #ffffff;",
+  "background: #ffffff;"
 ];
