@@ -3,8 +3,14 @@
     <Panel v-show="this.$route.name !== 'index'" class="nav" no-padding>
       <nav>
         <nuxt-link to="/" class="logo">
-          <h1 v-show="this.$route.name === 'index'">exquisite corpse club</h1>
-          <h1 v-show="this.$route.name !== 'index'" data-tooltip="home">ecc</h1>
+          <h1>
+            <span v-if="this.$route.name === 'index'">
+              exquisite corpse club
+            </span>
+            <span v-if="this.$route.name !== 'index'" data-tooltip="home">
+              ecc
+            </span>
+          </h1>
         </nuxt-link>
         <NavMenu style="margin-right: -6px;" />
       </nav>
@@ -31,8 +37,8 @@ export default {
   methods: {
     openHelp() {
       this.$store.dispatch("setIsHelping", true);
-    },
-  },
+    }
+  }
 };
 </script>
 

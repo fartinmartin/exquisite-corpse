@@ -41,9 +41,9 @@
             v-model="related.toggle"
           />
           <label for="featuredIn">
-            <h1 class="icon interactive">
+            <h2 class="icon interactive">
               feat<span class="hom">ured in...</span>
-            </h1>
+            </h2>
           </label>
         </div>
         <div>
@@ -55,9 +55,9 @@
             v-model="related.toggle"
           />
           <label for="moreBy">
-            <h1 class="icon interactive">
+            <h2 class="icon interactive">
               more <span class="hom">&nbsp;by this artist... </span>
-            </h1>
+            </h2>
           </label>
         </div>
       </form>
@@ -187,7 +187,8 @@ export default {
   padding-top: calc(calc(100% + 8px) / 3) !important;
 }
 
-h1 {
+h1,
+h2 {
   max-width: 400px;
   white-space: nowrap;
   overflow: hidden;
@@ -302,7 +303,7 @@ input:checked + label * {
   opacity: 1;
 }
 
-input:not(:checked) + label h1 {
+input:not(:checked) + label h2 {
   font-weight: normal;
   opacity: 0.5;
 }
