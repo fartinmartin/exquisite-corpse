@@ -41,8 +41,28 @@ export default {
     isLoading() {
       return this.$store.state.isLoading;
     },
+    mouseMode() {
+      return this.$store.state.mouse.mode;
+    },
+    offset() {
+      return {
+        ...(this.state === "loading" && { x: 0, y: 0 }),
+        ...(this.state === "auto" && { x: -3, y: 0 }),
+        ...(this.state === "pointer" && { x: 0, y: 0 }),
+        ...(this.state === "disabled" && { x: -5, y: -5 }),
+        ...(this.state === "grab" && { x: 0, y: 0 }),
+        ...(this.state === "draw" && { x: 1, y: -24 }),
+        ...(this.state === "erase" && { x: -12, y: -21 }),
+        ...(this.state === "fill" && { x: -1, y: -22 })
+      };
+    }
   },
   mounted() {
+    this.x = window.innerWidth / 2;
+    this.y = window.innerHeight / 2;
+
+    this.moveCursor();
+
     window.addEventListener("mousemove", this.cursorMove);
     window.addEventListener("mousedown", this.cursorDown);
     window.addEventListener("mouseup", this.cursorUp);
@@ -53,32 +73,23 @@ export default {
     window.removeEventListener("mouseup", this.cursorUp);
   },
   methods: {
-    cursorMove(e) {
-      // hotspot offsets based on state
-      let offset = {
-        ...(this.state === "loading" && { x: 0, y: 0 }),
-        ...(this.state === "auto" && { x: -3, y: 0 }),
-        ...(this.state === "pointer" && { x: 0, y: 0 }),
-        ...(this.state === "disabled" && { x: -5, y: -5 }),
-        ...(this.state === "grab" && { x: 0, y: 0 }),
-        ...(this.state === "draw" && { x: 1, y: -24 }),
-        ...(this.state === "erase" && { x: -12, y: -21 }),
-        ...(this.state === "fill" && { x: -1, y: -22 }),
-      };
-
-      // cursor pos
-      this.x = e.clientX + offset.x;
-      this.y = e.clientY + offset.y;
-
-      //move custom cursor
+    moveCursor() {
       const cursor = this.$refs.cursorRef;
       if (cursor) cursor.style.transform = `translate(${this.x}px,${this.y}px)`;
+    },
+    cursorMove(e) {
+      // cursor pos
+      this.x = e.clientX + this.offset.x;
+      this.y = e.clientY + this.offset.y;
+
+      //move custom cursor
+      this.moveCursor();
 
       //change state based on hovered targets
-      const hasTooltip = (t) => t.dataset.tooltip;
-      const isDisabled = (t) => t.disabled || t.classList.contains("disabled");
-      const isCanvas = (t) => t.tagName === "CANVAS";
-      const isClickable = (t) =>
+      const hasTooltip = t => t.dataset.tooltip;
+      const isDisabled = t => t.disabled || t.classList.contains("disabled");
+      const isCanvas = t => t.tagName === "CANVAS";
+      const isClickable = t =>
         t.tagName === "BUTTON" ||
         t.tagName === "LABEL" ||
         t.tagName === "INPUT" ||
@@ -124,8 +135,8 @@ export default {
         this.cursorMove(e);
         this.tooltip = null;
       }
-    },
-  },
+    }
+  }
 };
 </script>
 
