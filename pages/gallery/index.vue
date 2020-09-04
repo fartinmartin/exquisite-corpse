@@ -157,7 +157,13 @@ export default {
   name: "gallery",
   head() {
     return {
-      title: "exquisite corpse club ▪ gallery"
+      title: "exquisite corpse club ▪ gallery",
+      meta: [
+        {
+          itemprop: "description",
+          content: "checkout our masterpieces!"
+        }
+      ]
     };
   },
   data: () => ({

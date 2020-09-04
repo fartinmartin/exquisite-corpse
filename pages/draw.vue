@@ -26,7 +26,13 @@ export default {
   name: "draw",
   head() {
     return {
-      title: "exquisite corpse club ▪ draw"
+      title: "exquisite corpse club ▪ draw",
+      meta: [
+        {
+          itemprop: "description",
+          content: "create your very own masterpiece!"
+        }
+      ]
     };
   },
   data: () => ({ isFetching: "idle" }), // "idle", "fetching", "success", TODO: "error"
