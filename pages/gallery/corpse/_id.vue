@@ -55,7 +55,7 @@ export default {
       } catch (error) {
         console.error(error);
         this.isFetching = "error";
-        this.$store.dispatch("setIsLoading", true);
+        this.$store.dispatch("setIsLoading", false);
       }
     },
 
