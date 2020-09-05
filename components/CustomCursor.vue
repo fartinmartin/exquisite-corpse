@@ -36,7 +36,13 @@
 <script>
 export default {
   name: "CustomCursor",
-  data: () => ({ x: null, y: null, state: "auto", tooltip: null }),
+  data: () => ({
+    x: null,
+    y: null,
+    state: "auto",
+    tooltip: null,
+    previous: null
+  }),
   computed: {
     isLoading() {
       return this.$store.state.isLoading;
@@ -55,6 +61,14 @@ export default {
         ...(this.state === "erase" && { x: -12, y: -21 }),
         ...(this.state === "fill" && { x: -1, y: -22 })
       };
+    }
+  },
+  watch: {
+    isLoading: function() {
+      this.previous && this.cursorMove(this.previous);
+    },
+    mouseMode: function() {
+      this.previous && this.cursorMove(this.previous);
     }
   },
   mounted() {
@@ -78,6 +92,9 @@ export default {
       if (cursor) cursor.style.transform = `translate(${this.x}px,${this.y}px)`;
     },
     cursorMove(e) {
+      // log this state so that the watchers can emulate it!
+      this.previous = e;
+
       // cursor pos
       this.x = e.clientX + this.offset.x;
       this.y = e.clientY + this.offset.y;
