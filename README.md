@@ -1,6 +1,6 @@
 # exquisite corpse club™
 
-- [Figma prototype](https://www.figma.com/file/RNg8lCVQnMU5HAeYxu03UT/Exquisite-Corpse-Club?node-id=0%3A1).
+- [Figma prototype](https://www.figma.com/proto/RNg8lCVQnMU5HAeYxu03UT/exquisite-corpse-club?node-id=40%3A25&scaling=min-zoom).
 - [TODOs](https://trello.com/b/JmK3HtwP/exquisite-corpse-club™)
 
 ## Build Setup
