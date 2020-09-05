@@ -94,7 +94,7 @@ export default {
       const ref = this.$fireStore.collection(collection);
       const response = await ref.get();
 
-      response.forEach((doc) => {
+      response.forEach(doc => {
         docs.push(doc.data());
       });
 
@@ -131,7 +131,7 @@ export default {
       try {
         const firstResponse = await query.get();
         if (firstResponse.size > 0) {
-          firstResponse.forEach((doc) => {
+          firstResponse.forEach(doc => {
             const { featuredIn, ...docData } = doc.data();
             section = { docId: doc.id, ...docData };
           });
@@ -142,7 +142,7 @@ export default {
             .limit(1);
           const secondResponse = await secondQuery.get();
 
-          secondResponse.forEach((doc) => {
+          secondResponse.forEach(doc => {
             const { featuredIn, ...docData } = doc.data();
             section = { docId: doc.id, ...docData };
           });
@@ -160,7 +160,7 @@ export default {
 
       // get two other section types NOT of section.type
       let types = ["top", "mid", "bot"];
-      types = types.filter((t) => t !== section.type);
+      types = types.filter(t => t !== section.type);
 
       // firestore vars
       const timestamp = this.$fireStoreObj.Timestamp.fromDate(new Date());
@@ -174,7 +174,7 @@ export default {
 
       // get random docs and push their meta info to those "constructors"
       await Promise.all(
-        types.map(async (type) => {
+        types.map(async type => {
           const otherSection = await this.getRandomSectionByType(type);
           thumbsObject[type] = otherSection.thumb;
           idObject[type] = otherSection.docId;
@@ -188,7 +188,7 @@ export default {
       const corpseThumb = await mergeBase64([
         thumbsObject.top,
         thumbsObject.mid,
-        thumbsObject.bot,
+        thumbsObject.bot
       ]);
 
       let corpsePaylod = {
@@ -204,9 +204,9 @@ export default {
           ),
           bot: this.$fireStore.doc(
             `sections/${section.type === "bot" ? section.docId : idObject.bot}`
-          ),
+          )
         },
-        thumb: corpseThumb,
+        thumb: corpseThumb
       };
 
       const batch = this.$fireStore.batch();
@@ -214,22 +214,22 @@ export default {
       batch.set(corpseRef, corpsePaylod);
 
       batch.update(sectionRef, {
-        featuredIn: this.$fireStoreObj.FieldValue.arrayUnion(corpseRef),
+        featuredIn: this.$fireStoreObj.FieldValue.arrayUnion(corpseRef)
       });
 
-      types.forEach((type) => {
+      types.forEach(type => {
         const docRef = this.$fireStore
           .collection("sections")
           .doc(idObject[type]);
         batch.update(docRef, {
-          featuredIn: this.$fireStoreObj.FieldValue.arrayUnion(corpseRef),
+          featuredIn: this.$fireStoreObj.FieldValue.arrayUnion(corpseRef)
         });
       });
 
       batch
         .commit()
         .then(() => console.log("Made corpse drawing"))
-        .catch((error) => console.error(error));
+        .catch(error => console.error(error));
     },
 
     async removeCorpseAndItsReferences(corpseId, ignoreId = 1) {
@@ -244,11 +244,11 @@ export default {
       const batch = this.$fireStore.batch();
 
       // remove ref to corpse in each section
-      sectionRefs.forEach((section) => {
+      sectionRefs.forEach(section => {
         if (section.id !== ignoreId) {
           console.log("updating section:", section.id);
           batch.update(section, {
-            featuredIn: this.$fireStoreObj.FieldValue.arrayRemove(corpseRef),
+            featuredIn: this.$fireStoreObj.FieldValue.arrayRemove(corpseRef)
           });
         }
       });
@@ -261,7 +261,7 @@ export default {
       batch
         .commit()
         .then(() => console.log("Removed corpse drawing and its references"))
-        .catch((error) => console.error(error));
+        .catch(error => console.error(error));
     },
 
     async removeSectionAndItsReferences(sectionId) {
@@ -279,14 +279,14 @@ export default {
         .delete()
         .then(() => {
           console.log(corpseRefs, sectionRef.id);
-          corpseRefs.forEach(async (corpseRef) => {
+          corpseRefs.forEach(async corpseRef => {
             await this.removeCorpseAndItsReferences(
               corpseRef.id,
               sectionRef.id
             );
           });
         })
-        .catch((error) => console.error(error));
+        .catch(error => console.error(error));
     },
 
     async updateCorpseThumb(corpseId) {
@@ -294,7 +294,7 @@ export default {
 
       let thumbsObject = {};
 
-      sectionRefs.forEach(async (section) => {
+      sectionRefs.forEach(async section => {
         const doc = await this.getSingleSection(section.id);
         thumbsObject[doc.type] = doc.thumb;
       });
@@ -302,13 +302,13 @@ export default {
       const corpseThumb = await mergeBase64([
         thumbsObject.top,
         thumbsObject.mid,
-        thumbsObject.bot,
+        thumbsObject.bot
       ]);
 
       corpseRef
         .update({ thumb: corpseThumb })
         .then(() => console.log("it worked!", corpseThumb))
-        .catch((error) => console.error(error));
+        .catch(error => console.error(error));
     },
 
     async removeAllFeaturedInRefs() {
@@ -316,26 +316,26 @@ export default {
 
       const sectionsRef = this.$fireStore.collection("sections");
       const query = await sectionsRef.get();
-      query.forEach((doc) => {
+      query.forEach(doc => {
         batch.update(doc.ref, {
-          featuredIn: this.$fireStoreObj.FieldValue.delete(),
+          featuredIn: this.$fireStoreObj.FieldValue.delete()
         });
       });
 
       batch
         .commit()
         .then(() => console.log("removed section and its references"))
-        .catch((error) => console.error(error));
+        .catch(error => console.error(error));
     },
 
     async pushArrayOfDocsToCollection(collection, docsArray) {
       const ref = this.$fireStore.collection(collection);
 
-      docsArray.forEach((doc) => {
+      docsArray.forEach(doc => {
         ref
           .add(doc)
-          .then((docRef) => console.log(docRef.id))
-          .catch((error) => console.error(error));
+          .then(docRef => console.log(docRef.id))
+          .catch(error => console.error(error));
       });
     },
 
@@ -349,7 +349,7 @@ export default {
         sectionRef.update({
           date: this.$fireStoreObj.Timestamp.fromMillis(
             section.date.seconds * 1000 + section.date.nanoseconds * 1e-6
-          ),
+          )
         });
         console.log(`${section.docId}'s date updated`);
       } catch (error) {
@@ -362,7 +362,7 @@ export default {
         const { sectionRef, section } = await this.getSingleSection(sectionId);
         const dataStr =
           "data:text/json;charset=utf-8," +
-          encodeURIComponent(JSON.stringify(section.paths));
+          encodeURIComponent(JSON.stringify(Object.values(section.drawing)));
         const downloadAnchorNode = document.createElement("a");
         downloadAnchorNode.setAttribute("href", dataStr);
         downloadAnchorNode.setAttribute("download", section.docId + ".json");
@@ -378,14 +378,14 @@ export default {
       const corpsesRef = this.$fireStore.collection("corpses");
       const corpseResponse = await corpsesRef.get();
 
-      corpseResponse.forEach((doc) => {
+      corpseResponse.forEach(doc => {
         doc.ref.update({ likes: 0, likedBy: [] });
       });
 
       const sectionsRef = this.$fireStore.collection("sections");
       const sectionsResponse = await sectionsRef.get();
 
-      sectionsResponse.forEach((doc) => {
+      sectionsResponse.forEach(doc => {
         doc.ref.update({ likes: 0, likedBy: [] });
       });
     },
@@ -394,8 +394,8 @@ export default {
       this.$store.dispatch("setIsAdmin", false);
       this.$passwordProtect.removeAuthorisation();
       this.$router.push("/");
-    },
-  },
+    }
+  }
 };
 </script>
 
