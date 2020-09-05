@@ -26,7 +26,7 @@
           @click="removeCorpseAndItsReferences(corpse.id)"
           text="remove"
         />
-        <Button @click="updateCorpseThumb" text="update thumb" />
+        <Button @click="updateCorpseThumb(corpse.id)" text="update thumb" />
       </div>
     </Panel>
 
@@ -69,7 +69,7 @@ import { randomWordFromString } from "~/assets/js/randomWords";
 export default {
   name: "admin",
 
-  middleware: ["password-protect"],
+  // middleware: ["password-protect"],
   data: () => ({ corpse: { id: null, section: null }, section: { id: null } }),
   mounted() {
     document.addEventListener("keydown", this.handleShortcuts);
@@ -294,10 +294,10 @@ export default {
 
       let thumbsObject = {};
 
-      sectionRefs.forEach(async section => {
-        const doc = await this.getSingleSection(section.id);
-        thumbsObject[doc.type] = doc.thumb;
-      });
+      for (const doc of sectionRefs) {
+        const { section } = await this.getSingleSection(doc.id);
+        thumbsObject[section.type] = section.thumb;
+      }
 
       const corpseThumb = await mergeBase64([
         thumbsObject.top,
