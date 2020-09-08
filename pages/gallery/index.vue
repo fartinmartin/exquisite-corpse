@@ -145,6 +145,14 @@
       </nuxt-link>
     </div>
     <Observer v-if="isMobile" @intersect="appendNextPage" />
+    <Loading
+      v-show="isMobile && !emptyNextResults"
+      subtext="curating masterpieces"
+      color="yellow"
+      class="mt"
+      style="padding-top: calc(100% / 3)"
+      :throttle="500"
+    />
   </div>
 </template>
 
@@ -241,6 +249,9 @@ export default {
     },
 
     async appendNextPage() {
+      // don't run if fetchFirst() hasn't run yet:
+      if (!this.lastVisible) return;
+
       try {
         let query = this.$fireStore.collection(this.collection);
         if (this.collection === "sections")
@@ -252,7 +263,7 @@ export default {
 
         const nextResponse = await query.get();
         if (!nextResponse.empty) {
-          this.emptyPrevResults = false;
+          this.emptyNextResults = false;
 
           this.lastVisible = nextResponse.docs[nextResponse.docs.length - 1];
           this.firstVisible = nextResponse.docs[0];
@@ -261,7 +272,7 @@ export default {
             let mydoc = { docId: doc.id, thumb: doc.data().thumb };
             this.gallery.push(mydoc);
           });
-        } else {
+        } else if (nextResponse.empty) {
           this.emptyNextResults = true;
         }
       } catch (error) {
@@ -285,7 +296,7 @@ export default {
         const nextResponse = await query.get();
         if (!nextResponse.empty) {
           this.gallery = [];
-          this.emptyPrevResults = false;
+          this.emptyNextResults = false;
 
           this.lastVisible = nextResponse.docs[nextResponse.docs.length - 1];
           this.firstVisible = nextResponse.docs[0];
@@ -323,7 +334,7 @@ export default {
         const prevResponse = await query.get();
         if (!prevResponse.empty) {
           this.gallery = [];
-          this.emptyNextResults = false;
+          this.emptyPrevResults = false;
 
           this.lastVisible = prevResponse.docs[prevResponse.docs.length - 1];
           this.firstVisible = prevResponse.docs[0];
