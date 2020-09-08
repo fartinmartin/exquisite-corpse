@@ -28,12 +28,40 @@ export default {
   computed: {
     type() {
       return this.collection.slice(0, -1);
+    },
+    url() {
+      return `https://exquisitecorpse.club/gallery/${this.type}/${this.docId}`;
     }
   },
   methods: {
     async copyURL() {
-      const url = `https://exquisitecorpse.club/gallery/${this.type}/${this.docId}`;
-      await navigator.clipboard.writeText(url);
+      if (!navigator.clipboard) {
+        this.fallbackCopyURL();
+        return;
+      }
+      try {
+        await navigator.clipboard.writeText(this.url);
+        this.isCopied = true;
+        setTimeout(() => (this.isCopied = false), 1500);
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    fallbackCopyURL() {
+      const textArea = document.createElement("textarea");
+      textArea.value = this.url;
+
+      // Avoid scrolling to bottom
+      textArea.style.opacity = "0";
+      textArea.style.top = "0";
+      textArea.style.left = "0";
+      textArea.style.position = "fixed";
+
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+      document.execCommand("copy");
+      document.body.removeChild(textArea);
 
       this.isCopied = true;
       setTimeout(() => (this.isCopied = false), 1500);
