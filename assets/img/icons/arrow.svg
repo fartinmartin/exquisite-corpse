@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 60">
+  <g data-name="Layer 2">
+    <path fill="#333" d="M20 30v-7l-10 7 10 7v-7z" />
+    <path stroke="#333" stroke-miterlimit="10" stroke-width="4" fill="none" d="M50 30.01H15.03" />
+    <path fill="none" d="M0 0h60v60H0z" />
+  </g>
+</svg>

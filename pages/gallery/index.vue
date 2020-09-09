@@ -1,13 +1,5 @@
 <template>
   <div class="wrap">
-    <PrevNext
-      v-if="!isMobile"
-      :isFirstPage="isFirstPage"
-      :isLastPage="isLastPage"
-      @prev="prevPage"
-      @next="nextPage"
-    />
-
     <Panel class="mb filters" :class="{ sticky: isMobile }">
       <form>
         <div class="radio" :class="{ active: type === 'corpses' }">
@@ -144,6 +136,14 @@
         <Drawing :drawing="drawing" />
       </nuxt-link>
     </div>
+    <PrevNext
+      v-if="!isMobile"
+      :isFirstPage="isFirstPage"
+      :isLastPage="isLastPage"
+      @prev="prevPage"
+      @next="nextPage"
+      :type="type"
+    />
     <Observer v-if="isMobile" @intersect="appendNextPage" />
     <Loading
       v-show="isMobile && !emptyNextResults"
@@ -367,7 +367,7 @@ export default {
         this.pageSize = 9;
       } else {
         this.collection = "sections";
-        this.pageSize = 18;
+        this.pageSize = 21;
       }
 
       this.fetchFirst();
@@ -417,12 +417,16 @@ export default {
   grid-template-columns: repeat(auto-fill, minmax(calc(516px / 3), 1fr));
   grid-template-rows: repeat(auto-fill, minmax(calc(516px / 3), 1fr));
   grid-gap: calc(40px / 3);
-  min-height: 542.667px;
+  height: 544px;
+
+  @media (max-width: 571px) {
+    // 571px = isMobile value
+    height: auto;
+  }
 }
 
 .gallery.section {
   grid-template-rows: repeat(6, max-content);
-  min-height: 542.667px;
 }
 </style>
 
