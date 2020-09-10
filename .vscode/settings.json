@@ -1,17 +1,18 @@
 {
   "files.exclude": {
-    "node_modules/": true,
+    ".editorconfig": true,
+    ".env": true,
+    ".firebase": true,
+    ".firebaserc": true,
+    ".github": true,
+    ".gitignore": true,
     ".nuxt": true,
     ".vscode": true,
-    "dist/": true,
-    "public/": true,
-    ".editorconfig": true,
     "README.md": true,
-    "package-lock.json": true,
-    ".gitignore": true,
+    "dist/": true,
     "functions/.gitignore": true,
-    ".firebaserc": true,
-    ".firebase": true,
-    ".env": true
+    "node_modules/": true,
+    "package-lock.json": true,
+    "public/": true
   }
 }
