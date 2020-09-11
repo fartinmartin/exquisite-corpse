@@ -120,8 +120,9 @@ module.exports = {
   pwa: {
     meta: {
       title: "exquisite corpse club",
-      author: "Martin Lindberg",
-      description: "an online collaborative drawing game. ✏️"
+      author: "martin lindberg",
+      description: "an online collaborative drawing game. ✏️",
+      ogHost: "https://exquisitecorpse.club"
     },
     manifest: {
       name: "exquisite corpse club",
