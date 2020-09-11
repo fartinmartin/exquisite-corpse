@@ -113,7 +113,8 @@ export default {
         t.tagName === "A" ||
         t.classList.contains("pointer");
 
-      const targets = [e.target, e.target.parentNode];
+      const targets =
+        [e.target, e.target.parentNode] || document.getElementById("__tino");
 
       if (this.isLoading) {
         this.state = "loading";
