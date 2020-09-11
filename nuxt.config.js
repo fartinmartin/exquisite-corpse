@@ -122,7 +122,13 @@ module.exports = {
       title: "exquisite corpse club",
       author: "martin lindberg",
       description: "an online collaborative drawing game. ✏️",
-      ogHost: "https://exquisitecorpse.club"
+      ogHost: "https://exquisitecorpse.club",
+      ogImage: {
+        path: "/banner.png",
+        width: 1200,
+        height: 627,
+        type: "image/png"
+      }
     },
     manifest: {
       name: "exquisite corpse club",
