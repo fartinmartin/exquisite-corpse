@@ -1,74 +1,45 @@
 <template>
   <div class="wrap">
+    <Loading v-if="$fetchState.pending" subtext="waking up our artists" />
+
     <Loading
-      v-if="isFetching === 'error'"
-      text="oh dear"
-      subtext="we could not find this corpse!"
+      v-else-if="$fetchState.error"
       color="red"
+      text="oh no"
+      subtext="we have misplaced our corpses!"
     />
 
-    <Loading
-      v-else-if="isFetching !== 'success'"
-      subtext="waking up our artists"
-    />
+    <Display v-else :sections="sections" />
 
-    <Display v-else-if="isFetching === 'success'" :sections="sections" />
-
-    <Panel class="mt corpse-meta" :is-loading="isFetching">
-      <h1>{{ meta.title }}</h1>
-      <MetaMenu collection="corpses" :doc="meta" />
+    <!-- <Panel class="mt corpse-meta" :is-loading="fetchSuccessful"> -->
+    <Panel class="mt corpse-meta">
+      <h1 v-if="fetchSuccessful">{{ corpse.title }}</h1>
+      <MetaMenu v-if="fetchSuccessful" collection="corpses" :doc="corpse" />
     </Panel>
   </div>
 </template>
 
 <script>
+import { getCorpseById } from "~/mixins/getCorpseByIdMixin";
+import { getSections } from "~/mixins/getSectionsMixin";
+
 export default {
   name: "Corpse",
+  mixins: [getCorpseById, getSections],
   head() {
     return {
-      title: `exquisite corpse club ▪ ${this.meta.title}`
+      title: `exquisite corpse club ▪ ${this.corpse.title}`
     };
   },
-  data: () => ({
-    isFetching: "idle", // "idle", "fetching", "success", TODO: "error"
-    meta: { title: "" },
-    sections: {}
-  }),
-  mounted() {
-    this.getCorpseById(this.$route.params.id);
+  async fetch() {
+    this.$store.dispatch("setIsLoading", true);
+    await this.getCorpseById(this.$route.params.id);
+    await this.getSections(this.corpse.sections);
+    this.$store.dispatch("setIsLoading", false);
   },
-  methods: {
-    async getCorpseById(id) {
-      this.isFetching = "fetching";
-      this.$store.dispatch("setIsLoading", true);
-
-      try {
-        const query = this.$fireStore.collection("corpses").doc(id);
-        const doc = await query.get();
-
-        this.meta = { docId: doc.id, ...doc.data() };
-        await this.getSections(doc.data().sections);
-
-        this.isFetching = "success";
-
-        this.$store.dispatch("setIsLoading", false);
-      } catch (error) {
-        console.error(error);
-        this.isFetching = "error";
-        this.$store.dispatch("setIsLoading", false);
-      }
-    },
-
-    async getSections(sections) {
-      for (const [type, ref] of Object.entries(sections)) {
-        this.sections[type] = await this.getSection(ref);
-        this.sections[type].paths = Object.values(this.sections[type].drawing);
-      }
-    },
-
-    async getSection(docRef) {
-      const response = await docRef.get();
-      return { docId: response.id, ...response.data() };
+  computed: {
+    fetchSuccessful() {
+      return !this.$fetchState.pending && !this.$fetchState.error;
     }
   }
 };

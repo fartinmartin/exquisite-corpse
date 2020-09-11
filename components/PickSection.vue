@@ -45,13 +45,11 @@
 </template>
 
 <script>
+import { openHelp } from "~/mixins/openHelpMixin";
+
 export default {
   name: "PickSection",
-  methods: {
-    openHelp() {
-      this.$store.dispatch("setIsHelping", true);
-    },
-  },
+  mixins: [openHelp]
 };
 </script>
 

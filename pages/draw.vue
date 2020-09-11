@@ -55,10 +55,12 @@ export default {
       if (this.isMobile) this.$store.dispatch("drawing/setMobilePaths");
       this.$store.dispatch("drawing/setIsSaving", "modal-open");
     },
+
     closeSave(e) {
       if (e) this.$router.push({ path: `/gallery/corpse/${e}` });
       this.$store.dispatch("drawing/setIsSaving", "idle");
     },
+
     async handlePickedType(type) {
       this.isFetching = "fetching";
       this.$store.dispatch("setIsLoading", true);

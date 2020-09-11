@@ -1,37 +1,30 @@
 <template>
   <div class="wrap">
+    <Loading v-if="$fetchState.pending" subtext="preparing our canvas" />
+
     <Loading
-      v-if="isFetching === 'error'"
+      v-else-if="$fetchState.error"
+      color="red"
       text="oh dear"
       subtext="we could not find this section!"
-      color="red"
     />
 
-    <Loading
-      subtext="preparing our canvas"
-      v-else-if="isFetching !== 'success'"
-    />
+    <Canvas v-else :id="section.docId" mode="display" :section="section" />
 
-    <Canvas
-      :id="section.docId"
-      mode="display"
-      :section="section"
-      ref="previewCanvas"
-      v-else-if="isFetching === 'success'"
-    />
-
-    <Panel class="mt meta" :is-loading="isFetching">
-      <div>
+    <!-- <Panel class="mt meta" :is-loading="$fetchState"> -->
+    <Panel class="mt meta">
+      <div v-if="fetchSuccessful">
         <h1>
           {{ section.title }} <span><br class="br" />by</span>
           {{ section.artist }}
         </h1>
       </div>
-      <MetaMenu collection="sections" :doc="section" />
+      <MetaMenu v-if="fetchSuccessful" collection="sections" :doc="section" />
     </Panel>
 
-    <Panel class="mt mb related" :is-loading="isFetching">
-      <form>
+    <!-- <Panel class="mt meta" :is-loading="$fetchState"> -->
+    <Panel class="mt mb related">
+      <form v-if="fetchSuccessful">
         <div>
           <input
             type="radio"
@@ -64,20 +57,20 @@
     </Panel>
 
     <Loading
-      v-if="isFetching === 'error'"
+      v-if="$fetchState.pending && related.toggle === 'featuredIn'"
+      subtext="checkin out the studio"
+      style="padding-top: 31.6176471% !important"
+    />
+
+    <Loading
+      v-else-if="$fetchState.error"
       text="srsy, sry"
       color="red"
       style="padding-top: 31.6176471% !important"
     />
 
-    <Loading
-      subtext="checkin out the studio"
-      v-else-if="isFetching !== 'success' && related.toggle === 'featuredIn'"
-      style="padding-top: 31.6176471% !important"
-    />
-
     <div
-      v-else-if="isFetching === 'success' && related.toggle === 'featuredIn'"
+      v-else-if="related.toggle === 'featuredIn'"
       class="gallery mw-canvas"
       :class="{ more: related.toggle === 'moreBy' }"
     >
@@ -90,10 +83,7 @@
       </nuxt-link>
     </div>
 
-    <div
-      v-if="isFetching === 'success' && related.toggle === 'moreBy'"
-      class="gallery more-by"
-    >
+    <div v-else-if="related.toggle === 'moreBy'" class="gallery more-by">
       <div v-if="!related.moreBy.length" class="none-found">
         <Panel color="blue" style="width: max-content; margin: 0 auto">
           no drawings found!
@@ -111,6 +101,8 @@
 </template>
 
 <script>
+import { getSectionById, getRelated } from "~/mixins/getSectionByIdMixin";
+
 export default {
   name: "Section",
   head() {
@@ -118,65 +110,20 @@ export default {
       title: `exquisite corpse club ▪ ${this.section.title} by ${this.section.artist}`
     };
   },
+  mixins: [getSectionById, getRelated],
   data: () => ({
-    isFetching: "idle", // "idle", "fetching", "success", TODO: "error"
-    section: {},
-    related: {
-      featuredIn: [],
-      moreBy: [],
-      toggle: "featuredIn"
-    }
+    related: { toggle: "featuredIn" }
   }),
-  mounted() {
-    this.getSectionById(this.$route.params.id);
+  async fetch() {
+    this.$store.dispatch("setIsLoading", true);
+    await this.getSectionById(this.$route.params.id);
+    await this.getFeaturedIn();
+    await this.getMoreBy();
+    this.$store.dispatch("setIsLoading", false);
   },
-  methods: {
-    async getSectionById(id) {
-      this.isFetching = "fetching";
-      this.$store.dispatch("setIsLoading", true);
-
-      try {
-        const query = this.$fireStore.collection("sections").doc(id);
-        const doc = await query.get();
-
-        this.section = { docId: doc.id, ...doc.data() };
-        this.section.paths = Object.values(this.section.drawing);
-
-        await this.getFeaturedIn();
-        await this.getMoreBy();
-
-        this.isFetching = "success";
-        this.$store.dispatch("setIsLoading", false);
-      } catch (error) {
-        console.error(error);
-        this.isFetching = "error";
-        this.$store.dispatch("setIsLoading", false);
-      }
-    },
-
-    async getFeaturedIn() {
-      if (!this.section.featuredIn) return;
-
-      this.section.featuredIn.slice(-3).forEach(ref => {
-        ref.get().then(doc => {
-          const mydoc = { docId: doc.id, thumb: doc.data().thumb };
-          this.related.featuredIn.push(mydoc);
-        });
-      });
-    },
-
-    async getMoreBy() {
-      const sectionsRef = this.$fireStore.collection("sections");
-      const query = sectionsRef
-        .where("artist", "==", this.section.artist)
-        .orderBy("likes", "desc")
-        .limit(6);
-      const moreByDocs = await query.get();
-
-      moreByDocs.forEach(doc => {
-        const mydoc = { docId: doc.id, thumb: doc.data().thumb };
-        if (doc.id !== this.$route.params.id) this.related.moreBy.push(mydoc);
-      });
+  computed: {
+    fetchSuccessful() {
+      return !this.$fetchState.pending && !this.$fetchState.error;
     }
   }
 };
