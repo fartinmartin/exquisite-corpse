@@ -4,7 +4,7 @@
     <Nav />
 
     <transition name="fade">
-      <Nuxt v-if="isLoggedIn" />
+      <Nuxt v-if="isLoggedIn" keep-alive :keep-alive-props="{ max: 10 }" />
     </transition>
 
     <CustomCursor />

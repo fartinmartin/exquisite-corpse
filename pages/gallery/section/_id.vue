@@ -114,6 +114,11 @@ export default {
   data: () => ({
     related: { toggle: "featuredIn" }
   }),
+  activated() {
+    if (this.$fetchState.timestamp <= Date.now() - 60000 * 5) {
+      this.$fetch();
+    }
+  },
   async fetch() {
     this.$store.dispatch("setIsLoading", true);
     await this.getSectionById(this.$route.params.id);
