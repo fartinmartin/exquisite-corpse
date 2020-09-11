@@ -107,7 +107,29 @@ export default {
   name: "Section",
   head() {
     return {
-      title: `exquisite corpse club ▪ ${this.section.title} by ${this.section.artist}`
+      title: `exquisite corpse club ▪ ${this.section.title} by ${this.section.artist}`,
+      meta: [
+        {
+          hid: "description",
+          name: "description",
+          content: `a ${this.currentType} third of an exquisite corpse!`
+        },
+        {
+          name: "og:title",
+          hid: "og:title",
+          content: `exquisite corpse club ▪ ${this.section.title} by ${this.section.artist}`
+        },
+        {
+          name: "og:description",
+          hid: "og:description",
+          content: `a ${this.currentType} third of an exquisite corpse!`
+        },
+        {
+          name: "og:image",
+          hid: "og:image",
+          content: `${this.section.thumb}`
+        }
+      ]
     };
   },
   mixins: [getSectionById, getRelated],
@@ -122,13 +144,32 @@ export default {
   async fetch() {
     this.$store.dispatch("setIsLoading", true);
     await this.getSectionById(this.$route.params.id);
-    await this.getFeaturedIn();
-    await this.getMoreBy();
-    this.$store.dispatch("setIsLoading", false);
+    if (this.section.title) {
+      await this.getFeaturedIn();
+      await this.getMoreBy();
+      this.$store.dispatch("setIsLoading", false);
+    } else {
+      this.$store.dispatch("setIsLoading", false);
+      if (process.server) this.$nuxt.context.res.statusCode = 404;
+      throw new Error("Section not found!");
+    }
   },
   computed: {
     fetchSuccessful() {
       return !this.$fetchState.pending && !this.$fetchState.error;
+    },
+    currentType() {
+      switch (this.section.type) {
+        case "bot":
+          return `bottom`;
+          break;
+        case "mid":
+          return `middle`;
+          break;
+        default:
+          return this.section.type;
+          break;
+      }
     }
   }
 };

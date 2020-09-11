@@ -25,7 +25,6 @@
 </template>
 
 <script>
-// TODO: make all data fetches from pages asyncData() methods???
 import { getRandomCorpse } from "~/mixins/getRandomCorpseMixin";
 import { getSections } from "~/mixins/getSectionsMixin";
 import { openHelp } from "~/mixins/openHelpMixin";
@@ -36,8 +35,14 @@ export default {
   async fetch() {
     this.$store.dispatch("setIsLoading", true);
     await this.getRandomCorpse();
-    await this.getSections(this.corpse.sections);
-    this.$store.dispatch("setIsLoading", false);
+    if (this.corpse.sections) {
+      await this.getSections(this.corpse.sections);
+      this.$store.dispatch("setIsLoading", false);
+    } else {
+      this.$store.dispatch("setIsLoading", false);
+      if (process.server) this.$nuxt.context.res.statusCode = 404;
+      throw new Error("Corpse not found!");
+    }
   },
   computed: {
     fetchSuccessful() {
@@ -57,8 +62,10 @@ export default {
   justify-content: space-between;
 }
 
-.index-title a:hover {
+.index-title a {
   text-decoration: underline;
-  color: var(--blue);
+  &:hover {
+    color: var(--blue);
+  }
 }
 </style>

@@ -28,7 +28,29 @@ export default {
   mixins: [getCorpseById, getSections],
   head() {
     return {
-      title: `exquisite corpse club ▪ ${this.corpse.title}`
+      title: `exquisite corpse club ▪ ${this.corpse.title}`,
+      meta: [
+        {
+          hid: "description",
+          name: "description",
+          content: `an exquisite corpse drawn by ${this.artistsString}!`
+        },
+        {
+          name: "og:title",
+          hid: "og:title",
+          content: `exquisite corpse club ▪ ${this.corpse.title}`
+        },
+        {
+          name: "og:description",
+          hid: "og:description",
+          content: `an exquisite corpse drawn by ${this.artistsString}!`
+        },
+        {
+          name: "og:image",
+          hid: "og:image",
+          content: `${this.corpse.thumb}`
+        }
+      ]
     };
   },
   activated() {
@@ -39,12 +61,21 @@ export default {
   async fetch() {
     this.$store.dispatch("setIsLoading", true);
     await this.getCorpseById(this.$route.params.id);
-    await this.getSections(this.corpse.sections);
-    this.$store.dispatch("setIsLoading", false);
+    if (this.corpse.sections) {
+      await this.getSections(this.corpse.sections);
+      this.$store.dispatch("setIsLoading", false);
+    } else {
+      this.$store.dispatch("setIsLoading", false);
+      if (process.server) this.$nuxt.context.res.statusCode = 404;
+      throw new Error("Corpse not found!");
+    }
   },
   computed: {
     fetchSuccessful() {
       return !this.$fetchState.pending && !this.$fetchState.error;
+    },
+    artistsString() {
+      return this.artists.join(", ").replace(/,(?!.*,)/gim, ", and");
     }
   }
 };
