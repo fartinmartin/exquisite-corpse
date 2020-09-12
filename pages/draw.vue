@@ -51,6 +51,7 @@ export default {
     // set default random title
     let words = await twoRandomWords();
     store.dispatch("drawing/setTitle", words);
+    store.dispatch("setIsHelping", false);
   },
   mounted() {
     // fresh start

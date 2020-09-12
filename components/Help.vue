@@ -30,11 +30,13 @@
           <p>
             sound fun?
           </p>
-          <Button color="yellow" @click="closeAndDraw">
-            <span class="icon hom">
-              <img src="~/assets/img/toolbar/draw.svg" />
-            </span>
-            start drawing!
+          <Button color="yellow">
+            <nuxt-link to="/draw" @click="closeMe">
+              <span class="icon hom">
+                <img src="~/assets/img/toolbar/draw.svg" />
+              </span>
+              start drawing!
+            </nuxt-link>
           </Button>
         </Panel>
       </div>
@@ -58,12 +60,10 @@ export default {
     closeMe(e) {
       if (e.target.classList.contains("help-modal"))
         this.$store.dispatch("setIsHelping", false);
-    },
-    closeAndDraw() {
-      this.$router.push("/draw");
-      this.$store.dispatch("setIsHelping", false);
-    },
-  },
+      if (this.$route.name === "draw")
+        this.$store.dispatch("setIsHelping", false);
+    }
+  }
 };
 </script>
 
@@ -115,6 +115,11 @@ export default {
     justify-content: stretch;
     .content > * {
       width: 50%;
+    }
+
+    button a {
+      display: flex;
+      align-items: center;
     }
   }
 }
