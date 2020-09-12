@@ -46,8 +46,6 @@ export const actions = {
   },
   setMode({ commit }, value) {
     commit("SET_MODE", value);
-    // potentially: set local state of CustomCursor too 🤔
-    // or *better idea* move cursor state to store and from there set mode state = mouse state
   },
   incrementSize({ commit, getters }) {
     getters.currentSizeLessThanMax && commit("INCREMENT_SIZE");
