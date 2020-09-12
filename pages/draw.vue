@@ -29,8 +29,19 @@ export default {
       title: "exquisite corpse club ▪ draw",
       meta: [
         {
-          itemprop: "description",
-          content: "create your very own masterpiece!"
+          hid: "description",
+          name: "description",
+          content: `create your very own masterpiece!`
+        },
+        {
+          name: "og:title",
+          hid: "og:title",
+          content: `exquisite corpse club ▪ draw`
+        },
+        {
+          name: "og:description",
+          hid: "og:description",
+          content: `create your very own masterpiece!`
         }
       ]
     };
@@ -66,8 +77,7 @@ export default {
       this.$store.dispatch("setIsLoading", true);
 
       // get other types
-      let types = ["top", "mid", "bot"];
-      types = types.filter(t => t !== type);
+      const types = ["top", "mid", "bot"].filter(t => t !== type);
 
       // set drawing state and this section's docId as "temp" in the store
       this.$store.dispatch("drawing/setType", type);

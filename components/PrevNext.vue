@@ -42,20 +42,10 @@ export default {
   props: { isFirstPage: Boolean, isLastPage: Boolean, type: String },
   computed: {
     currentType() {
-      switch (this.type) {
-        case "bot":
-          return `bottoms`;
-          break;
-        case "mid":
-          return `middles`;
-          break;
-        case "top":
-          return `tops`;
-          break;
-        default:
-          return this.type;
-          break;
-      }
+      if (this.type === "bot") return `bottoms`;
+      else if (this.type === "mid") return `middles`;
+      else if (this.type === "top") return `tops`;
+      else return this.type;
     }
   }
 };

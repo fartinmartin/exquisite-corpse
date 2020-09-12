@@ -123,12 +123,12 @@ export default {
           name: "og:description",
           hid: "og:description",
           content: `a ${this.currentType} third of an exquisite corpse!`
-        },
-        {
-          name: "og:image",
-          hid: "og:image",
-          content: `${this.section.thumb}`
         }
+        // {
+        //   name: "og:image",
+        //   hid: "og:image",
+        //   content: `${this.section.thumb}`
+        // }
       ]
     };
   },
@@ -159,17 +159,9 @@ export default {
       return !this.$fetchState.pending && !this.$fetchState.error;
     },
     currentType() {
-      switch (this.section.type) {
-        case "bot":
-          return `bottom`;
-          break;
-        case "mid":
-          return `middle`;
-          break;
-        default:
-          return this.section.type;
-          break;
-      }
+      if (this.section.type === "bot") return `bottom`;
+      else if (this.section.type === "mid") return `middle`;
+      else return this.section.type;
     }
   }
 };

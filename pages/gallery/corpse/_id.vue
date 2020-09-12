@@ -44,12 +44,12 @@ export default {
           name: "og:description",
           hid: "og:description",
           content: `an exquisite corpse drawn by ${this.artistsString}!`
-        },
-        {
-          name: "og:image",
-          hid: "og:image",
-          content: `${this.corpse.thumb}`
         }
+        // {
+        //   name: "og:image",
+        //   hid: "og:image",
+        //   content: `${this.corpse.thumb}`
+        // }
       ]
     };
   },
