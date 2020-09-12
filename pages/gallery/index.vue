@@ -1,5 +1,8 @@
 <template>
-  <div class="wrap">
+  <div
+    class="wrap"
+    :class="collection === 'corpse' ? 'corpse-gal' : 'section-gal'"
+  >
     <Panel class="mb filters" :class="{ sticky: isMobile }">
       <form>
         <div class="radio" :class="{ active: type === 'corpses' }">
@@ -404,6 +407,11 @@ export default {
       margin-right: -6px;
     }
   }
+}
+
+.section-gal .loading-wrap {
+  padding-top: 92.1292831% !important;
+  margin-bottom: 56.15px;
 }
 </style>
 
