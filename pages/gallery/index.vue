@@ -1,8 +1,5 @@
 <template>
-  <div
-    class="wrap"
-    :class="collection === 'corpse' ? 'corpse-gal' : 'section-gal'"
-  >
+  <div class="wrap" :class="{ 'section-wrap': collection === 'sections' }">
     <Panel class="mb filters" :class="{ sticky: isMobile }">
       <form>
         <div class="radio" :class="{ active: type === 'corpses' }">
@@ -409,7 +406,7 @@ export default {
   }
 }
 
-.section-gal .loading-wrap {
+.section-wrap .loading-wrap {
   padding-top: 92.1292831% !important;
   margin-bottom: 56.15px;
 }
