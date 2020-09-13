@@ -110,27 +110,27 @@
     </Panel>
 
     <Loading
-      v-if="isFetching === 'error'"
+      v-if="$fetchState.pending && !isMobile"
+      subtext="curating masterpieces"
+      :throttle="500"
+    />
+
+    <Loading
+      v-else-if="$fetchState.error"
       color="red"
       text="oh no"
       subtext="we have misplaced our corpses!"
     />
 
-    <Loading
-      v-else-if="isFetching !== 'success'"
-      subtext="curating masterpieces"
-      :throttle="500"
-    />
-
     <div
-      v-else-if="isFetching === 'success'"
+      v-else
       class="gallery mw-canvas"
       :class="{ section: collection === 'sections' }"
       ref="gallery"
     >
       <nuxt-link
-        v-for="drawing in gallery"
-        :key="drawing.docId"
+        v-for="(drawing, i) in gallery"
+        :key="`${i}-${drawing.docId}`"
         :to="`/gallery/${galleryType}/${drawing.docId}`"
       >
         <Drawing :drawing="drawing" />
@@ -153,6 +153,15 @@
       style="padding-top: calc(100% / 3)"
       :throttle="500"
     />
+    <Loading
+      v-show="isMobile && emptyNextResults"
+      text="that's it!"
+      subtext="no more masterpieces"
+      color="red"
+      class="mt"
+      style="padding-top: calc(100% / 3)"
+      :throttle="500"
+    />
   </div>
 </template>
 
@@ -160,6 +169,7 @@
 import { mapGetters } from "vuex";
 import { enableBodyScroll } from "body-scroll-lock";
 import { handleBodyScroll } from "~/assets/js/handleBodyScroll";
+import { galleryMethods } from "~/mixins/galleryMixin";
 
 export default {
   name: "gallery",
@@ -168,195 +178,69 @@ export default {
       title: "exquisite corpse club ▪ gallery",
       meta: [
         {
-          itemprop: "description",
-          content: "checkout our masterpieces!"
+          hid: "description",
+          name: "description",
+          content: `checkout our masterpieces!`
+        },
+        {
+          name: "og:title",
+          hid: "og:title",
+          content: `exquisite corpse club ▪ gallery`
+        },
+        {
+          name: "og:description",
+          hid: "og:description",
+          content: `checkout our masterpieces!`
         }
       ]
     };
   },
+  mixins: [galleryMethods],
+  mounted() {
+    this.bodyScrollContainer = document.getElementById("__tino");
+    enableBodyScroll(this.bodyScrollContainer);
+  },
+  beforeDestroy() {
+    handleBodyScroll(this.bodyScrollContainer);
+  },
   data: () => ({
-    isFetching: "idle", // "idle", "fetching", "success", TODO: "error"
-    gallery: [],
-    firstItemId: "",
-    lastVisible: null,
-    firstVisible: null,
+    bodyScrollContainer: null,
     collection: "corpses", // "corpses", "sections"
     type: "corpses", // "corpses", "top", "mid", and "bot"
     field: "date", // "date", "likes"
     pageSize: 9, // 9, 18
-    emptyNextResults: null,
-    emptyPrevResults: null,
-    scrollY: 0,
-    container: null
+    fetch: "first"
   }),
   computed: {
     galleryType() {
       return this.collection.slice(0, -1);
     },
-    isFirstPage() {
-      if (this.gallery.length > 0)
-        return (
-          this.emptyPrevResults || this.gallery[0].docId === this.firstItemId
-        );
-    },
-    isLastPage() {
-      return this.emptyNextResults || this.gallery.length < this.pageSize;
-    },
     ...mapGetters(["isMobile"])
   },
-  mounted() {
-    this.fetchFirst();
+  async fetch() {
+    this.$store.dispatch("setIsLoading", true);
 
-    this.container = document.getElementById("__tino");
-    enableBodyScroll(this.container);
-  },
-  beforeDestroy() {
-    handleBodyScroll(this.container);
+    if (this.fetch === "first") await this.getCollection();
+    else if (this.fetch === "prev") await this.getPrevPage();
+    else if (this.fetch === "next") await this.getNextPage();
+
+    this.$store.dispatch("setIsLoading", false);
   },
   methods: {
-    // https://stackoverflow.com/questions/62639778/paginating-firestore-data-when-using-vuex-and-appending-new-data-to-the-state
-    async fetchFirst() {
-      try {
-        this.isFetching = "fetching";
-        this.$store.dispatch("setIsLoading", true);
-
-        this.gallery = [];
-        this.emptyPrevResults = false;
-        this.emptyNextResults = false;
-
-        let query = this.$fireStore.collection(this.collection);
-        if (this.collection === "sections")
-          query = query.where("type", "==", this.type);
-        query = query.orderBy(this.field, "desc").limit(this.pageSize);
-
-        const firstResponse = await query.get();
-        this.firstVisible = firstResponse.docs[0];
-        this.lastVisible = firstResponse.docs[firstResponse.docs.length - 1];
-
-        firstResponse.forEach(doc => {
-          let mydoc = { docId: doc.id, thumb: doc.data().thumb };
-          this.gallery.push(mydoc);
-        });
-
-        this.firstItemId = firstResponse.docs[0].id; // how necessary is this 🤔
-        this.isFetching = "success";
-        this.$store.dispatch("setIsLoading", false);
-      } catch (error) {
-        console.error(error);
-        this.isFetching = "error";
-        this.$store.dispatch("setIsLoading", false);
-      }
+    prevPage() {
+      this.fetch = "prev";
+      this.$fetch();
     },
 
-    async appendNextPage() {
-      // don't run if fetchFirst() hasn't run yet:
-      if (!this.lastVisible) return;
-
-      try {
-        let query = this.$fireStore.collection(this.collection);
-        if (this.collection === "sections")
-          query = query.where("type", "==", this.type);
-        query = query
-          .orderBy(this.field, "desc")
-          .startAfter(this.lastVisible)
-          .limit(this.pageSize);
-
-        const nextResponse = await query.get();
-        if (!nextResponse.empty) {
-          this.emptyNextResults = false;
-
-          this.lastVisible = nextResponse.docs[nextResponse.docs.length - 1];
-          this.firstVisible = nextResponse.docs[0];
-
-          nextResponse.forEach(doc => {
-            let mydoc = { docId: doc.id, thumb: doc.data().thumb };
-            this.gallery.push(mydoc);
-          });
-        } else if (nextResponse.empty) {
-          this.emptyNextResults = true;
-        }
-      } catch (error) {
-        console.error(error);
-      }
-    },
-
-    async nextPage() {
-      try {
-        this.isFetching = "fetching";
-        this.$store.dispatch("setIsLoading", true);
-
-        let query = this.$fireStore.collection(this.collection);
-        if (this.collection === "sections")
-          query = query.where("type", "==", this.type);
-        query = query
-          .orderBy(this.field, "desc")
-          .startAfter(this.lastVisible)
-          .limit(this.pageSize);
-
-        const nextResponse = await query.get();
-        if (!nextResponse.empty) {
-          this.gallery = [];
-          this.emptyNextResults = false;
-
-          this.lastVisible = nextResponse.docs[nextResponse.docs.length - 1];
-          this.firstVisible = nextResponse.docs[0];
-
-          nextResponse.forEach(doc => {
-            let mydoc = { docId: doc.id, thumb: doc.data().thumb };
-            this.gallery.push(mydoc);
-          });
-        } else {
-          this.emptyNextResults = true;
-        }
-
-        this.isFetching = "success";
-        this.$store.dispatch("setIsLoading", false);
-      } catch (error) {
-        console.error(error);
-        this.isFetching = "error";
-        this.$store.dispatch("setIsLoading", false);
-      }
-    },
-
-    async prevPage() {
-      try {
-        this.isFetching = "fetching";
-        this.$store.dispatch("setIsLoading", true);
-
-        let query = this.$fireStore.collection(this.collection);
-        if (this.collection === "sections")
-          query = query.where("type", "==", this.type);
-        query = query
-          .orderBy(this.field, "desc")
-          .endBefore(this.firstVisible)
-          .limitToLast(this.pageSize);
-
-        const prevResponse = await query.get();
-        if (!prevResponse.empty) {
-          this.gallery = [];
-          this.emptyPrevResults = false;
-
-          this.lastVisible = prevResponse.docs[prevResponse.docs.length - 1];
-          this.firstVisible = prevResponse.docs[0];
-
-          prevResponse.forEach(doc => {
-            let mydoc = { docId: doc.id, thumb: doc.data().thumb };
-            this.gallery.push(mydoc);
-          });
-        } else {
-          this.emptyPrevResults = true;
-        }
-
-        this.isFetching = "success";
-        this.$store.dispatch("setIsLoading", false);
-      } catch (error) {
-        console.error(error);
-        this.isFetching = "error";
-        this.$store.dispatch("setIsLoading", false);
-      }
+    nextPage() {
+      this.fetch = "next";
+      this.$fetch();
     },
 
     handleTypeChoice(e) {
+      this.isMobile && window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+      this.fetch = "first";
+
       const type = e.target.value;
 
       if (type === this.type) return;
@@ -370,15 +254,18 @@ export default {
         this.pageSize = 21;
       }
 
-      this.fetchFirst();
+      this.$fetch();
     },
 
     handleSortBy(e) {
+      this.isMobile && window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+      this.fetch = "first";
+
       const field = e.target.value;
       if (field === this.field) return;
 
       this.field = field;
-      this.fetchFirst();
+      this.$fetch();
     }
   }
 };
@@ -425,7 +312,6 @@ export default {
   height: 544px;
 
   @media (max-width: 571px) {
-    // 571px = isMobile value
     height: auto;
   }
 }
