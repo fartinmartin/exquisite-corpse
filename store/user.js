@@ -3,31 +3,20 @@ import { twoRandomWords } from "~/assets/js/randomWords";
 export const state = () => ({
   id: null,
   name: "",
-  logInAttempts: 3,
   isLoggedIn: false
 });
 
 export const getters = {};
 
 export const actions = {
-  async onEnter({ state, commit, dispatch }) {
-    commit("DECREMENT_LOGIN_ATTEMPT");
+  async onEnter({ commit, dispatch }) {
     try {
-      if (state.logInAttempts > 0) {
-        await dispatch("signInAnonymously");
-      }
+      await dispatch("signInAnonymously");
     } catch {
       commit("SET_IS_LOGGED_IN", false);
-      dispatch("onEnter");
     }
   },
   async signOut() {
-    const errStyle = [
-      ...style,
-      "border: 2px solid #fb9200;",
-      "box-shadow: 2px 2px 0 0 #f44e3b;"
-    ];
-
     this.$fireAuth
       .signOut()
       .then(() => {
@@ -47,14 +36,16 @@ export const actions = {
           .then(async response => {
             const displayName = await twoRandomWords("anonymous");
             await response.user.updateProfile({ displayName });
-            await commit("SET_USER", response.user);
-            await commit("SET_IS_LOGGED_IN", true);
+
+            commit("SET_USER", response.user);
+            commit("SET_IS_LOGGED_IN", true);
+
             dispatch("setIsLoading", false, { root: true });
             dispatch("welcomeUser");
           })
           .catch(async error => {
             dispatch("setIsLoading", false, { root: true });
-            await commit("SET_IS_LOGGED_IN", false);
+            commit("SET_IS_LOGGED_IN", false);
             console.error(error);
           });
       } else {
@@ -87,9 +78,6 @@ export const mutations = {
     state.name = user.displayName || `anonymous-${user.uid.substr(1, 4)}`;
     state.id = user.uid;
   },
-  DECREMENT_LOGIN_ATTEMPT(state) {
-    state.logInAttempts--;
-  },
   SET_IS_LOGGED_IN(state, bool) {
     state.isLoggedIn = bool;
   }
@@ -106,4 +94,10 @@ const style = [
   "border: 2px solid #fcda00;",
   "box-shadow: 2px 2px 0 0 #fb9200;",
   "background: #ffffff;"
+];
+
+const errStyle = [
+  ...style,
+  "border: 2px solid #fb9200;",
+  "box-shadow: 2px 2px 0 0 #f44e3b;"
 ];
