@@ -130,7 +130,6 @@ export default {
         }
       } catch (error) {
         console.error(error);
-        // this.getRandomSectionByType(type);
       }
 
       return section;
