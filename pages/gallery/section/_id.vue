@@ -34,9 +34,9 @@
             v-model="related.toggle"
           />
           <label for="featuredIn">
-            <h2 class="icon interactive">
+            <Icon style="width: auto;">
               feat<span class="hom">ured in...</span>
-            </h2>
+            </Icon>
           </label>
         </div>
         <div>
@@ -48,9 +48,9 @@
             v-model="related.toggle"
           />
           <label for="moreBy">
-            <h2 class="icon interactive">
+            <Icon style="width: auto;">
               more <span class="hom">&nbsp;by this artist... </span>
-            </h2>
+            </Icon>
           </label>
         </div>
       </form>
