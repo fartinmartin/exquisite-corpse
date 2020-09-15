@@ -1,111 +1,28 @@
 <template>
   <div class="wrap" :class="{ 'section-wrap': collection === 'sections' }">
-    <Panel class="mb filters" :class="{ sticky: isMobile }">
+    <Panel class="filters mb" :class="{ sticky: isMobile }">
       <form>
-        <div class="radio" :class="{ active: type === 'corpses' }">
-          <input
-            type="radio"
-            id="corpse"
-            name="collection"
-            value="corpses"
-            v-model="type"
-            @click="handleTypeChoice"
-          />
-          <label
-            class="icon interactive"
-            for="corpse"
-            data-tooltip="filter by full corpses"
-          >
-            <img src="~/assets/img/icons/corpses.svg" />
-          </label>
-        </div>
-        <div class="radio" :class="{ active: type === 'top' }">
-          <input
-            type="radio"
-            id="tops"
-            name="collection"
-            value="top"
-            v-model="type"
-            @click="handleTypeChoice"
-          />
-          <label
-            class="icon interactive"
-            for="tops"
-            data-tooltip="filter by tops"
-          >
-            <img src="~/assets/img/icons/tops.svg" />
-          </label>
-        </div>
-        <div class="radio" :class="{ active: type === 'mid' }">
-          <input
-            type="radio"
-            id="mids"
-            name="collection"
-            value="mid"
-            v-model="type"
-            @click="handleTypeChoice"
-          />
-          <label
-            class="icon interactive"
-            for="mids"
-            data-tooltip="filter by middles"
-          >
-            <img src="~/assets/img/icons/mids.svg" />
-          </label>
-        </div>
-        <div class="radio" :class="{ active: type === 'bot' }">
-          <input
-            type="radio"
-            id="bots"
-            name="collection"
-            value="bot"
-            v-model="type"
-            @click="handleTypeChoice"
-          />
-          <label
-            class="icon interactive"
-            for="bots"
-            data-tooltip="filter by bottoms"
-          >
-            <img src="~/assets/img/icons/bots.svg" />
-          </label>
-        </div>
+        <RadioButton group="filter" value="corpses" v-model="type">
+          <Icon svg="icons/corpses" data-tooltip="filter by full corpses" />
+        </RadioButton>
+        <RadioButton group="filter" value="top" v-model="type">
+          <Icon svg="icons/tops" data-tooltip="filter by tops" />
+        </RadioButton>
+        <RadioButton group="filter" value="mid" v-model="type">
+          <Icon svg="icons/mids" data-tooltip="filter by mids" />
+        </RadioButton>
+        <RadioButton group="filter" value="bot" v-model="type">
+          <Icon svg="icons/bots" data-tooltip="filter by bots" />
+        </RadioButton>
       </form>
+
       <form>
-        <div class="radio" :class="{ active: field === 'date' }">
-          <input
-            type="radio"
-            id="date"
-            name="field"
-            value="date"
-            v-model="field"
-            @click="handleSortBy"
-          />
-          <label
-            class="icon interactive"
-            for="date"
-            data-tooltip="sort by date"
-          >
-            <Date />
-          </label>
-        </div>
-        <div class="radio" :class="{ active: field === 'likes' }">
-          <input
-            type="radio"
-            id="likes"
-            name="field"
-            value="likes"
-            v-model="field"
-            @click="handleSortBy"
-          />
-          <label
-            class="icon interactive"
-            for="likes"
-            data-tooltip="sort by likes"
-          >
-            <img src="~/assets/img/icons/heart_.svg" alt="" />
-          </label>
-        </div>
+        <RadioButton group="sort" value="date" v-model="field">
+          <Icon data-tooltip="sort by date"> <Date /> </Icon>
+        </RadioButton>
+        <RadioButton group="sort" value="likes" v-model="field">
+          <Icon svg="icons/heart_" data-tooltip="sort by likes" />
+        </RadioButton>
       </form>
     </Panel>
 
@@ -208,9 +125,30 @@ export default {
     collection: "corpses", // "corpses", "sections"
     type: "corpses", // "corpses", "top", "mid", and "bot"
     field: "date", // "date", "likes"
-    pageSize: 9, // 9, 18
+    pageSize: 9, // 9, 21
     fetch: "first"
   }),
+  watch: {
+    type() {
+      this.isMobile && window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+
+      if (this.type === "corpses") {
+        this.collection = "corpses";
+        this.pageSize = 9;
+      } else {
+        this.collection = "sections";
+        this.pageSize = 21;
+      }
+
+      this.fetch = "first";
+      this.$fetch();
+    },
+    field() {
+      this.isMobile && window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+      this.fetch = "first";
+      this.$fetch();
+    }
+  },
   computed: {
     galleryType() {
       return this.collection.slice(0, -1);
@@ -235,38 +173,38 @@ export default {
     nextPage() {
       this.fetch = "next";
       this.$fetch();
-    },
-
-    handleTypeChoice(e) {
-      this.isMobile && window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
-      this.fetch = "first";
-
-      const type = e.target.value;
-
-      if (type === this.type) return;
-      this.type = type;
-
-      if (type === "corpses") {
-        this.collection = "corpses";
-        this.pageSize = 9;
-      } else {
-        this.collection = "sections";
-        this.pageSize = 21;
-      }
-
-      this.$fetch();
-    },
-
-    handleSortBy(e) {
-      this.isMobile && window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
-      this.fetch = "first";
-
-      const field = e.target.value;
-      if (field === this.field) return;
-
-      this.field = field;
-      this.$fetch();
     }
+
+    // handleTypeChoice(e) {
+    //   this.isMobile && window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+    //   this.fetch = "first";
+
+    //   const type = e.target.value;
+
+    //   if (type === this.type) return;
+    //   this.type = type;
+
+    //   if (type === "corpses") {
+    //     this.collection = "corpses";
+    //     this.pageSize = 9;
+    //   } else {
+    //     this.collection = "sections";
+    //     this.pageSize = 21;
+    //   }
+
+    //   this.$fetch();
+    // },
+
+    // handleSortBy(e) {
+    //   this.isMobile && window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+    //   this.fetch = "first";
+
+    //   const field = e.target.value;
+    //   if (field === this.field) return;
+
+    //   this.field = field;
+    //   this.$fetch();
+    // }
   }
 };
 </script>
@@ -299,10 +237,6 @@ export default {
 }
 </style>
 
-<style lang="scss">
-// TODO: below sections should be components
-</style>
-
 <style lang="scss" scoped>
 .gallery {
   display: grid;
@@ -319,23 +253,12 @@ export default {
 .gallery.section {
   grid-template-rows: repeat(6, max-content);
 }
-</style>
 
-<style lang="scss" scoped>
 form {
   display: flex;
-
-  input {
-    display: none;
-  }
 
   > *:not(:last-child) {
     margin-right: 1rem;
   }
-}
-
-.radio:not(.active) {
-  filter: grayscale(1);
-  opacity: 0.6;
 }
 </style>
