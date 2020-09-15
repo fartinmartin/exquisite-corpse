@@ -7,6 +7,7 @@
 
 <script>
 export default {
+  name: "Icon",
   props: {
     svg: { type: String },
     interactive: { type: Boolean, default: true },

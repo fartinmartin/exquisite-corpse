@@ -4,7 +4,11 @@
     <Nav />
 
     <transition name="fade">
-      <Nuxt v-if="isLoggedIn" keep-alive :keep-alive-props="{ max: 10 }" />
+      <Nuxt
+        v-if="isLoggedIn"
+        keep-alive
+        :keep-alive-props="{ max: 10, exclude: ['draw'] }"
+      />
     </transition>
 
     <CustomCursor />

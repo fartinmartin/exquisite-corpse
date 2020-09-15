@@ -15,6 +15,7 @@
 
 <script>
 export default {
+  name: "RadioButton",
   model: {
     prop: "active",
     event: "selected"

@@ -3,9 +3,7 @@
     <Panel class="info-panel">
       <span>pick a section to start drawing!</span>
       <button @click.prevent="openHelp">
-        <div class="icon interactive">
-          <img src="~/assets/img/icons/info.svg" />
-        </div>
+        <Icon svg="icons/info" />
       </button>
     </Panel>
     <div class="mw-canvas">
@@ -16,7 +14,9 @@
         interactive
         no-padding
       >
-        <div class="meta-box pointer"><div class="info pointer">top</div></div>
+        <div class="meta-box pointer">
+          <div class="info pointer">top</div>
+        </div>
       </Panel>
       <Panel
         class="section-template mt"

@@ -11,10 +11,10 @@ export const state = () => ({
   sections: {
     top: null,
     mid: null,
-    bot: null,
+    bot: null
   },
   title: "",
-  isSaving: "idle",
+  isSaving: "idle"
 });
 
 export const getters = {
@@ -39,7 +39,7 @@ export const getters = {
   isMobile: () => process.client && window.innerWidth < 571,
   computedPaths(state, getters) {
     return getters.isMobile ? state.mobilePaths : state.paths;
-  },
+  }
 };
 
 export const actions = {
@@ -131,7 +131,7 @@ export const actions = {
       x1: rootState.mouse.x,
       y1: rootState.mouse.y,
       x2: event.offsetX,
-      y2: event.offsetY,
+      y2: event.offsetY
     };
     if (process.client && window.innerWidth < 571)
       pointData.size = Math.round(pointData.size / getters.mobileFactor);
@@ -151,9 +151,7 @@ export const actions = {
     // handles undo scenarios that dont trigger undoCanvas() ? 🤔
     if (!paths.length) commit("CLEAR_CANVAS");
 
-    paths.forEach((path) =>
-      path.forEach((point) => dispatch("handleDraw", point))
-    );
+    paths.forEach(path => path.forEach(point => dispatch("handleDraw", point)));
   },
 
   handleDraw({ dispatch, commit }, point) {
@@ -218,7 +216,7 @@ export const actions = {
     let tolerance = 50;
     let dprPoint = {
       x2: point.x2 * devicePixelRatio,
-      y2: point.y2 * devicePixelRatio,
+      y2: point.y2 * devicePixelRatio
     };
     floodFill.fill(dprPoint.x2, dprPoint.y2, tolerance, ctx);
   },
@@ -226,8 +224,8 @@ export const actions = {
   setMobilePaths({ state, getters, commit }) {
     const f = getters.mobileFactor;
 
-    const newPaths = state.paths.map((path) => {
-      return path.map((point) => {
+    const newPaths = state.paths.map(path => {
+      return path.map(point => {
         const newPoint = { ...point };
 
         newPoint.x1 = Math.round(newPoint.x1 * f);
@@ -241,7 +239,7 @@ export const actions = {
     });
 
     commit("SET_MOBILE_PATHS", newPaths);
-  },
+  }
 };
 
 export const mutations = {
@@ -250,6 +248,7 @@ export const mutations = {
   },
 
   CLEAR_DRAWING(state) {
+    state.title = "";
     state.paths = [];
     state.history.paths = [];
     state.history.step = 0;
@@ -330,5 +329,5 @@ export const mutations = {
 
   SET_IS_SAVING(state, saveState) {
     state.isSaving = saveState;
-  },
+  }
 };
