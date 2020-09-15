@@ -1,18 +1,11 @@
 <template>
   <div class="nav-wrap">
-    <Panel v-show="this.$route.name !== 'index'" class="nav" no-padding>
+    <Panel v-show="!isIndex" class="nav" no-padding>
       <nav>
         <nuxt-link to="/" class="logo">
-          <h1>
-            <span v-if="this.$route.name === 'index'">
-              exquisite corpse club
-            </span>
-            <span v-if="this.$route.name !== 'index'" data-tooltip="home">
-              ecc
-            </span>
-          </h1>
+          <h1 data-tooltip="home">ecc</h1>
         </nuxt-link>
-        <NavMenu style="margin-right: -6px;" />
+        <NavMenu />
       </nav>
     </Panel>
 
@@ -36,7 +29,12 @@ import { openHelp } from "~/mixins/openHelpMixin";
 
 export default {
   name: "Nav",
-  mixins: [openHelp]
+  mixins: [openHelp],
+  computed: {
+    isIndex() {
+      return this.$route.name === "index";
+    }
+  }
 };
 </script>
 
@@ -53,10 +51,6 @@ export default {
   position: absolute;
   top: calc(40px / 3);
   z-index: 950;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
 .nav {
@@ -66,6 +60,7 @@ export default {
 
   .logo {
     margin-right: 1rem;
+    text-decoration: none;
   }
 
   nav {

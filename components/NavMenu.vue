@@ -48,6 +48,7 @@ export default {
 <style lang="scss" scoped>
 .menu {
   display: flex;
+  margin-right: -6px; // optically counter's icon padding
 
   > * {
     margin-left: 1rem;

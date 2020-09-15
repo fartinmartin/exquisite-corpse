@@ -11,8 +11,8 @@ export default {
   methods: {
     handleClick() {
       this.$emit("click");
-    },
-  },
+    }
+  }
 };
 </script>
 
@@ -54,6 +54,13 @@ button {
   &.red {
     --background-color: var(--red);
     color: var(--white);
+  }
+
+  a {
+    text-decoration: none;
+    &:hover {
+      color: var(--black);
+    }
   }
 }
 </style>

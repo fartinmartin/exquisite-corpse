@@ -47,14 +47,12 @@ export default {
     };
   },
   data: () => ({ isFetching: "idle" }), // "idle", "fetching", "success", TODO: "error"
-  async fetch({ store }) {
-    // set default random title
+  async fetch() {
     let words = await twoRandomWords();
-    store.dispatch("drawing/setTitle", words);
-    store.dispatch("setIsHelping", false);
+    this.$store.dispatch("drawing/setTitle", words);
+    this.$store.dispatch("setIsHelping", false); // in case user came from help "start drawing!" button
   },
   mounted() {
-    // fresh start
     this.$store.dispatch("drawing/clearDrawing");
     this.$store.dispatch("mouse/resetMouse");
   },

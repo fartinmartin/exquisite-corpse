@@ -7,10 +7,10 @@
  * From: https://dev.to/nektro/createimagebitmap-polyfill-for-safari-and-edge-228
  * Updated by Yoan Tournade <yoan@ytotech.com>
  *
- * Note: I use this so that pixelateDrawing() doesn't fail!
+ * Note: I use this so that pixelateDrawing() doesn't fail (in Safari)!
  */
 if (!("createImageBitmap" in window)) {
-  window.createImageBitmap = async function (data) {
+  window.createImageBitmap = async function(data) {
     return new Promise((resolve, reject) => {
       let dataURL;
       if (data instanceof Blob) {
@@ -28,7 +28,7 @@ if (!("createImageBitmap" in window)) {
         );
       }
       const img = document.createElement("img");
-      img.addEventListener("load", function () {
+      img.addEventListener("load", function() {
         resolve(this);
       });
       img.src = dataURL;

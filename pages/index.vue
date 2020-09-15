@@ -1,10 +1,8 @@
 <template>
   <div class="wrap">
     <Panel class="mb index-nav">
-      <nuxt-link to="/">
-        <h1>exquisite corpse club</h1>
-      </nuxt-link>
-      <NavMenu style="margin-right: -6px" />
+      <h1>exquisite corpse club</h1>
+      <NavMenu />
     </Panel>
 
     <Loading v-if="$fetchState.pending" subtext="digging up a random corpse" />
@@ -60,12 +58,5 @@ export default {
 
 .index-nav > .content {
   justify-content: space-between;
-}
-
-.index-title a {
-  text-decoration: underline;
-  &:hover {
-    color: var(--blue);
-  }
 }
 </style>
