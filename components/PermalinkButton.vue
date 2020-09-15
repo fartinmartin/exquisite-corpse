@@ -1,9 +1,6 @@
 <template>
-  <button
-    @click="copyURL"
-    :data-tooltip="isCopied ? 'link copied!' : 'share link'"
-  >
-    <div class="icon interactive">
+  <button @click="copyURL">
+    <Icon :data-tooltip="isCopied ? 'link copied!' : 'share link'">
       <transition name="slide-fade">
         <img
           v-if="isCopied"
@@ -15,7 +12,7 @@
       <transition name="fade">
         <img v-if="!isCopied" src="~/assets/img/icons/link.svg" alt="" />
       </transition>
-    </div>
+    </Icon>
   </button>
 </template>
 

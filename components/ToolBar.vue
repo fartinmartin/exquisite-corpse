@@ -2,113 +2,58 @@
   <div>
     <Panel class="toolbar canvas-tools">
       <div class="tool-group mode">
-        <div
-          class="tool draw"
-          :class="{ active: mode === 'draw' }"
-          data-tooltip="draw"
-        >
-          <input
-            type="radio"
-            name="mode"
-            id="draw"
-            value="draw"
-            v-model="mode"
-          />
-          <label for="draw">
-            <img src="~/assets/img/toolbar/draw.svg" />
-          </label>
-        </div>
-
-        <div
-          class="tool erase"
-          :class="{ active: mode === 'erase' }"
-          data-tooltip="erase"
-        >
-          <input
-            type="radio"
-            name="mode"
-            id="erase"
-            value="erase"
-            v-model="mode"
-          />
-          <label for="erase">
-            <img src="~/assets/img/toolbar/erase.svg" />
-          </label>
-        </div>
-
-        <div
-          class="tool fill"
-          :class="{ active: mode === 'fill' }"
-          data-tooltip="fill"
-        >
-          <input
-            type="radio"
-            name="mode"
-            id="fill"
-            value="fill"
-            v-model="mode"
-          />
-          <label for="fill">
-            <img src="~/assets/img/toolbar/fill.svg" />
-          </label>
-        </div>
+        <RadioButton group="mode" value="draw" v-model="mode">
+          <Icon svg="toolbar/draw" data-tooltip="draw" />
+        </RadioButton>
+        <RadioButton group="mode" value="erase" v-model="mode">
+          <Icon svg="toolbar/erase" data-tooltip="erase" />
+        </RadioButton>
+        <RadioButton group="mode" value="fill" v-model="mode">
+          <Icon svg="toolbar/fill" data-tooltip="fill" />
+        </RadioButton>
       </div>
 
       <div class="tool-group size">
         <button
-          class="tool size-down"
-          :disabled="!currentSizeMoreThanMin"
           @click="decrementSize"
           data-tooltip="smaller"
+          :disabled="!canShrink"
         >
-          <img src="~/assets/img/toolbar/size-down.svg" alt="" />
+          <Icon svg="toolbar/size-down" />
         </button>
         <span>{{ size.current }}px</span>
         <button
-          class="tool size-up"
-          :disabled="!currentSizeLessThanMax"
           @click="incrementSize"
           data-tooltip="bigger"
+          :disabled="!canGrow"
         >
-          <img src="~/assets/img/toolbar/size-up.svg" alt="" />
+          <Icon svg="toolbar/size-up" />
         </button>
       </div>
 
       <div class="tool-group edits">
-        <button
-          class="tool undo"
-          :disabled="cantUndo"
-          @click="undoCanvas"
-          data-tooltip="undo"
-        >
-          <img src="~/assets/img/toolbar/undo.svg" alt="" />
+        <button @click="undoCanvas" data-tooltip="undo" :disabled="cantUndo">
+          <Icon svg="toolbar/undo" />
+        </button>
+        <button @click="redoCanvas" data-tooltip="redo" :disabled="cantRedo">
+          <Icon svg="toolbar/redo" />
         </button>
         <button
-          class="tool redo"
-          :disabled="cantRedo"
-          @click="redoCanvas"
-          data-tooltip="redo"
-        >
-          <img src="~/assets/img/toolbar/redo.svg" alt="" />
-        </button>
-        <button
-          class="tool clear"
-          :disabled="isDrawingEmpty"
           @click="clearCanvas"
           data-tooltip="clear"
+          :disabled="isDrawingEmpty"
         >
-          <img src="~/assets/img/toolbar/clear.svg" alt="" />
+          <Icon svg="toolbar/clear" />
         </button>
       </div>
 
       <div class="tool-group save">
         <button
-          class="tool save"
-          :disabled="isDrawingEmpty"
           @click="$emit('start-save')"
           data-tooltip="save"
+          :disabled="isDrawingEmpty"
         >
-          <img src="~/assets/img/toolbar/save.svg" alt="" />
+          <Icon svg="toolbar/save" />
         </button>
       </div>
     </Panel>
@@ -154,15 +99,12 @@ export default {
       },
       set(value) {
         this.$store.dispatch("mouse/setMode", value);
-      },
+      }
     },
     ...mapState("drawing", ["isSaving"]),
     ...mapState("mouse", ["palette", "size"]),
-    ...mapGetters("mouse", [
-      "currentSizeLessThanMax",
-      "currentSizeMoreThanMin",
-    ]),
-    ...mapGetters("drawing", ["cantUndo", "cantRedo", "isDrawingEmpty"]),
+    ...mapGetters("mouse", ["canGrow", "canShrink"]),
+    ...mapGetters("drawing", ["cantUndo", "cantRedo", "isDrawingEmpty"])
   },
   methods: {
     handleShortcuts(e) {
@@ -227,21 +169,19 @@ export default {
     },
     clearCanvas(e) {
       this.$store.dispatch("drawing/clearCanvas", e);
-    },
-  },
+    }
+  }
 };
 </script>
 
 <style lang="scss">
 .toolbar {
-  user-select: none;
+  height: 60px;
 
   > .content {
     justify-content: space-between;
     flex-wrap: wrap;
   }
-
-  height: 60px;
 
   @media screen and (max-width: 508px) {
     height: initial;
@@ -276,10 +216,6 @@ export default {
   }
 }
 
-.canvas-tools {
-  padding: calc(1rem - 4px) 1rem; // to account for box-sizing 🤔
-}
-
 .tool-group {
   display: flex;
   align-items: center;
@@ -293,64 +229,8 @@ export default {
   }
 }
 
-// TODO: this will eventually live in Button.vue or its sister component 🤷‍♂️
-$icon-size: 25px;
-
-.tool {
-  width: $icon-size;
-  height: $icon-size;
-
-  box-sizing: content-box;
-  border: 2px solid transparent;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  input {
-    display: none;
-  }
-
-  label {
-    width: 100%;
-  }
-
-  svg,
-  img {
-    width: 100%;
-    pointer-events: none;
-  }
-}
-
-.palette label,
-.tool {
-  &:not([disabled]):active {
-    border: 2px solid var(--lighter-blue);
-    border-top: 2px solid var(--light-blue);
-    border-left: 2px solid var(--light-blue);
-    transform: translate3d(2px, 2px, 0);
-  }
-}
-
-.mode .tool.active {
-  border: 2px solid var(--light-blue);
-  border-top: 2px solid var(--lighter-blue);
-  border-left: 2px solid var(--lighter-blue);
-
-  &:active {
-    border: 2px solid var(--lighter-blue);
-    border-top: 2px solid var(--light-blue);
-    border-left: 2px solid var(--light-blue);
-    transform: translate3d(2px, 2px, 0);
-  }
-}
-
-.mode .tool:not(.active) {
-  filter: grayscale(1);
-  opacity: 0.6;
-}
-
-.fill {
+.mode div:nth-child(3) {
+  // fill bucket
   margin-left: 0.6rem !important;
 }
 
@@ -367,6 +247,15 @@ $icon-size: 25px;
 
   > *:not(:first-child) {
     margin-left: 0;
+  }
+}
+
+.palette label {
+  &:not([disabled]):active {
+    border: 2px solid var(--lighter-blue);
+    border-top: 2px solid var(--light-blue);
+    border-left: 2px solid var(--light-blue);
+    transform: translate3d(2px, 2px, 0);
   }
 }
 

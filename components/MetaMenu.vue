@@ -25,7 +25,8 @@ export default {
     margin-left: 0.5rem;
   }
 
-  > [data-tooltip*="link"] {
+  > :nth-child(2) {
+    // link icon
     margin-left: 0.375rem;
   }
 }

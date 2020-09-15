@@ -1,7 +1,7 @@
 <template>
   <button @click="handleClick">
-    <div
-      class="icon interactive"
+    <Icon
+      style="width: auto;"
       :class="{ liked: isLiked }"
       :data-tooltip="isLiked ? 'unlike' : 'like'"
     >
@@ -11,7 +11,7 @@
       <div style="width: 25px; height: 25px; pointer-events: none;">
         <div v-html="rawHeartSVG" />
       </div>
-    </div>
+    </Icon>
   </button>
 </template>
 
@@ -88,7 +88,6 @@ export default {
 }
 
 .icon {
-  width: auto;
   min-width: 25px;
 
   &.liked {

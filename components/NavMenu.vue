@@ -1,37 +1,13 @@
 <template>
   <div class="menu">
-    <button
-      @click.prevent="openHelp"
-      :class="{ 'look-at-me': this.$route.name === 'index' }"
-      data-tooltip="help"
-    >
-      <div class="icon interactive">
-        <img src="~/assets/img/icons/info.svg" />
-      </div>
+    <button @click.prevent="openHelp" data-tooltip="help">
+      <Icon svg="icons/info" :shimmer="this.$route.name === 'index'" />
     </button>
-    <nuxt-link
-      to="/gallery"
-      :class="{
-        'look-@-me': this.$route.name === 'index',
-        active: this.$route.name !== 'gallery'
-      }"
-      data-tooltip="gallery"
-    >
-      <div class="icon interactive">
-        <img src="~/assets/img/icons/gallery.svg" />
-      </div>
+    <nuxt-link to="/gallery" data-tooltip="gallery">
+      <Icon svg="icons/gallery" />
     </nuxt-link>
-    <nuxt-link
-      to="/draw"
-      :class="{
-        'look-@-me': this.$route.name === 'index',
-        active: this.$route.name !== 'draw'
-      }"
-      data-tooltip="draw"
-    >
-      <div class="icon interactive">
-        <img src="~/assets/img/toolbar/draw.svg" />
-      </div>
+    <nuxt-link to="/draw" data-tooltip="draw">
+      <Icon svg="toolbar/draw" />
     </nuxt-link>
   </div>
 </template>

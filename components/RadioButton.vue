@@ -33,6 +33,12 @@ input {
   display: none;
 }
 
+.radio-wrap.active .icon {
+  border: 2px solid var(--light-blue);
+  border-top: 2px solid var(--lighter-blue);
+  border-left: 2px solid var(--lighter-blue);
+}
+
 .radio-wrap:not(.active) {
   filter: grayscale(1);
   opacity: 0.6;

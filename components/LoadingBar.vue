@@ -1,6 +1,7 @@
 <script>
-// 🚨 this is pretty much stock with the exception of
+// 🚨 this is pretty much stock with the follwoing exception:
 // it dispatchs "setIsLoading" during the start() and finish() methods..
+// is this necessary anymore? 🤔
 export default {
   name: "NuxtLoading",
   data() {

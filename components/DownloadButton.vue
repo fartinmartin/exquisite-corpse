@@ -1,8 +1,6 @@
 <template>
   <button @click="saveImage" data-tooltip="download">
-    <div class="icon interactive">
-      <img src="~/assets/img/icons/download.svg" alt="" />
-    </div>
+    <Icon svg="icons/download" />
   </button>
 </template>
 
@@ -12,7 +10,7 @@ export default {
   props: {
     image: { type: String, required: true },
     title: { type: String, required: true },
-    artist: String,
+    artist: String
   },
   methods: {
     saveImage() {
@@ -39,11 +37,11 @@ export default {
         : `exquisite corpse club-${this.title}`;
       const link = document.createElement("a");
       link.download = fileName + ".png";
-      canvas.toBlob(function (blob) {
+      canvas.toBlob(function(blob) {
         link.href = URL.createObjectURL(blob);
         link.click();
       });
-    },
-  },
+    }
+  }
 };
 </script>

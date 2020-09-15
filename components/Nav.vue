@@ -16,9 +16,7 @@
         rel="noopener noreferrer"
         data-tooltip="cool guy"
       >
-        <div class="icon interactive">
-          <img src="~/assets/img/logo/m-light.svg" alt="" />
-        </div>
+        <Icon svg="logo/m-light" />
       </a>
     </Panel>
   </div>

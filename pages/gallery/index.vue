@@ -174,37 +174,6 @@ export default {
       this.fetch = "next";
       this.$fetch();
     }
-
-    // handleTypeChoice(e) {
-    //   this.isMobile && window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
-    //   this.fetch = "first";
-
-    //   const type = e.target.value;
-
-    //   if (type === this.type) return;
-    //   this.type = type;
-
-    //   if (type === "corpses") {
-    //     this.collection = "corpses";
-    //     this.pageSize = 9;
-    //   } else {
-    //     this.collection = "sections";
-    //     this.pageSize = 21;
-    //   }
-
-    //   this.$fetch();
-    // },
-
-    // handleSortBy(e) {
-    //   this.isMobile && window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
-    //   this.fetch = "first";
-
-    //   const field = e.target.value;
-    //   if (field === this.field) return;
-
-    //   this.field = field;
-    //   this.$fetch();
-    // }
   }
 };
 </script>

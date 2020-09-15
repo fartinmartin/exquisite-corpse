@@ -6,12 +6,10 @@
       @click="$emit('prev')"
       :data-tooltip="isFirstPage ? `this is the first page! :)` : `go back`"
     >
-      <div class="icon interactive">
-        <div class="icon">
-          <img src="~/assets/img/icons/arrow.svg" alt="" />
-        </div>
+      <Icon>
+        <img src="~/assets/img/icons/arrow.svg" alt="" />
         <span>back</span>
-      </div>
+      </Icon>
     </button>
 
     <button
@@ -22,16 +20,10 @@
         isLastPage ? `no more ${currentType} :(` : `more ${currentType}!`
       "
     >
-      <div class="icon interactive">
+      <Icon>
         <span>more!</span>
-        <div class="icon">
-          <img
-            src="~/assets/img/icons/arrow.svg"
-            alt=""
-            style="transform: rotate(180deg)"
-          />
-        </div>
-      </div>
+        <img src="~/assets/img/icons/arrow.svg" alt="" />
+      </Icon>
     </button>
   </Panel>
 </template>
@@ -58,16 +50,17 @@ export default {
   height: 25px;
 }
 
-.prev-next button .interactive {
-  display: flex;
-  width: auto;
-  height: 25px;
-  align-items: center;
-}
-
-/* 🚨 TODO: could tweak loading component to match new height too */
 .prev-next:not(.corpses) {
   transform: translateY(calc(calc(40px / 3) + 56.15px * -1));
+}
+
+.prev .icon,
+.next .icon {
+  width: auto !important;
+
+  img {
+    width: 25px;
+  }
 }
 
 .prev span {
@@ -76,5 +69,9 @@ export default {
 
 .next span {
   margin-left: 6px;
+}
+
+.next .icon img {
+  transform: rotate(180deg);
 }
 </style>

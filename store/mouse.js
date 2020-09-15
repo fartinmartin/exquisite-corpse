@@ -24,10 +24,10 @@ export const state = () => ({
 });
 
 export const getters = {
-  currentSizeLessThanMax(state) {
+  canGrow(state) {
     return state.size.current < state.size.max;
   },
-  currentSizeMoreThanMin(state) {
+  canShrink(state) {
     return state.size.current > state.size.min;
   }
 };
@@ -48,10 +48,10 @@ export const actions = {
     commit("SET_MODE", value);
   },
   incrementSize({ commit, getters }) {
-    getters.currentSizeLessThanMax && commit("INCREMENT_SIZE");
+    getters.canGrow && commit("INCREMENT_SIZE");
   },
   decrementSize({ commit, getters }) {
-    getters.currentSizeMoreThanMin && commit("DECREMENT_SIZE");
+    getters.canShrink && commit("DECREMENT_SIZE");
   },
   setColor({ commit }, color) {
     commit("SET_COLOR", color);
