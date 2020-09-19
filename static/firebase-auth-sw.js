@@ -1,8 +1,8 @@
 const ignorePaths = ["\u002F__webpack_hmr","\u002F_loading","\u002F_nuxt\u002F"]
 
 // Only works on Firebase hosting!
-importScripts('/__/firebase/7.18.0/firebase-app.js')
-importScripts('/__/firebase/7.18.0/firebase-auth.js')
+importScripts('/__/firebase/7.20.0/firebase-app.js')
+importScripts('/__/firebase/7.20.0/firebase-auth.js')
 importScripts('/__/firebase/init.js')
 
 /**
