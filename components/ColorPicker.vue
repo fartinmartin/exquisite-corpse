@@ -1,6 +1,6 @@
 <template>
-  <div class="picker-wrap">
-    <Panel class="picker">
+  <div class="picker-wrap" ref="pickerWrap">
+    <Panel class="picker" :style="pickerStyles" ref="picker">
       <div
         class="slider ignore-dbs"
         id="hue"
@@ -39,20 +39,29 @@
 
 <script>
 import tinycolor from "tinycolor2";
+import { mapGetters } from "vuex";
 
 export default {
   name: "ColorPicker",
   props: {
     color: { type: String }
   },
-  data: () => ({ currentColor: null, hueDrag: false, satDrag: false }),
+  data: () => ({
+    currentColor: null,
+    hueDrag: false,
+    satDrag: false,
+    pickerStyles: ""
+  }),
   mounted() {
     this.currentColor = this.color || "#ff0000";
     this.$refs.huePointer.style.left = `${(this.hsl.h / 360) * 100}%`;
     this.$refs.satPointer.style.left = `${this.hsl.s * 100}%`;
-    this.$refs.satPointer.style.top = `${this.hsl.l * 100}%`;
+    this.$refs.satPointer.style.top = `${(1 - this.hsl.l) * 100}%`;
+    this.handlePickerStyles();
+    console.log(this.pickerStyles);
   },
   computed: {
+    ...mapGetters(["isMobile"]),
     hsl() {
       return tinycolor(this.currentColor).toHsl();
     },
@@ -159,6 +168,27 @@ export default {
           s: saturation,
           v: bright
         }).toHex()}`;
+      }
+    },
+    handlePickerStyles() {
+      if (!this.isMobile) return;
+
+      const buttonCenter =
+        this.$refs.pickerWrap.getBoundingClientRect().left - 10;
+      const pickerWidth = this.$refs.picker.$el.offsetWidth / 2;
+
+      const maxRight = window.innerWidth - 40 / 3;
+      const maxLeft = 40 / 3;
+
+      // console.log(Math.abs(buttonCenter - pickerWidth), maxLeft);
+
+      if (buttonCenter + pickerWidth > maxRight) {
+        this.pickerStyles = `transform: translateX(calc(-50% - ${buttonCenter +
+          pickerWidth -
+          maxRight}px));`;
+      } else if (Math.abs(buttonCenter - pickerWidth) > maxLeft) {
+        this.pickerStyles = `transform: translateX(-${buttonCenter -
+          maxLeft}px);`;
       }
     }
   }
