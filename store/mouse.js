@@ -9,6 +9,7 @@ export const state = () => ({
     max: 10
   },
   palette: {
+    showPicker: false,
     current: "#000000",
     colors: [
       "#000000",
@@ -53,6 +54,9 @@ export const actions = {
   decrementSize({ commit, getters }) {
     getters.canShrink && commit("DECREMENT_SIZE");
   },
+  togglePicker({ commit }) {
+    commit("TOGGLE_PICKER");
+  },
   setColor({ commit }, color) {
     commit("SET_COLOR", color);
   },
@@ -81,6 +85,9 @@ export const mutations = {
   },
   SET_SIZE(state, size) {
     state.size.current = size;
+  },
+  TOGGLE_PICKER(state) {
+    state.palette.showPicker = !state.palette.showPicker;
   },
   SET_COLOR(state, color) {
     state.palette.current = color;

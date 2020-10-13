@@ -15,11 +15,12 @@
     "@nuxtjs/firebase": "^6.1.0",
     "@nuxtjs/pwa": "^3.0.2",
     "body-scroll-lock": "^3.1.5",
-    "firebase": "^7.21.0",
+    "firebase": "^7.23.0",
     "firebase-admin": "^8.10.0",
     "firebase-functions": "^3.11.0",
     "nuxt-password-protect": "^1.0.6",
     "nuxt-start": "^2.14.5",
+    "tinycolor2": "^1.4.2",
     "vue2-touch-events": "^2.3.2"
   },
   "devDependencies": {

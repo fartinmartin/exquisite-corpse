@@ -74,7 +74,22 @@
           id="addColor"
           @change="addColor($event)"
         />
-        <label for="addColor" class="add-color">+</label>
+        <!-- <label for="addColor" class="add-color">+</label> -->
+        <button class="add-color" @click="togglePicker">
+          <span
+            :style="
+              `transition: transform 0.3s ease; transform: rotate(${
+                palette.showPicker ? 45 : 0
+              }deg)`
+            "
+            >+</span
+          >
+        </button>
+        <ColorPicker
+          v-if="palette.showPicker"
+          :color="lastColor"
+          @add-color="addColor"
+        />
         <!-- TODO: https://github.com/xiaokaike/vue-color (mostly for safari support 🤔) -->
       </div>
     </Panel>
@@ -104,7 +119,10 @@ export default {
     ...mapState("drawing", ["isSaving"]),
     ...mapState("mouse", ["palette", "size"]),
     ...mapGetters("mouse", ["canGrow", "canShrink"]),
-    ...mapGetters("drawing", ["cantUndo", "cantRedo", "isDrawingEmpty"])
+    ...mapGetters("drawing", ["cantUndo", "cantRedo", "isDrawingEmpty"]),
+    lastColor() {
+      return this.palette.colors[this.palette.colors.length - 1];
+    }
   },
   methods: {
     handleShortcuts(e) {
@@ -150,10 +168,14 @@ export default {
       }
     },
     addColor(e) {
-      this.$store.dispatch("mouse/addColor", e.target.value);
+      this.$store.dispatch("mouse/addColor", e);
+      this.togglePicker();
     },
     setColor(e) {
       this.$store.dispatch("mouse/setColor", e);
+    },
+    togglePicker() {
+      this.$store.dispatch("mouse/togglePicker");
     },
     decrementSize() {
       this.$store.dispatch("mouse/decrementSize");
@@ -274,5 +296,6 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
+  border: 2px solid var(--lighter-blue);
 }
 </style>
