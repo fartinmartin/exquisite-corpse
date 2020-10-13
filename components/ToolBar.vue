@@ -74,23 +74,14 @@
           id="addColor"
           @change="addColor($event)"
         />
-        <!-- <label for="addColor" class="add-color">+</label> -->
-        <button class="add-color" @click="togglePicker">
-          <span
-            :style="
-              `transition: transform 0.3s ease; transform: rotate(${
-                palette.showPicker ? 45 : 0
-              }deg)`
-            "
-            >+</span
-          >
+        <button class="add-color ignore-dbs" @click="togglePicker">
+          <span :style="addColorButtonStyles">+</span>
         </button>
         <ColorPicker
           v-if="palette.showPicker"
           :color="lastColor"
           @add-color="addColor"
         />
-        <!-- TODO: https://github.com/xiaokaike/vue-color (mostly for safari support 🤔) -->
       </div>
     </Panel>
   </div>
@@ -122,6 +113,9 @@ export default {
     ...mapGetters("drawing", ["cantUndo", "cantRedo", "isDrawingEmpty"]),
     lastColor() {
       return this.palette.colors[this.palette.colors.length - 1];
+    },
+    addColorButtonStyles() {
+      return `transform: rotate(${this.palette.showPicker ? 45 : 0}deg)`;
     }
   },
   methods: {
@@ -297,5 +291,11 @@ export default {
   align-items: center;
   justify-content: center;
   border: 2px solid var(--lighter-blue);
+
+  span {
+    pointer-events: none;
+    transition: transform 0.3s ease;
+    line-height: 1;
+  }
 }
 </style>

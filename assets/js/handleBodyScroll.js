@@ -2,7 +2,7 @@ import { disableBodyScroll } from "body-scroll-lock";
 
 export function handleBodyScroll(container) {
   disableBodyScroll(container, {
-    allowTouchMove: (el) => {
+    allowTouchMove: el => {
       // console.log(el);
       return (
         el.tagName === "CANVAS" ||
@@ -10,10 +10,11 @@ export function handleBodyScroll(container) {
         el.tagName === "LABEL" ||
         el.tagName === "INPUT" ||
         el.tagName === "A" ||
+        el.classList.contains("ignore-dbs") ||
         el.classList.contains("pointer") ||
         el.classList.contains("interactive") ||
         el.classList.contains("fs-modal")
       );
-    },
+    }
   });
 }

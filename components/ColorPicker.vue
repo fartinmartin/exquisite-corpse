@@ -1,10 +1,20 @@
 <template>
   <div class="picker-wrap">
     <Panel class="picker">
-      <div class="slider" id="hue" ref="hue" @click="handleHueChange">
+      <div
+        class="slider ignore-dbs"
+        id="hue"
+        ref="hue"
+        @click="handleHueChange"
+      >
         <div class="pointer" ref="huePointer" />
       </div>
-      <div class="slider mt" id="sat" ref="sat" @click="handleSatChange">
+      <div
+        class="slider mt ignore-dbs"
+        id="sat"
+        ref="sat"
+        @click="handleSatChange"
+      >
         <div class="pointer" ref="satPointer" />
         <div class="to-white" />
         <div class="to-black" />
@@ -195,6 +205,7 @@ export default {
   .to-white,
   .to-black {
     position: absolute;
+    pointer-events: none;
     width: 100%;
     height: 100%;
   }
