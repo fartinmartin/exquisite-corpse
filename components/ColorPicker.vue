@@ -5,7 +5,11 @@
         class="slider ignore-dbs"
         id="hue"
         ref="hue"
-        @click="handleHueChange"
+        @mousedown="hueDrag = true"
+        @mouseup="hueDrag = false"
+        @mouseleave="hueDrag = false"
+        @click="handleHueClick"
+        @mousemove="handleHueDrag"
       >
         <div class="pointer" ref="huePointer" />
       </div>
@@ -13,7 +17,11 @@
         class="slider mt ignore-dbs"
         id="sat"
         ref="sat"
-        @click="handleSatChange"
+        @mousedown="satDrag = true"
+        @mouseup="satDrag = false"
+        @mouseleave="satDrag = false"
+        @click="handleSatClick"
+        @mousemove="handleSatDrag"
       >
         <div class="pointer" ref="satPointer" />
         <div class="to-white" />
@@ -37,7 +45,7 @@ export default {
   props: {
     color: { type: String }
   },
-  data: () => ({ currentColor: null }),
+  data: () => ({ currentColor: null, hueDrag: false, satDrag: false }),
   mounted() {
     this.currentColor = this.color || "#ff0000";
     this.$refs.huePointer.style.left = `${(this.hsl.h / 360) * 100}%`;
@@ -58,22 +66,9 @@ export default {
     },
     textColor() {
       if (!this.currentColor) return "#000000";
-
-      let hex = this.currentColor.slice(1);
-      const bw = true;
-
-      const r = parseInt(hex.slice(0, 2), 16);
-      const g = parseInt(hex.slice(2, 4), 16);
-      const b = parseInt(hex.slice(4, 6), 16);
-
-      if (bw) {
-        return r * 0.299 + g * 0.587 + b * 0.114 > 186 ? "#000000" : "#FFFFFF";
-      } else {
-        r = (255 - r).toString(16);
-        g = (255 - g).toString(16);
-        b = (255 - b).toString(16);
-        return "#" + padZero(r) + padZero(g) + padZero(b);
-      }
+      return tinycolor
+        .mostReadable(this.currentColor, ["black", "white"])
+        .toHexString();
     },
     buttonStyles() {
       return `
@@ -89,6 +84,12 @@ export default {
     }
   },
   methods: {
+    handleHueClick(e) {
+      this.handleHueChange(e);
+    },
+    handleHueDrag(e) {
+      this.hueDrag && this.handleHueChange(e);
+    },
     handleHueChange(e) {
       const root = this.$refs.hue;
       const width = root.clientWidth;
@@ -97,11 +98,10 @@ export default {
 
       let h, p;
       if (left < 0) {
-        h = 0;
-        p = 0;
+        h = p = 0;
       } else if (left > width) {
         h = 359;
-        p = 359;
+        p = 100;
       } else {
         const percent = (left * 100) / width;
         p = percent;
@@ -116,6 +116,12 @@ export default {
           l: this.hsl.l
         }).toHex()}`;
       }
+    },
+    handleSatClick(e) {
+      this.handleSatChange(e);
+    },
+    handleSatDrag(e) {
+      this.satDrag && this.handleSatChange(e);
     },
     handleSatChange(e) {
       const root = this.$refs.sat;
@@ -171,7 +177,7 @@ export default {
   position: absolute;
   pointer-events: auto;
   z-index: 1000;
-  top: calc((40px / 6) + 20px + 1rem + 4px);
+  top: calc((40px / 6) + 20px + 1rem + 4px + 1px);
   left: -10px;
   width: auto;
   max-width: 544px;
