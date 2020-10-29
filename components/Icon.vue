@@ -1,6 +1,6 @@
 <template>
   <div class="icon" :class="{ interactive, 'look-at-me': shimmer }">
-    <img v-if="svg" :src="require(`~/assets/img/${svg}.svg`)" />
+    <img v-if="svg" :src="require(`~/assets/img/${svg}.svg`)" alt="" />
     <slot />
   </div>
 </template>

@@ -1,6 +1,6 @@
 <template>
   <Panel color="blue" interactive no-padding>
-    <img :src="drawing.thumb" />
+    <img :src="drawing.thumb" :alt="drawing.title" />
   </Panel>
 </template>
 

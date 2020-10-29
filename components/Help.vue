@@ -3,13 +3,13 @@
     <div class="help-wrap">
       <div class="example">
         <Panel class="section" color="blue" no-padding>
-          <img src="~/assets/img/tutorial/top.png" alt="" />
+          <img src="~/assets/img/tutorial/top.png" alt="example top" />
         </Panel>
         <Panel class="section mt mb" color="blue" no-padding>
-          <img src="~/assets/img/tutorial/mid.png" alt="" />
+          <img src="~/assets/img/tutorial/mid.png" alt="example mid" />
         </Panel>
         <Panel class="section" color="blue" no-padding>
-          <img src="~/assets/img/tutorial/bot.png" alt="" />
+          <img src="~/assets/img/tutorial/bot.png" alt="example bot" />
         </Panel>
       </div>
 
@@ -33,7 +33,7 @@
           <Button color="yellow">
             <nuxt-link to="/draw" @click="closeMe">
               <span class="icon hom">
-                <img src="~/assets/img/toolbar/draw.svg" />
+                <img src="~/assets/img/toolbar/draw.svg" alt="" />
               </span>
               start drawing!
             </nuxt-link>

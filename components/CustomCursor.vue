@@ -1,33 +1,40 @@
 <template>
   <div id="cursor" ref="cursorRef">
-    <img v-show="isLoading" src="~/assets/img/cursor/loading.svg" />
+    <img v-show="isLoading" src="~/assets/img/cursor/loading.svg" alt="" />
     <img
       v-show="!isLoading && state === 'auto'"
       src="~/assets/img/cursor/auto.svg"
+      alt=""
     />
     <img
       v-show="!isLoading && state === 'pointer'"
       src="~/assets/img/cursor/pointer.svg"
+      alt=""
     />
     <img
       v-show="!isLoading && state === 'disabled'"
       src="~/assets/img/cursor/disabled.svg"
+      alt=""
     />
     <img
       v-show="!isLoading && state === 'grab'"
       src="~/assets/img/cursor/grab.svg"
+      alt=""
     />
     <img
       v-show="!isLoading && state === 'draw'"
       src="~/assets/img/cursor/draw.svg"
+      alt=""
     />
     <img
       v-show="!isLoading && state === 'erase'"
       src="~/assets/img/cursor/erase.svg"
+      alt=""
     />
     <img
       v-show="!isLoading && state === 'fill'"
       src="~/assets/img/cursor/fill.svg"
+      alt=""
     />
     <div v-show="tooltip" class="tooltip" ref="tooltip">{{ tooltip }}</div>
   </div>
