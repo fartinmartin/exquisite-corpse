@@ -8,13 +8,13 @@ const config = {
   ...nuxtConfig,
   dev: false,
   debug: false,
-  buildDir: "nuxt",
+  buildDir: "nuxt"
 };
 
 const nuxt = new Nuxt(config);
 
 exports.ssrapp = functions.https.onRequest(async (req, res) => {
+  res.set("Cache-Control", "public, max-age=300, s-maxage=600"); // 5min & 10min
   await nuxt.ready();
-  // res.set("Cache-Control", "public, max-age=30, s-maxage=30");
   nuxt.render(req, res);
 });
