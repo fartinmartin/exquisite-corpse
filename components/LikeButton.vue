@@ -1,5 +1,5 @@
 <template>
-  <button @click="handleClick">
+  <button @click="handleClick" :aria-label="isLiked ? 'unlike' : 'like'">
     <Icon
       style="width: auto;"
       :class="{ liked: isLiked }"

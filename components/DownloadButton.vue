@@ -1,5 +1,5 @@
 <template>
-  <button @click="saveImage" data-tooltip="download">
+  <button @click="saveImage" data-tooltip="download" aria-label="download">
     <Icon svg="icons/download" />
   </button>
 </template>

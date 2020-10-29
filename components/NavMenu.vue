@@ -1,6 +1,6 @@
 <template>
   <div class="menu">
-    <button @click.prevent="openHelp" data-tooltip="help">
+    <button @click.prevent="openHelp" data-tooltip="help" aria-label="help">
       <Icon svg="icons/info" :shimmer="this.$route.name === 'index'" />
     </button>
     <nuxt-link to="/gallery" data-tooltip="gallery">

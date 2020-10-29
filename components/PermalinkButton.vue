@@ -1,5 +1,8 @@
 <template>
-  <button @click="copyURL">
+  <button
+    @click="copyURL"
+    :aria-label="isCopied ? 'link copied!' : 'share link'"
+  >
     <Icon :data-tooltip="isCopied ? 'link copied!' : 'share link'">
       <transition name="slide-fade">
         <img

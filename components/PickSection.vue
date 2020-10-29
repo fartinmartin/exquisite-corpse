@@ -2,7 +2,7 @@
   <div>
     <Panel class="info-panel">
       <span>pick a section to start drawing!</span>
-      <button @click.prevent="openHelp">
+      <button @click.prevent="openHelp" aria-label="help">
         <Icon svg="icons/info" />
       </button>
     </Panel>

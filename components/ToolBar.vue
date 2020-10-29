@@ -17,6 +17,7 @@
         <button
           @click="decrementSize"
           data-tooltip="smaller"
+          aria-label="smaller"
           :disabled="!canShrink"
         >
           <Icon svg="toolbar/size-down" />
@@ -25,6 +26,7 @@
         <button
           @click="incrementSize"
           data-tooltip="bigger"
+          aria-label="bigger"
           :disabled="!canGrow"
         >
           <Icon svg="toolbar/size-up" />
@@ -32,15 +34,26 @@
       </div>
 
       <div class="tool-group edits">
-        <button @click="undoCanvas" data-tooltip="undo" :disabled="cantUndo">
+        <button
+          @click="undoCanvas"
+          data-tooltip="undo"
+          aria-label="undo"
+          :disabled="cantUndo"
+        >
           <Icon svg="toolbar/undo" />
         </button>
-        <button @click="redoCanvas" data-tooltip="redo" :disabled="cantRedo">
+        <button
+          @click="redoCanvas"
+          data-tooltip="redo"
+          aria-label="redo"
+          :disabled="cantRedo"
+        >
           <Icon svg="toolbar/redo" />
         </button>
         <button
           @click="clearCanvas"
           data-tooltip="clear"
+          aria-label="clear"
           :disabled="isDrawingEmpty"
         >
           <Icon svg="toolbar/clear" />
@@ -51,6 +64,7 @@
         <button
           @click="$emit('start-save')"
           data-tooltip="save"
+          aria-label="save"
           :disabled="isDrawingEmpty"
         >
           <Icon svg="toolbar/save" />
@@ -67,6 +81,7 @@
           :class="{ active: color === palette.current }"
           :style="{ backgroundColor: color }"
           @click="setColor(color)"
+          aria-label="color swatch"
         ></button>
         <input
           style="display: none"
@@ -74,7 +89,12 @@
           id="addColor"
           @change="addColor($event)"
         />
-        <button class="add-color ignore-dbs" @click="togglePicker">
+        <button
+          class="add-color ignore-dbs"
+          @click="togglePicker"
+          data-tooltip="add color swatch"
+          aria-label="add color swatch"
+        >
           <span :style="addColorButtonStyles">+</span>
         </button>
         <ColorPicker

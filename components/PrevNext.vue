@@ -5,6 +5,7 @@
       :disabled="isFirstPage"
       @click="$emit('prev')"
       :data-tooltip="isFirstPage ? `this is the first page! :)` : `go back`"
+      :aria-label="isFirstPage ? `this is the first page! :)` : `go back`"
     >
       <Icon>
         <img src="~/assets/img/icons/arrow.svg" alt="" />
@@ -17,6 +18,9 @@
       :disabled="isLastPage"
       @click="$emit('next')"
       :data-tooltip="
+        isLastPage ? `no more ${currentType} :(` : `more ${currentType}!`
+      "
+      :aria-label="
         isLastPage ? `no more ${currentType} :(` : `more ${currentType}!`
       "
     >
