@@ -1,3 +1,5 @@
+<sup>⚠️ This branch evolved from [`exquisite-corpse/vuex`](https://github.com/fartinmartin/exquisite-corpse/tree/vuex) and then became [`exquisite-corpse/firebase`](https://github.com/fartinmartin/exquisite-corpse/tree/firebase)!</sup>
+
 # exquisite-corpse
 
 - [Figma prototype](https://www.figma.com/file/RNg8lCVQnMU5HAeYxu03UT/Exquisite-Corpse-Club?node-id=0%3A1).
