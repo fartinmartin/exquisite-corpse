@@ -1,4 +1,4 @@
-<sup>⚠️ This is an "experimental branch—watch me convert this game to a Next.js app using React.js!</sup>
+<sup>⚠️ This is an "experimental" branch—watch me convert [exquisite corpse club](https://github.com/fartinmartin/exquisite-corpse) to a Next.js app using React.js!</sup>
 
 # exquisite corpse club™
 
