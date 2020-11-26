@@ -1,0 +1,10 @@
+{
+  "files.exclude": {
+    ".vscode": true,
+    ".next": true,
+    "node_modules/": true,
+    "README.md": true,
+    "yarn.lock": true,
+    ".gitignore": true
+  }
+}
