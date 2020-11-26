@@ -1,3 +1,5 @@
+<sup>⚠️ This is an "experimental branch—watch me convert this game to a Next.js app using React.js!</sup>
+
 # exquisite corpse club™
 
 - [Figma prototype](https://www.figma.com/proto/RNg8lCVQnMU5HAeYxu03UT/exquisite-corpse-club?node-id=40%3A25&scaling=min-zoom)
