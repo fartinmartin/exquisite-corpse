@@ -1,4 +1,4 @@
-<sup>⚠️ This is an "experimental" branch—watch me convert [exquisite corpse club](https://github.com/fartinmartin/exquisite-corpse) to a Next.js app using React.js!</sup>
+<sup>⚠️ This is an "experimental" branch—watch me (eventually) convert [exquisite corpse club](https://github.com/fartinmartin/exquisite-corpse) to a Next.js app using React.js!</sup>
 
 # exquisite corpse club™
 
@@ -48,5 +48,6 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/deploym
 
 - https://leerob.io/blog/nextjs-firebase-serverless
 - https://medium.com/@karlfrascari/best-of-next-js-multiple-dynamic-routes-and-seo-388e3ec373c0
+- https://arunoda.me/blog/what-is-nextjs-issg
 
 -->
