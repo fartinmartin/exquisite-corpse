@@ -1,0 +1,11 @@
+{
+	"files.exclude": {
+		"firestore.indexes.json": true,
+		"firestore-debug.log": true,
+		"package-lock.json": true,
+		"ui-debug.log": true,
+		".eslintrc.cjs": true,
+		".prettierrc": true,
+		".firebaserc": true
+	}
+}
