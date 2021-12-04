@@ -1,5 +1,8 @@
 {
 	"files.exclude": {
+		".svelte-kit": true,
+		".vscode": true,
+		"node_modules": true,
 		"firestore.indexes.json": true,
 		"firestore-debug.log": true,
 		"package-lock.json": true,
