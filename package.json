@@ -2,7 +2,7 @@
 	"name": "exquisite-corpse",
 	"version": "0.0.1",
 	"scripts": {
-		"emulate": "firebase emulators:start",
+		"emulate": "firebase emulators:start --import seed --export-on-exit",
 		"dev": "svelte-kit dev",
 		"build": "svelte-kit build",
 		"package": "svelte-kit package",
