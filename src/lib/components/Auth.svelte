@@ -1,13 +1,13 @@
 <script>
 	import { auth } from '$lib/firebase';
 	import {
+		onAuthStateChanged,
 		signInAnonymously,
 		signInWithPopup,
 		linkWithPopup,
+		signInWithCredential,
 		GoogleAuthProvider,
-		EmailAuthProvider,
-		linkWithCredential,
-		signInWithCredential
+		EmailAuthProvider // TODO: incorporate this option?
 	} from 'firebase/auth';
 	import { onMount } from 'svelte';
 	import { user } from '$lib/stores';
@@ -15,8 +15,14 @@
 	onMount(async () => {
 		// TODO: create user collection document with profile collection and append profile obj to $user?
 		try {
-			const res = await signInAnonymously(auth);
-			$user = res.user;
+			onAuthStateChanged(auth, async (firebaseUser) => {
+				if (firebaseUser) {
+					$user = firebaseUser;
+				} else {
+					const res = await signInAnonymously(auth);
+					$user = res.user;
+				}
+			});
 		} catch (error) {
 			console.error(error);
 		}
@@ -53,7 +59,7 @@
 
 	const signOut = () => {
 		auth.signOut();
-		$user = null; // TODO: sign in anonymously again?
+		$user = null; // TODO: sign in anonymously again? no, this is done via onAuthStateChange
 	};
 </script>
 
