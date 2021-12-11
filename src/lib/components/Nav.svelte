@@ -1,6 +1,5 @@
 <script>
 	import { user } from '$lib/stores';
-	$: console.log($user);
 </script>
 
 <a href="/">home</a>

@@ -13,3 +13,4 @@
 </script>
 
 <h1>user: {user}</h1>
+<a href="@{user}/section-title-sluggified">mock section</a>
