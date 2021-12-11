@@ -19,8 +19,8 @@
 				if (firebaseUser) {
 					$user = firebaseUser;
 				} else {
-					const res = await signInAnonymously(auth);
-					$user = res.user;
+					const result = await signInAnonymously(auth);
+					$user = result.user;
 				}
 			});
 		} catch (error) {
