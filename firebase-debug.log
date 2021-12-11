@@ -1,0 +1,62 @@
+[debug] [2021-12-11T17:50:47.055Z] ----------------------------------------------------------------------
+[debug] [2021-12-11T17:50:47.056Z] Command:       /Users/Martin/.nvm/versions/node/v16.13.0/bin/node /Users/Martin/.nvm/versions/node/v16.13.0/bin/firebase emulators:start --import seed --export-on-exit
+[debug] [2021-12-11T17:50:47.057Z] CLI Version:   9.23.0
+[debug] [2021-12-11T17:50:47.057Z] Platform:      darwin
+[debug] [2021-12-11T17:50:47.057Z] Node Version:  v16.13.0
+[debug] [2021-12-11T17:50:47.060Z] Time:          Sat Dec 11 2021 09:50:47 GMT-0800 (Pacific Standard Time)
+[debug] [2021-12-11T17:50:47.060Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2021-12-11T17:50:47.061Z] >>> [apiv2][query] GET https://firebase-public.firebaseio.com/cli.json [none]
+[debug] [2021-12-11T17:50:47.107Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2021-12-11T17:50:47.108Z] > authorizing via signed-in user (martin@martinlindberg.me)
+[info] i  emulators: Starting emulators: auth, firestore, storage {"metadata":{"emulator":{"name":"hub"},"message":"Starting emulators: auth, firestore, storage"}}
+[debug] [2021-12-11T17:50:47.113Z] [hub] writing locator at /var/folders/jn/5dnc4sjs5r14lk_1z__zgl3m0000gn/T/hub-ecc-sveltekit.json
+[info] i  firestore: Importing data from /Users/Martin/Sites/exquisite-corpse/seed/firestore_export/firestore_export.overall_export_metadata {"metadata":{"emulator":{"name":"firestore"},"message":"Importing data from /Users/Martin/Sites/exquisite-corpse/seed/firestore_export/firestore_export.overall_export_metadata"}}
+[debug] [2021-12-11T17:50:47.118Z] Ignoring unsupported arg: projectId {"metadata":{"emulator":{"name":"firestore"},"message":"Ignoring unsupported arg: projectId"}}
+[debug] [2021-12-11T17:50:47.118Z] Ignoring unsupported arg: auto_download {"metadata":{"emulator":{"name":"firestore"},"message":"Ignoring unsupported arg: auto_download"}}
+[debug] [2021-12-11T17:50:47.118Z] Starting Firestore Emulator with command {"binary":"java","args":["-Dgoogle.cloud_firestore.debug_log_level=FINE","-Duser.language=en","-jar","/Users/Martin/.cache/firebase/emulators/cloud-firestore-emulator-v1.13.1.jar","--host","localhost","--port",8081,"--seed_from_export","/Users/Martin/Sites/exquisite-corpse/seed/firestore_export/firestore_export.overall_export_metadata","--rules","/Users/Martin/Sites/exquisite-corpse/firestore.rules"],"optionalArgs":["port","webchannel_port","host","rules","functions_emulator","seed_from_export"],"joinArgs":false} {"metadata":{"emulator":{"name":"firestore"},"message":"Starting Firestore Emulator with command {\"binary\":\"java\",\"args\":[\"-Dgoogle.cloud_firestore.debug_log_level=FINE\",\"-Duser.language=en\",\"-jar\",\"/Users/Martin/.cache/firebase/emulators/cloud-firestore-emulator-v1.13.1.jar\",\"--host\",\"localhost\",\"--port\",8081,\"--seed_from_export\",\"/Users/Martin/Sites/exquisite-corpse/seed/firestore_export/firestore_export.overall_export_metadata\",\"--rules\",\"/Users/Martin/Sites/exquisite-corpse/firestore.rules\"],\"optionalArgs\":[\"port\",\"webchannel_port\",\"host\",\"rules\",\"functions_emulator\",\"seed_from_export\"],\"joinArgs\":false}"}}
+[info] i  firestore: Firestore Emulator logging to firestore-debug.log {"metadata":{"emulator":{"name":"firestore"},"message":"Firestore Emulator logging to \u001b[1mfirestore-debug.log\u001b[22m"}}
+[debug] [2021-12-11T17:50:47.316Z] <<< [apiv2][status] GET https://firebase-public.firebaseio.com/cli.json 200
+[debug] [2021-12-11T17:50:47.316Z] <<< [apiv2][body] GET https://firebase-public.firebaseio.com/cli.json {"cloudBuildErrorAfter":1594252800000,"cloudBuildWarnAfter":1590019200000,"defaultNode10After":1594252800000,"minVersion":"3.0.5","node8DeploysDisabledAfter":1613390400000,"node8RuntimeDisabledAfter":1615809600000,"node8WarnAfter":1600128000000}
+[debug] [2021-12-11T17:50:48.516Z] Dec 11, 2021 9:50:48 AM com.google.cloud.datastore.emulator.firestore.websocket.WebSocketServer start
+INFO: Started WebSocket server on ws://localhost:60205
+ {"metadata":{"emulator":{"name":"firestore"},"message":"Dec 11, 2021 9:50:48 AM com.google.cloud.datastore.emulator.firestore.websocket.WebSocketServer start\nINFO: Started WebSocket server on ws://localhost:60205\n"}}
+[debug] [2021-12-11T17:50:48.561Z] API endpoint: http:// {"metadata":{"emulator":{"name":"firestore"},"message":"API endpoint: http://"}}
+[debug] [2021-12-11T17:50:48.561Z] localhost:8081
+If you are using a library that supports the FIRESTORE_EMULATOR_HOST environment variable, run:
+
+   export FIRESTORE_EMULATOR_HOST=localhost:8081
+
+Dev App Server is now running.
+
+ {"metadata":{"emulator":{"name":"firestore"},"message":"localhost:8081\nIf you are using a library that supports the FIRESTORE_EMULATOR_HOST environment variable, run:\n\n   export FIRESTORE_EMULATOR_HOST=localhost:8081\n\nDev App Server is now running.\n\n"}}
+[info] i  auth: Importing config from /Users/Martin/Sites/exquisite-corpse/seed/auth_export/config.json {"metadata":{"emulator":{"name":"database"},"message":"Importing config from /Users/Martin/Sites/exquisite-corpse/seed/auth_export/config.json"}}
+[info] i  auth: Importing accounts from /Users/Martin/Sites/exquisite-corpse/seed/auth_export/accounts.json {"metadata":{"emulator":{"name":"database"},"message":"Importing accounts from /Users/Martin/Sites/exquisite-corpse/seed/auth_export/accounts.json"}}
+[debug] [2021-12-11T17:50:49.955Z] Ignoring unsupported arg: port {"metadata":{"emulator":{"name":"storage"},"message":"Ignoring unsupported arg: port"}}
+[debug] [2021-12-11T17:50:50.196Z] Temp file directory for storage emulator: /var/folders/jn/5dnc4sjs5r14lk_1z__zgl3m0000gn/T/firebase/storage/blobs {"metadata":{"emulator":{"name":"storage"},"message":"Temp file directory for storage emulator: /var/folders/jn/5dnc4sjs5r14lk_1z__zgl3m0000gn/T/firebase/storage/blobs"}}
+[debug] [2021-12-11T17:50:51.400Z] Ignoring unsupported arg: auto_download {"metadata":{"emulator":{"name":"ui"},"message":"Ignoring unsupported arg: auto_download"}}
+[debug] [2021-12-11T17:50:51.401Z] Ignoring unsupported arg: port {"metadata":{"emulator":{"name":"ui"},"message":"Ignoring unsupported arg: port"}}
+[debug] [2021-12-11T17:50:51.401Z] Starting Emulator UI with command {"binary":"node","args":["/Users/Martin/.cache/firebase/emulators/ui-v1.6.4/server.bundle.js"],"optionalArgs":[],"joinArgs":false} {"metadata":{"emulator":{"name":"ui"},"message":"Starting Emulator UI with command {\"binary\":\"node\",\"args\":[\"/Users/Martin/.cache/firebase/emulators/ui-v1.6.4/server.bundle.js\"],\"optionalArgs\":[],\"joinArgs\":false}"}}
+[info] i  ui: Emulator UI logging to ui-debug.log {"metadata":{"emulator":{"name":"ui"},"message":"Emulator UI logging to \u001b[1mui-debug.log\u001b[22m"}}
+[debug] [2021-12-11T17:50:51.454Z] Web / API server started at localhost:4000
+ {"metadata":{"emulator":{"name":"ui"},"message":"Web / API server started at localhost:4000\n"}}
+[info] 
+┌─────────────────────────────────────────────────────────────┐
+│ ✔  All emulators ready! It is now safe to connect your app. │
+│ i  View Emulator UI at http://localhost:4000                │
+└─────────────────────────────────────────────────────────────┘
+
+┌────────────────┬────────────────┬─────────────────────────────────┐
+│ Emulator       │ Host:Port      │ View in Emulator UI             │
+├────────────────┼────────────────┼─────────────────────────────────┤
+│ Authentication │ localhost:9099 │ http://localhost:4000/auth      │
+├────────────────┼────────────────┼─────────────────────────────────┤
+│ Firestore      │ localhost:8081 │ http://localhost:4000/firestore │
+├────────────────┼────────────────┼─────────────────────────────────┤
+│ Storage        │ localhost:9199 │ http://localhost:4000/storage   │
+└────────────────┴────────────────┴─────────────────────────────────┘
+  Emulator Hub running at localhost:4400
+  Other reserved ports: 4500
+
+Issues? Report them at https://github.com/firebase/firebase-tools/issues and attach the *-debug.log files.
+ 

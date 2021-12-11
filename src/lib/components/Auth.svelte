@@ -1,8 +1,8 @@
 <script>
-	import { auth } from './firebase';
+	import { auth } from '$lib/firebase';
 	import { signInAnonymously, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 	import { onMount } from 'svelte';
-	import { user } from './stores';
+	import { user } from '$lib/stores';
 
 	onMount(async () => {
 		try {
@@ -13,3 +13,15 @@
 		}
 	});
 </script>
+
+{#if $user}
+	<button>signup/convert anon</button>
+	<pre>{JSON.stringify($user, undefined, 2)}</pre>
+{/if}
+
+<style>
+	pre {
+		width: 55ch;
+		overflow: scroll;
+	}
+</style>
