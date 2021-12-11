@@ -13,6 +13,7 @@
 	import { user } from '$lib/stores';
 
 	onMount(async () => {
+		// TODO: create user collection document with profile collection and append profile obj to $user?
 		try {
 			const res = await signInAnonymously(auth);
 			$user = res.user;
@@ -22,13 +23,14 @@
 	});
 
 	const signUp = async () => {
-		// TODO: create user collection with profile data and append profile obj to $user?
+		// TODO: create user collection document with profile collection and append profile obj to $user?
 		try {
 			const provider = new GoogleAuthProvider();
 			const result = await linkWithPopup(auth.currentUser, provider);
 			$user = result.user;
 		} catch (error) {
 			try {
+				// TODO: merge current anon user data with previously signed up user??
 				const credential = GoogleAuthProvider.credentialFromError(error);
 				const result = await signInWithCredential(auth, credential);
 				$user = result.user;
@@ -39,6 +41,7 @@
 	};
 
 	const signIn = async () => {
+		// TODO: append profile obj to $user?
 		try {
 			const provider = new GoogleAuthProvider();
 			const result = await signInWithPopup(auth, provider);
@@ -50,7 +53,7 @@
 
 	const signOut = () => {
 		auth.signOut();
-		$user = null;
+		$user = null; // TODO: sign in anonymously again?
 	};
 </script>
 
