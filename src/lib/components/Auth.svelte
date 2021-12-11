@@ -57,10 +57,7 @@
 		}
 	};
 
-	const signOut = () => {
-		auth.signOut();
-		$user = null; // TODO: sign in anonymously again? no, this is done via onAuthStateChange
-	};
+	const signOut = () => auth.signOut();
 </script>
 
 <div>
