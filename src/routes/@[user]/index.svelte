@@ -9,8 +9,11 @@
 </script>
 
 <script>
+	import { slugify } from '$lib/utils';
+
 	export let user;
+	export let title = slugify('cool title! man™');
 </script>
 
 <h1>user: {user}</h1>
-<a href="@{user}/section-title-sluggified">mock section</a>
+<a href="@{user}/{title}">mock section</a>

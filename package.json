@@ -3,6 +3,7 @@
 	"version": "0.0.1",
 	"scripts": {
 		"emulate": "firebase emulators:start --import seed --export-on-exit",
+		"kill-emu": "lsof -ti tcp:8080 | xargs kill",
 		"dev": "svelte-kit dev",
 		"build": "svelte-kit build",
 		"package": "svelte-kit package",
