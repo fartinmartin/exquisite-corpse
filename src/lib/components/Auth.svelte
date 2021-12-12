@@ -5,15 +5,14 @@
 		signInAnonymously,
 		linkWithPopup,
 		signInWithCredential,
-		GoogleAuthProvider,
-		EmailAuthProvider // TODO: incorporate this option?
+		GoogleAuthProvider
+		// EmailAuthProvider // TODO: incorporate this option?
 	} from 'firebase/auth';
 	import { onMount } from 'svelte';
 	import { user } from '$lib/stores';
-	import { serverTimestamp, doc, writeBatch, setDoc } from 'firebase/firestore';
+	import { serverTimestamp, doc, writeBatch } from 'firebase/firestore';
 
 	onMount(async () => {
-		// TODO: create user collection document with profile collection and append profile obj to $user?
 		try {
 			onAuthStateChanged(auth, async (firebaseUser) => {
 				if (firebaseUser) {
@@ -21,7 +20,7 @@
 					$user = firebaseUser;
 				} else {
 					const result = await signInAnonymously(auth);
-					await createFirebaseDocs(result.user.uid);
+					await createFirebaseUserDocs(result.user.uid);
 					// TODO: append firebase user doc to $user?
 					$user = result.user;
 				}
@@ -37,7 +36,7 @@
 			const result = await linkWithPopup(auth.currentUser, provider);
 
 			// TODO: merge current anon user firebase data with newly signed up user??
-			await createFirebaseDocs(result.user.uid);
+			await createFirebaseUserDocs(result.user.uid);
 
 			// TODO: append firebase user doc to $user?
 			$user = result.user;
@@ -55,7 +54,7 @@
 	const signOut = () => auth.signOut();
 	const getRandomUsername = () => 'test';
 
-	const createFirebaseDocs = async (uid) => {
+	const createFirebaseUserDocs = async (uid) => {
 		try {
 			const username = getRandomUsername();
 			const batch = writeBatch(db);
