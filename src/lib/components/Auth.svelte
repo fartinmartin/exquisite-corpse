@@ -24,6 +24,7 @@
 				} else {
 					const result = await signInAnonymously(auth);
 					const { pseudonym } = await createFirebaseUserDocs(result.user.uid);
+					console.log(result.user);
 					$user = { ...result.user, pseudonym };
 				}
 			});
@@ -40,6 +41,7 @@
 			await mergeAnonFirebaseDocsWithNewUser();
 			const { pseudonym } = await createFirebaseUserDocs(result.user.uid);
 
+			// linkWithPopup() doesn't trigger onAuthStateChanged(), we must set $user manually
 			$user = { ...result.user, pseudonym };
 		} catch (error) {
 			try {
@@ -73,7 +75,7 @@
 	};
 
 	const signOut = () => auth.signOut();
-	const getRandomPseudonym = () => 'test';
+	const getRandomPseudonym = () => 'test_' + Math.round(Math.random() * 100);
 </script>
 
 <div>

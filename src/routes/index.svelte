@@ -1,4 +1,15 @@
+<script context="module">
+	export const load = async ({ fetch }) => {
+		const res = await fetch('/corpse/random.json');
+		const data = await res.json();
+		return {
+			props: { data }
+		};
+	};
+</script>
+
 <script>
+	export let data;
 	// home: collectionGroup query (1 rando)
 	// gallery: collectionGroup query (limit 9)
 	// corpse (1): ?
@@ -11,3 +22,14 @@
 
 <h1>Welcome to SvelteKit</h1>
 <p>Visit <a href="https://kit.svelte.dev">kit.svelte.dev</a> to read the documentation</p>
+
+<pre>{JSON.stringify(data, undefined, 2)}</pre>
+
+<style>
+	pre {
+		width: 55ch;
+		height: 55ch;
+		overflow-x: hidden;
+		overflow-y: scroll;
+	}
+</style>

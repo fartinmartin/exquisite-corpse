@@ -22,3 +22,12 @@ export const storage = getStorage(app);
 connectAuthEmulator(auth, 'http://localhost:9099');
 connectFirestoreEmulator(db, 'localhost', 8080);
 connectStorageEmulator(storage, 'localhost', 9199);
+
+// import admin from 'firebase-admin';
+// import serviceAccount from '../../serviceAccountKey.json';
+
+// admin.initializeApp({
+// 	credential: admin.credential.cert(serviceAccount)
+// });
+
+// export const db_admin = admin.firestore();
