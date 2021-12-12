@@ -10,19 +10,21 @@
 	} from 'firebase/auth';
 	import { onMount } from 'svelte';
 	import { user } from '$lib/stores';
-	import { serverTimestamp, doc, writeBatch } from 'firebase/firestore';
+	import { serverTimestamp, doc, getDoc, getDocFromCache, writeBatch } from 'firebase/firestore';
 
 	onMount(async () => {
 		try {
 			onAuthStateChanged(auth, async (firebaseUser) => {
 				if (firebaseUser) {
-					// TODO: append firebase user doc to $user?
-					$user = firebaseUser;
+					const docRef = doc(db, 'users', firebaseUser.uid);
+					const docSnap = await getDoc(docRef);
+					const pseudonym = docSnap.data().pseudonym;
+
+					$user = { ...firebaseUser, pseudonym };
 				} else {
 					const result = await signInAnonymously(auth);
-					await createFirebaseUserDocs(result.user.uid);
-					// TODO: append firebase user doc to $user?
-					$user = result.user;
+					const { pseudonym } = await createFirebaseUserDocs(result.user.uid);
+					$user = { ...result.user, pseudonym };
 				}
 			});
 		} catch (error) {
@@ -35,36 +37,43 @@
 			const provider = new GoogleAuthProvider();
 			const result = await linkWithPopup(auth.currentUser, provider);
 
-			// TODO: merge current anon user firebase data with newly signed up user??
-			await createFirebaseUserDocs(result.user.uid);
+			await mergeAnonFirebaseDocsWithNewUser();
+			const { pseudonym } = await createFirebaseUserDocs(result.user.uid);
 
-			// TODO: append firebase user doc to $user?
-			$user = result.user;
+			$user = { ...result.user, pseudonym };
 		} catch (error) {
 			try {
 				const errorCred = GoogleAuthProvider.credentialFromError(error);
 				await signInWithCredential(auth, errorCred);
-				// TODO: merge current anon user firebase data with previously signed up user??
+				await mergeAnonFirebaseDocsWithNewUser();
 			} catch (error) {
 				console.error(error);
 			}
 		}
 	};
 
-	const signOut = () => auth.signOut();
-	const getRandomUsername = () => 'test';
-
 	const createFirebaseUserDocs = async (uid) => {
 		try {
-			const username = getRandomUsername();
+			const pseudonym = getRandomPseudonym();
 			const batch = writeBatch(db);
-			batch.set(doc(db, 'users', uid), { username, joinDate: serverTimestamp() });
-			batch.set(doc(db, 'users', uid, 'username', username), { uid });
+			batch.set(doc(db, 'users', uid), { pseudonym, joinDate: serverTimestamp() });
+			batch.set(doc(db, 'users', uid, 'pseudonym', pseudonym), { uid });
 			await batch.commit();
+			return { pseudonym };
 		} catch (error) {
 			console.error();
 		}
 	};
+
+	const mergeAnonFirebaseDocsWithNewUser = async () => {
+		// TODO: this, once I know how my docs/collections will work.
+		// Firebase will merge uid/login info together. I need to re-attribute
+		// any documents to the new doc(db, 'users', uid) user document
+		// Perhaps, adding an "originalArtist" key to work done anonymously?
+	};
+
+	const signOut = () => auth.signOut();
+	const getRandomPseudonym = () => 'test';
 </script>
 
 <div>
@@ -82,6 +91,8 @@
 <style>
 	pre {
 		width: 55ch;
-		overflow: scroll;
+		height: 55ch;
+		overflow-x: hidden;
+		overflow-y: scroll;
 	}
 </style>
