@@ -1,2 +1,16 @@
-<h1>Welcome to SvelteKit</h1>
-<p>Visit <a href="https://kit.svelte.dev">kit.svelte.dev</a> to read the documentation</p>
+<script>
+  import { user } from "$lib/stores";
+  import { onMount } from "svelte";
+
+  onMount(async () => {
+    const response = await fetch("/sentencer");
+    const data = await response.json();
+    console.log(data);
+  });
+</script>
+
+<h1>home</h1>
+
+<pre>
+  {JSON.stringify($user, undefined, 2)}
+</pre>
