@@ -1,0 +1,35 @@
+@import url("https://use.typekit.net/jsu1pje.css");
+
+:root {
+	--black: #231f20;
+	--white: #fff;
+
+	--blue-100: #deebff;
+	--blue-200: #81b2ff;
+	--blue-300: #0064ff;
+
+	--red-100: #fab4ac;
+	--red-200: #fb9200;
+	--red-300: #f44e3b;
+
+	--yellow-100: #fff29d;
+	--yellow-200: #fcda00;
+	--yellow-300: #fcba03;
+
+	--green-100: #d1ee7f;
+	--green-200: #a4dd00;
+	--green-300: #86b500;
+
+	--font-base: monotalic, sans-serif;
+	--font-narrow: monotalic-narrow, sans-serif;
+	--font-wide: monotalic-wide, sans-serif;
+}
+
+body {
+	background: var(--blue-100)
+		url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAAEklEQVQImWNgYGD4z0AswK4SAFXuAf8EPy+xAAAAAElFTkSuQmCC)
+		repeat;
+	background-blend-mode: overlay;
+	font-family: var(--font-base);
+	user-select: none;
+}

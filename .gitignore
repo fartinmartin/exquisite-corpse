@@ -5,5 +5,6 @@ node_modules
 /package
 .env
 .env.*
-firebase-debug.log
-serviceAccountKey.json
+!.env.example
+vite.config.js.timestamp-*
+vite.config.ts.timestamp-*
