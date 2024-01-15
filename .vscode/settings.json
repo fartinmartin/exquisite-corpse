@@ -1,14 +1,14 @@
 {
 	"files.exclude": {
-		".svelte-kit": true,
-		".vscode": true,
-		"node_modules": true,
-		"firestore.indexes.json": true,
-		"firestore-debug.log": true,
-		"package-lock.json": true,
-		"ui-debug.log": true,
-		".eslintrc.cjs": true,
-		".prettierrc": true,
-		".firebaserc": true
+		// ".svelte-kit": true,
+		// ".vscode": true,
+		// "node_modules": true,
+		// "firestore.indexes.json": true,
+		// "firestore-debug.log": true,
+		// "package-lock.json": true,
+		// "ui-debug.log": true,
+		// ".eslintrc.cjs": true,
+		// ".prettierrc": true,
+		// ".firebaserc": true
 	}
 }

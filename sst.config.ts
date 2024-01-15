@@ -1,24 +1,18 @@
 import type { SSTConfig } from "sst";
-import { Bucket, SvelteKitSite } from "sst/constructs";
+import { FrontendStack } from "./stacks/frontend";
 
 export default {
 	config(_input) {
 		return {
 			name: "exquisite-corpse",
-			region: "us-west-1",
+			region: "us-west-2",
 		};
 	},
 	stacks(app) {
-		app.stack(function Site({ stack }) {
-			const bucket = new Bucket(stack, "public");
-
-			const site = new SvelteKitSite(stack, "site", {
-				bind: [bucket],
-			});
-
-			stack.addOutputs({
-				url: site.url,
-			});
-		});
+		app
+			// .stack(StorageStack)
+			// .stack(ApiStack)
+			// .stack(AuthStack)
+			.stack(FrontendStack);
 	},
 } satisfies SSTConfig;
