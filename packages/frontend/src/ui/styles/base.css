@@ -33,3 +33,39 @@ body {
 	font-family: var(--font-base);
 	user-select: none;
 }
+
+/*  */
+
+.panel {
+	--border-size: 2px;
+	--border-color: var(--red-100);
+	--box-shadow-size: 2px;
+	--box-shadow-color: var(--red-200);
+
+	border: var(--border-size) solid var(--border-color);
+	/* box-shadow: var(--box-shadow-size) var(--box-shadow-size) 0 0
+    var(--box-shadow-color); */
+	background: var(--white);
+
+	padding: 1rem;
+}
+
+.panel.yellow {
+	--border-color: var(--yellow-200);
+	--box-shadow-color: var(--yellow-300);
+}
+
+.panel.blue {
+	--border-color: var(--blue-200);
+	--box-shadow-color: var(--blue-300);
+}
+
+.panel.red {
+	--border-color: var(--red-200);
+	--box-shadow-color: var(--red-300);
+}
+
+.panel.green {
+	--border-color: var(--green-200);
+	--box-shadow-color: var(--green-300);
+}
