@@ -1,0 +1,10 @@
+{
+	"name": "@exquisite/functions",
+	"version": "0.0.0",
+	"dependencies": {
+		"@exquisite/core": "*"
+	},
+	"devDependencies": {
+		"@types/aws-lambda": "^8.10.137"
+	}
+}

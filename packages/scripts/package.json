@@ -1,0 +1,13 @@
+{
+	"name": "@exquisite/scripts",
+	"version": "0.0.0",
+	"dependencies": {
+		"@exquisite/core": "*"
+	},
+	"scripts": {
+		"shell": "sst shell tsx"
+	},
+	"devDependencies": {
+		"tsx": "^4.7.2"
+	}
+}
