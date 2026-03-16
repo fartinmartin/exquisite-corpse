@@ -6,7 +6,14 @@ settings:
 
 importers:
 
-  .: {}
+  .:
+    devDependencies:
+      '@varlock/1password-plugin':
+        specifier: ^0.2.3
+        version: 0.2.3(varlock@0.5.0)
+      varlock:
+        specifier: ^0.5.0
+        version: 0.5.0
 
   packages/app:
     dependencies:
@@ -32,6 +39,9 @@ importers:
       '@sveltejs/vite-plugin-svelte':
         specifier: ^7.0.0
         version: 7.0.0(svelte@5.53.12)(vite@8.0.0(@types/node@25.5.0)(esbuild@0.27.4)(tsx@4.21.0))
+      '@varlock/1password-plugin':
+        specifier: ^0.2.3
+        version: 0.2.3(varlock@0.5.0)
       svelte:
         specifier: ^5.53.12
         version: 5.53.12
@@ -1041,6 +1051,12 @@ packages:
     resolution: {integrity: sha512-dTLI8PEXhjUC7B9Kre+u0XznO696BhXcTlOn0/6kf1fHaQW8+VjJAVHJ3eTI14ZapTxdkOmc80HblPQLaEeJdg==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
 
+  '@varlock/1password-plugin@0.2.3':
+    resolution: {integrity: sha512-AyxbkW0Bd0guxEVWNzxFK1TCAAxRbZ45t1JMTEW6nlPvfZcYEdP24tbZBYmx0OE1whWpt1YNSJmsUAMftvtClg==}
+    engines: {node: '>=22'}
+    peerDependencies:
+      varlock: ^0.5.0
+
   acorn@8.16.0:
     resolution: {integrity: sha512-UVJyE9MttOsBQIDKw1skb9nAwQuR5wuGD3+82K6JgJlm/Y+KI92oNsMNGZCYdDsVtRHSak0pcV5Dno5+4jh9sw==}
     engines: {node: '>=0.4.0'}
@@ -1543,6 +1559,11 @@ packages:
     peerDependenciesMeta:
       typescript:
         optional: true
+
+  varlock@0.5.0:
+    resolution: {integrity: sha512-jfFNdzK+pznQWyp6eHv7X3iImEmNG7KaGZL2sQJxTlifxRtIwgNknLKmds8zPUhUMdcCybhJy52lewgscu8pkg==}
+    engines: {bun: '>=1.3.3', node: '>=22'}
+    hasBin: true
 
   vite@8.0.0:
     resolution: {integrity: sha512-fPGaRNj9Zytaf8LEiBhY7Z6ijnFKdzU/+mL8EFBaKr7Vw1/FWcTBAMW0wLPJAGMPX38ZPVCVgLceWiEqeoqL2Q==}
@@ -2275,6 +2296,10 @@ snapshots:
 
   '@typescript-eslint/types@8.57.0': {}
 
+  '@varlock/1password-plugin@0.2.3(varlock@0.5.0)':
+    dependencies:
+      varlock: 0.5.0
+
   acorn@8.16.0: {}
 
   aria-query@5.3.1: {}
@@ -2735,6 +2760,8 @@ snapshots:
   valibot@1.2.0(typescript@5.9.3):
     optionalDependencies:
       typescript: 5.9.3
+
+  varlock@0.5.0: {}
 
   vite@8.0.0(@types/node@25.5.0)(esbuild@0.27.4)(tsx@4.21.0):
     dependencies:

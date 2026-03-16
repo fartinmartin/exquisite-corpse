@@ -1,6 +1,6 @@
 import type { ActorIdentifier } from "@atcute/lexicons";
 import { getOAuthClient } from "@ecc/core";
-import { fail, redirect } from "@sveltejs/kit";
+import { fail, isRedirect, redirect } from "@sveltejs/kit";
 import type { Actions } from "./$types.js";
 
 export const actions: Actions = {
@@ -19,7 +19,7 @@ export const actions: Actions = {
       });
       throw redirect(302, url.toString());
     } catch (e) {
-      if (e instanceof Response) throw e;
+      if (isRedirect(e)) throw e;
       return fail(500, { error: "Failed to initiate sign-in. Check your handle and try again." });
     }
   },

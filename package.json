@@ -12,5 +12,9 @@
   "engines": {
     "node": ">=20",
     "pnpm": ">=9"
+  },
+  "devDependencies": {
+    "@varlock/1password-plugin": "^0.2.3",
+    "varlock": "^0.5.0"
   }
 }

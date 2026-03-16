@@ -8,16 +8,13 @@ dist/
 *.db-shm
 *.db-wal
 
-# Drizzle migrations output
-drizzle/
-
 # Generated lexicon JSON (derived from Valibot schemas)
 packages/lexicons/generated/
 
 # Environment
 .env
 .env.*
-!.env.example
+!.env.schema
 
 # macOS
 .DS_Store

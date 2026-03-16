@@ -9,7 +9,9 @@
   {#if data.user}
     <p>Signed in as {data.user.did}</p>
     <a href="/draw">Draw</a>
-    <a href="/logout">Sign out</a>
+    <form method="POST" action="/logout">
+      <button type="submit">Sign out</button>
+    </form>
   {:else}
     <a href="/login">Sign in with Bluesky</a>
     <a href="/draw">Draw as guest</a>
