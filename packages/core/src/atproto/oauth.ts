@@ -17,7 +17,7 @@ import {
 import { eq } from "drizzle-orm";
 import type { Did } from "@atcute/lexicons";
 import { db } from "../db/index.js";
-import { oauthSessions, oauthStates } from "../db/schema.js";
+import { oauthSessions, oauthStates } from "./oauth.sql.js";
 
 let _client: OAuthClient | null = null;
 
