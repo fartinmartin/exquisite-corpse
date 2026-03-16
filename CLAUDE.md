@@ -26,9 +26,12 @@ pnpm db:migrate        # apply migration
 
 - **Valibot** for all runtime validation (Standard Schema compliant — works directly with remote function validators)
 - **Namespace pattern** for core business logic: `Section.buildRecord()`, `Render.toPng()`
+- **errore** for error handling in `@ecc/core` — return errors as values, don't throw. At SvelteKit route boundaries, convert with `throw error(404, result.message)`.
+- **Colocated files** — tables in `*.sql.ts`, errors in `*.errors.ts`, next to the code that uses them
 - **Svelte 5 runes** throughout: `$state`, `$derived`, `$effect`, `$props`, `$bindable`
 - **`.svelte.ts`** extension for reactive service files
 - **`use` prefix** for singleton factory functions: `useMyService()`
+- **`createID(prefix)`** for all primary keys: `createID('section')` → `sec_<nanoid>`
 - Drizzle migrations live in `packages/core/drizzle/` — commit them
 - `@ecc/core` must be built before `@ecc/app` (it ships compiled JS, not raw TS)
 

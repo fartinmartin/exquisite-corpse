@@ -25,7 +25,9 @@
     "@atcute/oauth-node-client": "^1.1.0",
     "@ecc/lexicons": "workspace:*",
     "@libsql/client": "^0.17.0",
-    "drizzle-orm": "^0.45.1"
+    "drizzle-orm": "^0.45.1",
+    "errore": "^0.14.0",
+    "nanoid": "^5.1.7"
   },
   "devDependencies": {
     "@types/node": "^25.5.0",

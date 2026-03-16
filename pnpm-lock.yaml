@@ -78,6 +78,12 @@ importers:
       drizzle-orm:
         specifier: ^0.45.1
         version: 0.45.1(@libsql/client@0.17.0)
+      errore:
+        specifier: ^0.14.0
+        version: 0.14.0
+      nanoid:
+        specifier: ^5.1.7
+        version: 5.1.7
     devDependencies:
       '@types/node':
         specifier: ^25.5.0
@@ -1224,6 +1230,10 @@ packages:
       sqlite3:
         optional: true
 
+  errore@0.14.0:
+    resolution: {integrity: sha512-2RI7BGdxWlJe6yJ3DK0pIvLNzXEE4M41VmF2HrH7C2HldTjYiORQNJ+ufsvAvOUGW/4rRHPFOpooP3ebIRIEXw==}
+    hasBin: true
+
   esbuild-register@3.6.0:
     resolution: {integrity: sha512-H2/S7Pm8a9CL1uhp9OvjwrBh5Pvx0H8qVOxNu8Wed9Y7qv56MPtq+GGM8RJpq6glYJn9Wspr8uw7l55uyinNeg==}
     peerDependencies:
@@ -2356,6 +2366,8 @@ snapshots:
   drizzle-orm@0.45.1(@libsql/client@0.17.0):
     optionalDependencies:
       '@libsql/client': 0.17.0
+
+  errore@0.14.0: {}
 
   esbuild-register@3.6.0(esbuild@0.25.12):
     dependencies:
