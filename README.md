@@ -6,27 +6,47 @@
 
 ## The _what_ club?
 
-An exquisite corpse is a collaborative drawing made up of three sections. Each section is drawn by a different artist who can’t see the other sections. The results are sometimes strange but always entertaining. I adapted this analog collaborative drawing game for the remote world of 2020!
+An exquisite corpse is a collaborative drawing made up of three sections. Each section is drawn by a different artist who can't see the other sections. The results are sometimes strange but always entertaining. I adapted this analog collaborative drawing game for the remote world of 2020!
 
 ## The tech deets
 
-The exquisite corpse club™ is a progressive web app built with Vue.js, Nuxt.js, and Google Firebase.
+This branch is a ground-up rewrite using:
 
-## Build setup
+- **[SvelteKit](https://kit.svelte.dev/)** — frontend and server
+- **[AT Protocol](https://atproto.com/)** (via [atcute](https://github.com/mary-ext/atcute)) — identity, OAuth, and user data storage on the Bluesky network
+- **[Drizzle ORM](https://orm.drizzle.team/) + [Turso](https://turso.tech/)** — server-side DB for guest sessions, likes, and profile caching
+- **[@fartinmartin/canvas-paint](https://github.com/fartinmartin/canvas-paint)** — drawing engine (stroke commands as canonical data, PNG rendered server-side)
+
+Logged-in users authenticate with their Bluesky account (any PDS). Guest users get an ephemeral session; their drawings are hosted on the game's own account and can be migrated when they sign up.
+
+## Packages
+
+```
+packages/
+  lexicons/   @ecc/lexicons  — Valibot schemas + atproto lexicon JSON generator
+  core/       @ecc/core      — DB, OAuth, business logic (Section, Render namespaces)
+  app/        @ecc/app       — SvelteKit app
+  scripts/    @ecc/scripts   — one-time tooling (e.g. drawing migration)
+```
+
+## Dev setup
 
 ```bash
 # install dependencies
-$ npm install
+pnpm install
 
-# serve with hot reload at localhost:3000
-$ npm run dev
+# run the app
+pnpm dev
 
-# build for production and launch server
-$ npm run build
-$ npm run start
+# type-check all packages
+pnpm check
 
-# generate static project
-$ npm run generate
+# generate atproto lexicon JSON from Valibot schemas
+pnpm lexicons:generate
+
+# DB migrations
+pnpm db:generate
+pnpm db:migrate
 ```
 
-For detailed explanation on how things work, check out [Nuxt.js docs](https://nuxtjs.org).
+Copy `packages/app/.env.example` to `packages/app/.env` and fill in your values before running.

@@ -1,0 +1,16 @@
+{
+  "name": "@ecc/scripts",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "migrate:drawings": "tsx src/migrate-drawings.ts"
+  },
+  "dependencies": {
+    "@ecc/lexicons": "workspace:*"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.0",
+    "typescript": "^5.0.0"
+  }
+}
