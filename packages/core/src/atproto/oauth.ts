@@ -46,7 +46,7 @@ export function getOAuthClient(): OAuthClient {
 
   const sessionStore: SessionStore = {
     async get(key: Did) {
-      const row = await db.query.oauthSessions.findFirst({ where: eq(oauthSessions.key, key) });
+      const [row] = await db.select().from(oauthSessions).where(eq(oauthSessions.key, key)).limit(1);
       return row ? (JSON.parse(row.session) as StoredSession) : undefined;
     },
     async set(key: Did, session: StoredSession) {
@@ -62,7 +62,7 @@ export function getOAuthClient(): OAuthClient {
 
   const stateStore: StateStore = {
     async get(key: string) {
-      const row = await db.query.oauthStates.findFirst({ where: eq(oauthStates.key, key) });
+      const [row] = await db.select().from(oauthStates).where(eq(oauthStates.key, key)).limit(1);
       return row ? (JSON.parse(row.state) as StoredState) : undefined;
     },
     async set(key: string, state: StoredState) {
