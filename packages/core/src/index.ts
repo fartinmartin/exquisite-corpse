@@ -7,6 +7,7 @@ export { useTransaction, createTransaction, afterTx } from "./db/transaction.js"
 export * from "./atproto/oauth.sql.js";
 export * from "./section/section.sql.js";
 export * from "./gallery/gallery.sql.js";
+export * from "./corpse/corpse.sql.js";
 
 // Errors
 export * from "./atproto/atproto.errors.js";

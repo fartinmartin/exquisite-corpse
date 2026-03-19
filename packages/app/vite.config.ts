@@ -6,4 +6,8 @@ export default defineConfig({
   server: {
     allowedHosts: true,
   },
+  ssr: {
+    // node-canvas is a native addon — cannot be bundled by Vite
+    external: ["canvas"],
+  },
 });
