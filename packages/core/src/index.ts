@@ -16,6 +16,7 @@ export * from "./gallery/gallery.errors.js";
 
 // Business logic
 export { getOAuthClient } from "./atproto/oauth.js";
+export { Pds } from "./atproto/pds.js";
 export { Section } from "./section/index.js";
 export { Render } from "./render/index.js";
 

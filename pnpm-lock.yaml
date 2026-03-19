@@ -63,6 +63,9 @@ importers:
 
   packages/core:
     dependencies:
+      '@atcute/atproto':
+        specifier: ^3.1.10
+        version: 3.1.10
       '@atcute/client':
         specifier: ^4.2.1
         version: 4.2.1
@@ -137,6 +140,9 @@ importers:
         version: 5.9.3
 
 packages:
+
+  '@atcute/atproto@3.1.10':
+    resolution: {integrity: sha512-+GKZpOc0PJcdWMQEkTfg/rSNDAAHxmAUGBl60g2az15etqJn5WaUPNGFE2sB7hKpwi5Ue2h/L0OacINcE/JDDQ==}
 
   '@atcute/client@4.2.1':
     resolution: {integrity: sha512-ZBFM2pW075JtgGFu5g7HHZBecrClhlcNH8GVP9Zz1aViWR+cjjBsTpeE63rJs+FCOHFYlirUyo5L8SGZ4kMINw==}
@@ -1790,6 +1796,10 @@ packages:
     resolution: {integrity: sha512-B58NGBEoc8Y9MWWCQGl/gq9xBCe4IiKM0a2x7GZdQKOW5Exr8S1W24J6OgM1njK8xCRGvAJIL/MxXHf6SkmQKQ==}
 
 snapshots:
+
+  '@atcute/atproto@3.1.10':
+    dependencies:
+      '@atcute/lexicons': 1.2.9
 
   '@atcute/client@4.2.1':
     dependencies:
