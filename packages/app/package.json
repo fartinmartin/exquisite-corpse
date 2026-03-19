@@ -14,7 +14,9 @@
     "@atcute/lexicons": "^1.2.6",
     "@ecc/core": "workspace:*",
     "@ecc/lexicons": "workspace:*",
-    "@fartinmartin/canvas-paint": "^1.0.0"
+    "@fartinmartin/canvas-paint": "file:/Users/Martin/code/fartinmartin/canvas-paint",
+    "canvas": "^3.2.1",
+    "joyful": "^1.1.1"
   },
   "devDependencies": {
     "@sveltejs/adapter-node": "^5.5.4",

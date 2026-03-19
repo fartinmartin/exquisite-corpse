@@ -11,6 +11,9 @@ export const SectionRecordSchema = v.object({
   $type: v.literal("club.exquisitecorpse.section"),
   section: SectionTypeSchema,
   drawing: DrawingDataSchema,
+  title: v.optional(v.string()),
+  /** Local DB id of the assembled corpse this section belongs to. Null until matched. */
+  corpseId: v.optional(v.string()),
   /** Opaque ID linking this record to a guest session. Omitted for authenticated users. */
   guestId: v.optional(v.string()),
   createdAt: v.pipe(v.string(), v.isoTimestamp()),
