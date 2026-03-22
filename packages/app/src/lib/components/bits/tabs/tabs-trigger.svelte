@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
+  import type { HTMLButtonAttributes } from 'svelte/elements';
   import { useTabs } from './tabs-state.svelte.js';
 
   let {
@@ -7,16 +8,17 @@
     disabled = false,
     children,
     class: className,
+    ...rest
   }: {
     value: string;
     disabled?: boolean;
     children: Snippet;
     class?: string;
-  } = $props();
+  } & Omit<HTMLButtonAttributes, 'value' | 'disabled' | 'class'> = $props();
 
   const tabs = useTabs();
   const active = $derived(tabs.isActive(value));
-  const variant = tabs.variant;
+  const variant = $derived(tabs.variant);
 </script>
 
 <button
@@ -31,6 +33,7 @@
   tabindex={active ? 0 : -1}
   {disabled}
   onclick={() => tabs.activate(value)}
+  {...rest}
 >
   {@render children()}
 </button>

@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
-  import { uid, type Size } from '@/styles/types';
+  import type { HTMLInputAttributes } from 'svelte/elements';
+  import { uid, type Size } from '$lib/components/styles/types';
   import Label from './label.svelte';
 
   let {
@@ -16,6 +17,7 @@
     onchange,
     onblur,
     class: className,
+    ...rest
   }: {
     label: string;
     value?: string;
@@ -29,7 +31,7 @@
     onchange?: (value: string) => void;
     onblur?: () => void;
     class?: string;
-  } = $props();
+  } & Omit<HTMLInputAttributes, 'value' | 'type' | 'placeholder' | 'disabled' | 'class'> = $props();
 
   const inputId = uid('input');
 
@@ -55,6 +57,7 @@
       aria-invalid={invalid || undefined}
       oninput={handleInput}
       {onblur}
+      {...rest}
     />
     {#if suffix}
       <div class="suffix">

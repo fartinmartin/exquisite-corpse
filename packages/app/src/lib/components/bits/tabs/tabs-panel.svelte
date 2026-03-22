@@ -1,16 +1,17 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
+  import type { HTMLAttributes } from 'svelte/elements';
   import { useTabs } from './tabs-state.svelte.js';
 
   let {
     value,
     children,
     class: className,
-  }: {
-    value: string;
-    children: Snippet;
-    class?: string;
-  } = $props();
+    ...rest
+  }: { value: string; children: Snippet; class?: string } & Omit<
+    HTMLAttributes<HTMLDivElement>,
+    'class'
+  > = $props();
 
   const tabs = useTabs();
   const active = $derived(tabs.isActive(value));
@@ -26,6 +27,7 @@
     data-state="active"
     data-slot="tabs-content"
     tabindex={0}
+    {...rest}
   >
     {@render children()}
   </div>

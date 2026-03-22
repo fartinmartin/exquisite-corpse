@@ -29,6 +29,9 @@ importers:
       '@fartinmartin/canvas-paint':
         specifier: ^1.1.0
         version: 1.1.0
+      '@radix-ui/colors':
+        specifier: ^3.0.0
+        version: 3.0.0
       canvas:
         specifier: ^3.2.1
         version: 3.2.1
@@ -744,6 +747,9 @@ packages:
 
   '@polka/url@1.0.0-next.29':
     resolution: {integrity: sha512-wwQAWhWSuHaag8c4q/KN/vCoeOJYshAIvMQwD4GpSb3OiZklFfvAgmj0VCBBImRpuF/aFgIRzllXlVX93Jevww==}
+
+  '@radix-ui/colors@3.0.0':
+    resolution: {integrity: sha512-FUOsGBkHrYJwCSEtWRCIfQbZG7q1e6DgxCIOe1SUQzDe/7rXXeA47s8yCn6fuTNQAj1Zq4oTFi9Yjp3wzElcxg==}
 
   '@rolldown/binding-android-arm64@1.0.0-rc.9':
     resolution: {integrity: sha512-lcJL0bN5hpgJfSIz/8PIf02irmyL43P+j1pTCfbD1DbLkmGRuFIA4DD3B3ZOvGqG0XiVvRznbKtN0COQVaKUTg==}
@@ -2233,6 +2239,8 @@ snapshots:
   '@oxc-project/types@0.115.0': {}
 
   '@polka/url@1.0.0-next.29': {}
+
+  '@radix-ui/colors@3.0.0': {}
 
   '@rolldown/binding-android-arm64@1.0.0-rc.9':
     optional: true

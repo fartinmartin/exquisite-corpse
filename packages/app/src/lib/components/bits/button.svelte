@@ -1,8 +1,18 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
-  import type { HTMLButtonAttributes } from 'svelte/elements';
-  import type { Variant, Appearance, Size } from '@/styles/types';
-  import { openURL } from '@/lib/cep';
+  import type { HTMLAnchorAttributes, HTMLButtonAttributes } from 'svelte/elements';
+  import type { Variant, Appearance, Size } from '$lib/components/styles/types';
+
+  type Props = (HTMLButtonAttributes | HTMLAnchorAttributes) & {
+    variant?: Variant;
+    appearance?: Appearance;
+    size?: Size;
+    iconOnly?: boolean;
+    href?: string;
+    disabled?: boolean;
+    children: Snippet;
+    class?: string;
+  };
 
   let {
     variant,
@@ -11,40 +21,38 @@
     disabled = false,
     iconOnly = false,
     href,
-    onclick,
     children,
     class: className,
     ...rest
-  }: HTMLButtonAttributes & {
-    variant?: Variant;
-    appearance?: Appearance;
-    size?: Size;
-    iconOnly?: boolean;
-    href?: string;
-    children: Snippet;
-    class?: string;
-  } = $props();
+  }: Props = $props();
 
-  function handleClick(e: MouseEvent & { currentTarget: HTMLButtonElement }) {
-    if (href) {
-      openURL(href);
-    }
-    onclick?.(e);
-  }
+  const shared = $derived({
+    class: ['button', iconOnly && 'is-icon-only', className],
+    'data-variant': variant,
+    'data-appearance': appearance,
+    'data-size': size,
+  });
 </script>
 
-<button
-  type="button"
-  class={['button', iconOnly && 'is-icon-only', className]}
-  data-variant={variant}
-  data-appearance={appearance}
-  data-size={size}
-  {disabled}
-  onclick={handleClick}
-  {...rest}
->
-  {@render children()}
-</button>
+{#if href}
+  <a
+    {href}
+    aria-disabled={disabled || undefined}
+    {...shared}
+    {...rest as HTMLAnchorAttributes}
+  >
+    {@render children()}
+  </a>
+{:else}
+  <button
+    type="button"
+    {disabled}
+    {...shared}
+    {...rest as HTMLButtonAttributes}
+  >
+    {@render children()}
+  </button>
+{/if}
 
 <style>
   .button {

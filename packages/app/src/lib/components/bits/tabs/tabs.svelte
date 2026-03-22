@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
+  import type { HTMLAttributes } from 'svelte/elements';
   import { createTabs, type TabsVariant } from './tabs-state.svelte.js';
 
   let {
@@ -8,13 +9,14 @@
     onchange,
     children,
     class: className,
+    ...rest
   }: {
     value?: string;
     variant?: TabsVariant;
     onchange?: (value: string) => void;
     children: Snippet;
     class?: string;
-  } = $props();
+  } & Omit<HTMLAttributes<HTMLDivElement>, 'class'> = $props();
 
   // svelte-ignore state_referenced_locally
   const tabs = createTabs(value, variant);
@@ -28,7 +30,7 @@
   });
 </script>
 
-<div class={['tabs', className]} data-slot="tabs">
+<div class={['tabs', className]} data-slot="tabs" {...rest}>
   {@render children()}
 </div>
 

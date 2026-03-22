@@ -1,5 +1,6 @@
 <script lang="ts">
-  import { uid, type Size } from '@/styles/types';
+  import type { HTMLTextareaAttributes } from 'svelte/elements';
+  import { uid, type Size } from '$lib/components/styles/types';
   import Label from './label.svelte';
 
   let {
@@ -12,6 +13,7 @@
     size,
     onchange,
     class: className,
+    ...rest
   }: {
     label: string;
     value?: string;
@@ -22,7 +24,7 @@
     size?: Size;
     onchange?: (value: string) => void;
     class?: string;
-  } = $props();
+  } & Omit<HTMLTextareaAttributes, 'value' | 'placeholder' | 'disabled' | 'rows' | 'class'> = $props();
 
   const textareaId = uid('textarea');
 
@@ -43,7 +45,8 @@
     {rows}
     data-size={size}
     aria-invalid={invalid || undefined}
-    oninput={handleInput}>{value}</textarea
+    oninput={handleInput}
+    {...rest}>{value}</textarea
   >
 </Label>
 

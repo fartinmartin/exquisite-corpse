@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
-  import type { Variant } from '@/styles/types';
+  import type { HTMLAttributes } from 'svelte/elements';
+  import type { Variant } from '$lib/components/styles/types';
 
   let {
     variant,
@@ -9,6 +10,7 @@
     shape,
     children,
     class: className,
+    ...rest
   }: {
     variant?: Variant;
     appearance?: 'soft' | 'outlined' | 'soft-outlined' | 'ghost';
@@ -16,7 +18,7 @@
     shape?: 'square' | 'rounded';
     children: Snippet;
     class?: string;
-  } = $props();
+  } & Omit<HTMLAttributes<HTMLSpanElement>, 'class'> = $props();
 </script>
 
 <span
@@ -25,6 +27,7 @@
   data-appearance={appearance}
   data-size={size}
   data-shape={shape}
+  {...rest}
 >
   {@render children()}
 </span>

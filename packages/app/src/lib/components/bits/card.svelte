@@ -1,16 +1,15 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
+  import type { HTMLAttributes } from 'svelte/elements';
 
   let {
     children,
     class: className,
-  }: {
-    children: Snippet;
-    class?: string;
-  } = $props();
+    ...rest
+  }: { children: Snippet; class?: string } & Omit<HTMLAttributes<HTMLDivElement>, 'class'> = $props();
 </script>
 
-<div class={['card', className]}>
+<div class={['card', className]} {...rest}>
   {@render children()}
 </div>
 

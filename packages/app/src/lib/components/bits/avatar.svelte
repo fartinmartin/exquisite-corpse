@@ -1,17 +1,20 @@
 <script lang="ts">
+  import type { HTMLAttributes } from 'svelte/elements';
+
   let {
     src,
     alt = '',
     fallback,
     size = '3rem',
     class: className,
+    ...rest
   }: {
     src?: string;
     alt?: string;
     fallback?: string;
     size?: string;
     class?: string;
-  } = $props();
+  } & Omit<HTMLAttributes<HTMLDivElement>, 'class'> = $props();
 
   let imgError = $state(false);
 
@@ -20,7 +23,7 @@
   }
 </script>
 
-<div class={['avatar', className]} style:--avatar-size={size}>
+<div class={['avatar', className]} style:--avatar-size={size} {...rest}>
   {#if src && !imgError}
     <img class="avatar-image" {src} {alt} onerror={handleError} />
   {:else}

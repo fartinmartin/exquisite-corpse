@@ -1,18 +1,19 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
+  import type { HTMLLabelAttributes } from 'svelte/elements';
 
   let {
     for: htmlFor,
     children,
     class: className,
-  }: {
-    for?: string;
-    children: Snippet;
-    class?: string;
-  } = $props();
+    ...rest
+  }: { for?: string; children: Snippet; class?: string } & Omit<
+    HTMLLabelAttributes,
+    'for' | 'class'
+  > = $props();
 </script>
 
-<label class={['label', className]} for={htmlFor}>
+<label class={['label', className]} for={htmlFor} {...rest}>
   {@render children()}
 </label>
 

@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
-  import { uid } from '@/styles/types';
+  import type { HTMLSelectAttributes } from 'svelte/elements';
+  import { uid } from '$lib/components/styles/types';
   import Label from './label.svelte';
 
   let {
@@ -10,6 +11,7 @@
     children,
     class: className,
     onchange,
+    ...rest
   }: {
     label?: string;
     value?: string;
@@ -17,7 +19,7 @@
     children: Snippet;
     class?: string;
     onchange?: (value: string) => void;
-  } = $props();
+  } & Omit<HTMLSelectAttributes, 'value' | 'disabled' | 'class'> = $props();
 
   const selectId = uid('select');
 
@@ -31,12 +33,12 @@
 {#if label}
   <Label for={selectId} class={className}>
     <span>{label}</span>
-    <select id={selectId} class="select" {value} {disabled} onchange={handleChange}>
+    <select id={selectId} class="select" {value} {disabled} onchange={handleChange} {...rest}>
       {@render children()}
     </select>
   </Label>
 {:else}
-  <select class={['select', className]} {value} {disabled} onchange={handleChange}>
+  <select class={['select', className]} {value} {disabled} onchange={handleChange} {...rest}>
     {@render children()}
   </select>
 {/if}

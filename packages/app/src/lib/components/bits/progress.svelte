@@ -1,5 +1,6 @@
 <script lang="ts">
-  import type { Variant } from '@/styles/types';
+  import type { HTMLProgressAttributes } from 'svelte/elements';
+  import type { Variant } from '$lib/components/styles/types';
 
   let {
     value,
@@ -14,8 +15,7 @@
     variant?: Variant;
     size?: 'sm' | 'md' | 'lg';
     class?: string;
-    [key: string]: any;
-  } = $props();
+  } & Omit<HTMLProgressAttributes, 'value' | 'max' | 'class'> = $props();
 </script>
 
 <progress
@@ -35,12 +35,18 @@
     border: none;
     border-radius: var(--radius-full, 9999px);
     overflow: hidden;
-    background-color: var(--color-fill-normal, var(--color-neutral-fill-normal));
+    background-color: var(
+      --color-fill-normal,
+      var(--color-neutral-fill-normal)
+    );
   }
 
   /* Webkit (Chrome, Safari, CEP) */
   .progress::-webkit-progress-bar {
-    background-color: var(--color-fill-normal, var(--color-neutral-fill-normal));
+    background-color: var(
+      --color-fill-normal,
+      var(--color-neutral-fill-normal)
+    );
     border-radius: var(--radius-full, 9999px);
   }
 

@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
-  import type { Variant } from '@/styles/types';
+  import type { HTMLAttributes } from 'svelte/elements';
+  import type { Variant } from '$lib/components/styles/types';
 
   let {
     variant,
@@ -10,6 +11,7 @@
     children,
     icon,
     class: className,
+    ...rest
   }: {
     variant?: Variant;
     appearance?: 'outlined' | 'soft' | 'soft-outlined';
@@ -18,7 +20,7 @@
     children?: Snippet;
     icon?: Snippet;
     class?: string;
-  } = $props();
+  } & Omit<HTMLAttributes<HTMLDivElement>, 'class'> = $props();
 </script>
 
 <div
@@ -27,6 +29,7 @@
   data-appearance={appearance}
   data-size={size}
   role="alert"
+  {...rest}
 >
   {#if icon}
     {@render icon()}

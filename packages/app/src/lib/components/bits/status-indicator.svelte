@@ -1,14 +1,22 @@
 <script lang="ts">
+  import type { HTMLAttributes } from 'svelte/elements';
+
   let {
     status,
     class: className,
+    ...rest
   }: {
     status: 'disconnected' | 'connecting' | 'connected' | 'error';
     class?: string;
-  } = $props();
+  } & Omit<HTMLAttributes<HTMLSpanElement>, 'class'> = $props();
 </script>
 
-<span class={['status-dot', className]} data-status={status} role="status" aria-label={status}
+<span
+  class={['status-dot', className]}
+  data-status={status}
+  role="status"
+  aria-label={status}
+  {...rest}
 ></span>
 
 <style>

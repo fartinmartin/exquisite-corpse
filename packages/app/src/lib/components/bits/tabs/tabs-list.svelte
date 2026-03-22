@@ -1,20 +1,19 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
+  import type { HTMLAttributes } from 'svelte/elements';
   import { useTabs } from './tabs-state.svelte.js';
 
   let {
     children,
     class: className,
-  }: {
-    children: Snippet;
-    class?: string;
-  } = $props();
+    ...rest
+  }: { children: Snippet; class?: string } & Omit<HTMLAttributes<HTMLDivElement>, 'class'> = $props();
 
   const tabs = useTabs();
-  const variant = tabs.variant;
+  const variant = $derived(tabs.variant);
 </script>
 
-<div class={['tabs-list', `variant-${variant}`, className]} role="tablist" data-slot="tabs-list">
+<div class={['tabs-list', `variant-${variant}`, className]} role="tablist" data-slot="tabs-list" {...rest}>
   {@render children()}
 </div>
 

@@ -1,17 +1,20 @@
 <script lang="ts">
+  import type { HTMLInputAttributes } from 'svelte/elements';
+
   let {
     checked = $bindable(false),
     disabled = false,
     label,
     class: className,
     onchange,
+    ...rest
   }: {
     checked?: boolean;
     disabled?: boolean;
     label?: string;
     class?: string;
     onchange?: (checked: boolean) => void;
-  } = $props();
+  } & Omit<HTMLInputAttributes, 'checked' | 'disabled' | 'type' | 'class'> = $props();
 
   function handleChange(event: Event) {
     const target = event.target as HTMLInputElement;
@@ -29,6 +32,7 @@
       {checked}
       {disabled}
       onchange={handleChange}
+      {...rest}
     />
     {label}
   </label>
@@ -40,6 +44,7 @@
     {checked}
     {disabled}
     onchange={handleChange}
+    {...rest}
   />
 {/if}
 
