@@ -357,9 +357,9 @@
     --focus-ring-offset: 4px;
     --focus-ring-style: solid;
     --focus-ring-width: 2px;
-    --font-body: var(--font-sans);
-    --font-heading: var(--font-sans);
-    --font-mono: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+    --font-body: var(--font-mono);
+    --font-heading: var(--font-mono);
+    --font-mono: "Space Mono", SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
     --font-sans: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     --font-serif: Georgia, Cambria, "Times New Roman", Times, serif;
     --font-weight-bold: 700;

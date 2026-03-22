@@ -1,0 +1,28 @@
+/* Game-specific global styles for Exquisite Corpse Club.
+   These override the generic baseline in global.css. */
+
+html {
+  text-transform: lowercase;
+  word-spacing: 1px;
+}
+
+/* Nothing in the game UI should be selectable by default.
+   Components that need selection (e.g. text inputs) opt in via user-select: text. */
+*,
+*::before,
+*::after {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+input,
+textarea {
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+/* Headings are same size as body — the monospace lowercase aesthetic
+   treats type scale as decorative, not hierarchical. */
+h1, h2, h3, h4, h5, h6 {
+  font-size: 1rem;
+}

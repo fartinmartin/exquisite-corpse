@@ -90,4 +90,19 @@
   --color-info-border-quiet: light-dark(var(--color-blue-100), var(--color-blue-800));
   --color-info-border-normal:light-dark(var(--color-blue-200), var(--color-blue-700));
   --color-info-border-loud:  light-dark(var(--color-blue-300), var(--color-blue-500));
+
+  /* --- body background ---
+     Dot grid: radial-gradient 1 px dot every 4 px, color adapts to mode. */
+  --body-bg-color: light-dark(var(--color-pink-50), var(--color-neutral-950));
+  --body-bg-dot:   light-dark(
+    color-mix(in srgb, var(--color-pink-400) 40%, transparent),
+    color-mix(in srgb, var(--color-neutral-600) 50%, transparent)
+  );
+  --body-bg-pattern: radial-gradient(circle, var(--body-bg-dot) 1px, transparent 1px);
+}
+
+body {
+  background-color: var(--body-bg-color);
+  background-image: var(--body-bg-pattern);
+  background-size: 4px 4px;
 }

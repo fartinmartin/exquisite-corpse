@@ -1,0 +1,8 @@
+/* CANVAS UTILITY
+   Max-width container matching the drawing canvas (544px).
+   Centers itself with auto margins. */
+.canvas {
+  width: 100%;
+  max-width: 544px;
+  margin-inline: auto;
+}

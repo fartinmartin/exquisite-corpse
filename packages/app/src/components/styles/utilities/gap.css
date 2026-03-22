@@ -1,0 +1,13 @@
+/* GAP UTILITY
+   Sets gap-related custom properties for cluster, repel, grid-auto, and flow
+   compositions simultaneously. Compose with any of those classes.
+   e.g. <div class="cluster gap-xs"> */
+
+.gap-3xs { --cluster-gap: var(--space-3xs); --repel-gap: var(--space-3xs); --grid-gap: var(--space-3xs); --flow-space: var(--space-3xs); }
+.gap-2xs { --cluster-gap: var(--space-2xs); --repel-gap: var(--space-2xs); --grid-gap: var(--space-2xs); --flow-space: var(--space-2xs); }
+.gap-xs  { --cluster-gap: var(--space-xs);  --repel-gap: var(--space-xs);  --grid-gap: var(--space-xs);  --flow-space: var(--space-xs);  }
+.gap-sm  { --cluster-gap: var(--space-sm);  --repel-gap: var(--space-sm);  --grid-gap: var(--space-sm);  --flow-space: var(--space-sm);  }
+.gap-md  { --cluster-gap: var(--space-md);  --repel-gap: var(--space-md);  --grid-gap: var(--space-md);  --flow-space: var(--space-md);  }
+.gap-lg  { --cluster-gap: var(--space-lg);  --repel-gap: var(--space-lg);  --grid-gap: var(--space-lg);  --flow-space: var(--space-lg);  }
+.gap-xl  { --cluster-gap: var(--space-xl);  --repel-gap: var(--space-xl);  --grid-gap: var(--space-xl);  --flow-space: var(--space-xl);  }
+.gap-2xl { --cluster-gap: var(--space-2xl); --repel-gap: var(--space-2xl); --grid-gap: var(--space-2xl); --flow-space: var(--space-2xl); }

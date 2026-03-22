@@ -2,10 +2,10 @@
   "font": {
     "$type": "fontFamily",
     "body": {
-      "$value": "{font.sans}"
+      "$value": "{font.mono}"
     },
     "heading": {
-      "$value": "{font.sans}"
+      "$value": "{font.mono}"
     },
     "sans": {
       "$value": [
@@ -20,7 +20,7 @@
       ]
     },
     "mono": {
-      "$value": ["SFMono-Regular", "Consolas", "Liberation Mono", "Menlo", "monospace"]
+      "$value": ["Space Mono", "SFMono-Regular", "Consolas", "Liberation Mono", "Menlo", "monospace"]
     },
     "serif": {
       "$value": ["Georgia", "Cambria", "Times New Roman", "Times", "serif"]
