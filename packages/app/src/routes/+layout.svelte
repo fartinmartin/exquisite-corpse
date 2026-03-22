@@ -1,8 +1,12 @@
 <script lang="ts">
-  import type { Snippet } from "svelte";
-  import "$lib/components/styles/app.css"
+  import EmojiFavicon from "$components/bits/emoji-favicon.svelte";
+  import "$components/styles/app.css"
 
-  let { children }: { children: Snippet } = $props();
+  let { children } = $props();
 </script>
+
+<svelte:head>
+  <EmojiFavicon emoji="🖼️"/>
+</svelte:head>
 
 {@render children()}
