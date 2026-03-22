@@ -18,6 +18,8 @@ export * from "./gallery/gallery.errors.js";
 export { getOAuthClient } from "./atproto/oauth.js";
 export { Pds } from "./atproto/pds.js";
 export { Section } from "./section/index.js";
+export { Gallery } from "./gallery/index.js";
+export { Corpse } from "./corpse/index.js";
 export { Render } from "./render/index.js";
 
 // Utilities

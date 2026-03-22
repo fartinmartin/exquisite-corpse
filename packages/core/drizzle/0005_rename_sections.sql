@@ -1,0 +1,1 @@
+ALTER TABLE `guest_drawings` RENAME TO `sections`;

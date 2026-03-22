@@ -9,7 +9,7 @@ import {
   type DrawingData,
 } from "@ecc/lexicons";
 import { useTransaction } from "../db/transaction.js";
-import { guestDrawings } from "./section.sql.js";
+import { sections } from "./section.sql.js";
 import { createID } from "../util/id.js";
 
 const RESERVATION_MINUTES = 30;
@@ -77,20 +77,20 @@ export namespace Section {
 
       for (const type of siblingTypes) {
         const [row] = await tx
-          .select({ id: guestDrawings.id, recordUri: guestDrawings.recordUri })
-          .from(guestDrawings)
+          .select({ id: sections.id, recordUri: sections.recordUri })
+          .from(sections)
           .where(
             and(
-              eq(guestDrawings.section, type),
-              eq(guestDrawings.moderationStatus, "approved"),
-              isNull(guestDrawings.corpseId),
+              eq(sections.section, type),
+              eq(sections.moderationStatus, "approved"),
+              isNull(sections.corpseId),
               or(
-                isNull(guestDrawings.reservedUntil),
-                lt(guestDrawings.reservedUntil, now)
+                isNull(sections.reservedUntil),
+                lt(sections.reservedUntil, now)
               )
             )
           )
-          .orderBy(sql`${guestDrawings.createdAt} DESC`)
+          .orderBy(sql`${sections.createdAt} DESC`)
           .limit(1);
 
         if (!row) return null;
@@ -103,29 +103,33 @@ export namespace Section {
         .map((s) => s!.id);
 
       await tx
-        .update(guestDrawings)
+        .update(sections)
         .set({ reservedUntil })
-        .where(inArray(guestDrawings.id, siblingIds));
+        .where(inArray(sections.id, siblingIds));
 
       return { siblings };
     });
   }
 
   /**
-   * Inserts a guest section row into the local DB after PDS write.
+   * Inserts a section row into the local DB after PDS write.
    */
-  export async function insertGuestDrawing(input: {
+  export async function insert(input: {
     recordUri: string;
     guestToken: string;
     section: SectionType;
+    blobCid?: string;
+    title?: string;
   }): Promise<string> {
     const id = createID("section");
     await useTransaction((tx) =>
-      tx.insert(guestDrawings).values({
+      tx.insert(sections).values({
         id,
         guestToken: input.guestToken,
         recordUri: input.recordUri,
         section: input.section,
+        blobCid: input.blobCid,
+        title: input.title,
         moderationStatus: "approved",
       })
     );
@@ -141,9 +145,9 @@ export namespace Section {
   ): Promise<void> {
     await useTransaction((tx) =>
       tx
-        .update(guestDrawings)
+        .update(sections)
         .set({ corpseId, reservedUntil: null })
-        .where(inArray(guestDrawings.id, siblingIds))
+        .where(inArray(sections.id, siblingIds))
     );
   }
 }
