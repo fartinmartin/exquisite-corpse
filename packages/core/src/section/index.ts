@@ -116,8 +116,9 @@ export namespace Section {
    */
   export async function insert(input: {
     recordUri: string;
-    guestToken: string;
     section: SectionType;
+    guestToken?: string;
+    did?: Did;
     blobCid?: string;
     title?: string;
   }): Promise<string> {
@@ -126,6 +127,7 @@ export namespace Section {
       tx.insert(sections).values({
         id,
         guestToken: input.guestToken,
+        did: input.did,
         recordUri: input.recordUri,
         section: input.section,
         blobCid: input.blobCid,

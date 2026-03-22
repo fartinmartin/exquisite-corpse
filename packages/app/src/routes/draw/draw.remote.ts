@@ -1,7 +1,7 @@
 import { command, getRequestEvent } from "$app/server";
 import { error } from "@sveltejs/kit";
 import * as v from "valibot";
-import { Section, Render, Pds, Corpse, createID } from "@ecc/core";
+import { Section, Render, Pds, Corpse, CorpseAssemblyError, createID } from "@ecc/core";
 import { DrawingDataSchema, SectionTypeSchema } from "@ecc/lexicons";
 import type { Did } from "@atcute/lexicons";
 import { getAuthContext } from "$lib/atproto/auth";
@@ -20,7 +20,7 @@ export const submitSection = command(SubmitSectionInput, async ({ drawing, secti
 
   // 1. Validate drawing data
   const drawingData = Section.validateDrawing(drawing);
-  if (!("width" in drawingData)) throw error(400, "Invalid drawing data");
+  if (drawingData instanceof Error) throw error(400, "Invalid drawing data");
 
   // 2. Render PNG
   const png = await Render.toPng(drawingData);
@@ -59,8 +59,9 @@ export const submitSection = command(SubmitSectionInput, async ({ drawing, secti
   // 8. Insert into sections table
   const sectionId = await Section.insert({
     recordUri,
-    guestToken: guestToken ?? `did:${auth!.did}`,
     section: sectionType,
+    guestToken: isGuest ? guestToken! : undefined,
+    did: isGuest ? undefined : auth!.did,
     blobCid: blob.ref.$link,
     title: title ?? "",
   });
@@ -74,7 +75,8 @@ export const submitSection = command(SubmitSectionInput, async ({ drawing, secti
     corpseId = createID("corpse");
     const siblingIds = Object.values(match.siblings).filter(Boolean).map((s) => s!.id);
     await Section.confirmMatch([sectionId, ...siblingIds], corpseId);
-    await Corpse.assemble(corpseId);
+    const assembled = await Corpse.assemble(corpseId);
+    if (assembled instanceof CorpseAssemblyError) throw error(500, assembled.message);
   }
 
   return { recordUri, sectionId, corpseId, matched: !!match };

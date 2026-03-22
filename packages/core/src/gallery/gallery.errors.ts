@@ -5,7 +5,3 @@ export class LikeConflictError extends errore.createTaggedError({
   message: "Already liked $subjectUri",
 }) {}
 
-export class CorpseNotFoundError extends errore.createTaggedError({
-  name: "CorpseNotFoundError",
-  message: "Corpse $id not found",
-}) {}

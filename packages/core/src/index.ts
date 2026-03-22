@@ -13,6 +13,7 @@ export * from "./corpse/corpse.sql.js";
 export * from "./atproto/atproto.errors.js";
 export * from "./section/section.errors.js";
 export * from "./gallery/gallery.errors.js";
+export * from "./corpse/corpse.errors.js";
 
 // Business logic
 export { getOAuthClient } from "./atproto/oauth.js";

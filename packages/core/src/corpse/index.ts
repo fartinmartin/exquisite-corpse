@@ -1,11 +1,12 @@
 import { eq } from "drizzle-orm";
 import type { Did } from "@atcute/lexicons";
-import { useTransaction, createTransaction } from "../db/transaction.js";
+import { useTransaction } from "../db/transaction.js";
 import { sections } from "../section/section.sql.js";
 import { corpses } from "./corpse.sql.js";
 import { Render } from "../render/index.js";
 import { Pds } from "../atproto/pds.js";
 import { createID } from "../util/id.js";
+import { CorpseAssemblyError } from "./corpse.errors.js";
 
 const CORPSE_COLLECTION = "club.exquisitecorpse.drawing" as const;
 const POST_COLLECTION = "app.bsky.feed.post" as const;
@@ -59,47 +60,54 @@ export namespace Corpse {
    * Assembles a complete corpse from three matched sections.
    * Composites their PNG blobs, writes a drawing record to the club PDS,
    * inserts into the local corpses table, and posts to the club's bsky feed.
+   *
+   * Note: PDS writes and DB insert are not atomic. If the DB insert fails after
+   * a successful PDS write, the corpse record will exist on PDS but not locally.
+   * The firehose indexer (Phase 5) will recover from this by re-indexing.
    */
-  export async function assemble(corpseId: string): Promise<void> {
+  export async function assemble(corpseId: string): Promise<void | CorpseAssemblyError> {
     const clubDid = process.env.ECC_DID as Did;
 
     // 1. Fetch the three section rows (ordered top → mid → bot)
     const rows = await useTransaction((tx) =>
-      tx
-        .select()
-        .from(sections)
-        .where(eq(sections.corpseId, corpseId))
+      tx.select().from(sections).where(eq(sections.corpseId, corpseId))
     );
 
     const order = ["top", "mid", "bot"] as const;
     const sorted = order.map((type) => {
       const row = rows.find((r) => r.section === type);
-      if (!row) throw new Error(`Missing ${type} section for corpse ${corpseId}`);
+      if (!row) return new CorpseAssemblyError({ corpseId, reason: `missing ${type} section` });
+      if (!row.blobCid) return new CorpseAssemblyError({ corpseId, reason: `missing blobCid on ${type} section` });
       return row;
     });
 
+    const firstError = sorted.find((r): r is CorpseAssemblyError => r instanceof CorpseAssemblyError);
+    if (firstError) return firstError;
+    const [topRow, midRow, botRow] = sorted as Exclude<typeof sorted[number], CorpseAssemblyError>[];
+
     // 2. Fetch each PNG blob from PDS
     const pngs = await Promise.all(
-      sorted.map(async (row) => {
-        if (!row.blobCid) throw new Error(`Missing blobCid for section ${row.id}`);
+      [topRow, midRow, botRow].map(async (row) => {
         const did = row.did ?? clubDid;
         const res = await fetch(
           `https://bsky.social/xrpc/com.atproto.sync.getBlob?did=${did}&cid=${row.blobCid}`
         );
-        if (!res.ok) throw new Error(`Blob fetch failed for ${row.blobCid}`);
+        if (!res.ok) return new CorpseAssemblyError({ corpseId, reason: `blob fetch failed for cid ${row.blobCid}` });
         return Buffer.from(await res.arrayBuffer());
       })
     );
 
+    const failedFetch = pngs.find((p): p is CorpseAssemblyError => p instanceof CorpseAssemblyError);
+    if (failedFetch) return failedFetch;
+
     // 3. Composite vertically
-    const compositePng = await Render.composite(pngs);
+    const compositePng = await Render.composite(pngs as Buffer[]);
 
     // 4. Upload composited blob to club PDS
     const client = await Pds.forClub();
     const compositeBlob = await Pds.uploadBlob(client, compositePng);
 
     // 5. Generate title
-    const [topRow, midRow, botRow] = sorted;
     const title = mashupTitle(topRow.title ?? "", midRow.title ?? "", botRow.title ?? "");
 
     // 6. Write drawing record to club PDS
@@ -115,22 +123,20 @@ export namespace Corpse {
     });
 
     // 7. Insert into local corpses table
-    await createTransaction(async () => {
-      await useTransaction((tx) =>
-        tx.insert(corpses).values({
-          id: createID("corpse"),
-          recordUri,
-          topUri: topRow.recordUri,
-          midUri: midRow.recordUri,
-          botUri: botRow.recordUri,
-          title,
-          moderationStatus: "approved",
-        })
-      );
-    });
+    await useTransaction((tx) =>
+      tx.insert(corpses).values({
+        id: createID("corpse"),
+        recordUri,
+        topUri: topRow.recordUri,
+        midUri: midRow.recordUri,
+        botUri: botRow.recordUri,
+        title,
+        moderationStatus: "approved",
+      })
+    );
 
     // 8. Write bsky post: composited image + title + @mentions of auth'd contributors
-    const mentionedDids = [...new Set(sorted.map((r) => r.did).filter(Boolean) as string[])];
+    const mentionedDids = [...new Set([topRow, midRow, botRow].map((r) => r.did).filter(Boolean) as string[])];
     const mentionText = mentionedDids.map((did) => `@${did}`).join(" ");
     const postText = mentionText ? `${title}\n\n${mentionText}` : title;
 
@@ -139,12 +145,7 @@ export namespace Corpse {
       text: postText,
       embed: {
         $type: "app.bsky.embed.images",
-        images: [
-          {
-            image: compositeBlob,
-            alt: title,
-          },
-        ],
+        images: [{ image: compositeBlob, alt: title }],
       },
       createdAt: new Date().toISOString(),
     });
