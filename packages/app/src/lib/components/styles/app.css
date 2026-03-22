@@ -1,0 +1,35 @@
+@import url('remixicon/fonts/remixicon.css');
+@import url('./tokens.css');
+@import url('./variant-colors.css');
+@import url('./compositions.css');
+@import url('../bits/tooltip.css');
+
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  touch-action: none;
+  overscroll-behavior: none;
+  -webkit-user-drag: none;
+
+  font-family: var(--font-mono);
+  font-size: var(--text-base);
+
+  background: var(--color-surface-default);
+  color: var(--color-text-normal);
+}
+
+#app {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  gap: 1px;
+  background: var(--color-surface-default);
+}

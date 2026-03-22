@@ -1,0 +1,120 @@
+/*
+ * CUBE CSS Compositions — layout primitives.
+ *
+ * These are component-agnostic layout patterns from CUBE CSS / Every Layout.
+ * They control how elements relate to each other spatially, not how they look.
+ *
+ * Matches Sugarcube's composition API.
+ */
+
+/* ===== Flow =====
+ * Vertical rhythm: sibling elements get consistent spacing.
+ * Usage: <div class="flow">...</div>
+ * Override: --flow-space
+ */
+.flow > * + * {
+  margin-block-start: var(--flow-space, 1em);
+}
+
+/* ===== Cluster =====
+ * Inline grouping that wraps when space runs out.
+ * Usage: <div class="cluster">...</div>
+ * Override: --cluster-gap, --cluster-horizontal-alignment, --cluster-vertical-alignment
+ */
+.cluster {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--cluster-gap, 0.5rem);
+  justify-content: var(--cluster-horizontal-alignment, flex-start);
+  align-items: var(--cluster-vertical-alignment, center);
+}
+
+/* ===== Repel =====
+ * Push items to opposite ends; collapse to stack on narrow containers.
+ * Usage: <div class="repel">...</div>
+ * Override: --repel-gap, --repel-direction, --repel-vertical-alignment
+ */
+.repel {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  flex-direction: var(--repel-direction, row);
+  align-items: var(--repel-vertical-alignment, center);
+  gap: var(--repel-gap, 1rem);
+}
+
+/* ===== Stack =====
+ * Flexbox vertical stack with consistent gap.
+ * Usage: <div class="stack">...</div>
+ * Override: --stack-gap
+ */
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--stack-gap, var(--space-xs));
+}
+
+/* ===== Wrapper =====
+ * Constrain content width with inline padding.
+ * Usage: <div class="wrapper">...</div>
+ * Override: --wrapper-max-width, --wrapper-padding-inline
+ */
+.wrapper {
+  margin-inline: auto;
+  max-width: var(--wrapper-max-width, 1360px);
+  padding-left: var(--wrapper-padding-inline, 1rem);
+  padding-right: var(--wrapper-padding-inline, 1rem);
+  position: relative;
+}
+
+/* ===== Gutter utilities ===== */
+.gutter-3xs {
+  --cluster-gap: var(--space-3xs);
+  --repel-gap: var(--space-3xs);
+  --stack-gap: var(--space-3xs);
+}
+.gutter-2xs {
+  --cluster-gap: var(--space-2xs);
+  --repel-gap: var(--space-2xs);
+  --stack-gap: var(--space-2xs);
+}
+.gutter-xs {
+  --cluster-gap: var(--space-xs);
+  --repel-gap: var(--space-xs);
+  --stack-gap: var(--space-xs);
+}
+.gutter-sm {
+  --cluster-gap: var(--space-sm);
+  --repel-gap: var(--space-sm);
+  --stack-gap: var(--space-sm);
+}
+.gutter-md {
+  --cluster-gap: var(--space-md);
+  --repel-gap: var(--space-md);
+  --stack-gap: var(--space-md);
+}
+.gutter-lg {
+  --cluster-gap: var(--space-lg);
+  --repel-gap: var(--space-lg);
+  --stack-gap: var(--space-lg);
+}
+
+/* ===== Flow-space utilities ===== */
+.flow-space-3xs {
+  --flow-space: var(--space-3xs);
+}
+.flow-space-2xs {
+  --flow-space: var(--space-2xs);
+}
+.flow-space-xs {
+  --flow-space: var(--space-xs);
+}
+.flow-space-sm {
+  --flow-space: var(--space-sm);
+}
+.flow-space-md {
+  --flow-space: var(--space-md);
+}
+.flow-space-lg {
+  --flow-space: var(--space-lg);
+}
