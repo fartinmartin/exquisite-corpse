@@ -14,6 +14,7 @@ const config = {
     adapter: adapter(),
     alias: {
       $lib: "./src/lib",
+      $components: "./src/components",
     },
     experimental: {
       // .remote.ts files: query, form, command, prerender — SvelteKit 2.27+
