@@ -1,6 +1,7 @@
 <script lang="ts">
   import { Paint } from "@fartinmartin/canvas-paint";
   import { goto } from "$app/navigation";
+  import { submitSection } from "./draw.remote";
 
   type Section = "top" | "mid" | "bot";
 
@@ -59,18 +60,7 @@
 
     try {
       const drawing = paint.save();
-      const res = await fetch("/api/sections", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ drawing, section }),
-      });
-
-      if (!res.ok) {
-        const body = await res.json().catch(() => ({}));
-        throw new Error(body.message ?? `Error ${res.status}`);
-      }
-
-      const { recordUri } = await res.json();
+      const { recordUri } = await submitSection({ drawing, section });
       goto(`/sections/${encodeURIComponent(recordUri)}`);
     } catch (e) {
       error = e instanceof Error ? e.message : "Something went wrong";
