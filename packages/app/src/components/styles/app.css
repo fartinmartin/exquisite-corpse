@@ -1,5 +1,6 @@
 @import './global/global.css';
 @import './global/tokens.variables.gen.css';
+@import './themes/default.css';
 
 @import './compositions/cluster.css';
 @import './compositions/flow.css';

@@ -21,15 +21,6 @@
         { "$ref": "./space.json" },
         { "$ref": "./typography.json" }
       ]
-    },
-    {
-      "type": "modifier",
-      "name": "mode",
-      "default": "light",
-      "contexts": {
-        "light": [],
-        "dark": [{ "$ref": "./dark.json" }]
-      }
     }
   ]
 }
