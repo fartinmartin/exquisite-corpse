@@ -2,7 +2,7 @@ import * as errore from "errore";
 
 export class LikeConflictError extends errore.createTaggedError({
   name: "LikeConflictError",
-  message: "Already liked drawing $drawingUri",
+  message: "Already liked $subjectUri",
 }) {}
 
 export class CorpseNotFoundError extends errore.createTaggedError({

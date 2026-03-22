@@ -5,14 +5,14 @@ export const likes = sqliteTable(
   "likes",
   {
     id: integer("id").primaryKey({ autoIncrement: true }),
-    drawingUri: text("drawing_uri").notNull(),
+    subjectUri: text("subject_uri").notNull(),
     likerDid: text("liker_did"),
     guestToken: text("guest_token"),
     createdAt: text("created_at").notNull().default(sql`(datetime('now'))`),
   },
   (t) => [
-    unique("unique_like_did").on(t.drawingUri, t.likerDid),
-    unique("unique_like_guest").on(t.drawingUri, t.guestToken),
+    unique("unique_like_did").on(t.subjectUri, t.likerDid),
+    unique("unique_like_guest").on(t.subjectUri, t.guestToken),
   ]
 );
 

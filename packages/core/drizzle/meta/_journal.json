@@ -15,6 +15,34 @@
       "when": 1773889294523,
       "tag": "0001_cloudy_pet_avengers",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1742342400000,
+      "tag": "0002_likes_subject_uri",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1742342400001,
+      "tag": "0003_section_blob_cid",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1774141419608,
+      "tag": "0004_busy_human_cannonball",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "6",
+      "when": 1774141419609,
+      "tag": "0005_rename_sections",
+      "breakpoints": true
     }
   ]
 }
