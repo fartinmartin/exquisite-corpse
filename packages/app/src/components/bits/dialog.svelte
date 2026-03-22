@@ -1,6 +1,4 @@
 <script lang="ts">
-  import type { Snippet } from 'svelte';
-
   let {
     open = $bindable(false),
     children,
@@ -8,7 +6,6 @@
     onclose,
   }: {
     open?: boolean;
-    children: Snippet;
     class?: string;
     onclose?: () => void;
   } = $props();

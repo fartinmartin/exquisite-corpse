@@ -1,7 +1,6 @@
 <script lang="ts">
-  import type { Snippet } from 'svelte';
   import type { HTMLSelectAttributes } from 'svelte/elements';
-  import { uid } from '$lib/components/styles/types';
+  import { uid } from '$components/styles/types';
   import Label from './label.svelte';
 
   let {
@@ -16,7 +15,6 @@
     label?: string;
     value?: string;
     disabled?: boolean;
-    children: Snippet;
     class?: string;
     onchange?: (value: string) => void;
   } & Omit<HTMLSelectAttributes, 'value' | 'disabled' | 'class'> = $props();

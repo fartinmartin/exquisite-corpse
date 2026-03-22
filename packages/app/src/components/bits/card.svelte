@@ -1,12 +1,11 @@
 <script lang="ts">
-  import type { Snippet } from 'svelte';
   import type { HTMLAttributes } from 'svelte/elements';
 
   let {
     children,
     class: className,
     ...rest
-  }: { children: Snippet; class?: string } & Omit<HTMLAttributes<HTMLDivElement>, 'class'> = $props();
+  }: HTMLAttributes<HTMLDivElement> = $props();
 </script>
 
 <div class={['card', className]} {...rest}>

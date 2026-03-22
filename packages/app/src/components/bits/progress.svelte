@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { HTMLProgressAttributes } from 'svelte/elements';
-  import type { Variant } from '$lib/components/styles/types';
+  import type { Variant } from '$components/styles/types';
 
   let {
     value,

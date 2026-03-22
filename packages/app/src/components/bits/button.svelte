@@ -1,7 +1,6 @@
 <script lang="ts">
-  import type { Snippet } from 'svelte';
   import type { HTMLAnchorAttributes, HTMLButtonAttributes } from 'svelte/elements';
-  import type { Variant, Appearance, Size } from '$lib/components/styles/types';
+  import type { Variant, Appearance, Size } from '$components/styles/types';
 
   type Props = (HTMLButtonAttributes | HTMLAnchorAttributes) & {
     variant?: Variant;
@@ -10,7 +9,6 @@
     iconOnly?: boolean;
     href?: string;
     disabled?: boolean;
-    children: Snippet;
     class?: string;
   };
 

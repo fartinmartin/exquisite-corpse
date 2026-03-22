@@ -1,5 +1,4 @@
 <script lang="ts">
-  import type { Snippet } from 'svelte';
   import type { HTMLButtonAttributes } from 'svelte/elements';
   import { useTabs } from './tabs-state.svelte.js';
 
@@ -12,7 +11,6 @@
   }: {
     value: string;
     disabled?: boolean;
-    children: Snippet;
     class?: string;
   } & Omit<HTMLButtonAttributes, 'value' | 'disabled' | 'class'> = $props();
 

@@ -1,5 +1,4 @@
 <script lang="ts">
-  import type { Snippet } from 'svelte';
   import type { HTMLAttributes } from 'svelte/elements';
   import { createTabs, type TabsVariant } from './tabs-state.svelte.js';
 
@@ -14,7 +13,6 @@
     value?: string;
     variant?: TabsVariant;
     onchange?: (value: string) => void;
-    children: Snippet;
     class?: string;
   } & Omit<HTMLAttributes<HTMLDivElement>, 'class'> = $props();
 

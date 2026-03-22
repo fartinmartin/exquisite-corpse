@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
   import type { HTMLInputAttributes } from 'svelte/elements';
-  import { uid, type Size } from '$lib/components/styles/types';
+  import { uid, type Size } from '$components/styles/types';
   import Label from './label.svelte';
 
   let {

@@ -1,5 +1,4 @@
 <script lang="ts">
-  import type { Snippet } from 'svelte';
   import type { HTMLAttributes } from 'svelte/elements';
   import { useTabs } from './tabs-state.svelte.js';
 
@@ -7,7 +6,7 @@
     children,
     class: className,
     ...rest
-  }: { children: Snippet; class?: string } & Omit<HTMLAttributes<HTMLDivElement>, 'class'> = $props();
+  }: HTMLAttributes<HTMLDivElement> = $props();
 
   const tabs = useTabs();
   const variant = $derived(tabs.variant);

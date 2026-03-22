@@ -1,12 +1,11 @@
 <script lang="ts">
-  import type { Snippet } from 'svelte';
   import type { HTMLAttributes } from 'svelte/elements';
 
   let {
     children,
     class: className,
     ...rest
-  }: { children: Snippet; } & HTMLAttributes<HTMLDivElement> = $props();
+  }: HTMLAttributes<HTMLDivElement> = $props();
 </script>
 
 <div class={['accordion', className]} {...rest}>
