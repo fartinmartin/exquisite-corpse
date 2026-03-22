@@ -25,7 +25,7 @@
     "@atcute/lexicons": "^1.2.6",
     "@atcute/oauth-node-client": "^1.1.0",
     "@ecc/lexicons": "workspace:*",
-    "@fartinmartin/canvas-paint": "file:/Users/Martin/code/fartinmartin/canvas-paint",
+    "@fartinmartin/canvas-paint": "^1.1.0",
     "@libsql/client": "^0.17.0",
     "canvas": "^3.2.1",
     "drizzle-orm": "^0.45.1",
