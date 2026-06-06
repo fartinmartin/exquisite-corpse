@@ -4,6 +4,9 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "atproto:setup": "atproto-oauth setup",
+    "atproto:keygen": "atproto-oauth keygen",
+    "atproto:secret": "atproto-oauth secret",
     "dev": "varlock run -- vite dev",
     "build": "varlock run -- vite build",
     "preview": "varlock run -- vite preview",
@@ -12,14 +15,16 @@
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch"
   },
   "dependencies": {
+    "@atcute/atproto": "^4.0.0",
     "@atcute/lexicons": "^1.2.6",
     "@ecc/core": "workspace:*",
     "@ecc/lexicons": "workspace:*",
     "@fartinmartin/canvas-paint": "^1.1.0",
     "@radix-ui/colors": "^3.0.0",
+    "@svelte-atproto/oauth": "^0.3.0",
     "canvas": "^3.2.1",
     "joyful": "^1.1.1",
-    "valibot": "^1.3.1"
+    "valibot": "^1.0.0"
   },
   "devDependencies": {
     "@sugarcube-sh/cli": "^0.1.5",

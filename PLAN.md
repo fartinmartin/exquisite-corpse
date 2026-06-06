@@ -1,5 +1,8 @@
 # Exquisite Corpse Club — Next Steps
 
+🚨 INSPO: https://www.getty.edu/tracingart/
+🚨 move to vite-plus monorepo?
+
 ## What's done
 
 - Monorepo scaffold (lexicons, core, app, scripts)

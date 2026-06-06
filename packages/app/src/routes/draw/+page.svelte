@@ -1,8 +1,10 @@
 <script lang="ts">
   import { Paint } from "@fartinmartin/canvas-paint";
+  import { untrack } from "svelte";
   import { goto } from "$app/navigation";
   import { submitSection } from "./draw.remote";
   import Button from '$components/bits/button.svelte';
+  import { Toggle, ToggleGroup } from '$components/bits/toggle/index.js';
 
   type Section = "top" | "mid" | "bot";
 
@@ -28,7 +30,7 @@
       width: CANVAS_WIDTH,
       height: CANVAS_HEIGHT,
       bgColor: BG_COLOR,
-      brush: { size: brushSize, color: brushColor },
+      brush: untrack(() => ({ size: brushSize, color: brushColor })),
     });
 
     paint = p;
@@ -94,21 +96,11 @@
 
     <div class="cluster gap-xs toolbar">
       <div class="cluster gap-2xs tool-group">
-        <Button
-          size="sm"
-          appearance={brushMode === "draw" ? undefined : "outlined"}
-          onclick={() => (brushMode = "draw")}
-        >pen</Button>
-        <Button
-          size="sm"
-          appearance={brushMode === "erase" ? undefined : "outlined"}
-          onclick={() => (brushMode = "erase")}
-        >erase</Button>
-        <Button
-          size="sm"
-          appearance={brushMode === "fill" ? undefined : "outlined"}
-          onclick={() => (brushMode = "fill")}
-        >fill</Button>
+        <ToggleGroup value={brushMode} onchange={(v) => (brushMode = v as typeof brushMode)}>
+          <Toggle value="draw" size="sm">pen</Toggle>
+          <Toggle value="erase" size="sm">erase</Toggle>
+          <Toggle value="fill" size="sm">fill</Toggle>
+        </ToggleGroup>
       </div>
 
       <div class="cluster gap-2xs tool-group">
