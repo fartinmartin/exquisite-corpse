@@ -26,7 +26,10 @@ create the Netlify site, set the Firebase service-account env vars there, then c
 - [x] Netlify config + env docs (`netlify.toml`, `.env.schema`, README, app CLAUDE.md)
 - [x] Verify against live Firestore data (ADC with the service account; home/gallery/section render real records)
 - [x] Backfill decision: keep the read-time adapter; optional `pnpm convert:drawings` script added
-- [ ] Deploy to Netlify + DNS cutover
+- [x] Reuse the existing Netlify site (`exquisite-corpse-club`, `00f3062d-7e5d-4686-9dda-136bcb1f07d9`); remote Linux builds work, functions bundle, fixture draft verified
+- [ ] Rotate the exposed Firebase service-account key and set Netlify env secrets
+- [ ] Production deploy with live data + set the Netlify production branch in the UI
+- [ ] DNS cutover
 
 ## Decisions
 
@@ -42,6 +45,8 @@ create the Netlify site, set the Firebase service-account env vars there, then c
 - **2026-06-09** — Real-data audit: ~246 sections, every one still in the legacy command-array shape. 1 record is in the mobile-normalized ~1080 space (detected by bounds), 26 have points past the 544×181 panel (left clipped, matching the live renderer). No backfill required.
 - **2026-06-09** — Converted data is ~2.5× larger than legacy commands; 6 records would exceed Firestore's 1MiB doc limit after conversion. The converter skips those unless `--force`, and new saves reject drawings over the document budget (413).
 - **2026-06-09** — New drawings are capped by serialized size (~900KB with thumb); larger drawings need blob/Storage storage, which the atproto phase would solve with PDS blobs.
+- **2026-06-10** — Netlify deploy path: `netlify deploy --remote` (Linux builder) from the repo; the site must have the commit pushed to a branch. `canvas` is imported lazily and corpse thumbs are composed in the browser so the request path has no native dependency. Admin thumb rebuilds still use node-canvas.
+- **2026-06-10** — The service-account key was accidentally echoed into a chat/CLI transcript; it must be rotated before the production deploy. Netlify secrets are set from a local file with output suppressed (never `env:import`).
 
 ## Open questions
 
