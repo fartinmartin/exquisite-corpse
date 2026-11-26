@@ -4,11 +4,16 @@
 
   type CursorState = "auto" | "pointer" | "disabled" | "grab" | "draw" | "erase" | "fill";
 
-  let cursorEl: HTMLElement;
-  let tooltipEl = $state<HTMLElement>();
+  /** Every cursor image, warmed after mount so the first switch to a state doesn't flash blank. */
+  const CURSOR_IMAGES = ["auto", "pointer", "disabled", "grab", "draw", "erase", "fill", "loading"];
 
-  let x = $state(0);
-  let y = $state(0);
+  let cursorEl: HTMLElement;
+  // Measured via a ResizeObserver-backed binding, so mousemove never forces layout.
+  let tooltipWidth = $state(0);
+
+  // Only used to position the cursor imperatively; nothing renders from them.
+  let x = 0;
+  let y = 0;
   let cursor = $state<CursorState>("auto");
   let tooltip = $state<string | null>(null);
   let flipTooltip = $state(false);
@@ -64,8 +69,8 @@
     evaluate(event);
     if (cursorEl) cursorEl.style.transform = `translate(${x}px,${y}px)`;
 
-    if (tooltip && tooltipEl) {
-      flipTooltip = window.innerWidth - event.clientX < tooltipEl.offsetWidth + 60;
+    if (tooltip) {
+      flipTooltip = window.innerWidth - event.clientX < tooltipWidth + 60;
     }
   }
 
@@ -80,8 +85,14 @@
     }
   }
 
+  // Low priority, after the page is up, and only where the custom cursor shows.
   $effect(() => {
-    window.addEventListener("mousemove", move);
+    if (!matchMedia("(hover: hover)").matches) return;
+    for (const name of CURSOR_IMAGES) new Image().src = `/img/cursor/${name}.svg`;
+  });
+
+  $effect(() => {
+    window.addEventListener("mousemove", move, { passive: true });
     window.addEventListener("mousedown", down);
     window.addEventListener("mouseup", up);
     return () => {
@@ -114,7 +125,7 @@
     <div
       class="tooltip"
       class:flip={flipTooltip}
-      bind:this={tooltipEl}
+      bind:offsetWidth={tooltipWidth}
     >{tooltip}</div>
   {/if}
 </div>
