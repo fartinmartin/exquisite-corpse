@@ -1,13 +1,14 @@
 # Migrate the live Nuxt site to SvelteKit + Firestore
 
-**Status:** in-progress — updated 2026-06-09
+**Status:** in-progress — updated 2026-06-11
 
 ## Resume here
 
-Legacy data is confirmed working against the live project (246 sections, all in
-the 2020 shape; read-time conversion is enough, no backfill needed). Next:
-create the Netlify site, set the Firebase service-account env vars there, then cut
-`exquisitecorpse.club` DNS over from Firebase Hosting.
+The SvelteKit app is deployed and serving live Firestore data at
+`https://exquisite-corpse-club.netlify.app` (site `exquisite-corpse-club`,
+`00f3062d-…`). Remaining: set the Netlify production branch to `firestore` in the
+UI, run a real-data draw/save smoke test, then cut `exquisitecorpse.club` DNS over
+from Firebase Hosting.
 
 ## Steps
 
@@ -28,7 +29,9 @@ create the Netlify site, set the Firebase service-account env vars there, then c
 - [x] Backfill decision: keep the read-time adapter; optional `pnpm convert:drawings` script added
 - [x] Reuse the existing Netlify site (`exquisite-corpse-club`, `00f3062d-7e5d-4686-9dda-136bcb1f07d9`); remote Linux builds work, functions bundle, fixture draft verified
 - [ ] Rotate the exposed Firebase service-account key; store the fields in 1Password (`firebase-private-key`, `firebase-client-email`) and set Netlify secret env vars from there
-- [ ] Production deploy with live data + set the Netlify production branch in the UI
+- [x] Production deploy with live data (Netlify secrets: `FIREBASE_SERVICE_ACCOUNT`, `ECC_ADMIN_PASSWORD`)
+- [ ] Set the Netlify production branch to `firestore` in the UI (API left it at `nuxt`)
+- [ ] Draw/save smoke test against live data
 - [ ] DNS cutover
 
 ## Decisions
@@ -47,12 +50,15 @@ create the Netlify site, set the Firebase service-account env vars there, then c
 - **2026-06-09** — New drawings are capped by serialized size (~900KB with thumb); larger drawings need blob/Storage storage, which the atproto phase would solve with PDS blobs.
 - **2026-06-10** — Netlify deploy path: `netlify deploy --remote` (Linux builder) from the repo; the site must have the commit pushed to a branch. `canvas` is imported lazily and corpse thumbs are composed in the browser so the request path has no native dependency. Admin thumb rebuilds still use node-canvas.
 - **2026-06-10** — The service-account key was accidentally echoed into a chat/CLI transcript; it must be rotated before the production deploy. Netlify secrets are set from a local file with output suppressed (never `env:import`).
+- **2026-06-11** — Rotation initially hit the old `exquisite-corpse-d0cbf` project (2020 web config). The live key (`h6d3s@exquisite-corpse-club`) was revoked separately and verified `UNAUTHENTICATED`; a new key reads 246 sections.
+- **2026-06-11** — No credentials on disk: Netlify holds `FIREBASE_SERVICE_ACCOUNT` (base64 JSON) and `ECC_ADMIN_PASSWORD` as secrets; the admin password is in the macOS Keychain (`ecc-admin-password`); local dev expects the 1Password fields referenced by `.env.schema`. The old and new JSON files were deleted from disk.
 
 ## Open questions
 
 - Netlify site + DNS cutover plan (`exquisitecorpse.club` currently on Firebase Hosting).
 - Firebase service-account credentials need real 1Password item names (the `op://` refs in `.env.schema` are placeholders).
 - Optional: backfill only sub-limit records with `convert:drawings --write --backup`? Not needed for correctness; keep the adapter.
+- Clean up the unused `exquisite-corpse-d0cbf` project (and the new key minted there) if nothing still uses it.
 - Old likes were keyed by Firebase anonymous UIDs. Counts are preserved, but current visitors can't "unlike" someone else's old like (each cookie only toggles its own).
 
 ## Context
