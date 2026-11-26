@@ -7,7 +7,7 @@ export default defineConfig({
     allowedHosts: true,
   },
   ssr: {
-    // node-canvas is a native addon — cannot be bundled by Vite
-    external: ["canvas"],
+    // native addon / server-only SDK — cannot be bundled by Vite
+    external: ["canvas", "firebase-admin"],
   },
 });

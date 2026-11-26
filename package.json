@@ -3,7 +3,7 @@
   "private": true,
   "scripts": {
     "dev": "pnpm --filter @ecc/app dev",
-    "build": "pnpm --filter @ecc/lexicons build && pnpm --filter @ecc/core build && pnpm --filter @ecc/app build",
+    "build": "pnpm --filter @ecc/lexicons build && pnpm --filter @ecc/firestore build && pnpm --filter @ecc/app build",
     "check": "pnpm -r check",
     "db:generate": "pnpm --filter @ecc/core db:generate",
     "db:migrate": "pnpm --filter @ecc/core db:migrate",

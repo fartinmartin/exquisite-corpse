@@ -1,5 +1,13 @@
-import adapter from "@sveltejs/adapter-node";
+import adapterNode from "@sveltejs/adapter-node";
+import adapterNetlify from "@sveltejs/adapter-netlify";
 import { vitePreprocess } from "@sveltejs/vite-plugin-svelte";
+
+/**
+ * Netlify is the deploy target (SSR functions + CDN). Set ADAPTER=node to build
+ * a plain Node server instead.
+ */
+const adapter =
+  process.env.ADAPTER === "node" ? adapterNode() : adapterNetlify();
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
@@ -11,10 +19,9 @@ const config = {
     },
   },
   kit: {
-    adapter: adapter(),
+    adapter,
     alias: {
       $lib: "./src/lib",
-      $components: "./src/components",
     },
     experimental: {
       // .remote.ts files: query, form, command, prerender — SvelteKit 2.27+

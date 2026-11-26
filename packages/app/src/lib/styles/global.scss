@@ -1,0 +1,248 @@
+/* Ported from the 2020 Nuxt app (assets/css). Keep selectors close to the original. */
+
+@font-face {
+  font-family: "Space Mono";
+  font-style: normal;
+  font-weight: 400;
+  src: url("/fonts/spacemono/SpaceMono-Regular.woff2") format("woff2"),
+    url("/fonts/spacemono/SpaceMono-Regular.woff") format("woff");
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Space Mono";
+  font-style: bold;
+  font-weight: 700;
+  src: url("/fonts/spacemono/SpaceMono-Bold.woff2") format("woff2"),
+    url("/fonts/spacemono/SpaceMono-Bold.woff") format("woff");
+  font-display: swap;
+}
+
+:root {
+  --black: #231f20;
+  --white: #fff;
+
+  --blue: #0064ff;
+  --light-blue: #81b2ff;
+  --lighter-blue: #deebff;
+
+  --red: #f44e3b;
+  --orange: #fb9200;
+  --lighter-red: #fab4ac;
+
+  --yellow: #fcba03;
+  --light-yellow: #fcda00;
+  --lighter-yellow: #fff29d;
+
+  --green: #86b500;
+  --light-green: #a4dd00;
+  --lighter-green: #d1ee7f;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  user-select: none;
+  font-variant-ligatures: none;
+}
+
+input {
+  font-size: inherit;
+  font-family: inherit;
+
+  border: none;
+  border-radius: 0;
+  background: none;
+}
+
+input[type="text"],
+input[type="password"],
+input[type="number"] {
+  user-select: initial;
+}
+
+button {
+  border: none;
+  margin: 0;
+  padding: 0;
+  width: auto;
+  overflow: visible;
+  border-radius: 0;
+
+  background: transparent;
+
+  /* inherit font & color from ancestor */
+  color: inherit;
+  font: inherit;
+  text-align: inherit;
+  outline: none;
+
+  line-height: normal;
+
+  -webkit-font-smoothing: inherit;
+  -moz-osx-font-smoothing: inherit;
+
+  -webkit-appearance: none;
+
+  &::-moz-focus-inner {
+    border: 0;
+    padding: 0;
+  }
+}
+
+button[disabled] {
+  opacity: 0.5;
+  > * {
+    pointer-events: none;
+  }
+}
+
+.body-bg {
+  /* http://www.patternify.com/ */
+  background: var(--lighter-blue)
+    url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAAEklEQVQImWNgYGD4z0AswK4SAFXuAf8EPy+xAAAAAElFTkSuQmCC)
+    repeat;
+  background-blend-mode: overlay;
+}
+
+html {
+  font-family: "Space Mono", monospace;
+  font-size: 16px;
+  word-spacing: 1px;
+  text-transform: lowercase;
+
+  -ms-text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+
+  color: var(--black);
+
+  background: var(--lighter-blue)
+    url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAAEklEQVQImWNgYGD4z0AswK4SAFXuAf8EPy+xAAAAAElFTkSuQmCC)
+    repeat;
+  background-blend-mode: overlay;
+
+  box-sizing: border-box;
+}
+
+html,
+body,
+#app {
+  min-height: 100%;
+}
+
+#app {
+  padding: calc(40px / 3);
+
+  @media screen and (min-width: 1040px) {
+    display: grid;
+    place-items: center;
+    min-height: 100vh;
+  }
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+a {
+  color: var(--black);
+  text-decoration: underline;
+
+  &:hover {
+    color: var(--blue);
+  }
+}
+
+h1 {
+  font-size: 1rem;
+}
+
+.mw-canvas {
+  width: 100%;
+  max-width: 544px;
+}
+
+.wrap {
+  width: 100%;
+  max-width: 544px;
+  margin: 0 auto;
+
+  @media screen and (max-width: 1040px) {
+    padding: calc(60px + calc(40px / 3)) 0;
+  }
+}
+
+.hom {
+  @media screen and (max-width: 544px) {
+    display: none;
+  }
+}
+
+.mt {
+  margin-top: calc(40px / 3);
+}
+
+.mb {
+  margin-bottom: calc(40px / 3);
+}
+
+.fs-modal {
+  position: absolute;
+  z-index: 951;
+
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100%;
+
+  background: var(--lighter-blue)
+    url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAAEklEQVQImWNgYGD4z0AswK4SAFXuAf8EPy+xAAAAAElFTkSuQmCC)
+    repeat;
+  background-blend-mode: overlay;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: calc(40px / 3);
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.2s ease;
+}
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+.canvas-stack {
+  #top {
+    border-bottom: none;
+  }
+
+  #mid {
+    border-top: none;
+    border-bottom: none;
+  }
+
+  #bot {
+    border-top: none;
+  }
+}
+
+.progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 2px;
+  width: 100%;
+  background: var(--light-blue);
+  z-index: 999999;
+}
