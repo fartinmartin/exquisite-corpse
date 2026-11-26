@@ -18,7 +18,9 @@
   let section = $state<SectionType | null>(null);
   let siblings = $state<Partial<Record<SectionType, Sibling>>>({});
   let fetching = $state(false);
-  let saving = $state(false);
+  /** The drawing being saved, serialized once when the save modal opens. */
+  let pending = $state.raw<DrawingData | null>(null);
+  const saving = $derived(pending !== null);
   let error = $state<string | null>(null);
   let title = $state("untitled");
   let artist = $state("anonymous");
@@ -58,11 +60,14 @@
     };
   }
 
-  async function save({ title, artist }: { title: string; artist: string }) {
-    const paint = drawState.paint;
-    if (!paint || !section) throw new Error("nothing to save");
+  function openSave() {
+    pending = (drawState.paint?.save() as unknown as DrawingData | undefined) ?? null;
+  }
 
-    const drawing = paint.save() as unknown as DrawingData;
+  async function save({ title, artist }: { title: string; artist: string }) {
+    const drawing = pending;
+    if (!drawing || !section) throw new Error("nothing to save");
+
     // Compose the corpse preview in the browser — no native canvas on the server.
     const panels: Partial<Record<SectionType, DrawingData>> = {
       top: siblings.top?.drawing,
@@ -92,14 +97,13 @@
 <Seo title="draw" description="create your very own masterpiece!" />
 
 <div class="wrap">
-  {#if saving && section && drawState.paint}
-    {@const drawing = drawState.paint.save() as unknown as DrawingData}
+  {#if pending && section}
     <SaveModal
-      {drawing}
+      drawing={pending}
       defaultTitle={title}
       defaultArtist={artist}
       onsave={save}
-      onclose={() => (saving = false)}
+      onclose={() => (pending = null)}
     />
   {/if}
 
@@ -117,7 +121,10 @@
     </Panel>
   {:else}
     <div class="mw-canvas">
-      <Toolbar enabled={!saving} onsave={() => (saving = true)} />
+      <Toolbar
+        enabled={!saving}
+        onsave={openSave}
+      />
 
       <div class="canvas-stack">
         {#each TYPES as type (type)}
