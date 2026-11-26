@@ -112,6 +112,11 @@ export function db(): Firestore {
     );
 
   instance = getFirestore(app);
-  instance.settings({ ignoreUndefinedProperties: true });
+  instance.settings({
+    ignoreUndefinedProperties: true,
+    // REST instead of gRPC for one-shot reads/writes: skips loading and
+    // handshaking the gRPC stack, which dominates serverless cold starts.
+    preferRest: true,
+  });
   return instance;
 }
