@@ -21,6 +21,7 @@
   // svelte-ignore state_referenced_locally
   let artist = $state(defaultArtist);
   let status = $state<"idle" | "saving" | "success" | "error">("idle");
+  let errorMessage = $state("");
 
   const busy = $derived(status === "saving" || status === "success");
 
@@ -30,7 +31,10 @@
     try {
       await onsave({ title, artist });
       status = "success";
-    } catch {
+    } catch (cause) {
+      // SvelteKit's HttpError carries the server's message in `body`.
+      const body = (cause as { body?: { message?: string } })?.body;
+      errorMessage = body?.message ?? (cause instanceof Error ? cause.message : "");
       status = "error";
     }
   }
@@ -42,7 +46,9 @@
   }
 
   function handleKeydown(event: KeyboardEvent) {
-    if (event.code === "Escape" && status === "idle") onclose();
+    if (event.code !== "Escape") return;
+    if (status === "idle") onclose();
+    else if (status === "error") status = "idle";
   }
 
   $effect(() => {
@@ -104,8 +110,12 @@
           {:else if status === "success"}
             <Loading text="you did it!" subtext="your drawing was saved" color="green" />
           {:else if status === "error"}
-            <button class="error-reset" onclick={onclose} aria-label="close">
-              <Loading text="oop!" subtext="there was an error.. try again?" color="red" />
+            <button class="error-reset" onclick={() => (status = "idle")} aria-label="try again">
+              <Loading
+                text="oop! there was an error.."
+                subtext={`${errorMessage ? `${errorMessage} — ` : ""}click to try again`}
+                color="red"
+              />
             </button>
           {/if}
         </div>
