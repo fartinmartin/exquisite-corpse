@@ -6,18 +6,12 @@ import type { DrawingData } from "@ecc/lexicons";
 import { db } from "./client.js";
 import { Fixtures } from "./fixtures.js";
 import { Drawing } from "./drawing.js";
-import {
-  Records,
-  corpseToSummary,
-  sectionToRecord,
-  sectionToSummary,
-  type CorpseRecord,
-  type SectionRecord,
-} from "./records.js";
+import { Records } from "./records.js";
 import type {
   Corpse,
   GalleryPage,
   Section,
+  SectionDetail,
   SectionType,
   SectionWithDrawing,
 } from "./types.js";
@@ -53,7 +47,6 @@ export interface SaveInput {
   siblings: Partial<Record<SectionType, string>>;
   /** Pre-composed corpse thumbnail (browser). Falls back to node-canvas when absent. */
   corpseThumb?: string;
-  liker?: string;
 }
 
 export interface SaveResult {
@@ -94,24 +87,39 @@ export async function get(id: string): Promise<SectionWithDrawing | SectionError
     return section ?? new SectionNotFoundError({ id });
   }
 
-  try {
-    const snap = await db().collection("sections").doc(id).get();
-    if (!snap.exists) return new SectionNotFoundError({ id });
-    const record = sectionToRecord(snap);
-    if (!record) return new SectionNotFoundError({ id });
-    return { ...sectionToSummary(record), drawing: record.drawing };
-  } catch (cause) {
-    return new FirestoreError({ cause });
-  }
+  const snap = await Records.loadOne("sections", id, Records.SECTION_DRAWING_FIELDS).catch(
+    (cause: unknown) => new FirestoreError({ cause })
+  );
+  if (snap instanceof Error) return snap;
+  return (snap && Records.toSectionWithDrawing(snap)) ?? new SectionNotFoundError({ id });
+}
+
+/**
+ * Everything the section page shows, in two round trips: the section, then its
+ * corpses and the artist's other sections in parallel.
+ */
+export async function detail(id: string): Promise<SectionDetail | SectionError> {
+  const section = await get(id);
+  if (section instanceof Error) return section;
+
+  const related = await Promise.all([
+    featuredIn(section, 3),
+    moreByArtist(section.artist, { excludeId: id }),
+  ]).catch((cause: unknown) => new FirestoreError({ cause }));
+  if (related instanceof Error) return related;
+
+  const [corpses, moreBy] = related;
+  return { section, featuredIn: corpses, moreBy };
 }
 
 export async function randomByType(type: SectionType): Promise<SectionWithDrawing | null> {
   if (Fixtures.enabled()) return Fixtures.randomSection(type);
 
-  const snap = await Records.randomSnapshot("sections", { field: "type", value: type });
-  if (!snap) return null;
-  const record = sectionToRecord(snap);
-  return record ? { ...sectionToSummary(record), drawing: record.drawing } : null;
+  const snap = await Records.randomSnapshot("sections", {
+    fields: Records.SECTION_DRAWING_FIELDS,
+    filter: { field: "type", value: type },
+  });
+  return snap ? Records.toSectionWithDrawing(snap) : null;
 }
 
 export async function list(options: {
@@ -124,39 +132,27 @@ export async function list(options: {
 
   let query = db().collection("sections") as FirebaseFirestore.Query;
   if (options.type) query = query.where("type", "==", options.type);
-  query = query.orderBy(sortField(options.sort), "desc");
+  query = query.orderBy(sortField(options.sort), "desc").select(...Records.SECTION_SUMMARY_FIELDS);
 
   const { docs, hasMore } = await Records.paginate(query, {
     page: options.page,
     pageSize: options.pageSize,
   });
 
-  const items = docs
-    .map((doc) => sectionToRecord(doc))
-    .filter((record): record is SectionRecord => record !== null)
-    .map(sectionToSummary);
-
-  return { items, page: options.page, hasMore };
+  return { items: docs.map(Records.toSection).filter(Records.isPresent), page: options.page, hasMore };
 }
 
-/** The corpses a section appears in (its `featuredIn` refs). */
-export async function featuredIn(sectionId: string, limit = 3): Promise<Corpse[]> {
-  if (Fixtures.enabled()) return Fixtures.featuredIn(sectionId);
+/** The most recent corpses a section appears in (its `featuredIn` refs). */
+async function featuredIn(section: Section, limit: number): Promise<Corpse[]> {
+  if (Fixtures.enabled()) return Fixtures.featuredIn(section.id);
 
-  const snap = await db().collection("sections").doc(sectionId).get();
-  const record = snap.exists ? sectionToRecord(snap) : null;
-  if (!record) return [];
-
-  const ids = record.featuredIn.slice(-limit);
-  const corpses = await Records.loadCorpses(ids);
-  return corpses
-    .map((doc) => Records.corpseToRecord(doc))
-    .filter((corpse): corpse is CorpseRecord => corpse !== null)
-    .map(Records.corpseToSummary);
+  const ids = section.featuredIn.slice(-limit);
+  const snaps = await Records.loadMany("corpses", ids, Records.CORPSE_SUMMARY_FIELDS);
+  return snaps.map(Records.toCorpse).filter(Records.isPresent);
 }
 
 /** Other sections by the same artist, most liked first. */
-export async function moreByArtist(
+async function moreByArtist(
   artist: string,
   { excludeId, limit = 6 }: { excludeId?: string; limit?: number }
 ): Promise<Section[]> {
@@ -167,15 +163,15 @@ export async function moreByArtist(
     .collection("sections")
     .where("artist", "==", artist)
     .orderBy("likes", "desc")
+    .select(...Records.SECTION_SUMMARY_FIELDS)
     .limit(limit + 1)
     .get();
 
   return snap.docs
     .filter((doc) => doc.id !== excludeId)
     .slice(0, limit)
-    .map((doc) => sectionToRecord(doc))
-    .filter((record): record is SectionRecord => record !== null)
-    .map(sectionToSummary);
+    .map(Records.toSection)
+    .filter(Records.isPresent);
 }
 
 /**
@@ -206,18 +202,16 @@ export async function save(
   const siblingTypes = SECTION_TYPES.filter((type) => type !== input.type);
   const siblingIds = siblingTypes.map((type) => input.siblings[type]).filter(Boolean) as string[];
 
-  // Read the panels shown while drawing, plus their thumbs for the corpse preview.
-  const siblingRecords = new Map<string, SectionRecord>();
-  for (const doc of await Records.loadSections(siblingIds)) {
-    const record = sectionToRecord(doc);
-    if (record) siblingRecords.set(record.id, record);
-  }
+  // Read the panels shown while drawing: their type (to validate) and title (for
+  // the corpse name). Their thumbs are only needed for the node-canvas fallback.
+  const siblingFields = input.corpseThumb ? ["type", "title"] : ["type", "title", "thumb"];
+  const siblingSnaps = await Records.loadMany("sections", siblingIds, siblingFields);
+  const siblingRecords = new Map(siblingSnaps.map((snap) => [snap.id, snap]));
 
   for (const type of siblingTypes) {
     const id = input.siblings[type];
     if (!id) continue;
-    const record = siblingRecords.get(id);
-    if (!record || record.type !== type) return new SiblingSectionError({ id });
+    if (siblingRecords.get(id)?.get("type") !== type) return new SiblingSectionError({ id });
   }
 
   const corpseRef = db().collection("corpses").doc();
@@ -228,11 +222,11 @@ export async function save(
   const panelIds: Partial<Record<SectionType, string>> = { [input.type]: sectionRef.id };
 
   for (const type of siblingTypes) {
-    const record = input.siblings[type] ? siblingRecords.get(input.siblings[type]!) : undefined;
-    if (!record) continue;
-    thumbs[type] = record.thumb;
-    titles[type] = record.title;
-    panelIds[type] = record.id;
+    const snap = input.siblings[type] ? siblingRecords.get(input.siblings[type]!) : undefined;
+    if (!snap) continue;
+    thumbs[type] = snap.get("thumb");
+    titles[type] = snap.get("title");
+    panelIds[type] = snap.id;
   }
 
   const corpseThumb =

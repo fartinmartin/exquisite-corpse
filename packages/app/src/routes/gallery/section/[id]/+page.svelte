@@ -4,21 +4,25 @@
   import MetaMenu from "#lib/components/meta-menu.svelte";
   import Panel from "#lib/components/panel.svelte";
   import RadioButton from "#lib/components/radio-button.svelte";
-  import type { PageData } from "./$types";
+  import { thumbAttrs } from "#lib/thumbs.ts";
   import { getSection } from "./section.remote";
 
-  const id = $derived(page.params.id ?? "");
+  const TYPE_NAMES = { top: "top", mid: "middle", bot: "bottom" } as const;
 
-  let { data }: { data: PageData } = $props();
+  const id = $derived(page.params.id ?? "");
 
   let related = $state<"featuredIn" | "moreBy">("featuredIn");
 
   const result = $derived(await getSection(id));
+  const drawings = $derived([result.section.drawing]);
 </script>
 
 <svelte:head>
-  <title>{data.title}</title>
-  <meta name="description" content={data.description} />
+  <title>exquisite corpse club ▪ {result.section.title} by {result.section.artist}</title>
+  <meta
+    name="description"
+    content={`a ${TYPE_NAMES[result.section.type]} third of an exquisite corpse!`}
+  />
 </svelte:head>
 
   <div class="wrap">
@@ -40,9 +44,8 @@
         collection="sections"
         id={result.section.id}
         title={result.section.title}
-        thumb={result.section.thumb}
-        likes={result.likeState.likes}
-        liked={result.likeState.liked}
+        {drawings}
+        likes={result.section.likes}
         artist={result.section.artist}
       />
     </Panel>
@@ -78,7 +81,7 @@
           {#each result.featuredIn as corpse (corpse.id)}
             <a href={`/gallery/corpse/${corpse.id}`}>
               <Panel color="blue" interactive noPadding class="drawing">
-                <img src={corpse.thumb} alt={corpse.title} />
+                <img {...thumbAttrs("corpses", corpse)} alt={corpse.title} loading="lazy" />
               </Panel>
             </a>
           {/each}
@@ -93,7 +96,7 @@
         {#each result.moreBy as other (other.id)}
           <a href={`/gallery/section/${other.id}`}>
             <Panel color="blue" interactive noPadding class="drawing">
-              <img src={other.thumb} alt={other.title} />
+              <img {...thumbAttrs("sections", other)} alt={other.title} loading="lazy" />
             </Panel>
           </a>
         {/each}

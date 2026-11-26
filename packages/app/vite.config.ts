@@ -11,6 +11,10 @@ import { defineConfig } from "vite";
 const adapter = process.env.ADAPTER === "node" ? adapterNode() : adapterNetlify();
 
 export default defineConfig({
+  define: {
+    // Netlify's Image CDN (`/.netlify/images`) only exists on Netlify deploys.
+    __NETLIFY_IMAGE_CDN__: JSON.stringify(process.env.NETLIFY === "true"),
+  },
   plugins: [
     sveltekit({
       preprocess: vitePreprocess(),

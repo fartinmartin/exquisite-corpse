@@ -3,6 +3,7 @@
   import Loading from "#lib/components/loading.svelte";
   import Panel from "#lib/components/panel.svelte";
   import PrevNext from "#lib/components/prev-next.svelte";
+  import { thumbAttrs } from "#lib/thumbs.ts";
   import { listGallery } from "./gallery.remote";
 
   type Filter = "corpses" | "top" | "mid" | "bot";
@@ -26,6 +27,10 @@
   let sentinel = $state<HTMLElement>();
 
   const kind = $derived(filter === "corpses" ? "corpse" : "section");
+  const collection = $derived(filter === "corpses" ? "corpses" : "sections");
+
+  /** Roughly the first screenful on desktop; later rows load as they scroll in. */
+  const EAGER_COUNT = 9;
 
   async function loadMore() {
     if (loadingMore || !hasMore) return;
@@ -54,10 +59,14 @@
 </script>
 
   <div class={["gallery", "mw-canvas", filter !== "corpses" ? "section" : ""]}>
-    {#each items as item (item.id)}
+    {#each items as item, index (item.id)}
       <a href={`/gallery/${kind}/${item.id}`}>
         <Panel color="blue" interactive noPadding class="drawing">
-          <img src={item.thumb} alt={item.title} />
+          <img
+            {...thumbAttrs(collection, item)}
+            alt={item.title}
+            loading={index < EAGER_COUNT ? "eager" : "lazy"}
+          />
         </Panel>
       </a>
     {/each}

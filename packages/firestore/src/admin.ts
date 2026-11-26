@@ -3,6 +3,7 @@ export * as Admin from "./admin.js";
 import { FieldValue } from "firebase-admin/firestore";
 import * as errore from "errore";
 import { db } from "./client.js";
+import { Records } from "./records.js";
 
 export class NotFoundError extends errore.createTaggedError({
   name: "NotFoundError",
@@ -19,8 +20,8 @@ export type AdminError = NotFoundError | FirestoreError;
 /** Deletes a section, plus every corpse it appears in. */
 export async function removeSection(id: string): Promise<true | AdminError> {
   const ref = db().collection("sections").doc(id);
-  const snap = await ref.get();
-  if (!snap.exists) return new NotFoundError({ collection: "sections", id });
+  const snap = await Records.loadOne("sections", id, ["featuredIn"]);
+  if (!snap) return new NotFoundError({ collection: "sections", id });
 
   const featuredIn = (snap.get("featuredIn") ?? []) as { id?: string; path?: string }[];
 
@@ -39,8 +40,8 @@ export async function removeSection(id: string): Promise<true | AdminError> {
 /** Deletes a corpse and clears the reference from its sections. */
 export async function removeCorpse(id: string): Promise<true | AdminError> {
   const ref = db().collection("corpses").doc(id);
-  const snap = await ref.get();
-  if (!snap.exists) return new NotFoundError({ collection: "corpses", id });
+  const snap = await Records.loadOne("corpses", id, ["sections"]);
+  if (!snap) return new NotFoundError({ collection: "corpses", id });
 
   const sections = (snap.get("sections") ?? {}) as Record<string, { id?: string; path?: string }>;
   const batch = db().batch();
@@ -78,7 +79,7 @@ export async function clearFeaturedInRefs(): Promise<true | FirestoreError> {
 
 /** Returns the raw legacy path commands for a section (admin export). */
 export async function sectionDrawing(id: string): Promise<unknown | NotFoundError> {
-  const snap = await db().collection("sections").doc(id).get();
-  if (!snap.exists) return new NotFoundError({ collection: "sections", id });
+  const snap = await Records.loadOne("sections", id, ["drawing"]);
+  if (!snap) return new NotFoundError({ collection: "sections", id });
   return snap.get("drawing");
 }

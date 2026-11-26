@@ -21,6 +21,13 @@ export type LegacyDrawing = Record<string, LegacyPoint[]>;
 /** `sections.drawing` field: canvas-paint data for new drawings, legacy map for old ones. */
 export type StoredDrawing = DrawingData | LegacyDrawing;
 
+export type Collection = "sections" | "corpses";
+
+/**
+ * Summaries carry no image data. The thumbnail is served separately (by id)
+ * and `thumbVersion` changes whenever the stored thumb is replaced, so a
+ * versioned thumb URL can be cached forever.
+ */
 export interface Section {
   id: string;
   type: SectionType;
@@ -28,7 +35,7 @@ export interface Section {
   artist: string;
   date: string;
   likes: number;
-  thumb: string;
+  thumbVersion: number;
   featuredIn: string[];
 }
 
@@ -41,12 +48,29 @@ export interface Corpse {
   title: string;
   date: string;
   likes: number;
-  thumb: string;
+  thumbVersion: number;
   sections: Record<SectionType, string>;
 }
 
 export interface CorpseWithSections extends Corpse {
   panels: Partial<Record<SectionType, SectionWithDrawing>>;
+}
+
+export interface SectionDetail {
+  section: SectionWithDrawing;
+  featuredIn: Corpse[];
+  moreBy: Section[];
+}
+
+export interface LikeState {
+  likes: number;
+  liked: boolean;
+}
+
+/** A stored thumbnail, decoded from its data URL. */
+export interface Thumb {
+  contentType: string;
+  bytes: Uint8Array<ArrayBuffer>;
 }
 
 export interface GalleryPage<T> {

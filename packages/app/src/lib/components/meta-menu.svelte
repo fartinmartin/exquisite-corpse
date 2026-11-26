@@ -1,4 +1,5 @@
 <script lang="ts">
+  import type { DrawingData } from "@ecc/lexicons";
   import DownloadButton from "./download-button.svelte";
   import LikeButton from "./like-button.svelte";
   import PermalinkButton from "./permalink-button.svelte";
@@ -7,19 +8,18 @@
     collection: "sections" | "corpses";
     id: string;
     title: string;
-    thumb: string;
+    drawings: DrawingData[];
     likes: number;
-    liked: boolean;
     artist?: string;
   };
 
-  let { collection, id, title, thumb, likes, liked, artist }: Props = $props();
+  let { collection, id, title, drawings, likes, artist }: Props = $props();
 </script>
 
 <div class="menu">
-  <LikeButton {collection} {id} {likes} {liked} />
+  <LikeButton {collection} {id} {likes} />
   <PermalinkButton {collection} {id} />
-  <DownloadButton image={thumb} {title} {artist} />
+  <DownloadButton {drawings} {title} {artist} />
 </div>
 
 <style lang="scss">

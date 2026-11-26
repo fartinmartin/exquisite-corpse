@@ -1,19 +1,12 @@
 import { error } from "@sveltejs/kit";
-import { getRequestEvent, query } from "$app/server";
+import { query } from "$app/server";
 import * as v from "valibot";
-import { Likes, Sections } from "@ecc/firestore";
+import { Sections } from "@ecc/firestore";
 
+/** Public section page data. Per-visitor like state comes from `getLikeState`. */
 export const getSection = query(v.string(), async (id) => {
-  const section = await Sections.get(id);
-  if (section instanceof Error) error(404, "section not found");
-
-  const [featuredIn, moreBy] = await Promise.all([
-    Sections.featuredIn(id, 3),
-    Sections.moreByArtist(section.artist, { excludeId: id }),
-  ]);
-
-  const liker = getRequestEvent().cookies.get("ecc_guest_token");
-  const likeState = await Likes.state({ collection: "sections", id, liker });
-
-  return { section, featuredIn, moreBy, likeState };
+  const detail = await Sections.detail(id);
+  if (detail instanceof Sections.SectionNotFoundError) error(404, "section not found");
+  if (detail instanceof Error) error(500, detail.message);
+  return detail;
 });

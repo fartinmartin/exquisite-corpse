@@ -1,7 +1,6 @@
 <script lang="ts">
   import { page } from "$app/state";
   import type { SectionType } from "@ecc/firestore";
-  import type { PageData } from "./$types";
   import CanvasPanel from "#lib/components/canvas-panel.svelte";
   import MetaMenu from "#lib/components/meta-menu.svelte";
   import Panel from "#lib/components/panel.svelte";
@@ -10,20 +9,28 @@
   const TYPES: SectionType[] = ["top", "mid", "bot"];
   const id = $derived(page.params.id ?? "");
 
-  let { data }: { data: PageData } = $props();
+  const corpse = $derived(await getCorpse(id));
+  const panels = $derived(TYPES.map((type) => corpse.panels[type]).filter((panel) => panel !== undefined));
+  const drawings = $derived(panels.map((panel) => panel.drawing));
 
-  const result = $derived(await getCorpse(id));
+  /** "a, b, and c" */
+  const artists = $derived(
+    panels
+      .map((panel) => panel.artist)
+      .join(", ")
+      .replace(/,(?!.*,)/gim, ", and")
+  );
 </script>
 
 <svelte:head>
-  <title>{data.title}</title>
-  <meta name="description" content={data.description} />
+  <title>exquisite corpse club ▪ {corpse.title}</title>
+  <meta name="description" content={`an exquisite corpse drawn by ${artists}!`} />
 </svelte:head>
 
   <div class="wrap">
     <div class="canvas-stack mw-canvas">
       {#each TYPES as type (type)}
-        {@const panel = result.corpse.panels[type]}
+        {@const panel = corpse.panels[type]}
         {#if panel}
           <CanvasPanel
             id={type}
@@ -40,14 +47,13 @@
     </div>
 
     <Panel class="mt corpse-meta">
-      <h1>{result.corpse.title}</h1>
+      <h1>{corpse.title}</h1>
       <MetaMenu
         collection="corpses"
-        id={result.corpse.id}
-        title={result.corpse.title}
-        thumb={result.corpse.thumb}
-        likes={result.likeState.likes}
-        liked={result.likeState.liked}
+        id={corpse.id}
+        title={corpse.title}
+        {drawings}
+        likes={corpse.likes}
       />
     </Panel>
   </div>

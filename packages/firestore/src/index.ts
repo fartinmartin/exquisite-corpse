@@ -5,6 +5,7 @@ export * as Likes from "./likes.js";
 export * as Admin from "./admin.js";
 export * as Client from "./client.js";
 export * as Records from "./records.js";
+export * as Thumbs from "./thumbs.js";
 
 export type {
   SectionType,
@@ -12,7 +13,11 @@ export type {
   SectionWithDrawing,
   Corpse,
   CorpseWithSections,
+  Collection,
   GalleryPage,
+  LikeState,
+  SectionDetail,
+  Thumb,
   StoredDrawing,
   LegacyDrawing,
   LegacyPoint,

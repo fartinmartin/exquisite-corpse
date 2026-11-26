@@ -7,6 +7,14 @@ async function canvasPaint() {
   return import("@fartinmartin/canvas-paint/render");
 }
 
+/** Display width of stored thumbnails: ~3× the 172px gallery cell. */
+const THUMB_WIDTH = 540;
+
+/** Width of downloaded images (matches the old full-size thumbs). */
+const DOWNLOAD_WIDTH = 1080;
+
+const THUMB_QUALITY = 0.85;
+
 /** Lexicon paths keep cap/join/tolerance optional; canvas-paint always has them. */
 export function asRenderData(drawing: DrawingData): RenderData {
   return drawing as unknown as RenderData;
@@ -28,39 +36,82 @@ function dpr(): number {
   return typeof devicePixelRatio === "number" ? devicePixelRatio : 1;
 }
 
-/** Sizes a display canvas to its CSS box at device resolution and paints white. */
+/**
+ * Sizes a display canvas to its CSS box at device resolution and paints it
+ * white. The backing store is only reallocated when the size actually changes.
+ */
 function prepare(canvas: HTMLCanvasElement) {
   const rect = canvas.getBoundingClientRect();
   const width = Math.max(1, Math.round(rect.width));
   const height = Math.max(1, Math.round(rect.height));
   const ratio = dpr();
+  const backingWidth = Math.round(width * ratio);
+  const backingHeight = Math.round(height * ratio);
 
-  canvas.width = Math.round(width * ratio);
-  canvas.height = Math.round(height * ratio);
+  if (canvas.width !== backingWidth) canvas.width = backingWidth;
+  if (canvas.height !== backingHeight) canvas.height = backingHeight;
 
   const ctx = canvas.getContext("2d")!;
   ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+  ctx.globalAlpha = 1;
   ctx.fillStyle = "#ffffff";
   ctx.fillRect(0, 0, width, height);
 
   return { ctx, width, height };
 }
 
+/** Renders a drawing at its own document size. */
+export async function renderDrawing(drawing: DrawingData): Promise<HTMLCanvasElement> {
+  const { render } = await canvasPaint();
+  return render(asRenderData(drawing));
+}
+
 /**
- * Draws a stored drawing onto an existing canvas. `pixelate` reproduces the
+ * Paints `paths` onto `target`, which already holds every earlier path of the
+ * same drawing. This is what makes replay O(paths) instead of O(frames × paths).
+ *
+ * canvas-paint's public API only has `render()`, which starts by filling a fresh
+ * canvas with the background. We hand it our canvas through `createCanvas` and
+ * swallow that first `fillRect`, so every path is drawn by canvas-paint's own
+ * code, in order, on one context, exactly as a full `render()` would.
+ * TODO: replace with `drawPathToContext` once canvas-paint exports it.
+ */
+async function paintOnto(target: HTMLCanvasElement, drawing: DrawingData, paths: DrawingData["paths"]) {
+  const { render } = await canvasPaint();
+  const ctx = target.getContext("2d")!;
+  let skippedBackground = false;
+
+  const context = new Proxy(ctx, {
+    get(object, key) {
+      if (key === "fillRect" && !skippedBackground) {
+        skippedBackground = true;
+        return () => {};
+      }
+      const value = Reflect.get(object, key, object);
+      return typeof value === "function" ? value.bind(object) : value;
+    },
+    set(object, key, value) {
+      return Reflect.set(object, key, value, object);
+    },
+  });
+
+  const canvas = { getContext: () => context } as unknown as HTMLCanvasElement;
+  render(asRenderData({ ...drawing, paths }), { createCanvas: () => canvas });
+}
+
+/**
+ * Draws a rendered drawing onto a display canvas. `pixelate` reproduces the
  * live site's blurred, half-opacity sibling preview.
  */
-export async function drawStatic(
+export function blit(
   canvas: HTMLCanvasElement,
-  drawing: DrawingData,
+  source: HTMLCanvasElement,
   { pixelate = false } = {}
-): Promise<void> {
-  const { render } = await canvasPaint();
+): void {
   const { ctx, width, height } = prepare(canvas);
-  const source = render(asRenderData(drawing));
+  ctx.imageSmoothingEnabled = false;
 
   if (!pixelate) {
-    ctx.imageSmoothingEnabled = false;
     ctx.drawImage(source, 0, 0, width, height);
     return;
   }
@@ -73,91 +124,99 @@ export async function drawStatic(
   smallCtx.imageSmoothingEnabled = false;
   smallCtx.drawImage(source, 0, 0, small.width, small.height);
 
-  ctx.imageSmoothingEnabled = false;
   ctx.globalAlpha = 0.5;
   ctx.drawImage(small, 0, 0, small.width, small.height, 0, 0, width, height);
   ctx.globalAlpha = 1;
 }
 
-/** Renders a drawing to a 1080×360 PNG data URL for gallery thumbnails. */
-export async function drawingToThumb(drawing: DrawingData): Promise<string> {
-  const { render } = await canvasPaint();
-  const canvas = render(asRenderData(drawing));
-  return canvas.toDataURL("image/png");
+function reducedMotion(): boolean {
+  return typeof matchMedia === "function" && matchMedia("(prefers-reduced-motion: reduce)").matches;
 }
 
-/** Stacks three PNG data URLs (top/mid/bot) into one corpse preview. */
-export async function mergeThumbs(thumbs: (string | undefined)[]): Promise<string> {
-  const images = await Promise.all(
-    thumbs.map((thumb) => {
-      if (!thumb) return Promise.resolve(null);
-      return new Promise<HTMLImageElement | null>((resolve) => {
-        const image = new Image();
-        image.onload = () => resolve(image);
-        image.onerror = () => resolve(null);
-        image.src = thumb;
-      });
-    })
-  );
-
-  const present = images.filter((image): image is HTMLImageElement => image !== null);
-  if (present.length === 0) return "";
-
-  const width = Math.max(...present.map((image) => image.width));
-  const height = present.reduce(
-    (sum, image) => sum + Math.round((image.height * width) / image.width),
-    0
-  );
-
-  const canvas = document.createElement("canvas");
-  canvas.width = width;
-  canvas.height = height;
-  const ctx = canvas.getContext("2d")!;
-  ctx.fillStyle = "#ffffff";
-  ctx.fillRect(0, 0, width, height);
-
-  let y = 0;
-  for (const image of images) {
-    if (!image) continue;
-    const h = Math.round((image.height * width) / image.width);
-    ctx.drawImage(image, 0, y, width, h);
-    y += h;
-  }
-
-  return canvas.toDataURL("image/png");
-}
-
-function sleep(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
+function nextFrame(): Promise<number> {
+  return new Promise((resolve) => requestAnimationFrame(resolve));
 }
 
 /**
- * Replays a drawing onto a canvas. Renders a bounded number of frames so long
- * drawings stay cheap, then settles on the final image.
+ * Replays a drawing onto a display canvas over `duration` ms, painting only
+ * the paths that are new each frame. Resolves with the fully rendered drawing
+ * (for cheap re-blits on resize), or `null` if aborted.
  */
-export async function drawReplay(
+export async function replay(
   canvas: HTMLCanvasElement,
   drawing: DrawingData,
-  { duration = 500, frames = 40 } = {}
-): Promise<void> {
-  const { render } = await canvasPaint();
+  { duration = 500, signal }: { duration?: number; signal?: AbortSignal } = {}
+): Promise<HTMLCanvasElement | null> {
   const total = drawing.paths.length;
 
-  if (total === 0) {
-    await drawStatic(canvas, drawing);
-    return;
+  if (total === 0 || duration <= 0 || reducedMotion()) {
+    const source = await renderDrawing(drawing);
+    if (signal?.aborted) return null;
+    blit(canvas, source);
+    return source;
   }
 
-  const steps = Math.min(frames, total);
-  const delay = duration / steps;
+  const source = await renderDrawing({ ...drawing, paths: [] });
+  let painted = 0;
+  const start = await nextFrame();
 
-  for (let step = 1; step <= steps; step++) {
-    const upto = Math.ceil((step / steps) * total);
-    const { ctx, width, height } = prepare(canvas);
-    const source = render(asRenderData({ ...drawing, paths: drawing.paths.slice(0, upto) }));
-    ctx.imageSmoothingEnabled = false;
-    ctx.drawImage(source, 0, 0, width, height);
+  while (painted < total) {
+    const now = await nextFrame();
+    if (signal?.aborted) return null;
 
-    if (step < steps && delay > 0) await sleep(delay);
+    const upto = Math.ceil(Math.min(1, (now - start) / duration) * total);
+    if (upto > painted) {
+      await paintOnto(source, drawing, drawing.paths.slice(painted, upto));
+      painted = upto;
+      blit(canvas, source);
+    }
   }
+
+  return source;
+}
+
+/** Stacks drawings top to bottom, each scaled to `width`, on a white canvas. */
+async function stack(drawings: DrawingData[], width: number): Promise<HTMLCanvasElement> {
+  const sources = await Promise.all(drawings.map(renderDrawing));
+  const heights = sources.map((source) => Math.round((source.height * width) / source.width));
+
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = heights.reduce((sum, height) => sum + height, 0);
+
+  const ctx = canvas.getContext("2d")!;
+  ctx.fillStyle = "#ffffff";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.imageSmoothingQuality = "high";
+
+  let y = 0;
+  sources.forEach((source, index) => {
+    ctx.drawImage(source, 0, y, width, heights[index]);
+    y += heights[index];
+  });
+
+  return canvas;
+}
+
+/** WebP where the browser can encode it (Safari can't), JPEG otherwise. Both are far smaller than PNG. */
+function encodeThumb(canvas: HTMLCanvasElement): string {
+  const webp = canvas.toDataURL("image/webp", THUMB_QUALITY);
+  if (webp.startsWith("data:image/webp")) return webp;
+  return canvas.toDataURL("image/jpeg", THUMB_QUALITY);
+}
+
+/** Gallery thumbnail for one section. */
+export async function drawingToThumb(drawing: DrawingData): Promise<string> {
+  return encodeThumb(await stack([drawing], THUMB_WIDTH));
+}
+
+/** Gallery thumbnail for a corpse: its panels stacked top/mid/bot. */
+export async function corpseToThumb(drawings: DrawingData[]): Promise<string> {
+  return encodeThumb(await stack(drawings, THUMB_WIDTH));
+}
+
+/** Full-size PNG of one or more stacked drawings, for the download button. */
+export async function drawingsToPng(drawings: DrawingData[]): Promise<Blob | null> {
+  const canvas = await stack(drawings, DOWNLOAD_WIDTH);
+  return new Promise((resolve) => canvas.toBlob(resolve, "image/png"));
 }

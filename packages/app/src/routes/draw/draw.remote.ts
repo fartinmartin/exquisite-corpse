@@ -18,23 +18,21 @@ export interface Sibling {
   type: SectionType;
   title: string;
   artist: string;
-  thumb: string;
   drawing: DrawingData;
 }
 
 /** Two random sections to draw against, for the section the artist picked. */
 export const getSiblings = query(SectionTypeSchema, async (type) => {
+  const sections = await Promise.all(SIBLING_TYPES[type].map(Sections.randomByType));
   const siblings: Partial<Record<SectionType, Sibling>> = {};
 
-  for (const siblingType of SIBLING_TYPES[type]) {
-    const section = await Sections.randomByType(siblingType);
+  for (const section of sections) {
     if (!section) continue;
-    siblings[siblingType] = {
+    siblings[section.type] = {
       id: section.id,
       type: section.type,
       title: section.title,
       artist: section.artist,
-      thumb: section.thumb,
       drawing: section.drawing,
     };
   }
@@ -52,7 +50,7 @@ const SaveInput = v.object({
   title: v.pipe(v.string(), v.maxLength(40)),
   artist: v.pipe(v.string(), v.maxLength(30)),
   drawing: DrawingDataSchema,
-  // PNG data URL rendered client-side; Firestore caps documents at 1 MiB.
+  // Image data URL rendered client-side; Firestore caps documents at 1 MiB.
   thumb: v.pipe(v.string(), v.maxLength(600_000)),
   siblings: v.object({
     top: v.optional(v.string()),
@@ -77,7 +75,6 @@ export const saveDrawing = command(SaveInput, async (input) => {
     thumb: input.thumb,
     siblings: input.siblings,
     corpseThumb: input.corpseThumb,
-    liker: event.cookies.get("ecc_guest_token"),
   });
 
   if (result instanceof Sections.DrawingTooLargeError) error(413, result.message);

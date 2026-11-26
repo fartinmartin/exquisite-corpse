@@ -2,7 +2,7 @@ export * as Fixtures from "./fixtures.js";
 
 import type { DrawingData } from "@ecc/lexicons";
 import type { CorpseRecord, SectionRecord } from "./records.js";
-import type { Corpse, Section, SectionType, SectionWithDrawing } from "./types.js";
+import type { Collection, Corpse, Section, SectionType, SectionWithDrawing } from "./types.js";
 import { Drawing } from "./drawing.js";
 import { SECTION_TYPES } from "./types.js";
 
@@ -96,6 +96,7 @@ function seed(): void {
       likes: (i * 7) % 13,
       likedBy: [],
       thumb: panelSvg(type, ["#deebff", "#fff29d", "#d1ee7f"][i % 3]),
+      thumbVersion: 0,
       featuredIn: [],
       drawing: drawingFor(type),
     });
@@ -115,6 +116,7 @@ function seed(): void {
       likes: i * 3,
       likedBy: [],
       thumb: corpseSvg(["#deebff", "#fff29d", "#d1ee7f"]),
+      thumbVersion: 0,
       sections: {
         top: panels[0].id,
         mid: panels[1].id,
@@ -130,13 +132,25 @@ function seed(): void {
 }
 
 function summary(record: SectionRecord): SectionWithDrawing {
-  const { likedBy: _likedBy, ...rest } = record;
+  const { likedBy: _likedBy, thumb: _thumb, ...rest } = record;
+  return rest;
+}
+
+function listItem(record: SectionRecord): Section {
+  const { drawing: _drawing, likedBy: _likedBy, thumb: _thumb, ...rest } = record;
   return rest;
 }
 
 function corpseSummary(record: CorpseRecord): Corpse {
-  const { likedBy: _likedBy, ...rest } = record;
+  const { likedBy: _likedBy, thumb: _thumb, ...rest } = record;
   return rest;
+}
+
+export function thumb(collection: Collection, id: string): string | undefined {
+  seed();
+  const records: (SectionRecord | CorpseRecord)[] =
+    collection === "sections" ? store.sections : store.corpses;
+  return records.find((entry) => entry.id === id)?.thumb;
 }
 
 export function section(id: string): SectionWithDrawing | null {
@@ -166,10 +180,7 @@ export function listSections(options: {
     );
 
   const start = options.page * options.pageSize;
-  const items = filtered.slice(start, start + options.pageSize).map((record) => {
-    const { drawing: _drawing, likedBy: _likedBy, ...rest } = record;
-    return rest;
-  });
+  const items = filtered.slice(start, start + options.pageSize).map(listItem);
 
   return { items, page: options.page, hasMore: start + options.pageSize < filtered.length };
 }
@@ -181,6 +192,7 @@ export function saveSection(input: {
   drawing: DrawingData;
   thumb: string;
   siblings: Partial<Record<SectionType, string>>;
+  corpseThumb?: string;
 }): { sectionId: string; corpseId: string } {
   seed();
   const sectionId = `sec_fixture_${store.sections.length}`;
@@ -195,6 +207,7 @@ export function saveSection(input: {
     likes: 0,
     likedBy: [],
     thumb: input.thumb,
+    thumbVersion: 0,
     featuredIn: [corpseId],
     drawing: input.drawing,
   });
@@ -208,15 +221,14 @@ export function saveSection(input: {
     if (sibling) panels[type] = sibling.id;
   }
 
-  const thumb = corpseSvg(["#deebff", "#fff29d", "#d1ee7f"]);
-
   store.corpses.push({
     id: corpseId,
     title: "fresh corpse",
     date: new Date().toISOString(),
     likes: 0,
     likedBy: [],
-    thumb,
+    thumb: input.corpseThumb ?? corpseSvg(["#deebff", "#fff29d", "#d1ee7f"]),
+    thumbVersion: 0,
     sections: {
       top: panels.top ?? sectionId,
       mid: panels.mid ?? sectionId,
@@ -243,10 +255,7 @@ export function moreByArtist(artist: string, excludeId?: string): Section[] {
     .filter((entry) => entry.artist === artist && entry.id !== excludeId)
     .sort((a, b) => b.likes - a.likes)
     .slice(0, 6)
-    .map((record) => {
-      const { drawing: _drawing, likedBy: _likedBy, ...rest } = record;
-      return rest;
-    });
+    .map(listItem);
 }
 
 export function corpse(id: string): Corpse & { panels: Partial<Record<SectionType, SectionWithDrawing>> } {

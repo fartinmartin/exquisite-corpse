@@ -5,14 +5,7 @@ import * as errore from "errore";
 import { db } from "./client.js";
 import { Fixtures } from "./fixtures.js";
 import { Drawing } from "./drawing.js";
-import {
-  Records,
-  corpseToRecord,
-  corpseToSummary,
-  sectionToRecord,
-  type CorpseRecord,
-  type SectionRecord,
-} from "./records.js";
+import { Records } from "./records.js";
 import type {
   Corpse,
   CorpseWithSections,
@@ -47,27 +40,25 @@ function mashupTitle(titles: string[]): string {
 }
 
 async function panelsFor(sections: Corpse["sections"]): Promise<CorpseWithSections["panels"]> {
-  const ids = [sections.top, sections.mid, sections.bot].filter(Boolean);
+  const ids = [sections.top, sections.mid, sections.bot];
+  const snaps = await Records.loadMany("sections", ids, Records.SECTION_DRAWING_FIELDS);
   const panels: CorpseWithSections["panels"] = {};
 
-  for (const doc of await Records.loadSections(ids)) {
-    const record = sectionToRecord(doc);
-    if (record) panels[record.type] = { ...Records.sectionToSummary(record), drawing: record.drawing };
+  for (const panel of snaps.map(Records.toSectionWithDrawing).filter(Records.isPresent)) {
+    panels[panel.type] = panel;
   }
 
   return panels;
 }
 
+/** A corpse and its three panels' drawings, in two round trips. */
 export async function get(id: string): Promise<CorpseWithSections | CorpseError> {
   if (Fixtures.enabled()) return Fixtures.corpse(id);
 
   try {
-    const snap = await db().collection("corpses").doc(id).get();
-    if (!snap.exists) return new CorpseNotFoundError({ id });
-    const record = corpseToRecord(snap);
-    if (!record) return new CorpseNotFoundError({ id });
-
-    const corpse = corpseToSummary(record);
+    const snap = await Records.loadOne("corpses", id, Records.CORPSE_SUMMARY_FIELDS);
+    const corpse = snap ? Records.toCorpse(snap) : null;
+    if (!corpse) return new CorpseNotFoundError({ id });
     return { ...corpse, panels: await panelsFor(corpse.sections) };
   } catch (cause) {
     return new FirestoreError({ cause });
@@ -77,12 +68,9 @@ export async function get(id: string): Promise<CorpseWithSections | CorpseError>
 export async function random(): Promise<CorpseWithSections | null> {
   if (Fixtures.enabled()) return Fixtures.randomCorpse();
 
-  const snap = await Records.randomSnapshot("corpses");
-  if (!snap) return null;
-  const record = corpseToRecord(snap);
-  if (!record) return null;
-
-  const corpse = corpseToSummary(record);
+  const snap = await Records.randomSnapshot("corpses", { fields: Records.CORPSE_SUMMARY_FIELDS });
+  const corpse = snap ? Records.toCorpse(snap) : null;
+  if (!corpse) return null;
   return { ...corpse, panels: await panelsFor(corpse.sections) };
 }
 
@@ -95,33 +83,37 @@ export async function list(options: {
 
   const query = db()
     .collection("corpses")
-    .orderBy(options.sort === "likes" ? "likes" : "date", "desc");
+    .orderBy(options.sort === "likes" ? "likes" : "date", "desc")
+    .select(...Records.CORPSE_SUMMARY_FIELDS);
 
   const { docs, hasMore } = await Records.paginate(query, {
     page: options.page,
     pageSize: options.pageSize,
   });
 
-  const items = docs
-    .map((doc) => corpseToRecord(doc))
-    .filter((record): record is CorpseRecord => record !== null)
-    .map(corpseToSummary);
-
-  return { items, page: options.page, hasMore };
+  return { items: docs.map(Records.toCorpse).filter(Records.isPresent), page: options.page, hasMore };
 }
 
 /** Re-stacks a corpse's thumbnail from its three sections' thumbs. */
 export async function rebuildThumb(id: string): Promise<true | CorpseError> {
   if (Fixtures.enabled()) return true;
 
-  const corpse = await get(id);
-  if (corpse instanceof Error) return corpse;
-
-  const thumbs = SECTION_TYPES.map((type) => corpse.panels[type]?.thumb);
-  const thumb = await Drawing.composeThumbs(thumbs);
-
   try {
-    await db().collection("corpses").doc(id).update({ thumb });
+    const snap = await Records.loadOne("corpses", id, Records.CORPSE_SUMMARY_FIELDS);
+    const corpse = snap ? Records.toCorpse(snap) : null;
+    if (!corpse) return new CorpseNotFoundError({ id });
+
+    const panels = await Records.loadMany(
+      "sections",
+      SECTION_TYPES.map((type) => corpse.sections[type]),
+      ["type", "thumb"]
+    );
+    const thumbFor = (type: SectionType) =>
+      panels.find((panel) => panel.get("type") === type)?.get("thumb") as string | undefined;
+    const thumb = await Drawing.composeThumbs(SECTION_TYPES.map(thumbFor));
+
+    // A new version gives the thumb a new URL, so cached copies are never served.
+    await db().collection("corpses").doc(id).update({ thumb, thumbVersion: Date.now() });
     return true;
   } catch (cause) {
     return new FirestoreError({ cause });
@@ -138,18 +130,29 @@ export async function createFromSection(sectionId: string): Promise<{ corpseId: 
     return result ?? new CorpseNotFoundError({ id: sectionId });
   }
 
-  const snap = await db().collection("sections").doc(sectionId).get();
-  const section = snap.exists ? sectionToRecord(snap) : null;
-  if (!section) return new CorpseNotFoundError({ id: sectionId });
+  const PANEL_FIELDS = ["type", "title", "thumb"];
+  const snap = await Records.loadOne("sections", sectionId, PANEL_FIELDS);
+  const type = snap?.get("type") as SectionType | undefined;
+  if (!snap || !type) return new CorpseNotFoundError({ id: sectionId });
 
-  const panels: Partial<Record<SectionType, SectionRecord>> = { [section.type]: section };
+  type Panel = { id: string; title: string; thumb?: string };
+  const toPanel = (doc: FirebaseFirestore.DocumentSnapshot): Panel => ({
+    id: doc.id,
+    title: doc.get("title") ?? "untitled",
+    thumb: doc.get("thumb"),
+  });
+  const panels: Partial<Record<SectionType, Panel>> = { [type]: toPanel(snap) };
 
-  for (const type of SECTION_TYPES) {
-    if (type === section.type) continue;
-    const other = await Records.randomSnapshot("sections", { field: "type", value: type });
-    const record = other ? sectionToRecord(other) : null;
-    if (record) panels[type] = record;
-  }
+  const others = await Promise.all(
+    SECTION_TYPES.filter((other) => other !== type).map(async (other) => {
+      const doc = await Records.randomSnapshot("sections", {
+        fields: PANEL_FIELDS,
+        filter: { field: "type", value: other },
+      });
+      return [other, doc] as const;
+    })
+  );
+  for (const [other, doc] of others) if (doc) panels[other] = toPanel(doc);
 
   const corpseRef = db().collection("corpses").doc();
   const thumb = await Drawing.composeThumbs(
@@ -194,8 +197,9 @@ export async function createFromSection(sectionId: string): Promise<{ corpseId: 
 export async function remove(id: string): Promise<true | CorpseError> {
   if (Fixtures.enabled()) return Fixtures.removeCorpse(id);
 
-  const corpse = await get(id);
-  if (corpse instanceof Error) return corpse;
+  const snap = await Records.loadOne("corpses", id, ["sections"]);
+  const corpse = snap ? Records.toCorpse(snap) : null;
+  if (!corpse) return new CorpseNotFoundError({ id });
 
   const corpseRef = db().collection("corpses").doc(id);
   const batch = db().batch();

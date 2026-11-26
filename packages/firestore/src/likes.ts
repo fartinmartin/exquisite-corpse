@@ -4,6 +4,8 @@ import { FieldValue } from "firebase-admin/firestore";
 import * as errore from "errore";
 import { db } from "./client.js";
 import { Fixtures } from "./fixtures.js";
+import { Records } from "./records.js";
+import type { Collection, LikeState } from "./types.js";
 
 export class LikeTargetNotFoundError extends errore.createTaggedError({
   name: "LikeTargetNotFoundError",
@@ -15,12 +17,7 @@ export class FirestoreError extends errore.createTaggedError({
   message: "Firestore request failed",
 }) {}
 
-export type Collection = "sections" | "corpses";
-
-export interface LikeState {
-  likes: number;
-  liked: boolean;
-}
+export type { Collection, LikeState };
 
 /**
  * Toggles a like for an opaque liker id (the guest cookie), keeping the
@@ -40,8 +37,9 @@ export async function toggle(input: {
 
   try {
     return await db().runTransaction(async (tx) => {
-      const snap = await tx.get(ref);
-      if (!snap.exists) throw new LikeTargetNotFoundError(input);
+      // Only the like fields: the rest of the doc (drawing, thumb) is large.
+      const [snap] = await tx.getAll(ref, { fieldMask: Records.LIKE_FIELDS });
+      if (!snap?.exists) throw new LikeTargetNotFoundError(input);
 
       const likedBy: string[] = Array.isArray(snap.get("likedBy")) ? snap.get("likedBy") : [];
       const liked = likedBy.includes(input.liker);
@@ -70,12 +68,8 @@ export async function state(input: {
 }): Promise<LikeState> {
   if (Fixtures.enabled()) return Fixtures.likeState(input.collection, input.id, input.liker);
 
-  const snap = await db().collection(input.collection).doc(input.id).get();
-  const likedBy: string[] = Array.isArray(snap.get("likedBy")) ? snap.get("likedBy") : [];
-  return {
-    likes: snap.get("likes") ?? 0,
-    liked: Boolean(input.liker && likedBy.includes(input.liker)),
-  };
+  const snap = await Records.loadOne(input.collection, input.id, Records.LIKE_FIELDS);
+  return snap ? Records.toLikeState(snap, input.liker) : { likes: 0, liked: false };
 }
 
 /** Admin helper: zero out likes on every corpse and section. */

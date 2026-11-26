@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { DrawingData } from "@ecc/lexicons";
   import { drawState } from "#lib/draw/state.svelte.ts";
-  import { drawReplay, drawStatic } from "#lib/render.ts";
+  import { blit, renderDrawing, replay } from "#lib/render.ts";
   import Panel from "./panel.svelte";
 
   type Mode = "draw" | "display" | "pixelate";
@@ -78,23 +78,28 @@
     const target = canvas;
     if (!target || !data) return;
 
-    let animating = true;
+    const controller = new AbortController();
+    const pixelate = currentMode === "pixelate";
+    // The fully rendered drawing, kept so a resize is a cheap re-blit.
+    let source: HTMLCanvasElement | null = null;
 
-    const render = () => {
-      if (animating && currentMode === "display") {
-        void drawReplay(target, data, { duration }).finally(() => (animating = false));
-      } else {
-        void drawStatic(target, data, { pixelate: currentMode === "pixelate" });
-      }
-    };
+    void (async () => {
+      source =
+        currentMode === "display"
+          ? await replay(target, data, { duration, signal: controller.signal })
+          : await renderDrawing(data);
+      if (source && !controller.signal.aborted) blit(target, source, { pixelate });
+    })();
 
     const observer = new ResizeObserver(() => {
-      if (!animating) render();
+      if (source) blit(target, source, { pixelate });
     });
     observer.observe(target);
-    render();
 
-    return () => observer.disconnect();
+    return () => {
+      controller.abort();
+      observer.disconnect();
+    };
   });
 
   // keep the brush in sync with the toolbar

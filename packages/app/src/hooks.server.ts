@@ -1,37 +1,54 @@
-import { redirect } from '@sveltejs/kit';
-import type { Handle } from '@sveltejs/kit/hooks';
-import { joyful } from 'joyful';
+import { redirect } from "@sveltejs/kit";
+import type { Handle } from "@sveltejs/kit/hooks";
+import { joyful } from "joyful";
+import { COOKIE_OPTIONS, GUEST_HANDLE_COOKIE } from "#lib/draw/state.svelte.ts";
 
-const GUEST_TOKEN_COOKIE = 'ecc_guest_token';
-const GUEST_HANDLE_COOKIE = 'ecc_guest_handle';
+/** Pages whose HTML is the same for every visitor. */
+const PUBLIC_ROUTES = new Set(["/gallery", "/gallery/section/[id]", "/gallery/corpse/[id]"]);
 
-// Server startup hook — good place to initialize background services
-// (e.g. firehose subscription for real-time section discovery) when needed
+/** Remote queries (`/_app/remote/<hash>/<name>`) whose results are the same for every visitor. */
+const PUBLIC_QUERIES = new Set(["listGallery", "getSection", "getCorpse"]);
+
+/**
+ * Browsers revalidate every time; Netlify's CDN serves a shared copy for a
+ * minute and keeps serving it while it refreshes in the background, so new
+ * drawings and like counts show up within about a minute.
+ */
+const PUBLIC_CACHE = {
+  "cache-control": "public, max-age=0, must-revalidate",
+  "netlify-cdn-cache-control": "public, s-maxage=60, stale-while-revalidate=600, durable",
+};
+
+function isPublic(event: Parameters<Handle>[0]["event"]): boolean {
+  if (event.request.method !== "GET") return false;
+  if (event.route.id && PUBLIC_ROUTES.has(event.route.id)) return true;
+
+  const [, app, remote, , name] = event.url.pathname.split("/");
+  return app === "_app" && remote === "remote" && PUBLIC_QUERIES.has(name ?? "");
+}
+
 export const handle: Handle = async ({ event, resolve }) => {
   // Keep likes, cookies and analytics on one domain. Exact match only, so
   // deploy permalinks (`<id>--….netlify.app`) still work.
-  if (event.url.hostname === 'exquisite-corpse-club.netlify.app') {
+  if (event.url.hostname === "exquisite-corpse-club.netlify.app") {
     redirect(301, `https://exquisitecorpse.club${event.url.pathname}${event.url.search}`, { external: true });
   }
 
-  if (!event.cookies.get(GUEST_TOKEN_COOKIE)) {
-    const token = crypto.randomUUID();
-    const handle = joyful({ segments: 2, separator: '-' });
-
-    event.cookies.set(GUEST_TOKEN_COOKIE, token, {
-      path: '/',
-      httpOnly: true,
-      sameSite: 'lax',
-      maxAge: 60 * 60 * 24 * 365 // 1 year
-    });
-
-    event.cookies.set(GUEST_HANDLE_COOKIE, handle, {
-      path: '/',
+  // The draw page shows this as the default artist name. Other pages don't
+  // need it, and skipping Set-Cookie there keeps them cacheable. The guest
+  // token for likes is issued by `toggleLike`.
+  if (event.route.id === "/draw" && !event.cookies.get(GUEST_HANDLE_COOKIE)) {
+    event.cookies.set(GUEST_HANDLE_COOKIE, joyful({ segments: 2, separator: "-" }), {
+      ...COOKIE_OPTIONS,
       httpOnly: false, // readable client-side for display
-      sameSite: 'lax',
-      maxAge: 60 * 60 * 24 * 365,
     });
   }
 
-  return resolve(event);
+  const response = await resolve(event);
+
+  if (isPublic(event) && response.ok && !response.headers.has("set-cookie")) {
+    for (const [name, value] of Object.entries(PUBLIC_CACHE)) response.headers.set(name, value);
+  }
+
+  return response;
 };
