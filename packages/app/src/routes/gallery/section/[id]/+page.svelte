@@ -1,9 +1,9 @@
 <script lang="ts">
   import { page } from "$app/state";
-  import CanvasPanel from "$lib/components/canvas-panel.svelte";
-  import MetaMenu from "$lib/components/meta-menu.svelte";
-  import Panel from "$lib/components/panel.svelte";
-  import RadioButton from "$lib/components/radio-button.svelte";
+  import CanvasPanel from "#lib/components/canvas-panel.svelte";
+  import MetaMenu from "#lib/components/meta-menu.svelte";
+  import Panel from "#lib/components/panel.svelte";
+  import RadioButton from "#lib/components/radio-button.svelte";
   import type { PageData } from "./$types";
   import { getSection } from "./section.remote";
 

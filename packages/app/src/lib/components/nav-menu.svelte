@@ -1,6 +1,6 @@
 <script lang="ts">
   import Icon from "./icon.svelte";
-  import { help } from "$lib/help.svelte";
+  import { help } from "#lib/help.svelte.ts";
   import { page } from "$app/state";
 
   const isIndex = $derived(page.route.id === "/");

@@ -1,5 +1,5 @@
 import { redirect } from "@sveltejs/kit";
-import { ADMIN_COOKIE } from "$lib/server/admin";
+import { ADMIN_COOKIE } from "#lib/server/admin.ts";
 import type { RequestHandler } from "./$types";
 
 export const POST: RequestHandler = ({ cookies }) => {

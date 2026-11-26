@@ -1,6 +1,6 @@
 <script lang="ts">
   import { navigating } from "$app/state";
-  import { drawState } from "$lib/draw/state.svelte";
+  import { drawState } from "#lib/draw/state.svelte.ts";
 
   type CursorState = "auto" | "pointer" | "disabled" | "grab" | "draw" | "erase" | "fill";
 

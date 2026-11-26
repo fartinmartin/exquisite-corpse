@@ -2,7 +2,7 @@ import { command, getRequestEvent, query } from "$app/server";
 import { error } from "@sveltejs/kit";
 import * as v from "valibot";
 import { Admin, Corpses, Likes, Sections } from "@ecc/firestore";
-import { requireAdmin } from "$lib/server/admin";
+import { requireAdmin } from "#lib/server/admin.ts";
 
 function context() {
   const event = getRequestEvent();

@@ -2,7 +2,7 @@
   import type { SectionType } from "@ecc/firestore";
   import Icon from "./icon.svelte";
   import Panel from "./panel.svelte";
-  import { help } from "$lib/help.svelte";
+  import { help } from "#lib/help.svelte.ts";
 
   type Props = {
     onpick: (type: SectionType) => void;

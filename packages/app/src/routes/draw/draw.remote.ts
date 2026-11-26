@@ -5,7 +5,7 @@ import { joyful } from "joyful";
 import { Sections } from "@ecc/firestore";
 import { DrawingDataSchema, SectionTypeSchema, type DrawingData } from "@ecc/lexicons";
 import type { SectionType } from "@ecc/firestore";
-import { COOKIE_OPTIONS, GUEST_HANDLE_COOKIE } from "$lib/draw/state.svelte";
+import { COOKIE_OPTIONS, GUEST_HANDLE_COOKIE } from "#lib/draw/state.svelte.ts";
 
 const SIBLING_TYPES: Record<SectionType, SectionType[]> = {
   top: ["mid", "bot"],

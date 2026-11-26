@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { drawState } from "$lib/draw/state.svelte";
+  import { drawState } from "#lib/draw/state.svelte.ts";
   import Icon from "./icon.svelte";
   import Panel from "./panel.svelte";
   import RadioButton from "./radio-button.svelte";

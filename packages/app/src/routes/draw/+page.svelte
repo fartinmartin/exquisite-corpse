@@ -2,14 +2,14 @@
   import { goto } from "$app/navigation";
   import type { SectionType } from "@ecc/firestore";
   import type { DrawingData } from "@ecc/lexicons";
-  import CanvasPanel from "$lib/components/canvas-panel.svelte";
-  import Loading from "$lib/components/loading.svelte";
-  import Panel from "$lib/components/panel.svelte";
-  import SaveModal from "$lib/components/save-modal.svelte";
-  import SectionPicker from "$lib/components/section-picker.svelte";
-  import Toolbar from "$lib/components/toolbar.svelte";
-  import { drawState, GUEST_HANDLE_COOKIE } from "$lib/draw/state.svelte";
-  import { drawingToThumb, mergeThumbs } from "$lib/render";
+  import CanvasPanel from "#lib/components/canvas-panel.svelte";
+  import Loading from "#lib/components/loading.svelte";
+  import Panel from "#lib/components/panel.svelte";
+  import SaveModal from "#lib/components/save-modal.svelte";
+  import SectionPicker from "#lib/components/section-picker.svelte";
+  import Toolbar from "#lib/components/toolbar.svelte";
+  import { drawState, GUEST_HANDLE_COOKIE } from "#lib/draw/state.svelte.ts";
+  import { drawingToThumb, mergeThumbs } from "#lib/render.ts";
   import { getSiblings, randomTitle, saveDrawing, type Sibling } from "./draw.remote";
 
   const TYPES: SectionType[] = ["top", "mid", "bot"];

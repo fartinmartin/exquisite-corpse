@@ -18,13 +18,13 @@
   },
   "dependencies": {
     "@ecc/lexicons": "workspace:*",
-    "canvas": "^3.2.1",
-    "errore": "^0.14.0",
+    "canvas": "^3.2.3",
+    "errore": "^0.14.1",
     "firebase-admin": "^14.5.1",
-    "valibot": "^1.1.0"
+    "valibot": "^1.5.0"
   },
   "devDependencies": {
-    "@types/node": "^25.5.0",
-    "typescript": "^5.0.0"
+    "@types/node": "^25.9.12",
+    "typescript": "^6.0.3"
   }
 }

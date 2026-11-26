@@ -1,4 +1,5 @@
-import { redirect, type Handle } from '@sveltejs/kit';
+import { redirect } from '@sveltejs/kit';
+import type { Handle } from '@sveltejs/kit/hooks';
 import { joyful } from 'joyful';
 
 const GUEST_TOKEN_COOKIE = 'ecc_guest_token';
@@ -10,7 +11,7 @@ export const handle: Handle = async ({ event, resolve }) => {
   // Keep likes, cookies and analytics on one domain. Exact match only, so
   // deploy permalinks (`<id>--….netlify.app`) still work.
   if (event.url.hostname === 'exquisite-corpse-club.netlify.app') {
-    redirect(301, `https://exquisitecorpse.club${event.url.pathname}${event.url.search}`);
+    redirect(301, `https://exquisitecorpse.club${event.url.pathname}${event.url.search}`, { external: true });
   }
 
   if (!event.cookies.get(GUEST_TOKEN_COOKIE)) {
@@ -21,7 +22,7 @@ export const handle: Handle = async ({ event, resolve }) => {
       path: '/',
       httpOnly: true,
       sameSite: 'lax',
-      maxAge: 60 * 60 * 24 * 365, // 1 year
+      maxAge: 60 * 60 * 24 * 365 // 1 year
     });
 
     event.cookies.set(GUEST_HANDLE_COOKIE, handle, {

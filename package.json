@@ -10,11 +10,11 @@
     "lexicons:generate": "pnpm --filter @ecc/lexicons generate"
   },
   "engines": {
-    "node": ">=20",
+    "node": ">=22.17",
     "pnpm": ">=9"
   },
   "devDependencies": {
-    "@varlock/1password-plugin": "^0.2.3",
-    "varlock": "^0.5.0"
+    "@varlock/1password-plugin": "^2.0.7",
+    "varlock": "^1.25.0"
   }
 }

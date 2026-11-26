@@ -1,8 +1,8 @@
 <script lang="ts">
   import type { SectionType } from "@ecc/firestore";
-  import CanvasPanel from "$lib/components/canvas-panel.svelte";
-  import NavMenu from "$lib/components/nav-menu.svelte";
-  import Panel from "$lib/components/panel.svelte";
+  import CanvasPanel from "#lib/components/canvas-panel.svelte";
+  import NavMenu from "#lib/components/nav-menu.svelte";
+  import Panel from "#lib/components/panel.svelte";
   import { randomCorpse } from "./home.remote";
 
   const TYPES: SectionType[] = ["top", "mid", "bot"];

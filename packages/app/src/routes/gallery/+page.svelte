@@ -1,8 +1,8 @@
 <script lang="ts">
-  import DateIcon from "$lib/components/date-icon.svelte";
-  import Icon from "$lib/components/icon.svelte";
-  import Panel from "$lib/components/panel.svelte";
-  import RadioButton from "$lib/components/radio-button.svelte";
+  import DateIcon from "#lib/components/date-icon.svelte";
+  import Icon from "#lib/components/icon.svelte";
+  import Panel from "#lib/components/panel.svelte";
+  import RadioButton from "#lib/components/radio-button.svelte";
   import GalleryGrid from "./gallery-grid.svelte";
 
   type Filter = "corpses" | "top" | "mid" | "bot";

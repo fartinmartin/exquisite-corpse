@@ -1,6 +1,6 @@
 <script lang="ts">
   import { page } from "$app/state";
-  import Panel from "$lib/components/panel.svelte";
+  import Panel from "#lib/components/panel.svelte";
 
   const notFound = $derived(page.status === 404);
 </script>

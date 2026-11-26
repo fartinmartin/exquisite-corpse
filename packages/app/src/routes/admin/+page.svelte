@@ -1,7 +1,7 @@
 <script lang="ts">
-  import Button from "$lib/components/button.svelte";
-  import Input from "$lib/components/input.svelte";
-  import Panel from "$lib/components/panel.svelte";
+  import Button from "#lib/components/button.svelte";
+  import Input from "#lib/components/input.svelte";
+  import Panel from "#lib/components/panel.svelte";
   import {
     deleteCorpse,
     deleteSection,

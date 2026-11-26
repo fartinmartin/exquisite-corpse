@@ -1,8 +1,8 @@
 <script lang="ts">
   import type { ActionData } from "./$types";
-  import Button from "$lib/components/button.svelte";
-  import Input from "$lib/components/input.svelte";
-  import Panel from "$lib/components/panel.svelte";
+  import Button from "#lib/components/button.svelte";
+  import Input from "#lib/components/input.svelte";
+  import Panel from "#lib/components/panel.svelte";
 
   let { form }: { form: ActionData } = $props();
   let password = $state("");

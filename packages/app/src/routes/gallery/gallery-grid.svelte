@@ -1,8 +1,8 @@
 <script lang="ts">
   import type { Corpse, Section } from "@ecc/firestore";
-  import Loading from "$lib/components/loading.svelte";
-  import Panel from "$lib/components/panel.svelte";
-  import PrevNext from "$lib/components/prev-next.svelte";
+  import Loading from "#lib/components/loading.svelte";
+  import Panel from "#lib/components/panel.svelte";
+  import PrevNext from "#lib/components/prev-next.svelte";
   import { listGallery } from "./gallery.remote";
 
   type Filter = "corpses" | "top" | "mid" | "bot";

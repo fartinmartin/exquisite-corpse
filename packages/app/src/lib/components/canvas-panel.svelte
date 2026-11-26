@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { DrawingData } from "@ecc/lexicons";
-  import { drawState } from "$lib/draw/state.svelte";
-  import { drawReplay, drawStatic } from "$lib/render";
+  import { drawState } from "#lib/draw/state.svelte.ts";
+  import { drawReplay, drawStatic } from "#lib/render.ts";
   import Panel from "./panel.svelte";
 
   type Mode = "draw" | "display" | "pixelate";

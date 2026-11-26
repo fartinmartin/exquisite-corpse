@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { toggleLike } from "$lib/likes.remote";
-  import heart from "$lib/assets/heart.svg?raw";
+  import { toggleLike } from "#lib/likes.remote.ts";
+  import heart from "#lib/assets/heart.svg?raw";
   import Icon from "./icon.svelte";
 
   type Props = {

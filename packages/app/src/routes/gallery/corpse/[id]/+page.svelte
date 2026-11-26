@@ -2,9 +2,9 @@
   import { page } from "$app/state";
   import type { SectionType } from "@ecc/firestore";
   import type { PageData } from "./$types";
-  import CanvasPanel from "$lib/components/canvas-panel.svelte";
-  import MetaMenu from "$lib/components/meta-menu.svelte";
-  import Panel from "$lib/components/panel.svelte";
+  import CanvasPanel from "#lib/components/canvas-panel.svelte";
+  import MetaMenu from "#lib/components/meta-menu.svelte";
+  import Panel from "#lib/components/panel.svelte";
   import { getCorpse } from "./corpse.remote";
 
   const TYPES: SectionType[] = ["top", "mid", "bot"];

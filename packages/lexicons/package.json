@@ -17,10 +17,10 @@
     "dev": "tsc --watch"
   },
   "dependencies": {
-    "valibot": "^1.1.0"
+    "valibot": "^1.5.0"
   },
   "devDependencies": {
-    "tsx": "^4.19.0",
-    "typescript": "^5.0.0"
+    "tsx": "^4.23.15",
+    "typescript": "^6.0.3"
   }
 }

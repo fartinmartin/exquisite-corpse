@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { help } from "$lib/help.svelte";
+  import { help } from "#lib/help.svelte.ts";
   import Button from "./button.svelte";
   import Icon from "./icon.svelte";
   import Panel from "./panel.svelte";

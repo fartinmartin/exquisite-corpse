@@ -1,5 +1,5 @@
 import { fail, redirect } from "@sveltejs/kit";
-import { ADMIN_COOKIE, adminToken, isAdmin } from "$lib/server/admin";
+import { ADMIN_COOKIE, adminToken, isAdmin } from "#lib/server/admin.ts";
 import type { Actions, PageServerLoad } from "./$types";
 
 export const load: PageServerLoad = ({ cookies }) => {

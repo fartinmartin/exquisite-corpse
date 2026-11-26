@@ -4,11 +4,16 @@ The live site's Nuxt/Vue app is being replaced by this SvelteKit app, reading an
 writing the **existing Firebase project** (`exquisite-corpse-club`). atproto is
 deferred — that work lives on the `atproto` branch.
 
-## Experimental flags (svelte.config.js)
+## SvelteKit 3 config
 
-Both are enabled and documented as experimental:
+All config is passed to the `sveltekit()` plugin in `vite.config.ts`; there is no
+`svelte.config.js`. Import app code with `#lib/…` and the file extension
+(`#lib/server/admin.ts`). Redirects to another origin need `{ external: true }`.
+TypeScript stays on 6 (SvelteKit 3's peer range).
+
+Two experimental flags are enabled:
 - `compilerOptions.experimental.async` — `await` in components and `$derived`
-- `kit.experimental.remoteFunctions` — `.remote.ts` files (`query`, `command` from `$app/server`)
+- `experimental.remoteFunctions` — `.remote.ts` files (`query`, `command` from `$app/server`)
 
 ## Data flow
 
@@ -81,6 +86,6 @@ a service-account `.json` exists is between key creation and copying it into
 ## Deploy
 
 Netlify (SSR functions) via `@sveltejs/adapter-netlify`; `netlify.toml` at the repo
-root sets `base = packages/app`. Set `FIREBASE_PROJECT_ID`, `FIREBASE_CLIENT_EMAIL`,
-`FIREBASE_PRIVATE_KEY`, `ECC_ADMIN_PASSWORD` in the Netlify UI. Firebase keeps the
-data; it no longer serves the app.
+root sets `base = packages/app`. Pushes to `firestore` deploy production. Netlify
+holds `FIREBASE_SERVICE_ACCOUNT` and `ECC_ADMIN_PASSWORD`. Firebase keeps the data;
+it no longer serves the app. `netlify/edge-functions/` rate limits saves and likes.

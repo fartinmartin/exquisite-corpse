@@ -1,10 +1,10 @@
 <script lang="ts">
   import { navigating, page } from "$app/state";
-  import Cursor from "$lib/components/cursor.svelte";
-  import Help from "$lib/components/help.svelte";
-  import Nav from "$lib/components/nav.svelte";
-  import { help } from "$lib/help.svelte";
-  import "$lib/styles/global.scss";
+  import Cursor from "#lib/components/cursor.svelte";
+  import Help from "#lib/components/help.svelte";
+  import Nav from "#lib/components/nav.svelte";
+  import { help } from "#lib/help.svelte.ts";
+  import "#lib/styles/global.scss";
 
   let { children } = $props();
 
