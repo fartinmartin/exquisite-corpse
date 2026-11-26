@@ -4,11 +4,11 @@
 
 ## Resume here
 
-The SvelteKit app is deployed and serving live Firestore data at
-`https://exquisite-corpse-club.netlify.app` (site `exquisite-corpse-club`,
-`00f3062d-…`). Pushes to `firestore` are now the production branch. Remaining:
-run a real-data draw/save smoke test, then cut `exquisitecorpse.club` DNS over
-from Firebase Hosting.
+`https://exquisitecorpse.club` runs the SvelteKit app on Netlify against the live
+Firestore data, and the Nuxt app on Firebase is retired. Remaining: account
+cleanup (unused Google Cloud projects, old GitHub branches and settings, unused
+Netlify sites), redirect the `netlify.app` address, and restore local dev
+credentials in 1Password.
 
 ## Steps
 
@@ -32,8 +32,14 @@ from Firebase Hosting.
 - [ ] Store the new key fields in 1Password (`firebase-private-key`, `firebase-client-email`, `admin-password`) for local dev
 - [x] Production deploy with live data (Netlify secrets: `FIREBASE_SERVICE_ACCOUNT`, `ECC_ADMIN_PASSWORD`)
 - [x] Set the Netlify production branch to `firestore` in the UI (API left it at `nuxt`)
-- [ ] Draw/save smoke test against live data
-- [ ] DNS cutover
+- [x] Draw/save smoke test against live data (kept: "the night shift" by "claude (smoke test)")
+- [x] DNS cutover (Namecheap DNS: apex ALIAS, `www` CNAME; no email on the domain)
+- [x] Counterscale analytics, site ID `exquisitecorpse.club`
+- [x] Firestore export and weekly scheduled backups (Sunday, 98 days)
+- [x] Retire the Nuxt app: deny client rules, disable Hosting, delete `ssrapp`, its build buckets, old web API keys and the 2020 backup key
+- [ ] Decide on Firebase anonymous sign-in (unused by the new app, still enabled)
+- [ ] Redirect `exquisite-corpse-club.netlify.app` to the custom domain
+- [ ] Account cleanup: Google Cloud projects, GitHub, Netlify
 
 ## Decisions
 
@@ -54,9 +60,12 @@ from Firebase Hosting.
 - **2026-06-11** — Rotation initially hit the old `exquisite-corpse-d0cbf` project (2020 web config). The live key (`h6d3s@exquisite-corpse-club`) was revoked separately and verified `UNAUTHENTICATED`; a new key reads 246 sections.
 - **2026-06-11** — No credentials on disk: Netlify holds `FIREBASE_SERVICE_ACCOUNT` (base64 JSON) and `ECC_ADMIN_PASSWORD` as secrets; the admin password is in the macOS Keychain (`ecc-admin-password`); local dev expects the 1Password fields referenced by `.env.schema`. The old and new JSON files were deleted from disk.
 
+- **2026-11-26** — Namecheap keeps DNS. The domain has no email, so it publishes `v=spf1 -all` and DMARC `p=reject`.
+- **2026-11-26** — Firestore rules deny all client access; the server uses the Admin SDK and guests are identified by cookie. Don't delete the Firebase project: the data lives there.
+- **2026-11-26** — Netlify's `ignore` command watches the workspace packages the app imports, not only `packages/app`.
+
 ## Open questions
 
-- Netlify site + DNS cutover plan (`exquisitecorpse.club` currently on Firebase Hosting).
 - Firebase service-account credentials need real 1Password item names (the `op://` refs in `.env.schema` are placeholders).
 - Optional: backfill only sub-limit records with `convert:drawings --write --backup`? Not needed for correctness; keep the adapter.
 - Clean up the unused `exquisite-corpse-d0cbf` project (and the new key minted there) if nothing still uses it.
@@ -64,4 +73,4 @@ from Firebase Hosting.
 
 ## Context
 
-The repo's default branch (`firebase`) is the live Nuxt 2 + Firestore app at `exquisitecorpse.club`. `atproto` is a ground-up atproto rewrite (SvelteKit + remote functions + canvas-paint) kept for later. This branch migrates the live app to SvelteKit first, against the live data, so the atproto data move can happen on top of a working app.
+The repo's default branch (`firebase`) is the retired Nuxt 2 + Firestore app. `atproto` is a ground-up atproto rewrite (SvelteKit + remote functions + canvas-paint) kept for later. This branch migrates the live app to SvelteKit first, against the live data, so the atproto data move can happen on top of a working app.
