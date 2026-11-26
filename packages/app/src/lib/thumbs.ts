@@ -14,14 +14,20 @@ const DIMENSIONS: Record<Collection, { width: number; height: number }> = {
   sections: { width: 540, height: 180 },
 };
 
+/**
+ * Bump when the rendered output changes (renderer, size, encoding), so every
+ * thumb gets a new URL and blob key instead of the old render being served.
+ */
+const RENDER_VERSION = "r1";
+
 export interface ThumbRef {
   id: string;
   thumbVersion: number;
 }
 
-/** Versioned, cache-forever URL for a stored thumbnail. */
+/** Versioned, cache-forever URL for a thumbnail rendered from the item's drawing(s). */
 export function thumbUrl(collection: Collection, item: ThumbRef): string {
-  return `/thumbs/${collection}/${item.id}?v=${item.thumbVersion}`;
+  return `/thumbs/${collection}/${item.id}?v=${RENDER_VERSION}-${item.thumbVersion}`;
 }
 
 function resized(source: string, width: number): string {
@@ -29,9 +35,8 @@ function resized(source: string, width: number): string {
 }
 
 /**
- * `<img>` attributes for a thumbnail. On Netlify, legacy full-size PNG thumbs
- * are resized and re-encoded (WebP/AVIF) by the Image CDN; elsewhere the
- * stored image is served as-is.
+ * `<img>` attributes for a thumbnail. On Netlify, the Image CDN resizes the
+ * 1080px render for each display size; elsewhere the render is served as-is.
  */
 export function thumbAttrs(collection: Collection, item: ThumbRef) {
   const source = thumbUrl(collection, item);

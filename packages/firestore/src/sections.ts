@@ -5,7 +5,6 @@ import * as errore from "errore";
 import type { DrawingData } from "@ecc/lexicons";
 import { db } from "./client.js";
 import { Fixtures } from "./fixtures.js";
-import { Drawing } from "./drawing.js";
 import { Records } from "./records.js";
 import type {
   Corpse,
@@ -42,11 +41,8 @@ export interface SaveInput {
   title: string;
   artist: string;
   drawing: DrawingData;
-  thumb: string;
   /** Ids of the two sections shown while drawing (all three get set on the corpse). */
   siblings: Partial<Record<SectionType, string>>;
-  /** Pre-composed corpse thumbnail (browser). Falls back to node-canvas when absent. */
-  corpseThumb?: string;
 }
 
 export interface SaveResult {
@@ -56,7 +52,7 @@ export interface SaveResult {
 
 export type SectionError = SectionNotFoundError | FirestoreError;
 
-/** Firestore documents are capped at 1MiB; leave headroom for the thumb and fields. */
+/** Firestore documents are capped at 1MiB; leave headroom for the other fields. */
 const DOCUMENT_BUDGET = 900_000;
 
 /** Splits a title into words, falling back to a random flavour word. */
@@ -174,27 +170,16 @@ async function moreByArtist(
     .filter(Records.isPresent);
 }
 
-/**
- * Saves a drawn section and assembles the corpse it was drawn against.
- * The three panels' thumbnails are stacked server-side so the gallery reads
- * a single image per corpse.
- */
+/** Saves a drawn section and assembles the corpse it was drawn against. */
 export async function save(
   input: SaveInput
 ): Promise<SaveResult | SiblingSectionError | DrawingTooLargeError | FirestoreError> {
   if (Fixtures.enabled()) return Fixtures.saveSection(input);
 
-  const bytes = JSON.stringify(input.drawing).length + input.thumb.length;
+  const bytes = JSON.stringify(input.drawing).length;
   if (bytes > DOCUMENT_BUDGET) {
     return new DrawingTooLargeError({
       kb: Math.round(bytes / 1000),
-      limit: Math.round(DOCUMENT_BUDGET / 1000),
-    });
-  }
-
-  if (input.corpseThumb && input.corpseThumb.length > DOCUMENT_BUDGET) {
-    return new DrawingTooLargeError({
-      kb: Math.round(input.corpseThumb.length / 1000),
       limit: Math.round(DOCUMENT_BUDGET / 1000),
     });
   }
@@ -203,9 +188,8 @@ export async function save(
   const siblingIds = siblingTypes.map((type) => input.siblings[type]).filter(Boolean) as string[];
 
   // Read the panels shown while drawing: their type (to validate) and title (for
-  // the corpse name). Their thumbs are only needed for the node-canvas fallback.
-  const siblingFields = input.corpseThumb ? ["type", "title"] : ["type", "title", "thumb"];
-  const siblingSnaps = await Records.loadMany("sections", siblingIds, siblingFields);
+  // the corpse name). Thumbnails are rendered from drawings on request.
+  const siblingSnaps = await Records.loadMany("sections", siblingIds, ["type", "title"]);
   const siblingRecords = new Map(siblingSnaps.map((snap) => [snap.id, snap]));
 
   for (const type of siblingTypes) {
@@ -217,21 +201,16 @@ export async function save(
   const corpseRef = db().collection("corpses").doc();
   const sectionRef = db().collection("sections").doc();
 
-  const thumbs: Partial<Record<SectionType, string>> = { [input.type]: input.thumb };
   const titles: Partial<Record<SectionType, string>> = { [input.type]: input.title };
   const panelIds: Partial<Record<SectionType, string>> = { [input.type]: sectionRef.id };
 
   for (const type of siblingTypes) {
     const snap = input.siblings[type] ? siblingRecords.get(input.siblings[type]!) : undefined;
     if (!snap) continue;
-    thumbs[type] = snap.get("thumb");
     titles[type] = snap.get("title");
     panelIds[type] = snap.id;
   }
 
-  const corpseThumb =
-    input.corpseThumb ??
-    (await Drawing.composeThumbs([thumbs.top, thumbs.mid, thumbs.bot]));
   const corpseTitle = mashupTitle([
     titles.top ?? input.title,
     titles.mid ?? input.title,
@@ -248,7 +227,6 @@ export async function save(
     date: now,
     likes: 0,
     likedBy: [],
-    thumb: input.thumb,
     drawing: input.drawing,
     featuredIn: [corpseRef],
   });
@@ -258,7 +236,6 @@ export async function save(
     date: now,
     likes: 0,
     likedBy: [],
-    thumb: corpseThumb,
     sections: {
       top: db().collection("sections").doc(panelIds.top ?? sectionRef.id),
       mid: db().collection("sections").doc(panelIds.mid ?? sectionRef.id),

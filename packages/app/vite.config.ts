@@ -34,6 +34,6 @@ export default defineConfig({
   server: { allowedHosts: true },
   ssr: {
     // native addon / server-only SDK — cannot be bundled by Vite
-    external: ["canvas", "firebase-admin"],
+    external: ["@napi-rs/canvas", "firebase-admin"],
   },
 });

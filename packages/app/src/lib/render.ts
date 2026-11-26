@@ -1,5 +1,6 @@
 import type { RenderData } from "@fartinmartin/canvas-paint/render";
 import type { DrawingData } from "@ecc/lexicons";
+import { stack } from "#lib/compose.ts";
 
 // canvas-paint touches `document` at module scope, so it can only be imported
 // in the browser.
@@ -7,13 +8,8 @@ async function canvasPaint() {
   return import("@fartinmartin/canvas-paint/render");
 }
 
-/** Display width of stored thumbnails: ~3× the 172px gallery cell. */
-const THUMB_WIDTH = 540;
-
 /** Width of downloaded images (matches the old full-size thumbs). */
 const DOWNLOAD_WIDTH = 1080;
-
-const THUMB_QUALITY = 0.85;
 
 /** Lexicon paths keep cap/join/tolerance optional; canvas-paint always has them. */
 export function asRenderData(drawing: DrawingData): RenderData {
@@ -152,48 +148,16 @@ export async function replay(
   return source;
 }
 
-/** Stacks drawings top to bottom, each scaled to `width`, on a white canvas. */
-async function stack(drawings: DrawingData[], width: number): Promise<HTMLCanvasElement> {
-  const sources = await Promise.all(drawings.map(renderDrawing));
-  const heights = sources.map((source) => Math.round((source.height * width) / source.width));
-
+function browserCanvas(width: number, height: number): HTMLCanvasElement {
   const canvas = document.createElement("canvas");
   canvas.width = width;
-  canvas.height = heights.reduce((sum, height) => sum + height, 0);
-
-  const ctx = canvas.getContext("2d")!;
-  ctx.fillStyle = "#ffffff";
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-  ctx.imageSmoothingQuality = "high";
-
-  let y = 0;
-  sources.forEach((source, index) => {
-    ctx.drawImage(source, 0, y, width, heights[index]);
-    y += heights[index];
-  });
-
+  canvas.height = height;
   return canvas;
-}
-
-/** WebP where the browser can encode it (Safari can't), JPEG otherwise. Both are far smaller than PNG. */
-function encodeThumb(canvas: HTMLCanvasElement): string {
-  const webp = canvas.toDataURL("image/webp", THUMB_QUALITY);
-  if (webp.startsWith("data:image/webp")) return webp;
-  return canvas.toDataURL("image/jpeg", THUMB_QUALITY);
-}
-
-/** Gallery thumbnail for one section. */
-export async function drawingToThumb(drawing: DrawingData): Promise<string> {
-  return encodeThumb(await stack([drawing], THUMB_WIDTH));
-}
-
-/** Gallery thumbnail for a corpse: its panels stacked top/mid/bot. */
-export async function corpseToThumb(drawings: DrawingData[]): Promise<string> {
-  return encodeThumb(await stack(drawings, THUMB_WIDTH));
 }
 
 /** Full-size PNG of one or more stacked drawings, for the download button. */
 export async function drawingsToPng(drawings: DrawingData[]): Promise<Blob | null> {
-  const canvas = await stack(drawings, DOWNLOAD_WIDTH);
+  const sources = await Promise.all(drawings.map(renderDrawing));
+  const canvas = stack(sources, { width: DOWNLOAD_WIDTH, createCanvas: browserCanvas });
   return new Promise((resolve) => canvas.toBlob(resolve, "image/png"));
 }

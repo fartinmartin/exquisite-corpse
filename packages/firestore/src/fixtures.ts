@@ -192,9 +192,7 @@ export function saveSection(input: {
   title: string;
   artist: string;
   drawing: DrawingData;
-  thumb: string;
   siblings: Partial<Record<SectionType, string>>;
-  corpseThumb?: string;
 }): { sectionId: string; corpseId: string } {
   seed();
   const sectionId = `sec_fixture_${store.sections.length}`;
@@ -208,7 +206,7 @@ export function saveSection(input: {
     date: new Date().toISOString(),
     likes: 0,
     likedBy: [],
-    thumb: input.thumb,
+    thumb: panelSvg(input.type, "#ffffff"),
     thumbVersion: 0,
     featuredIn: [corpseId],
     drawing: input.drawing,
@@ -229,7 +227,7 @@ export function saveSection(input: {
     date: new Date().toISOString(),
     likes: 0,
     likedBy: [],
-    thumb: input.corpseThumb ?? corpseSvg(["#deebff", "#fff29d", "#d1ee7f"]),
+    thumb: corpseSvg(["#deebff", "#fff29d", "#d1ee7f"]),
     thumbVersion: 0,
     sections: {
       top: panels.top ?? sectionId,
@@ -347,7 +345,6 @@ export function makeCorpse(sectionId: string): { corpseId: string } | null {
     title: record.title,
     artist: record.artist,
     drawing: record.drawing,
-    thumb: record.thumb,
     siblings: {},
   });
   return { corpseId: result.corpseId };

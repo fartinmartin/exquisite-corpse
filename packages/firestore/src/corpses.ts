@@ -4,7 +4,6 @@ import { FieldValue, Timestamp } from "firebase-admin/firestore";
 import * as errore from "errore";
 import { db } from "./client.js";
 import { Fixtures } from "./fixtures.js";
-import { Drawing } from "./drawing.js";
 import { Records } from "./records.js";
 import type {
   Corpse,
@@ -94,26 +93,17 @@ export async function list(options: {
   return { items: docs.map(Records.toCorpse).filter(Records.isPresent), page: options.page, hasMore };
 }
 
-/** Re-stacks a corpse's thumbnail from its three sections' thumbs. */
+/**
+ * Forces a corpse thumbnail to be re-rendered: a new version gives it a new
+ * URL, so cached and stored copies of the old one are never served again.
+ */
 export async function rebuildThumb(id: string): Promise<true | CorpseError> {
   if (Fixtures.enabled()) return true;
 
   try {
-    const snap = await Records.loadOne("corpses", id, Records.CORPSE_SUMMARY_FIELDS);
-    const corpse = snap ? Records.toCorpse(snap) : null;
-    if (!corpse) return new CorpseNotFoundError({ id });
-
-    const panels = await Records.loadMany(
-      "sections",
-      SECTION_TYPES.map((type) => corpse.sections[type]),
-      ["type", "thumb"]
-    );
-    const thumbFor = (type: SectionType) =>
-      panels.find((panel) => panel.get("type") === type)?.get("thumb") as string | undefined;
-    const thumb = await Drawing.composeThumbs(SECTION_TYPES.map(thumbFor));
-
-    // A new version gives the thumb a new URL, so cached copies are never served.
-    await db().collection("corpses").doc(id).update({ thumb, thumbVersion: Date.now() });
+    const snap = await Records.loadOne("corpses", id, ["title"]);
+    if (!snap) return new CorpseNotFoundError({ id });
+    await db().collection("corpses").doc(id).update({ thumbVersion: Date.now() });
     return true;
   } catch (cause) {
     return new FirestoreError({ cause });
@@ -130,16 +120,15 @@ export async function createFromSection(sectionId: string): Promise<{ corpseId: 
     return result ?? new CorpseNotFoundError({ id: sectionId });
   }
 
-  const PANEL_FIELDS = ["type", "title", "thumb"];
+  const PANEL_FIELDS = ["type", "title"];
   const snap = await Records.loadOne("sections", sectionId, PANEL_FIELDS);
   const type = snap?.get("type") as SectionType | undefined;
   if (!snap || !type) return new CorpseNotFoundError({ id: sectionId });
 
-  type Panel = { id: string; title: string; thumb?: string };
+  type Panel = { id: string; title: string };
   const toPanel = (doc: FirebaseFirestore.DocumentSnapshot): Panel => ({
     id: doc.id,
     title: doc.get("title") ?? "untitled",
-    thumb: doc.get("thumb"),
   });
   const panels: Partial<Record<SectionType, Panel>> = { [type]: toPanel(snap) };
 
@@ -155,9 +144,6 @@ export async function createFromSection(sectionId: string): Promise<{ corpseId: 
   for (const [other, doc] of others) if (doc) panels[other] = toPanel(doc);
 
   const corpseRef = db().collection("corpses").doc();
-  const thumb = await Drawing.composeThumbs(
-    SECTION_TYPES.map((type) => panels[type]?.thumb)
-  );
   const title = mashupTitle(
     SECTION_TYPES.map((type) => panels[type]?.title ?? "untitled")
   );
@@ -168,7 +154,6 @@ export async function createFromSection(sectionId: string): Promise<{ corpseId: 
     date: Timestamp.now(),
     likes: 0,
     likedBy: [],
-    thumb,
     sections: Object.fromEntries(
       SECTION_TYPES.map((type) => [
         type,

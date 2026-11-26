@@ -10,7 +10,6 @@
   import SectionPicker from "#lib/components/section-picker.svelte";
   import Toolbar from "#lib/components/toolbar.svelte";
   import { drawState, GUEST_HANDLE_COOKIE } from "#lib/draw/state.svelte.ts";
-  import { corpseToThumb, drawingToThumb } from "#lib/render.ts";
   import { getSiblings, randomTitle, saveDrawing, type Sibling } from "./draw.remote";
 
   const TYPES: SectionType[] = ["top", "mid", "bot"];
@@ -68,26 +67,12 @@
     const drawing = pending;
     if (!drawing || !section) throw new Error("nothing to save");
 
-    // Compose the corpse preview in the browser — no native canvas on the server.
-    const panels: Partial<Record<SectionType, DrawingData>> = {
-      top: siblings.top?.drawing,
-      mid: siblings.mid?.drawing,
-      bot: siblings.bot?.drawing,
-      [section]: drawing,
-    };
-    const [thumb, corpseThumb] = await Promise.all([
-      drawingToThumb(drawing),
-      corpseToThumb(TYPES.map((type) => panels[type]).filter((panel) => panel !== undefined)),
-    ]);
-
     const result = await saveDrawing({
       type: section,
       title,
       artist,
       drawing,
-      thumb,
       siblings: siblingIds(),
-      corpseThumb,
     });
 
     await goto(`/gallery/corpse/${result.corpseId}`);

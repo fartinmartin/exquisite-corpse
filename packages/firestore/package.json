@@ -18,7 +18,6 @@
   },
   "dependencies": {
     "@ecc/lexicons": "workspace:*",
-    "canvas": "^3.2.3",
     "errore": "^0.14.1",
     "firebase-admin": "^14.5.1",
     "valibot": "^1.5.0"
