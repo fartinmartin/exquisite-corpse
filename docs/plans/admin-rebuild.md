@@ -1,10 +1,10 @@
 # Admin rebuild
 
-**Status:** in-progress: Phase 3a and the budget gate shipped; Phases 1, 2 and 4 not started. Updated 2026-11-26.
+**Status:** in-progress: Phase 3a and the budget gate shipped; Phase 1 built on `feat/admin-phase1`, not shipped; Phases 2 and 4 not started. Updated 2026-11-26.
 
 ## Resume here
 
-Budget gate shipped (`3ff07a0`, see "Budget gate" under Steps). Next: Phase 1 in a new worktree. First, `purgeCache({ tags: ["thumb:<collection>:<id>"] })` from `@netlify/cache` in `deleteSection`/`deleteCorpse`; then auth hardening; then the cascade preview. Open question 2 (hide vs delete) blocks Phase 2.
+Phase 1 is on `feat/admin-phase1` (worktree `../exquisite-corpse-admin`), tested locally with fixtures; waiting on Martin to ship. After shipping, the first real delete in /admin is the production check for the purge + Blobs cleanup: afterwards the deleted thumb URL should 404 (see the Phase 1 steps). Then Phase 2, which starts with the `hidden` migration (see Decisions, hide vs delete).
 
 ## Steps
 
@@ -21,9 +21,12 @@ Budget gate shipped (`3ff07a0`, see "Budget gate" under Steps). Next: Phase 1 in
 
 ### Phase 1: make moderation actually work (small, ship first)
 
-- [ ] **Purge the CDN on admin changes.** Since the perf work, public pages are CDN-cached (60 s + stale-while-revalidate) and thumbs are cached for a year. Without a purge, a deleted section can stay visible after an admin deletes it, and its thumb URL keeps working. Add `Netlify-Cache-Tag` headers in `hooks.server.ts` and the `/thumbs` route (`section:<id>`, `corpse:<id>`, `gallery`), and call `purgeCache({ tags })` from `@netlify/functions` after every admin mutation (and after a save, for `gallery`).
-- [ ] **Auth hardening.** Reject admin tokens older than 24 h server-side (`isAdmin` currently checks only the signature, so a leaked cookie never expires). Compare the password with `timingSafeEqual`. Add login throttling: both free Netlify rate-limit rules are taken, so count failures per IP in Netlify Blobs and lock for 15 min after 5 failures.
-- [ ] **Show what an action will affect before it runs.** "Remove section" also deletes every corpse it's in. Preview the cascade ("this deletes 1 section + 3 corpses") with thumbnails, then confirm.
+- [x] **Thumb cleanup on delete** (scope as decided: thumbs only, pages self-heal). `forgetThumbs()` in `lib/server/thumbs.ts` deletes every Blobs render under `collection/id/` and calls `purgeCache({ tags: ["thumb:<collection>:<id>"] })` (`@netlify/cache`). It runs from `deleteSection` (the section + every corpse it took with it) and `deleteCorpse`. Best-effort: logged, never fails the delete. Blobs had to be cleared too because `/thumbs` checks Blobs before Firestore. **Not verified on Netlify** (a test delete would remove real data from the shared Firestore). Check after the first real delete: the old thumb URL should 404.
+- [x] **Auth hardening.** `isAdmin` rejects tokens older than 24 h (`SESSION_MS`); `checkPassword` compares HMACs with `timingSafeEqual`; login locks an IP for 15 min after 5 failures (`lib/server/login-throttle.ts`, Blobs store `admin-login`, IPs hashed). Verified locally: a 25 h-old signed token redirects to login, a 1 h-old one works; tries 1–5 → 401, try 6 → 429 "too many tries, wait 15 min", even with the right password.
+- [x] **Delete preview.** "remove section" and "remove" (corpse) now load a preview (`sectionDeletePreview`/`corpseDeletePreview`) and show the thumbnails of everything that will go ("deletes 1 section + 2 corpses it's in") with delete/cancel, instead of `confirm()`. `Admin.removeSection` is now one batch and returns the deleted corpse ids. Verified locally with fixtures (admin now works in fixtures mode).
+- [x] Fixed `vite dev` crashing in the dependency optimizer on the `@napi-rs/canvas` binary (a regression from Phase 3a, only seen when Vite's cache is rebuilt): excluded it from `optimizeDeps` and `ssr.optimizeDeps`.
+- [x] Removed `Sections.remove` (unused; admin deletes go through `Admin.*`).
+- [ ] Ship.
 
 ### Phase 2: browse instead of pasting ids
 
@@ -71,11 +74,12 @@ Budget gate shipped (`3ff07a0`, see "Budget gate" under Steps). Next: Phase 1 in
 - **2026-11-26**: thumbs render at 1080px, not 540, because they're also the link-preview image; the Image CDN downsizes for the gallery.
 - **2026-11-26**: Blobs store is site-wide, so previews share it with production. Safe because keys include the render version and the content depends only on data. Rule: any rendering change must bump `RENDER_VERSION` (comment in `lib/server/thumbs.ts`).
 - **2026-11-26**: budget gate: Martin chose $10/month, emails at 50/90/100%, and automatic reopening next month. The push goes straight to the app (no Cloud Function), verified by Google's OIDC token with the request URL as audience. Netlify itself (free plan) can still pause the site if its own allowance runs out; nothing in-app can cover that.
+- **2026-11-26**: **hide vs delete (Open question 2): hide is the main moderation action, delete is the second option.** Hiding needs a `hidden` field on every doc (Firestore can only filter on fields that exist), so Phase 2 starts with a one-off migration setting `hidden: false` on all 485 docs, plus composite indexes for each public list query and the random pickers. Hiding should also call `forgetThumbs()`.
 
 ## Open questions
 
 1. ~~Where do thumbnails come from?~~ Decided: server-rendered (see Decisions). See the thumbnail discussion in chat (2026-11-26). Options: (a) keep browser-rendered thumbs uploaded with the save, plus admin regenerate/scan (this plan as written); (b) render on the server at save time with a prebuilt canvas (`@napi-rs/canvas`); (c) don't store thumbs at all: the `/thumbs` route renders from the drawing on a cache miss and the CDN keeps it forever. If (c), most of Phase 3 disappears.
-2. **Blocking Phase 2: hide vs delete.** Add a `hidden` flag (reversible, keeps history) and filter it out of public queries? Firestore needs every doc to have the field for `where("hidden", "==", false)`, so that's a one-time migration plus composite indexes for each list query. Or keep hard delete only?
+2. ~~Hide vs delete?~~ Decided: hide first, delete second (see Decisions). Original question: Add a `hidden` flag (reversible, keeps history) and filter it out of public queries? Firestore needs every doc to have the field for `where("hidden", "==", false)`, so that's a one-time migration plus composite indexes for each list query. Or keep hard delete only?
 3. **Non-blocking:** user-facing "report" button feeding the moderation feed? Small to build, but it needs rate limiting and spam handling.
 4. **Non-blocking:** is "reset all likes" still wanted? It's destructive and rarely the right tool; per-item reset may be enough.
 5. **Non-blocking:** how much to invest before the atproto move? Phase 1 and the thumbnail decision carry over. The browse UI carries over if it sits on a thin data interface. Firestore-specific hygiene (Phase 4) doesn't.
