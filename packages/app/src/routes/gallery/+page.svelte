@@ -4,6 +4,7 @@
   import Icon from "#lib/components/icon.svelte";
   import Panel from "#lib/components/panel.svelte";
   import RadioButton from "#lib/components/radio-button.svelte";
+  import { MediaQuery } from "svelte/reactivity";
   import GalleryGrid from "./gallery-grid.svelte";
 
   type Filter = "corpses" | "top" | "mid" | "bot";
@@ -19,22 +20,17 @@
   let filter = $state<Filter>("corpses");
   let sort = $state<Sort>("date");
   let page = $state(0);
-  let mobile = $state(false);
 
-  $effect(() => {
-    const query = window.matchMedia("(max-width: 571px)");
-    mobile = query.matches;
-    const listener = (event: MediaQueryListEvent) => (mobile = event.matches);
-    query.addEventListener("change", listener);
-    return () => query.removeEventListener("change", listener);
-  });
+  const mobileQuery = new MediaQuery("max-width: 571px", false);
+  const mobile = $derived(mobileQuery.current);
 
-  // A new filter/sort always starts from the first page.
-  $effect(() => {
-    void filter;
-    void sort;
+  // A new filter/sort always starts from the first page. Reset in the same
+  // update (not in an effect afterwards), so the grid never fetches the old page.
+  function select(next: { filter?: Filter; sort?: Sort }) {
+    filter = next.filter ?? filter;
+    sort = next.sort ?? sort;
     page = 0;
-  });
+  }
 </script>
 
 <Seo title="gallery" description="checkout our masterpieces!" />
@@ -47,7 +43,7 @@
           group="filter"
           value={option.value}
           active={filter}
-          onselect={(value) => (filter = value as Filter)}
+          onselect={(value) => select({ filter: value as Filter })}
         >
           <Icon svg={option.icon} tooltip={option.tooltip} />
         </RadioButton>
@@ -59,7 +55,7 @@
         group="sort"
         value="date"
         active={sort}
-        onselect={() => (sort = "date")}
+        onselect={() => select({ sort: "date" })}
       >
         <Icon tooltip="sort by date">
           <DateIcon />
@@ -69,7 +65,7 @@
         group="sort"
         value="likes"
         active={sort}
-        onselect={() => (sort = "likes")}
+        onselect={() => select({ sort: "likes" })}
       >
         <Icon svg="icons/heart_" tooltip="sort by likes" />
       </RadioButton>
