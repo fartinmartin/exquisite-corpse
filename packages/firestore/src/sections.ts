@@ -38,6 +38,11 @@ export class FirestoreError extends errore.createTaggedError({
   message: "Firestore request failed",
 }) {}
 
+export class DrawingTooLargeError extends errore.createTaggedError({
+  name: "DrawingTooLargeError",
+  message: "Drawing is too large to store ($kb KB, limit $limit KB)",
+}) {}
+
 export interface SaveInput {
   type: SectionType;
   title: string;
@@ -55,6 +60,9 @@ export interface SaveResult {
 }
 
 export type SectionError = SectionNotFoundError | FirestoreError;
+
+/** Firestore documents are capped at 1MiB; leave headroom for the thumb and fields. */
+const DOCUMENT_BUDGET = 900_000;
 
 /** Splits a title into words, falling back to a random flavour word. */
 function words(value: string, fallback: string): string[] {
@@ -173,8 +181,18 @@ export async function moreByArtist(
  * The three panels' thumbnails are stacked server-side so the gallery reads
  * a single image per corpse.
  */
-export async function save(input: SaveInput): Promise<SaveResult | SiblingSectionError | FirestoreError> {
+export async function save(
+  input: SaveInput
+): Promise<SaveResult | SiblingSectionError | DrawingTooLargeError | FirestoreError> {
   if (Fixtures.enabled()) return Fixtures.saveSection(input);
+
+  const bytes = JSON.stringify(input.drawing).length + input.thumb.length;
+  if (bytes > DOCUMENT_BUDGET) {
+    return new DrawingTooLargeError({
+      kb: Math.round(bytes / 1000),
+      limit: Math.round(DOCUMENT_BUDGET / 1000),
+    });
+  }
 
   const siblingTypes = SECTION_TYPES.filter((type) => type !== input.type);
   const siblingIds = siblingTypes.map((type) => input.siblings[type]).filter(Boolean) as string[];

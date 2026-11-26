@@ -162,9 +162,15 @@ importers:
 
   packages/scripts:
     dependencies:
+      '@ecc/firestore':
+        specifier: workspace:*
+        version: link:../firestore
       '@ecc/lexicons':
         specifier: workspace:*
         version: link:../lexicons
+      firebase-admin:
+        specifier: ^14.5.1
+        version: 14.5.1
     devDependencies:
       tsx:
         specifier: ^4.19.0

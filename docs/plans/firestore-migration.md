@@ -1,13 +1,13 @@
 # Migrate the live Nuxt site to SvelteKit + Firestore
 
-**Status:** in-progress — updated 2026-06-08
+**Status:** in-progress — updated 2026-06-09
 
 ## Resume here
 
-Verify against real Firestore data (needs service-account credentials or the
-emulator): create the Netlify site, then cut `exquisitecorpse.club` DNS over from
-Firebase Hosting. Ported screens are all rendering from `ECC_FIXTURES=1`; admin
-login/make-corpse works, likes and pagination work.
+Legacy data is confirmed working against the live project (246 sections, all in
+the 2020 shape; read-time conversion is enough, no backfill needed). Next:
+create the Netlify site, set the Firebase service-account env vars there, then cut
+`exquisitecorpse.club` DNS over from Firebase Hosting.
 
 ## Steps
 
@@ -24,9 +24,9 @@ login/make-corpse works, likes and pagination work.
 - [x] Admin (password login, make corpse from section, delete section/corpse, update thumb, reset likes, export paths)
 - [x] Fixture mode (`ECC_FIXTURES=1`) for developing without credentials
 - [x] Netlify config + env docs (`netlify.toml`, `.env.schema`, README, app CLAUDE.md)
-- [ ] Verify against live Firestore data and compare counts/content with the Nuxt app
+- [x] Verify against live Firestore data (ADC with the service account; home/gallery/section render real records)
+- [x] Backfill decision: keep the read-time adapter; optional `pnpm convert:drawings` script added
 - [ ] Deploy to Netlify + DNS cutover
-- [ ] Backfill decision: keep the read-time legacy adapter or rewrite old `drawing` docs
 
 ## Decisions
 
@@ -39,12 +39,16 @@ login/make-corpse works, likes and pagination work.
 - **2026-06-08** — SSR data uses `$derived(await query(...))` without a `pending` boundary; Svelte renders only the `pending` snippet on the server. Boundaries are kept for client-loaded UI only.
 - **2026-06-08** — canvas-paint is imported dynamically in the browser (`document` at import time) and `Paint` is re-fitted after creation because it measures at document width before CSS applies.
 - **2026-06-08** — `ECC_FIXTURES=1` fixture mode added for reviewing the UI before Firebase credentials are available.
+- **2026-06-09** — Real-data audit: ~246 sections, every one still in the legacy command-array shape. 1 record is in the mobile-normalized ~1080 space (detected by bounds), 26 have points past the 544×181 panel (left clipped, matching the live renderer). No backfill required.
+- **2026-06-09** — Converted data is ~2.5× larger than legacy commands; 6 records would exceed Firestore's 1MiB doc limit after conversion. The converter skips those unless `--force`, and new saves reject drawings over the document budget (413).
+- **2026-06-09** — New drawings are capped by serialized size (~900KB with thumb); larger drawings need blob/Storage storage, which the atproto phase would solve with PDS blobs.
 
 ## Open questions
 
 - Netlify site + DNS cutover plan (`exquisitecorpse.club` currently on Firebase Hosting).
 - Firebase service-account credentials need real 1Password item names (the `op://` refs in `.env.schema` are placeholders).
-- Whether to backfill old section documents into canvas-paint data, or keep the read-time adapter indefinitely.
+- Optional: backfill only sub-limit records with `convert:drawings --write --backup`? Not needed for correctness; keep the adapter.
+- Old likes were keyed by Firebase anonymous UIDs. Counts are preserved, but current visitors can't "unlike" someone else's old like (each cookie only toggles its own).
 
 ## Context
 

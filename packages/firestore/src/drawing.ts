@@ -8,9 +8,14 @@ import type { LegacyDrawing, LegacyPoint, StoredDrawing } from "./types.js";
 export const DOCUMENT_WIDTH = 1080;
 export const DOCUMENT_HEIGHT = 360;
 
-/** Logical size legacy (2020 Vue app) drawings were recorded at. */
-const LEGACY_WIDTH = 540;
-const LEGACY_HEIGHT = 180;
+/**
+ * Legacy (2020 Vue app) drawings were recorded in CSS pixels of the ~544px
+ * panel. Drawings made on mobile were normalized at save time to a ~1080px
+ * space, so the bounds tell us which space a record is in.
+ */
+const LEGACY_WIDTH = 544;
+const LEGACY_MOBILE_WIDTH = 1080;
+const LEGACY_MOBILE_THRESHOLD = 560;
 
 /** True when `drawing` is already canvas-paint data rather than the legacy map. */
 export function isDrawingData(value: unknown): value is DrawingData {
@@ -22,23 +27,49 @@ export function isDrawingData(value: unknown): value is DrawingData {
   );
 }
 
+export interface LegacyBounds {
+  maxX: number;
+  maxY: number;
+}
+
+/** Furthest x/y any legacy command reaches, including fill points. */
+export function legacyBounds(legacy: LegacyDrawing): LegacyBounds {
+  let maxX = 0;
+  let maxY = 0;
+
+  for (const commands of Object.values(legacy)) {
+    for (const point of commands) {
+      maxX = Math.max(maxX, point.x1 ?? 0, point.x2 ?? 0);
+      maxY = Math.max(maxY, point.y1 ?? 0, point.y2 ?? 0);
+    }
+  }
+
+  return { maxX, maxY };
+}
+
 /**
  * Normalizes either stored shape to canvas-paint data. Legacy point commands
- * become one Path per command, in the coordinate space they were drawn in.
+ * become one Path per command. Points past the panel edge are kept as-is so
+ * the drawing frames exactly like it did on the live site (clipped by the
+ * canvas), rather than being rescaled.
  */
 export function toDrawingData(stored: StoredDrawing | null | undefined): DrawingData {
   if (isDrawingData(stored)) return stored;
 
   const legacy: LegacyDrawing = stored ?? {};
-  const paths: Path[] = [];
+  const { maxX, maxY } = legacyBounds(legacy);
 
+  const width = maxX > LEGACY_MOBILE_THRESHOLD ? LEGACY_MOBILE_WIDTH : LEGACY_WIDTH;
+  const height = Math.round(width / 3);
+
+  const paths: Path[] = [];
   for (const commands of Object.values(legacy)) {
     for (const command of commands) paths.push(legacyPointToPath(command));
   }
 
   return {
-    width: LEGACY_WIDTH,
-    height: LEGACY_HEIGHT,
+    width,
+    height,
     version: "legacy",
     bgColor: "#ffffff",
     paths,

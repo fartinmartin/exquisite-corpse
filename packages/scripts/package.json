@@ -4,10 +4,12 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "migrate:drawings": "tsx src/migrate-drawings.ts"
+    "convert:drawings": "tsx src/convert-legacy-drawings.ts"
   },
   "dependencies": {
-    "@ecc/lexicons": "workspace:*"
+    "@ecc/firestore": "workspace:*",
+    "@ecc/lexicons": "workspace:*",
+    "firebase-admin": "^14.5.1"
   },
   "devDependencies": {
     "tsx": "^4.19.0",

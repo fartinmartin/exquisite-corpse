@@ -34,6 +34,13 @@ The 2020 app stored `sections.drawing` as `{ [pathIndex]: PointCommand[] }`. New
 drawings store canvas-paint `DrawingData`; `Drawing.toDrawingData()` normalizes both
 shapes at read time. Don't write the legacy shape.
 
+Legacy quirks the adapter covers: 544×181 desktop coordinates vs the ~1080 space
+mobile saves were normalized into (switched on by bounds), commands with no
+coordinates (`clear`), fills, and JSON-export timestamp/ref shapes. Points past the
+panel edge are left alone so framing matches the live site. Converted data is ~2.5×
+larger than the legacy arrays, so `Sections.save` refuses drawings that would push a
+document over ~900KB (Firestore's limit is 1MiB).
+
 ## Drawing (canvas-paint)
 
 `@fartinmartin/canvas-paint` touches `document` at module scope, so it is imported

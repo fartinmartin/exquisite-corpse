@@ -27,15 +27,23 @@ function refId(value: unknown): string {
   if (value && typeof (value as DocumentReference).id === "string") {
     return (value as DocumentReference).id;
   }
-  return "";
+
+  // JSON/emulator exports carry the path instead of a DocumentReference.
+  const exported = value as { _path?: { segments?: string[] }; path?: string } | undefined;
+  const segments = exported?._path?.segments ?? exported?.path?.split("/");
+  const last = Array.isArray(segments) ? segments.at(-1) : undefined;
+  return last ?? "";
 }
 
 function millis(value: unknown): number {
   if (value instanceof Timestamp) return value.toMillis();
   if (typeof value === "number") return value;
   if (typeof value === "string") return Date.parse(value);
-  const timestamp = value as { seconds?: number } | undefined;
-  if (typeof timestamp?.seconds === "number") return timestamp.seconds * 1000;
+  const timestamp = value as
+    | { seconds?: number; _seconds?: number }
+    | undefined;
+  const seconds = timestamp?.seconds ?? timestamp?._seconds;
+  if (typeof seconds === "number") return seconds * 1000;
   return 0;
 }
 

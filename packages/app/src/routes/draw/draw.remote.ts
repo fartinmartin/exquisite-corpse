@@ -53,7 +53,7 @@ const SaveInput = v.object({
   artist: v.pipe(v.string(), v.maxLength(30)),
   drawing: DrawingDataSchema,
   // PNG data URL rendered client-side; Firestore caps documents at 1 MiB.
-  thumb: v.pipe(v.string(), v.maxLength(1_000_000)),
+  thumb: v.pipe(v.string(), v.maxLength(600_000)),
   siblings: v.object({
     top: v.optional(v.string()),
     mid: v.optional(v.string()),
@@ -78,6 +78,7 @@ export const saveDrawing = command(SaveInput, async (input) => {
     liker: event.cookies.get("ecc_guest_token"),
   });
 
+  if (result instanceof Sections.DrawingTooLargeError) error(413, result.message);
   if (result instanceof Error) error(500, result.message);
   return result;
 });
