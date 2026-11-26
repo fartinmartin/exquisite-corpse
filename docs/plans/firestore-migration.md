@@ -5,10 +5,8 @@
 ## Resume here
 
 `https://exquisitecorpse.club` runs the SvelteKit app on Netlify against the live
-Firestore data, and the Nuxt app on Firebase is retired. Remaining: account
-cleanup (unused Google Cloud projects, old GitHub branches and settings, unused
-Netlify sites), redirect the `netlify.app` address, and restore local dev
-credentials in 1Password.
+Firestore data. The Nuxt app is retired and the accounts are cleaned up. Remaining:
+restore local dev credentials in 1Password.
 
 ## Steps
 
@@ -37,9 +35,9 @@ credentials in 1Password.
 - [x] Counterscale analytics, site ID `exquisitecorpse.club`
 - [x] Firestore export and weekly scheduled backups (Sunday, 98 days)
 - [x] Retire the Nuxt app: deny client rules, disable Hosting, delete `ssrapp`, its build buckets, old web API keys and the 2020 backup key
-- [ ] Decide on Firebase anonymous sign-in (unused by the new app, still enabled)
-- [ ] Redirect `exquisite-corpse-club.netlify.app` to the custom domain
-- [ ] Account cleanup: Google Cloud projects, GitHub, Netlify
+- [x] Disable Firebase anonymous sign-in (guests are cookie-based)
+- [x] Redirect `exquisite-corpse-club.netlify.app` to the custom domain; deploy previews off
+- [x] Account cleanup: unused Google Cloud projects shut down, old branches tagged `archive/*` and deleted, unused Netlify site and DNS zones removed
 
 ## Decisions
 
@@ -68,9 +66,8 @@ credentials in 1Password.
 
 - Firebase service-account credentials need real 1Password item names (the `op://` refs in `.env.schema` are placeholders).
 - Optional: backfill only sub-limit records with `convert:drawings --write --backup`? Not needed for correctness; keep the adapter.
-- Clean up the unused `exquisite-corpse-d0cbf` project (and the new key minted there) if nothing still uses it.
 - Old likes were keyed by Firebase anonymous UIDs. Counts are preserved, but current visitors can't "unlike" someone else's old like (each cookie only toggles its own).
 
 ## Context
 
-The repo's default branch (`firebase`) is the retired Nuxt 2 + Firestore app. `atproto` is a ground-up atproto rewrite (SvelteKit + remote functions + canvas-paint) kept for later. This branch migrates the live app to SvelteKit first, against the live data, so the atproto data move can happen on top of a working app.
+The retired Nuxt 2 + Firestore app is tagged `archive/firebase`; `firestore` is the default branch. `atproto` is a ground-up atproto rewrite (SvelteKit + remote functions + canvas-paint) kept for later. This branch migrates the live app to SvelteKit first, against the live data, so the atproto data move can happen on top of a working app.
