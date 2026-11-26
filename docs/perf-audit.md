@@ -1,10 +1,10 @@
 # Performance audit — 2026-11-26 (`firestore` branch)
 
-**Status:** in-progress: #1–#8 + SEO shipped; round 2 (#11, #15, #16) ready to ship; #10 on hold; #14 moved to the admin plan. Updated 2026-11-26.
+**Status:** in-progress: #1–#8, SEO, #15 and #16 shipped; #11 tried and reverted; #10 and #14 moved to the admin plan. Updated 2026-11-26.
 
 ## Resume here
 
-Round 2 (#11, #15, #16) is committed on `perf/round-2` (worktree `../exquisite-corpse-perf2`) and verified on draft deploy https://6b0880c0df5de4075d96c1b1--exquisite-corpse-club.netlify.app. Waiting on Martin to ship it (fast-forward `firestore`, push). #10 is on hold pending the thumbnail discussion; #14 moved into `docs/plans/admin-rebuild.md`. #9, #12 and #13 are skipped for now (see Decisions).
+Round 2 shipped (`6bee29f`) with `preferRest` reverted in production (`02eb67b`, see Decisions). Remaining: #10 is now part of the thumbnail rework in `docs/plans/admin-rebuild.md` (render thumbs server-side on demand); #14 is in that plan too. #9, #12 and #13 are skipped. This audit is effectively done once the admin plan's thumbnail phase lands; delete this file then.
 
 ## Steps
 
@@ -38,6 +38,7 @@ Round 2 (#11, #15, #16) is committed on `perf/round-2` (worktree `../exquisite-c
 - **2026-11-26**: like state moved out of page data into `getLikeState` (browser-only `$effect`) so the cached HTML/query responses have no per-visitor data. Trade-off: one small extra request per detail page, and the heart fills in after hydration.
 - **2026-11-26**: the canvas-paint Proxy workaround is replaced by the upstream `drawPaths` export (canvas-paint 1.2.0). Supersedes the `paintOnto`-Proxy entry below.
 - **2026-11-26**: #11 measured on draft deploys (one cold sample each, cache-busted section page): gRPC cold 1.07 s → REST cold 0.74 s; warm unchanged (~0.5 s). Region left alone: functions are in us-east-1 and Firestore in nam5 (US multi-region), and server-side time for a section page is only ~0.2 s (`/draw`, no DB, 0.22 s vs section 0.41 s from the same client).
+- **2026-11-26**: **reverted `preferRest`** (supersedes the #11 entry above). REST returns documents as JSON, which is far bigger than gRPC's protobuf for drawing-heavy docs. Corpse page (3 drawings) went from 0.72 s to 1.3–1.4 s warm median; the section page (1 drawing), the only page measured before shipping, was even. It shipped in `6bee29f` and was reverted ~15 min later in `02eb67b`; production corpse page back to 0.84 s, home 0.63 s. Lesson: measure the heaviest read path, not a representative one. Cache-busting in zsh: use `uuidgen`; `$RANDOM` repeats inside subshells and silently hits the CDN cache.
 - **2026-11-26**: correction to the audit text for #14: production has 247 sections / 238 corpses, so the 500-write batch limit isn't hit yet. Reading every full doc still is. Folded into the admin plan (Phase 4).
 - **2026-11-26**: skipping #12 (cursor pagination) and #13 (likes out of the main doc) until the atproto plan is clearer; both get replaced there. #9 is mostly covered: uploads are ~15 KB of thumbs now.
 - **2026-11-26**: npm now holds a new version for a few minutes (malware scan) before listing it. Re-running `publish` in that window returns `409 Cannot publish over previously staged version`, which means the first publish succeeded (npm/cli#9889). Wait and check `npm view`; don't bump the version.

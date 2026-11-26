@@ -1,10 +1,10 @@
 # Admin rebuild
 
-**Status:** proposed, not started. Waiting on Martin's answers to Open questions. Updated 2026-11-26.
+**Status:** proposed, not started. Thumbnail strategy decided; cache-purge scope proposed. Updated 2026-11-26.
 
 ## Resume here
 
-Nothing is built yet. Next: Martin answers the Open questions, especially #1 (thumbnail strategy) and #2 (soft-hide). Then start Phase 1 in a new worktree; its first step is cache purging, because moderation is pointless while deleted pages stay on the CDN.
+Nothing is built yet. Next: confirm the purge scope (Decisions, last entry) and answer Open question 2 (hide vs delete). Then start in a new worktree with Phase 3a (server-rendered thumbs), because it changes what Phases 1 and 3 need to do.
 
 ## Steps
 
@@ -22,6 +22,15 @@ Nothing is built yet. Next: Martin answers the Open questions, especially #1 (th
 - [ ] Multi-select + bulk actions (hide, delete, regenerate thumb) and artist-level actions ("everything by this artist").
 - [ ] Keyboard: `j`/`k` move, `h` hide, `r` regenerate, `⌫` delete (with confirm), `/` search.
 - [ ] Paste an id or a public URL into search to jump straight to an item (keeps the current workflow fast).
+
+### Phase 3a: server-rendered thumbs (decided 2026-11-26, do first)
+
+- [ ] Spike: canvas-paint `render()` with `@napi-rs/canvas` (prebuilt binaries, no system libs) in a Netlify function. Check output is pixel-identical to browser/node-canvas on the 16-drawing harness (`diff.mjs`-style), and check function bundle size and cold start.
+- [ ] `/thumbs/[collection]/[id]` renders from the drawing(s) on a miss: section = its drawing; corpse = its three drawings stacked. Encode WebP at 540px (Image CDN still serves other widths).
+- [ ] Persist rendered thumbs in Netlify Blobs keyed by `collection/id/version`, so a deploy (which clears the CDN cache) doesn't mean re-rendering everything. The CDN sits in front, Blobs is the store, and the drawing is the source of truth.
+- [ ] Saves stop uploading `thumb`/`corpseThumb` (smaller request; nothing user-supplied is shown as an image). Drop the browser `drawingToThumb`/`corpseToThumb` from the save path.
+- [ ] Remove node-canvas, `Drawing.composeThumbs` and the stored `thumb` fields' readers (keep the data until the atproto move; stop writing it).
+- [ ] This fixes the striped legacy thumbs automatically: they're re-rendered from drawings.
 
 ### Phase 3: thumbnail tools (replaces the node-canvas admin paths, audit #10)
 
@@ -41,11 +50,13 @@ Nothing is built yet. Next: Martin answers the Open questions, especially #1 (th
 ## Decisions
 
 - **2026-11-26**: plan only, written after the perf round; nothing implemented. Sized for the real data (247 sections / 238 corpses), so client-driven chunked jobs are simpler than background workers or queues.
-- **2026-11-26**: phase order puts cache purge + auth first. They're small, and the perf caching made purge a correctness issue for moderation.
+- **2026-11-26**: phase order puts cache purge + auth first.
+- **2026-11-26**: **thumbnail strategy = render on the server from the drawing** (Open question 1, option c). It removes the client-trust gap (saves could upload any image as a thumb), broken stored thumbs, backfills and node-canvas, and it's the right shape for atproto, where the drawing record is the source of truth. Stored in Netlify Blobs + CDN (Phase 3a). Most of Phase 3's regenerate/scan/backfill tooling becomes unnecessary; keep only "re-render this item" (bump version + purge).
+- **2026-11-26**: **proposed purge scope (Martin leans "stale over expensive"):** don't purge pages. They self-heal within ~60 s of the next visit, which is fine for moderation. Purge only on delete/hide, and only that item's thumb tag (`thumb:<collection>:<id>`), because thumbs are cached for a year and would otherwise keep serving at their URL. That's one small targeted call on a rare action; Netlify purges aren't billed. Supersedes Phase 1's "purge on every admin mutation and every save". They're small, and the perf caching made purge a correctness issue for moderation.
 
 ## Open questions
 
-1. **Blocking Phase 3: where do thumbnails come from?** See the thumbnail discussion in chat (2026-11-26). Options: (a) keep browser-rendered thumbs uploaded with the save, plus admin regenerate/scan (this plan as written); (b) render on the server at save time with a prebuilt canvas (`@napi-rs/canvas`); (c) don't store thumbs at all: the `/thumbs` route renders from the drawing on a cache miss and the CDN keeps it forever. If (c), most of Phase 3 disappears.
+1. ~~Where do thumbnails come from?~~ Decided: server-rendered (see Decisions). See the thumbnail discussion in chat (2026-11-26). Options: (a) keep browser-rendered thumbs uploaded with the save, plus admin regenerate/scan (this plan as written); (b) render on the server at save time with a prebuilt canvas (`@napi-rs/canvas`); (c) don't store thumbs at all: the `/thumbs` route renders from the drawing on a cache miss and the CDN keeps it forever. If (c), most of Phase 3 disappears.
 2. **Blocking Phase 2: hide vs delete.** Add a `hidden` flag (reversible, keeps history) and filter it out of public queries? Firestore needs every doc to have the field for `where("hidden", "==", false)`, so that's a one-time migration plus composite indexes for each list query. Or keep hard delete only?
 3. **Non-blocking:** user-facing "report" button feeding the moderation feed? Small to build, but it needs rate limiting and spam handling.
 4. **Non-blocking:** is "reset all likes" still wanted? It's destructive and rarely the right tool; per-item reset may be enough.
