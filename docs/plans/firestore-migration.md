@@ -1,13 +1,13 @@
 # Migrate the live Nuxt site to SvelteKit + Firestore
 
-**Status:** in-progress — updated 2026-06-11
+**Status:** in-progress — updated 2026-11-26
 
 ## Resume here
 
 The SvelteKit app is deployed and serving live Firestore data at
 `https://exquisite-corpse-club.netlify.app` (site `exquisite-corpse-club`,
-`00f3062d-…`). Remaining: set the Netlify production branch to `firestore` in the
-UI, run a real-data draw/save smoke test, then cut `exquisitecorpse.club` DNS over
+`00f3062d-…`). Pushes to `firestore` are now the production branch. Remaining:
+run a real-data draw/save smoke test, then cut `exquisitecorpse.club` DNS over
 from Firebase Hosting.
 
 ## Steps
@@ -28,9 +28,10 @@ from Firebase Hosting.
 - [x] Verify against live Firestore data (ADC with the service account; home/gallery/section render real records)
 - [x] Backfill decision: keep the read-time adapter; optional `pnpm convert:drawings` script added
 - [x] Reuse the existing Netlify site (`exquisite-corpse-club`, `00f3062d-7e5d-4686-9dda-136bcb1f07d9`); remote Linux builds work, functions bundle, fixture draft verified
-- [ ] Rotate the exposed Firebase service-account key; store the fields in 1Password (`firebase-private-key`, `firebase-client-email`) and set Netlify secret env vars from there
+- [x] Rotate the exposed Firebase service-account key and set Netlify secret env vars
+- [ ] Store the new key fields in 1Password (`firebase-private-key`, `firebase-client-email`, `admin-password`) for local dev
 - [x] Production deploy with live data (Netlify secrets: `FIREBASE_SERVICE_ACCOUNT`, `ECC_ADMIN_PASSWORD`)
-- [ ] Set the Netlify production branch to `firestore` in the UI (API left it at `nuxt`)
+- [x] Set the Netlify production branch to `firestore` in the UI (API left it at `nuxt`)
 - [ ] Draw/save smoke test against live data
 - [ ] DNS cutover
 
