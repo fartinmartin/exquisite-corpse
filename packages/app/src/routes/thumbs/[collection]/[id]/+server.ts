@@ -23,8 +23,10 @@ export const GET: RequestHandler = async ({ params, url }) => {
     // `durable` shares the cached copy across all of Netlify's edge nodes, so
     // each thumb renders about once instead of once per edge location.
     "netlify-cdn-cache-control": `${cache}, durable`,
-    // For targeted purges when an item is deleted or hidden (admin plan, Phase 1).
-    "netlify-cache-tag": `thumb:${collection}:${params.id}`,
+    // Keeps the cached thumb across deploys (a versioned URL never changes
+    // content) and doubles as the purge tag for when an item is deleted or
+    // hidden (admin plan, Phase 1).
+    "netlify-cache-id": `thumb:${collection}:${params.id}`,
   };
 
   const key = `${collection}/${params.id}/${version ?? "latest"}`;

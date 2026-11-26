@@ -31,6 +31,11 @@ export async function renderThumb(drawings: DrawingData[], key: string): Promise
 }
 
 /**
+ * The store is site-wide: previews and production share it. That's safe
+ * because keys contain the render version and the content depends only on
+ * the data. So any change to rendering must bump `RENDER_VERSION` in
+ * `lib/thumbs.ts`, or a preview could overwrite production thumbs.
+ *
  * Rendered thumbs persist in Netlify Blobs so a deploy (which empties the CDN)
  * doesn't mean re-rendering everything. Outside Netlify there's no store and
  * every miss renders, which is fine for local dev.
