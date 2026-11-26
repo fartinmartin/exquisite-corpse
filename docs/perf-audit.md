@@ -1,10 +1,12 @@
 # Performance audit — 2026-11-26 (`firestore` branch)
 
-**Status:** in-progress: #1–#8 done and committed on `perf/audit-fixes` (worktree `../exquisite-corpse-perf`); needs a deploy preview. Updated 2026-11-26.
+**Status:** in-progress: #1–#8 and SEO committed on `perf/audit-fixes` (worktree `../exquisite-corpse-perf`); waiting on the canvas-paint 1.2.0 publish, then a deploy preview. Updated 2026-11-26.
 
 ## Resume here
 
-Push `perf/audit-fixes` and open a Netlify deploy preview (it's an outward-facing step, so it's left for Martin). On the preview, check the two Netlify-only items under Open questions. If `/.netlify/images?url=/thumbs/...` fails, set `__NETLIFY_IMAGE_CDN__` to `false` in `packages/app/vite.config.ts`. After that, the remaining audit items are #9–#16 below. #10 (drop node-canvas) is the natural next one: corpse thumbs now always come from the browser, so only the admin `rebuildThumb`/`createFromSection` still need it.
+1. **canvas-paint 1.2.0 isn't on npm yet** (registry still shows 1.1.0). The source is committed and pushed (`e16d6bb`…`0ba036d` on canvas-paint `main`) and the dist is built from it. Publish with `cd ~/code/fartinmartin/canvas-paint && pnpm publish --access public --no-git-checks` (it asks for a 2FA code).
+2. Then, in this worktree, run `pnpm install`. That locks `^1.2.0`; `packages/app/package.json` and `src/lib/render.ts` (`paintOnto` now calls `drawPaths`) are already changed but uncommitted. Run `pnpm check`, re-test the replay on a corpse page with `ECC_FIXTURES=1`, and commit.
+3. Push `perf/audit-fixes` and open a deploy preview. Verify the Netlify-only items under Open questions, plus link previews (og tags) on a corpse URL.
 
 ## Steps
 
@@ -18,6 +20,9 @@ Push `perf/audit-fixes` and open a Netlify deploy preview (it's an outward-facin
 - [x] #8 `render.ts` `replay()`: paints only new paths per rAF frame onto one canvas (via `paintOnto`), aborts on unmount, skips under reduced motion; `canvas-panel.svelte` re-blits the cached render on resize
 - [x] smoke test with fixtures (`ECC_FIXTURES=1 npx vite dev`). Covered: every page 200 with no `data:image` thumbs in HTML; unknown ids 404; `/thumbs` immutable; cookie only on `/draw`; like toggle persists across reload; download gives a 1080px PNG; draw → save produced a 540×540 WebP corpse thumb (11 KB) and section thumb (3.7 KB); no console errors. `pnpm check` clean; `NETLIFY=true vite build` OK.
 - [x] committed (one code commit: the type change from thumb data to `thumbVersion` couples the data layer, pages and like button, so they don't split into commits that each compile)
+- [x] SEO: removed the static title/description/og tags from `app.html`; every page renders one set via `lib/components/seo.svelte` (title, description, canonical, og:*, twitter:card). Corpse/section pages use their thumb as og:image (JPEG via the Image CDN on Netlify); admin and error pages are `noindex`.
+- [x] canvas-paint: added a `drawPaths(ctx, data)` export (paths onto an existing context, no background fill); `render()` uses it. Verified with the 16-drawing harness: 0 differing bytes against `render()`. Committed and pushed to canvas-paint `main` as 1.2.0.
+- [ ] publish canvas-paint 1.2.0, then commit the app switch from the Proxy to `drawPaths` (Resume here)
 - [ ] deploy preview: verify Image CDN + CDN caching (Open questions)
 - [ ] after merge: compare against the "Measurements" table (gallery HTML was 1.4 MB gzipped)
 
@@ -27,6 +32,8 @@ Push `perf/audit-fixes` and open a Netlify deploy preview (it's an outward-facin
 - **2026-11-26**: #8 incremental replay verified pixel-identical to a full `render()`. Test: 16 real legacy drawings scraped from the live home page, node-canvas, random uneven chunks, 0 differing pixels in every one. Script: `diff.mjs` in the session scratchpad. It's a node-canvas harness around `canvas-paint/render`; re-create it if needed.
 - **2026-11-26**: #7 merging contiguous legacy segments into one polyline is **not** pixel-identical. Separate strokes double-composite their anti-aliased edges at every joint; one polyline doesn't. Across the same 16 drawings: 0.01–1.85% of pixels change, by up to 169/255. Size savings were only 1–6% for 12 of 16 drawings (37–43% for the other 4). Per the "keep at-rest fidelity" rule, not shipped. Gzip already removes most of the repetition (home: 1 MB raw → 322 KB).
 - **2026-11-26**: like state moved out of page data into `getLikeState` (browser-only `$effect`) so the cached HTML/query responses have no per-visitor data. Trade-off: one small extra request per detail page, and the heart fills in after hydration.
+- **2026-11-26**: the canvas-paint Proxy workaround is replaced by the upstream `drawPaths` export (canvas-paint 1.2.0). Supersedes the `paintOnto`-Proxy entry below.
+- **2026-11-26**: the atproto version keeps the same idea (a caching image route on our domain) but keys it by blob: `/thumbs/{did}/{cid}` proxying `com.atproto.sync.getBlob` from the record's PDS. A CID is content-addressed, so it replaces `?v=` and is immutable by definition. Only `lib/thumbs.ts` builds thumb URLs, so the swap is local. Records must hold real `blob` refs (not CID strings like `CorpseRecordSchema.renderedBlob` today) or the PDS garbage-collects the blob.
 - **2026-11-26**: thumbs live at `/thumbs/...`, not `/img/...`, because `static/img` already holds icons.
 - **2026-11-26**: `paintOnto` feeds our canvas to canvas-paint's `render()` via `createCanvas` and swallows its initial background `fillRect`, because `drawPathToContext` isn't exported from `@fartinmartin/canvas-paint/render`. That's a hack that depends on render internals (commented in code). Proper fix: export it from canvas-paint.
 
@@ -34,8 +41,6 @@ Push `perf/audit-fixes` and open a Netlify deploy preview (it's an outward-facin
 
 - **Non-blocking, verify on a deploy preview:** does Netlify Image CDN accept a function-served source (`/.netlify/images?url=/thumbs/...`)? If not, set `__NETLIFY_IMAGE_CDN__` to false in `vite.config.ts` and legacy thumbs are served full-size (still cached, no longer inlined).
 - **Non-blocking, verify on a deploy preview:** does Netlify's CDN honour `netlify-cdn-cache-control` on the SSR function and remote query responses? Look for `cache-status: "Netlify Edge"; hit` on a second request.
-- **Non-blocking:** export `drawPathToContext` from canvas-paint (your package, needs a publish) so `paintOnto` can drop the Proxy.
-- **Non-blocking, found while testing:** `app.html` has a static `<title>`/description *before* `%sveltekit.head%`, so SSR'd pages have two titles and crawlers/link previews see the generic one. Not perf, so not fixed here; predates this branch.
 - **Non-blocking:** backfill legacy 1080px PNG thumbs to small WebP? It writes production data, so I didn't do it. The Image CDN covers display in the meantime.
 
 ---
