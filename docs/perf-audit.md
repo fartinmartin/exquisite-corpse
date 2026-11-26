@@ -1,10 +1,10 @@
 # Performance audit — 2026-11-26 (`firestore` branch)
 
-**Status:** in-progress: #1–#8, SEO and the canvas-paint 1.2.0 switch committed on `perf/audit-fixes` (worktree `../exquisite-corpse-perf`); needs a deploy preview. Updated 2026-11-26.
+**Status:** in-progress: #1–#8, SEO and canvas-paint 1.2.0 done on `perf/audit-fixes` and verified on a draft deploy; ready to ship. Updated 2026-11-26.
 
 ## Resume here
 
-Push `perf/audit-fixes` and open a Netlify deploy preview. On it, verify the Netlify-only items under Open questions, plus link previews (og tags) on a corpse URL. After that, the remaining audit items are #9–#16. #10 (drop node-canvas) is the natural next one.
+Draft deploy of `4755da1` verified: https://6b087e4d134eb1c656508193--exquisite-corpse-club.netlify.app (results under Steps). Next: Martin decides whether to ship. Production deploys from the `firestore` branch, so merging `perf/audit-fixes` into `firestore` and pushing releases it. After that, the remaining audit items are #9–#16; #10 (drop node-canvas) is the natural next one.
 
 ## Steps
 
@@ -21,8 +21,13 @@ Push `perf/audit-fixes` and open a Netlify deploy preview. On it, verify the Net
 - [x] SEO: removed the static title/description/og tags from `app.html`; every page renders one set via `lib/components/seo.svelte` (title, description, canonical, og:*, twitter:card). Corpse/section pages use their thumb as og:image (JPEG via the Image CDN on Netlify); admin and error pages are `noindex`.
 - [x] canvas-paint: added a `drawPaths(ctx, data)` export (paths onto an existing context, no background fill); `render()` uses it. Verified with the 16-drawing harness: 0 differing bytes against `render()`. Committed and pushed to canvas-paint `main` as 1.2.0.
 - [x] canvas-paint 1.2.0 published (live 18:37 UTC); app and core now depend on `^1.2.0` and `paintOnto` calls `drawPaths`. Replay re-tested with fixtures: final pixels identical to the Proxy version.
-- [ ] deploy preview: verify Image CDN + CDN caching (Open questions)
-- [ ] after merge: compare against the "Measurements" table (gallery HTML was 1.4 MB gzipped)
+- [x] draft deploy (`netlify deploy --remote --filter @ecc/app --site 00f3062d-…`; `--alias` can't be combined with `--remote`, and `--json` makes CLI 27.20 exit early). Verified against live data, read-only:
+  - `/gallery` HTML: **1,418 KB → 4 KB** gzipped, no inline image data; `/` 322 KB → 27 KB (random corpse, so it varies)
+  - Image CDN accepts the function-served `/thumbs/...` source: a legacy 1080px PNG corpse thumb comes back as 10 KB WebP at w=360 (20 KB at w=720), `immutable`
+  - CDN caching: second request to gallery/corpse/section pages is a `Netlify Durable` hit, TTFB ~0.3 s vs 0.7–0.9 s on a miss; home stays `no-cache` (random) as intended; no `Set-Cookie` on public pages
+  - og tags: one set per page; corpse og:image is a 65 KB JPEG via the Image CDN
+  - browser: section page replays, `getLikeState` 200, gallery 9/9 images load, no console errors
+- [ ] after shipping: compare production against the "Measurements" table
 
 ## Decisions
 
@@ -38,8 +43,8 @@ Push `perf/audit-fixes` and open a Netlify deploy preview. On it, verify the Net
 
 ## Open questions
 
-- **Non-blocking, verify on a deploy preview:** does Netlify Image CDN accept a function-served source (`/.netlify/images?url=/thumbs/...`)? If not, set `__NETLIFY_IMAGE_CDN__` to false in `vite.config.ts` and legacy thumbs are served full-size (still cached, no longer inlined).
-- **Non-blocking, verify on a deploy preview:** does Netlify's CDN honour `netlify-cdn-cache-control` on the SSR function and remote query responses? Look for `cache-status: "Netlify Edge"; hit` on a second request.
+- **Non-blocking, pre-existing data issue:** some stored corpse thumbs are just vertical stripes. Seen on `ktzR92nJQi8UJZxZeS9v` (all stripes) and `JQT4p3gLjQ7YuT7WzJxu` (striped top panel). The raw PNG in Firestore looks like that, so it's not the CDN or this branch; production serves the same image. Probably a bad composition at save time. Admin "update thumb" rebuilds it from the section thumbs, if those are OK.
+
 - **Non-blocking:** backfill legacy 1080px PNG thumbs to small WebP? It writes production data, so I didn't do it. The Image CDN covers display in the meantime.
 
 ---
