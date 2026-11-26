@@ -1,12 +1,23 @@
 # Admin rebuild
 
-**Status:** in-progress: Phase 3a shipped; Phases 1, 2 and 4 not started. Updated 2026-11-26.
+**Status:** in-progress: Phase 3a and the budget gate shipped; Phases 1, 2 and 4 not started. Updated 2026-11-26.
 
 ## Resume here
 
-Phase 3a shipped (`99d701a`). Next: Phase 1 in a new worktree. First, `purgeCache({ tags: ["thumb:<collection>:<id>"] })` from `@netlify/cache` in `deleteSection`/`deleteCorpse` (thumb responses already send that `Netlify-Cache-ID`); then auth hardening; then the cascade preview. Open question 2 (hide vs delete) blocks Phase 2.
+Budget gate shipped (`3ff07a0`, see "Budget gate" under Steps). Next: Phase 1 in a new worktree. First, `purgeCache({ tags: ["thumb:<collection>:<id>"] })` from `@netlify/cache` in `deleteSection`/`deleteCorpse`; then auth hardening; then the cascade preview. Open question 2 (hide vs delete) blocks Phase 2.
 
 ## Steps
+
+### Budget gate (shipped 2026-11-26)
+
+- [x] Site mode `open | read-only | closed` in Netlify Blobs (`site` store), checked in `hooks.server.ts` with a 30 s per-instance cache (`lib/server/site-mode.ts`). The key is `production` for the published deploy and `deploy-<id>` for every other deploy, so drafts can't close the live site. Blobs errors fail open.
+  - read-only: `saveDrawing`/`toggleLike` return 503; `/draw` shows a paused message; galleries stay up.
+  - closed: every public route returns a plain holding page (`lib/server/closed-page.ts`, 503, `no-store`). `/admin`, `/thumbs`, `/api/budget` and signed-in admins bypass the gate.
+- [x] Admin switch: "site mode" panel at the top of `/admin` (`siteMode`/`setSiteMode`). Manual changes are recorded with reason `manual`, and the budget hook never undoes them.
+- [x] Budget hook: GCP budget **"exquisite corpse club: read-only gate"** (`billingAccounts/012219-5E8599-AD930F/budgets/327dfa44-…`), $10/month, project `exquisite-corpse-club` only, emails billing admins at 50/90/100%. It publishes to topic `budget-alerts`, and push subscription `budget-gate` (never expires) sends to `https://exquisitecorpse.club/api/budget` with an OIDC token for `budget-push@exquisite-corpse-club.iam.gserviceaccount.com` (Netlify env `BUDGET_PUSH_SERVICE_ACCOUNT`). Spend ≥ budget → read-only (reason `budget`). The first under-budget notification of a *new* budget period reopens it, and only if the budget closed it.
+- [x] Verified end-to-end on a draft with a temporary subscription (deleted): unsigned/forged → 401; a fake over-budget message → draft read-only and likes 503, while production stayed open; same-month under-budget → stays read-only; new month → reopens. Production after ship: open, endpoint 401 for unsigned.
+- To test again safely: deploy a draft, create a temporary push subscription to `<draft>/api/budget` (same service account), publish `{"costAmount":12,"budgetAmount":10,"costIntervalStart":"<ISO>"}` to `budget-alerts`, then delete the subscription. **Don't** publish an over-budget message while only `budget-gate` exists: that closes production.
+- To change the amount: `gcloud billing budgets update <name> --budget-amount=…USD`. To disable: delete the `budget-gate` subscription (the budget emails keep working).
 
 ### Phase 1: make moderation actually work (small, ship first)
 
@@ -59,6 +70,7 @@ Phase 3a shipped (`99d701a`). Next: Phase 1 in a new worktree. First, `purgeCach
 - **2026-11-26**: server thumbs are not pixel-identical to the browser, and can't be: Skia (napi) vs Chrome differ in 0.6–9.6% of pixels across the 16 drawings, almost all anti-aliasing (pixels off by >64/255: 0.01–0.6%). node-canvas (Cairo) differs from Chrome by about the same (0.6–8.2%). Accepted: thumbnails are previews. The at-rest artwork on corpse/section pages is still rendered in the visitor's browser, and the download is still rendered in the browser.
 - **2026-11-26**: thumbs render at 1080px, not 540, because they're also the link-preview image; the Image CDN downsizes for the gallery.
 - **2026-11-26**: Blobs store is site-wide, so previews share it with production. Safe because keys include the render version and the content depends only on data. Rule: any rendering change must bump `RENDER_VERSION` (comment in `lib/server/thumbs.ts`).
+- **2026-11-26**: budget gate: Martin chose $10/month, emails at 50/90/100%, and automatic reopening next month. The push goes straight to the app (no Cloud Function), verified by Google's OIDC token with the request URL as audience. Netlify itself (free plan) can still pause the site if its own allowance runs out; nothing in-app can cover that.
 
 ## Open questions
 
