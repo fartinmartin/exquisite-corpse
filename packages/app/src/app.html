@@ -6,6 +6,8 @@
     <!-- Per-page title, description and og:* tags come from lib/components/seo.svelte. -->
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="exquisite corpse club" />
+    <!-- Body text font: start fetching before the CSS is parsed to avoid a swap reflow. -->
+    <link rel="preload" href="/fonts/spacemono/SpaceMono-Regular.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="icon" href="/icon.png" />
     <link rel="apple-touch-icon" href="/icon.png" />
     <script
