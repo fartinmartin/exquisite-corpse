@@ -1,4 +1,4 @@
-import type { Handle } from '@sveltejs/kit';
+import { redirect, type Handle } from '@sveltejs/kit';
 import { joyful } from 'joyful';
 
 const GUEST_TOKEN_COOKIE = 'ecc_guest_token';
@@ -7,6 +7,12 @@ const GUEST_HANDLE_COOKIE = 'ecc_guest_handle';
 // Server startup hook — good place to initialize background services
 // (e.g. firehose subscription for real-time section discovery) when needed
 export const handle: Handle = async ({ event, resolve }) => {
+  // Keep likes, cookies and analytics on one domain. Exact match only, so
+  // deploy permalinks (`<id>--….netlify.app`) still work.
+  if (event.url.hostname === 'exquisite-corpse-club.netlify.app') {
+    redirect(301, `https://exquisitecorpse.club${event.url.pathname}${event.url.search}`);
+  }
+
   if (!event.cookies.get(GUEST_TOKEN_COOKIE)) {
     const token = crypto.randomUUID();
     const handle = joyful({ segments: 2, separator: '-' });
