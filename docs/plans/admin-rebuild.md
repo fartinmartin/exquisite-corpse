@@ -1,10 +1,10 @@
 # Admin rebuild
 
-**Status:** in-progress: Phase 3a and the budget gate shipped; Phase 1 built on `feat/admin-phase1`, not shipped; Phases 2 and 4 not started. Updated 2026-11-26.
+**Status:** in-progress: Phases 1 and 3a and the budget gate shipped; Phases 2 and 4 not started. Updated 2026-11-26.
 
 ## Resume here
 
-Phase 1 is on `feat/admin-phase1` (worktree `../exquisite-corpse-admin`), tested locally with fixtures; waiting on Martin to ship. After shipping, the first real delete in /admin is the production check for the purge + Blobs cleanup: afterwards the deleted thumb URL should 404 (see the Phase 1 steps). Then Phase 2, which starts with the `hidden` migration (see Decisions, hide vs delete).
+Phase 1 shipped (`340566c`). Open check: after the first real delete in /admin, its old thumb URL should 404 (purge + Blobs cleanup has only run locally). Next: Phase 2, which starts with the `hidden` migration and Firestore indexes. Both change production, so confirm with Martin before running them.
 
 ## Steps
 
@@ -26,7 +26,8 @@ Phase 1 is on `feat/admin-phase1` (worktree `../exquisite-corpse-admin`), tested
 - [x] **Delete preview.** "remove section" and "remove" (corpse) now load a preview (`sectionDeletePreview`/`corpseDeletePreview`) and show the thumbnails of everything that will go ("deletes 1 section + 2 corpses it's in") with delete/cancel, instead of `confirm()`. `Admin.removeSection` is now one batch and returns the deleted corpse ids. Verified locally with fixtures (admin now works in fixtures mode).
 - [x] Fixed `vite dev` crashing in the dependency optimizer on the `@napi-rs/canvas` binary (a regression from Phase 3a, only seen when Vite's cache is rebuilt): excluded it from `optimizeDeps` and `ssr.optimizeDeps`.
 - [x] Removed `Sections.remove` (unused; admin deletes go through `Admin.*`).
-- [ ] Ship.
+- [x] Shipped 2026-11-26 (`340566c`). Production check: all pages 200, `/admin` → login, thumbs render, a wrong password → 401 through the new lockout path.
+- [ ] Verify purge + Blobs cleanup on the first real delete.
 
 ### Phase 2: browse instead of pasting ids
 
