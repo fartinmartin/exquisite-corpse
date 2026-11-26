@@ -1,10 +1,10 @@
 # Performance audit — 2026-11-26 (`firestore` branch)
 
-**Status:** in-progress: #1–#8, SEO and canvas-paint 1.2.0 done on `perf/audit-fixes` and verified on a draft deploy; ready to ship. Updated 2026-11-26.
+**Status:** in-progress: #1–#8 + SEO shipped; #9–#16 open. Updated 2026-11-26.
 
 ## Resume here
 
-Draft deploy of `4755da1` verified: https://6b087e4d134eb1c656508193--exquisite-corpse-club.netlify.app (results under Steps). Next: Martin decides whether to ship. Production deploys from the `firestore` branch, so merging `perf/audit-fixes` into `firestore` and pushing releases it. After that, the remaining audit items are #9–#16; #10 (drop node-canvas) is the natural next one.
+#1–#8 shipped to production on 2026-11-26 (`effa7ac`, deploy `6b087f22`). Next, in this order: #11 (`preferRest` + check the function region; uncached TTFB is still ~0.7–0.9 s), #10 (drop node-canvas), #14 (admin bulk ops break past 500 docs), then #15/#16. Skip #12/#13 unless the atproto cut-over is far off. The striped thumbs (Open questions) can be fixed from /admin now.
 
 ## Steps
 
@@ -27,7 +27,7 @@ Draft deploy of `4755da1` verified: https://6b087e4d134eb1c656508193--exquisite-
   - CDN caching: second request to gallery/corpse/section pages is a `Netlify Durable` hit, TTFB ~0.3 s vs 0.7–0.9 s on a miss; home stays `no-cache` (random) as intended; no `Set-Cookie` on public pages
   - og tags: one set per page; corpse og:image is a 65 KB JPEG via the Image CDN
   - browser: section page replays, `getLikeState` 200, gallery 9/9 images load, no console errors
-- [ ] after shipping: compare production against the "Measurements" table
+- [x] shipped (`firestore` fast-forwarded to `effa7ac`). Production vs the Measurements table, gzipped HTML: `/` 322 → 20 KB, `/gallery` 1,418 → 4 KB, corpse 210 → 25 KB, section 292 → 7 KB. Repeat `/gallery` hits the durable cache at 0.22 s TTFB.
 
 ## Decisions
 
