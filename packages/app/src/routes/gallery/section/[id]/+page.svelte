@@ -1,10 +1,11 @@
 <script lang="ts">
+  import Seo from "#lib/components/seo.svelte";
   import { page } from "$app/state";
   import CanvasPanel from "#lib/components/canvas-panel.svelte";
   import MetaMenu from "#lib/components/meta-menu.svelte";
   import Panel from "#lib/components/panel.svelte";
   import RadioButton from "#lib/components/radio-button.svelte";
-  import { thumbAttrs } from "#lib/thumbs.ts";
+  import { thumbAttrs, thumbOgImage } from "#lib/thumbs.ts";
   import { getSection } from "./section.remote";
 
   const TYPE_NAMES = { top: "top", mid: "middle", bot: "bottom" } as const;
@@ -17,13 +18,11 @@
   const drawings = $derived([result.section.drawing]);
 </script>
 
-<svelte:head>
-  <title>exquisite corpse club ▪ {result.section.title} by {result.section.artist}</title>
-  <meta
-    name="description"
-    content={`a ${TYPE_NAMES[result.section.type]} third of an exquisite corpse!`}
-  />
-</svelte:head>
+<Seo
+  title={`${result.section.title} by ${result.section.artist}`}
+  description={`a ${TYPE_NAMES[result.section.type]} third of an exquisite corpse!`}
+  image={thumbOgImage("sections", result.section, page.url.origin)}
+/>
 
   <div class="wrap">
     <div class="canvas-stack mw-canvas">

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Seo from "#lib/components/seo.svelte";
   import DateIcon from "#lib/components/date-icon.svelte";
   import Icon from "#lib/components/icon.svelte";
   import Panel from "#lib/components/panel.svelte";
@@ -36,10 +37,7 @@
   });
 </script>
 
-<svelte:head>
-  <title>exquisite corpse club ▪ gallery</title>
-  <meta name="description" content="checkout our masterpieces!" />
-</svelte:head>
+<Seo title="gallery" description="checkout our masterpieces!" />
 
 <div class="wrap" class:section-wrap={filter !== "corpses"}>
   <Panel class={`filters mb ${mobile ? "sticky" : ""}`}>

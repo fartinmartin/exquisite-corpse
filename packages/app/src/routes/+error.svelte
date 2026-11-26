@@ -1,13 +1,12 @@
 <script lang="ts">
+  import Seo from "#lib/components/seo.svelte";
   import { page } from "$app/state";
   import Panel from "#lib/components/panel.svelte";
 
   const notFound = $derived(page.status === 404);
 </script>
 
-<svelte:head>
-  <title>exquisite corpse club</title>
-</svelte:head>
+<Seo title={notFound ? "not found" : "error"} noindex />
 
 <div class="container">
   <Panel color="red" class="error-msg">

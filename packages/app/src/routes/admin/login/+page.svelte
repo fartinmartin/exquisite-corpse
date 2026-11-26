@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Seo from "#lib/components/seo.svelte";
   import type { ActionData } from "./$types";
   import Button from "#lib/components/button.svelte";
   import Input from "#lib/components/input.svelte";
@@ -8,9 +9,7 @@
   let password = $state("");
 </script>
 
-<svelte:head>
-  <title>exquisite corpse club ▪ admin</title>
-</svelte:head>
+<Seo title="admin" noindex />
 
 <div class="wrap">
   <form method="POST">

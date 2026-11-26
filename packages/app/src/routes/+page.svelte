@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Seo from "#lib/components/seo.svelte";
   import type { SectionType } from "@ecc/firestore";
   import CanvasPanel from "#lib/components/canvas-panel.svelte";
   import NavMenu from "#lib/components/nav-menu.svelte";
@@ -10,9 +11,7 @@
   const corpse = $derived(await randomCorpse());
 </script>
 
-<svelte:head>
-  <title>exquisite corpse club</title>
-</svelte:head>
+<Seo />
 
 <div class="wrap">
   <Panel class="mb index-nav">

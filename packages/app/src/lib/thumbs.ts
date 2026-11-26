@@ -45,3 +45,13 @@ export function thumbAttrs(collection: Collection, item: ThumbRef) {
     sizes: SIZES,
   };
 }
+
+/**
+ * Absolute image URL for link previews (og:image). Preview scrapers don't all
+ * read WebP, so on Netlify the Image CDN re-encodes to JPEG.
+ */
+export function thumbOgImage(collection: Collection, item: ThumbRef, origin: string): string {
+  const source = thumbUrl(collection, item);
+  if (!__NETLIFY_IMAGE_CDN__) return `${origin}${source}`;
+  return `${origin}/.netlify/images?url=${encodeURIComponent(source)}&w=1080&fm=jpg`;
+}

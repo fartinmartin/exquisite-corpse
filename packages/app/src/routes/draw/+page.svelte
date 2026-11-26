@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Seo from "#lib/components/seo.svelte";
   import { goto } from "$app/navigation";
   import type { SectionType } from "@ecc/firestore";
   import type { DrawingData } from "@ecc/lexicons";
@@ -88,10 +89,7 @@
   }
 </script>
 
-<svelte:head>
-  <title>exquisite corpse club ▪ draw</title>
-  <meta name="description" content="create your very own masterpiece!" />
-</svelte:head>
+<Seo title="draw" description="create your very own masterpiece!" />
 
 <div class="wrap">
   {#if saving && section && drawState.paint}

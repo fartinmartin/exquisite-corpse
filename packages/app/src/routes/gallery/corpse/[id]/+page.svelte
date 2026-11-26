@@ -1,9 +1,11 @@
 <script lang="ts">
+  import Seo from "#lib/components/seo.svelte";
   import { page } from "$app/state";
   import type { SectionType } from "@ecc/firestore";
   import CanvasPanel from "#lib/components/canvas-panel.svelte";
   import MetaMenu from "#lib/components/meta-menu.svelte";
   import Panel from "#lib/components/panel.svelte";
+  import { thumbOgImage } from "#lib/thumbs.ts";
   import { getCorpse } from "./corpse.remote";
 
   const TYPES: SectionType[] = ["top", "mid", "bot"];
@@ -22,10 +24,11 @@
   );
 </script>
 
-<svelte:head>
-  <title>exquisite corpse club ▪ {corpse.title}</title>
-  <meta name="description" content={`an exquisite corpse drawn by ${artists}!`} />
-</svelte:head>
+<Seo
+  title={corpse.title}
+  description={`an exquisite corpse drawn by ${artists}!`}
+  image={thumbOgImage("corpses", corpse, page.url.origin)}
+/>
 
   <div class="wrap">
     <div class="canvas-stack mw-canvas">
