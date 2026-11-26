@@ -65,12 +65,18 @@ Fixture mode lives in `packages/firestore/src/fixtures.ts` and is only active wh
 Firestore emulator: set `FIRESTORE_EMULATOR_HOST` + `GCLOUD_PROJECT` instead of the
 service-account variables.
 
-Credentials live in 1Password, not on disk: the item referenced by `.env.schema`
-(`op://Personal/exquisitecorpse.club/…`) stores `firebase-client-email` and
-`firebase-private-key`. Varlock resolves those for `pnpm dev`. For one-off scripts,
-read them with `op read` (e.g. `FIREBASE_PRIVATE_KEY="$(op read …)" pnpm --filter @ecc/scripts …`).
-The only time a service-account `.json` exists is between `gcloud iam service-accounts
-keys create` and copying the fields into 1Password — delete it afterwards.
+Credentials live in 1Password, not on disk. `Client` accepts them in this order:
+
+1. `FIREBASE_SERVICE_ACCOUNT` — the whole service-account JSON, raw or base64-encoded
+   (preferred for hosts like Netlify; the project id comes from the JSON).
+2. `FIREBASE_CLIENT_EMAIL` + `FIREBASE_PRIVATE_KEY` + `FIREBASE_PROJECT_ID` — the
+   individual fields from `.env.schema`.
+3. Application Default Credentials (local `gcloud`, or `GOOGLE_APPLICATION_CREDENTIALS`).
+
+`FIREBASE_SERVICE_ACCOUNT` is parsed in memory and never logged. Varlock resolves
+the 1Password refs for `pnpm dev`; for one-off scripts use `op read`. The only time
+a service-account `.json` exists is between key creation and copying it into
+1Password — delete it afterwards.
 
 ## Deploy
 
