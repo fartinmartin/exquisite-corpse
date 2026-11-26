@@ -11,3 +11,16 @@
 
 # Server-side env (set in the Netlify UI, not committed):
 #   FIREBASE_SERVICE_ACCOUNT (raw or base64 JSON), ECC_ADMIN_PASSWORD
+
+# Static assets that aren't content-hashed. A day in browsers, longer at the CDN
+# (a deploy purges the CDN cache, so edits still go out on deploy).
+[[headers]]
+  for = "/fonts/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/img/*"
+  [headers.values]
+    Cache-Control = "public, max-age=86400"
+    Netlify-CDN-Cache-Control = "public, max-age=31536000"
