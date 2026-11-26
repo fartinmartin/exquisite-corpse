@@ -6,6 +6,8 @@ allowBuilds:
   canvas: true
   esbuild: true
   protobufjs: true
+minimumReleaseAgeExclude:
+  - '@fartinmartin/canvas-paint@1.2.0'
 overrides:
   # drizzle-kit still pulls an esbuild with a dev-server advisory via @esbuild-kit.
   "@esbuild-kit/core-utils>esbuild": ^0.25.0
