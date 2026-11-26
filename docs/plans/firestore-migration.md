@@ -27,7 +27,7 @@ create the Netlify site, set the Firebase service-account env vars there, then c
 - [x] Verify against live Firestore data (ADC with the service account; home/gallery/section render real records)
 - [x] Backfill decision: keep the read-time adapter; optional `pnpm convert:drawings` script added
 - [x] Reuse the existing Netlify site (`exquisite-corpse-club`, `00f3062d-7e5d-4686-9dda-136bcb1f07d9`); remote Linux builds work, functions bundle, fixture draft verified
-- [ ] Rotate the exposed Firebase service-account key and set Netlify env secrets
+- [ ] Rotate the exposed Firebase service-account key; store the fields in 1Password (`firebase-private-key`, `firebase-client-email`) and set Netlify secret env vars from there
 - [ ] Production deploy with live data + set the Netlify production branch in the UI
 - [ ] DNS cutover
 

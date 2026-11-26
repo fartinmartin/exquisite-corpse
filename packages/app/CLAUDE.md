@@ -65,6 +65,13 @@ Fixture mode lives in `packages/firestore/src/fixtures.ts` and is only active wh
 Firestore emulator: set `FIRESTORE_EMULATOR_HOST` + `GCLOUD_PROJECT` instead of the
 service-account variables.
 
+Credentials live in 1Password, not on disk: the item referenced by `.env.schema`
+(`op://Personal/exquisitecorpse.club/…`) stores `firebase-client-email` and
+`firebase-private-key`. Varlock resolves those for `pnpm dev`. For one-off scripts,
+read them with `op read` (e.g. `FIREBASE_PRIVATE_KEY="$(op read …)" pnpm --filter @ecc/scripts …`).
+The only time a service-account `.json` exists is between `gcloud iam service-accounts
+keys create` and copying the fields into 1Password — delete it afterwards.
+
 ## Deploy
 
 Netlify (SSR functions) via `@sveltejs/adapter-netlify`; `netlify.toml` at the repo
