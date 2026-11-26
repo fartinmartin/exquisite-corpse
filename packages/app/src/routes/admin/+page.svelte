@@ -9,8 +9,27 @@
     downloadPaths,
     makeCorpse,
     resetLikes,
+    setSiteMode,
+    siteMode,
     updateThumb,
   } from "./admin.remote";
+  import type { SiteMode } from "#lib/site-mode.ts";
+
+  const MODES: { mode: SiteMode; label: string; color: "green" | "yellow" | "red" }[] = [
+    { mode: "open", label: "open", color: "green" },
+    { mode: "read-only", label: "read-only", color: "yellow" },
+    { mode: "closed", label: "closed", color: "red" },
+  ];
+
+  const site = $derived(await siteMode());
+
+  function changeMode(mode: SiteMode) {
+    if (mode !== "open" && !confirm(`set the site to ${mode}?`)) return;
+    return run(async () => {
+      await setSiteMode(mode);
+      return `site is now ${mode}`;
+    });
+  }
 
   let corpseSectionId = $state("");
   let corpseId = $state("");
@@ -89,6 +108,22 @@
   <h2>admin</h2>
 
   <Panel class="admin-index">
+    <h1>site mode: {site.mode}</h1>
+    <p class="note">
+      {site.reason === "budget" ? "set by the budget hook" : "set manually"} ▪ {new Date(site.at).toLocaleString()}
+    </p>
+    <div class="input-wrap">
+      {#each MODES as option (option.mode)}
+        <Button
+          color={option.color}
+          onclick={() => changeMode(option.mode)}
+          text={option.label}
+        />
+      {/each}
+    </div>
+  </Panel>
+
+  <Panel class="admin-index">
     <h1>corpse</h1>
     <div class="input-wrap">
       <Input id="section-id-for-corpse" placeholder="enter sectionId" bind:value={corpseSectionId} />
@@ -164,6 +199,11 @@
         margin-top: 1rem;
       }
     }
+  }
+
+  .note {
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
   }
 
   :global(.status .content) {

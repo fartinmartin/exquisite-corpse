@@ -10,9 +10,14 @@
   import SectionPicker from "#lib/components/section-picker.svelte";
   import Toolbar from "#lib/components/toolbar.svelte";
   import { drawState, GUEST_HANDLE_COOKIE } from "#lib/draw/state.svelte.ts";
+  import { pausedMessage } from "#lib/site-mode.ts";
+  import type { PageData } from "./$types";
   import { getSiblings, randomTitle, saveDrawing, type Sibling } from "./draw.remote";
 
   const TYPES: SectionType[] = ["top", "mid", "bot"];
+
+  let { data }: { data: PageData } = $props();
+  const paused = $derived(data.site.mode !== "open");
 
   let section = $state<SectionType | null>(null);
   let siblings = $state<Partial<Record<SectionType, Sibling>>>({});
@@ -92,7 +97,11 @@
     />
   {/if}
 
-  {#if !section}
+  {#if paused}
+    <Panel color="yellow" class="paused">
+      <p>{pausedMessage(data.site)} <a href="/gallery">see the gallery</a></p>
+    </Panel>
+  {:else if !section}
     <SectionPicker onpick={pick} />
   {:else if fetching}
     <div class="mw-canvas">

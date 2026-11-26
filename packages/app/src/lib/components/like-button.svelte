@@ -44,6 +44,8 @@
       const state = await toggleLike(target);
       token++; // supersede any in-flight getLikeState
       own = { ...state, id: target.id };
+    } catch {
+      // Refused (e.g. the site is read-only) or offline: the count just stays as is.
     } finally {
       busy = false;
     }

@@ -3,6 +3,7 @@ import { error } from "@sveltejs/kit";
 import * as v from "valibot";
 import { Admin, Corpses, Likes, Sections } from "@ecc/firestore";
 import { requireAdmin } from "#lib/server/admin.ts";
+import { getSiteState, setSiteState } from "#lib/server/site-mode.ts";
 
 function context() {
   const event = getRequestEvent();
@@ -62,4 +63,18 @@ export const downloadPaths = command(v.string(), async (id) => {
   const drawing = await Admin.sectionDrawing(id);
   if (drawing instanceof Error) fail(drawing);
   return { drawing };
+});
+
+export const siteMode = query(async () => {
+  const event = context();
+  return getSiteState(event.platform);
+});
+
+/** Manual changes are never undone by the budget hook (it only reopens its own closures). */
+export const setSiteMode = command(v.picklist(["open", "read-only", "closed"]), async (mode) => {
+  const event = context();
+  const state = { mode, reason: "manual" as const, at: new Date().toISOString() };
+  await setSiteState(event.platform, state);
+  await siteMode().set(state);
+  return state;
 });
