@@ -1,10 +1,10 @@
 # Admin rebuild
 
-**Status:** proposed, not started. Thumbnail strategy decided; cache-purge scope proposed. Updated 2026-11-26.
+**Status:** in-progress: Phase 3a (server-rendered thumbs) built on `feat/server-thumbs` and verified on a draft deploy, not shipped. Purge scope confirmed. Updated 2026-11-26.
 
 ## Resume here
 
-Nothing is built yet. Next: confirm the purge scope (Decisions, last entry) and answer Open question 2 (hide vs delete). Then start in a new worktree with Phase 3a (server-rendered thumbs), because it changes what Phases 1 and 3 need to do.
+Phase 3a is on `feat/server-thumbs` (worktree `../exquisite-corpse-thumbs`), verified on https://6b08b2d19ec5874994e7cb44--exquisite-corpse-club.netlify.app. Next: Martin approves shipping (fast-forward `firestore`, push). After that: Phase 1 (cache purge via `@netlify/cache` `purgeCache({ tags: ["thumb:<collection>:<id>"] })` on delete, plus auth hardening). Open question 2 (hide vs delete) still blocks Phase 2.
 
 ## Steps
 
@@ -25,12 +25,14 @@ Nothing is built yet. Next: confirm the purge scope (Decisions, last entry) and 
 
 ### Phase 3a: server-rendered thumbs (decided 2026-11-26, do first)
 
-- [ ] Spike: canvas-paint `render()` with `@napi-rs/canvas` (prebuilt binaries, no system libs) in a Netlify function. Check output is pixel-identical to browser/node-canvas on the 16-drawing harness (`diff.mjs`-style), and check function bundle size and cold start.
-- [ ] `/thumbs/[collection]/[id]` renders from the drawing(s) on a miss: section = its drawing; corpse = its three drawings stacked. Encode WebP at 540px (Image CDN still serves other widths).
-- [ ] Persist rendered thumbs in Netlify Blobs keyed by `collection/id/version`, so a deploy (which clears the CDN cache) doesn't mean re-rendering everything. The CDN sits in front, Blobs is the store, and the drawing is the source of truth.
-- [ ] Saves stop uploading `thumb`/`corpseThumb` (smaller request; nothing user-supplied is shown as an image). Drop the browser `drawingToThumb`/`corpseToThumb` from the save path.
-- [ ] Remove node-canvas, `Drawing.composeThumbs` and the stored `thumb` fields' readers (keep the data until the atproto move; stop writing it).
-- [ ] This fixes the striped legacy thumbs automatically: they're re-rendered from drawings.
+- [x] Spike: canvas-paint `render()` with `@napi-rs/canvas` 1.2.1. 16 real legacy drawings render in ~33 ms each. Not pixel-identical to Chrome (see Decisions), same class of difference as node-canvas. Linux binary ~36 MB unpacked; bundles fine.
+- [x] `/thumbs/[collection]/[id]` renders from the drawing(s): section = its drawing, corpse = its three drawings stacked (`lib/compose.ts` `stack()`, shared with the browser download button). 1080px WebP q85; the Image CDN serves the gallery sizes. Lookup is CDN → Blobs → render; the response header `x-thumb-source: blob|render|stored` says which.
+- [x] Rendered thumbs persist in Netlify Blobs (`thumbs` store, key `collection/id/v`), and the CDN keeps them across deploys via `Netlify-Cache-ID: thumb:<collection>:<id>`, which is also the purge tag. URLs are `?v=<RENDER_VERSION>-<thumbVersion>` (`lib/thumbs.ts`).
+- [x] Saves no longer upload `thumb`/`corpseThumb` or write a `thumb` field. `rebuildThumb` just bumps `thumbVersion`. `createFromSection` no longer composes.
+- [x] node-canvas removed from `app` and `firestore` (`Drawing.composeThumbs` deleted). It's still a dependency of the unused atproto `core` package. The stored `thumb` field is now read only as a fallback when rendering fails (`Thumbs.stored`, short cache).
+- [x] Striped legacy thumbs fixed by construction: `5HNVUa4bAsDiTPJkGj5r` and corpse `JQT4p3gLjQ7YuT7WzJxu` render correctly from their drawings on the draft.
+- [x] Verified on draft deploys (live data, read-only): gallery 9/9 thumbs, no console errors. Timings: render miss 1.0–2.8 s (includes cold start + Firestore), Blobs hit ~0.46 s, durable-cache hit ~0.33 s, edge hit ~0.14 s.
+- [ ] Ship.
 
 ### Phase 3: thumbnail tools (replaces the node-canvas admin paths, audit #10)
 
@@ -52,7 +54,11 @@ Nothing is built yet. Next: confirm the purge scope (Decisions, last entry) and 
 - **2026-11-26**: plan only, written after the perf round; nothing implemented. Sized for the real data (247 sections / 238 corpses), so client-driven chunked jobs are simpler than background workers or queues.
 - **2026-11-26**: phase order puts cache purge + auth first.
 - **2026-11-26**: **thumbnail strategy = render on the server from the drawing** (Open question 1, option c). It removes the client-trust gap (saves could upload any image as a thumb), broken stored thumbs, backfills and node-canvas, and it's the right shape for atproto, where the drawing record is the source of truth. Stored in Netlify Blobs + CDN (Phase 3a). Most of Phase 3's regenerate/scan/backfill tooling becomes unnecessary; keep only "re-render this item" (bump version + purge).
+- **2026-11-26**: purge scope below confirmed by Martin ("great, continue").
 - **2026-11-26**: **proposed purge scope (Martin leans "stale over expensive"):** don't purge pages. They self-heal within ~60 s of the next visit, which is fine for moderation. Purge only on delete/hide, and only that item's thumb tag (`thumb:<collection>:<id>`), because thumbs are cached for a year and would otherwise keep serving at their URL. That's one small targeted call on a rare action; Netlify purges aren't billed. Supersedes Phase 1's "purge on every admin mutation and every save". They're small, and the perf caching made purge a correctness issue for moderation.
+- **2026-11-26**: server thumbs are not pixel-identical to the browser, and can't be: Skia (napi) vs Chrome differ in 0.6–9.6% of pixels across the 16 drawings, almost all anti-aliasing (pixels off by >64/255: 0.01–0.6%). node-canvas (Cairo) differs from Chrome by about the same (0.6–8.2%). Accepted: thumbnails are previews. The at-rest artwork on corpse/section pages is still rendered in the visitor's browser, and the download is still rendered in the browser.
+- **2026-11-26**: thumbs render at 1080px, not 540, because they're also the link-preview image; the Image CDN downsizes for the gallery.
+- **2026-11-26**: Blobs store is site-wide, so previews share it with production. Safe because keys include the render version and the content depends only on data. Rule: any rendering change must bump `RENDER_VERSION` (comment in `lib/server/thumbs.ts`).
 
 ## Open questions
 
