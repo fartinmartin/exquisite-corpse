@@ -4,6 +4,7 @@ import { FieldValue, Timestamp } from "firebase-admin/firestore";
 import * as errore from "errore";
 import type { DrawingData } from "@ecc/lexicons";
 import { db } from "./client.js";
+import { Fixtures } from "./fixtures.js";
 import { Drawing } from "./drawing.js";
 import {
   Records,
@@ -78,6 +79,11 @@ function sortField(sort: "date" | "likes"): string {
 }
 
 export async function get(id: string): Promise<SectionWithDrawing | SectionError> {
+  if (Fixtures.enabled()) {
+    const section = Fixtures.section(id);
+    return section ?? new SectionNotFoundError({ id });
+  }
+
   try {
     const snap = await db().collection("sections").doc(id).get();
     if (!snap.exists) return new SectionNotFoundError({ id });
@@ -90,6 +96,8 @@ export async function get(id: string): Promise<SectionWithDrawing | SectionError
 }
 
 export async function randomByType(type: SectionType): Promise<SectionWithDrawing | null> {
+  if (Fixtures.enabled()) return Fixtures.randomSection(type);
+
   const snap = await Records.randomSnapshot("sections", { field: "type", value: type });
   if (!snap) return null;
   const record = sectionToRecord(snap);
@@ -102,6 +110,8 @@ export async function list(options: {
   page: number;
   pageSize: number;
 }): Promise<GalleryPage<Section>> {
+  if (Fixtures.enabled()) return Fixtures.listSections(options);
+
   let query = db().collection("sections") as FirebaseFirestore.Query;
   if (options.type) query = query.where("type", "==", options.type);
   query = query.orderBy(sortField(options.sort), "desc");
@@ -121,6 +131,8 @@ export async function list(options: {
 
 /** The corpses a section appears in (its `featuredIn` refs). */
 export async function featuredIn(sectionId: string, limit = 3): Promise<Corpse[]> {
+  if (Fixtures.enabled()) return Fixtures.featuredIn(sectionId);
+
   const snap = await db().collection("sections").doc(sectionId).get();
   const record = snap.exists ? sectionToRecord(snap) : null;
   if (!record) return [];
@@ -138,6 +150,8 @@ export async function moreByArtist(
   artist: string,
   { excludeId, limit = 6 }: { excludeId?: string; limit?: number }
 ): Promise<Section[]> {
+  if (Fixtures.enabled()) return Fixtures.moreByArtist(artist, excludeId);
+
   if (!artist) return [];
   const snap = await db()
     .collection("sections")
@@ -160,6 +174,8 @@ export async function moreByArtist(
  * a single image per corpse.
  */
 export async function save(input: SaveInput): Promise<SaveResult | SiblingSectionError | FirestoreError> {
+  if (Fixtures.enabled()) return Fixtures.saveSection(input);
+
   const siblingTypes = SECTION_TYPES.filter((type) => type !== input.type);
   const siblingIds = siblingTypes.map((type) => input.siblings[type]).filter(Boolean) as string[];
 
@@ -245,6 +261,8 @@ export async function save(input: SaveInput): Promise<SaveResult | SiblingSectio
 
 /** Deletes a section. Corpse cleanup lives in `Admin.removeSection`. */
 export async function remove(id: string): Promise<true | FirestoreError> {
+  if (Fixtures.enabled()) return Fixtures.removeSection(id);
+
   try {
     await db().collection("sections").doc(id).delete();
     return true;
@@ -255,6 +273,8 @@ export async function remove(id: string): Promise<true | FirestoreError> {
 
 /** Total number of sections — used by the admin screen. */
 export async function count(): Promise<number> {
+  if (Fixtures.enabled()) return Fixtures.count().sections;
+
   const snap = await db().collection("sections").count().get();
   return snap.data().count;
 }

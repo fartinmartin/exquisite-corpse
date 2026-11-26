@@ -3,6 +3,7 @@ export * as Likes from "./likes.js";
 import { FieldValue } from "firebase-admin/firestore";
 import * as errore from "errore";
 import { db } from "./client.js";
+import { Fixtures } from "./fixtures.js";
 
 export class LikeTargetNotFoundError extends errore.createTaggedError({
   name: "LikeTargetNotFoundError",
@@ -30,6 +31,11 @@ export async function toggle(input: {
   id: string;
   liker: string;
 }): Promise<LikeState | LikeTargetNotFoundError | FirestoreError> {
+  if (Fixtures.enabled()) {
+    const state = Fixtures.toggleLike(input.collection, input.id, input.liker);
+    return state ?? new LikeTargetNotFoundError({ ...input });
+  }
+
   const ref = db().collection(input.collection).doc(input.id);
 
   try {
@@ -62,6 +68,8 @@ export async function state(input: {
   id: string;
   liker?: string;
 }): Promise<LikeState> {
+  if (Fixtures.enabled()) return Fixtures.likeState(input.collection, input.id, input.liker);
+
   const snap = await db().collection(input.collection).doc(input.id).get();
   const likedBy: string[] = Array.isArray(snap.get("likedBy")) ? snap.get("likedBy") : [];
   return {
@@ -72,6 +80,8 @@ export async function state(input: {
 
 /** Admin helper: zero out likes on every corpse and section. */
 export async function resetAll(): Promise<true | FirestoreError> {
+  if (Fixtures.enabled()) return true;
+
   try {
     const batch = db().batch();
     for (const collection of ["corpses", "sections"] as const) {

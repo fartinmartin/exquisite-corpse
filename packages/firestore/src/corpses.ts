@@ -3,6 +3,7 @@ export * as Corpses from "./corpses.js";
 import { FieldValue, Timestamp } from "firebase-admin/firestore";
 import * as errore from "errore";
 import { db } from "./client.js";
+import { Fixtures } from "./fixtures.js";
 import { Drawing } from "./drawing.js";
 import {
   Records,
@@ -58,6 +59,8 @@ async function panelsFor(sections: Corpse["sections"]): Promise<CorpseWithSectio
 }
 
 export async function get(id: string): Promise<CorpseWithSections | CorpseError> {
+  if (Fixtures.enabled()) return Fixtures.corpse(id);
+
   try {
     const snap = await db().collection("corpses").doc(id).get();
     if (!snap.exists) return new CorpseNotFoundError({ id });
@@ -72,6 +75,8 @@ export async function get(id: string): Promise<CorpseWithSections | CorpseError>
 }
 
 export async function random(): Promise<CorpseWithSections | null> {
+  if (Fixtures.enabled()) return Fixtures.randomCorpse();
+
   const snap = await Records.randomSnapshot("corpses");
   if (!snap) return null;
   const record = corpseToRecord(snap);
@@ -86,6 +91,8 @@ export async function list(options: {
   page: number;
   pageSize: number;
 }): Promise<GalleryPage<Corpse>> {
+  if (Fixtures.enabled()) return Fixtures.listCorpses(options);
+
   const query = db()
     .collection("corpses")
     .orderBy(options.sort === "likes" ? "likes" : "date", "desc");
@@ -105,6 +112,8 @@ export async function list(options: {
 
 /** Re-stacks a corpse's thumbnail from its three sections' thumbs. */
 export async function rebuildThumb(id: string): Promise<true | CorpseError> {
+  if (Fixtures.enabled()) return true;
+
   const corpse = await get(id);
   if (corpse instanceof Error) return corpse;
 
@@ -124,6 +133,11 @@ export async function rebuildThumb(id: string): Promise<true | CorpseError> {
  * two types, the way the old site's "make corpse" button did.
  */
 export async function createFromSection(sectionId: string): Promise<{ corpseId: string } | CorpseError> {
+  if (Fixtures.enabled()) {
+    const result = Fixtures.makeCorpse(sectionId);
+    return result ?? new CorpseNotFoundError({ id: sectionId });
+  }
+
   const snap = await db().collection("sections").doc(sectionId).get();
   const section = snap.exists ? sectionToRecord(snap) : null;
   if (!section) return new CorpseNotFoundError({ id: sectionId });
@@ -178,6 +192,8 @@ export async function createFromSection(sectionId: string): Promise<{ corpseId: 
 
 /** Deletes a corpse and removes it from its sections' `featuredIn` lists. */
 export async function remove(id: string): Promise<true | CorpseError> {
+  if (Fixtures.enabled()) return Fixtures.removeCorpse(id);
+
   const corpse = await get(id);
   if (corpse instanceof Error) return corpse;
 
@@ -202,6 +218,8 @@ export async function remove(id: string): Promise<true | CorpseError> {
 }
 
 export async function count(): Promise<number> {
+  if (Fixtures.enabled()) return Fixtures.count().corpses;
+
   const snap = await db().collection("corpses").count().get();
   return snap.data().count;
 }
