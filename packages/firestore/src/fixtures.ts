@@ -77,6 +77,8 @@ interface Store {
 
 const store: Store = { sections: [], corpses: [], seeded: false };
 
+const CORPSE_ADJECTIVES = ["odd", "lumpy", "quiet", "bright", "crooked", "soft"];
+
 function seed(): void {
   if (store.seeded) return;
   store.seeded = true;
@@ -111,7 +113,7 @@ function seed(): void {
     const corpseId = `corpse_fixture_${i}`;
     store.corpses.push({
       id: corpseId,
-      title: ["odd", "lumpy", "quiet", "bright", "crooked", "soft"][i] + " creature",
+      title: CORPSE_ADJECTIVES[i % CORPSE_ADJECTIVES.length] + " creature",
       date: new Date(Date.now() - i * 7_200_000).toISOString(),
       likes: i * 3,
       likedBy: [],
