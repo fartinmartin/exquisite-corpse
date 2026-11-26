@@ -27,8 +27,8 @@ importers:
         specifier: workspace:*
         version: link:../lexicons
       '@fartinmartin/canvas-paint':
-        specifier: ^1.1.0
-        version: 1.1.0
+        specifier: ^1.2.0
+        version: 1.2.0
       canvas:
         specifier: ^3.2.3
         version: 3.2.3
@@ -94,8 +94,8 @@ importers:
         specifier: workspace:*
         version: link:../lexicons
       '@fartinmartin/canvas-paint':
-        specifier: ^1.1.0
-        version: 1.1.0
+        specifier: ^1.2.0
+        version: 1.2.0
       '@libsql/client':
         specifier: ^0.18.0
         version: 0.18.0
@@ -574,8 +574,8 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@fartinmartin/canvas-paint@1.1.0':
-    resolution: {integrity: sha512-Z13eJ25BwB9clJxiv17L1fpO8oiQRVvk4yLxu7ryoThh+Cd64lI8z5gsX7/yVNnK+fNFo7dfjIzPJTv+IRUr3Q==}
+  '@fartinmartin/canvas-paint@1.2.0':
+    resolution: {integrity: sha512-2WnqWje5XWdN85kRNsjv/Cb1GICDBBNoL6LXtIkcPKrXFpbN5ILa6B8Zs1ja1fXOjs9g4gNpSUv6xQRdmFgtdA==}
 
   '@fastify/busboy@3.2.6':
     resolution: {integrity: sha512-UPXdyAMbz/gNvjS8HONpJR2TDaHM3wQKMtSRPFkoh2LTeRRtnm+ICVYKgBYkTwlPOVzDNynOd34EH8qapwfelQ==}
@@ -2407,7 +2407,7 @@ snapshots:
   '@esbuild/win32-x64@0.28.2':
     optional: true
 
-  '@fartinmartin/canvas-paint@1.1.0':
+  '@fartinmartin/canvas-paint@1.2.0':
     dependencies:
       catenary-curve: 2.0.2
       color2k: 2.2.0

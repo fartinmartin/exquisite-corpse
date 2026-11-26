@@ -13,7 +13,7 @@
   "dependencies": {
     "@ecc/firestore": "workspace:*",
     "@ecc/lexicons": "workspace:*",
-    "@fartinmartin/canvas-paint": "^1.1.0",
+    "@fartinmartin/canvas-paint": "^1.2.0",
     "canvas": "^3.2.3",
     "firebase-admin": "^14.5.1",
     "joyful": "^1.3.1",

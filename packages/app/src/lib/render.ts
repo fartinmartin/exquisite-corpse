@@ -68,35 +68,12 @@ export async function renderDrawing(drawing: DrawingData): Promise<HTMLCanvasEle
 
 /**
  * Paints `paths` onto `target`, which already holds every earlier path of the
- * same drawing. This is what makes replay O(paths) instead of O(frames × paths).
- *
- * canvas-paint's public API only has `render()`, which starts by filling a fresh
- * canvas with the background. We hand it our canvas through `createCanvas` and
- * swallow that first `fillRect`, so every path is drawn by canvas-paint's own
- * code, in order, on one context, exactly as a full `render()` would.
- * TODO: replace with `drawPathToContext` once canvas-paint exports it.
+ * same drawing. This is what makes replay O(paths) instead of O(frames × paths);
+ * consecutive slices give the same pixels as one `render()`.
  */
 async function paintOnto(target: HTMLCanvasElement, drawing: DrawingData, paths: DrawingData["paths"]) {
-  const { render } = await canvasPaint();
-  const ctx = target.getContext("2d")!;
-  let skippedBackground = false;
-
-  const context = new Proxy(ctx, {
-    get(object, key) {
-      if (key === "fillRect" && !skippedBackground) {
-        skippedBackground = true;
-        return () => {};
-      }
-      const value = Reflect.get(object, key, object);
-      return typeof value === "function" ? value.bind(object) : value;
-    },
-    set(object, key, value) {
-      return Reflect.set(object, key, value, object);
-    },
-  });
-
-  const canvas = { getContext: () => context } as unknown as HTMLCanvasElement;
-  render(asRenderData({ ...drawing, paths }), { createCanvas: () => canvas });
+  const { drawPaths } = await canvasPaint();
+  drawPaths(target.getContext("2d")!, asRenderData({ ...drawing, paths }));
 }
 
 /**
