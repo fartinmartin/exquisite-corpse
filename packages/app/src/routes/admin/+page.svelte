@@ -4,16 +4,27 @@
   import Input from "#lib/components/input.svelte";
   import Panel from "#lib/components/panel.svelte";
   import {
+    corpseDeletePreview,
     deleteCorpse,
     deleteSection,
     downloadPaths,
     makeCorpse,
     resetLikes,
+    sectionDeletePreview,
     setSiteMode,
     siteMode,
     updateThumb,
   } from "./admin.remote";
   import type { SiteMode } from "#lib/site-mode.ts";
+  import { thumbAttrs, type ThumbRef } from "#lib/thumbs.ts";
+  import type { Collection } from "@ecc/firestore";
+
+  /** A delete waiting for confirmation, with everything it would remove. */
+  interface PendingDelete {
+    summary: string;
+    items: { collection: Collection; ref: ThumbRef & { title: string } }[];
+    confirm: () => Promise<string>;
+  }
 
   const MODES: { mode: SiteMode; label: string; color: "green" | "yellow" | "red" }[] = [
     { mode: "open", label: "open", color: "green" },
@@ -35,6 +46,7 @@
   let corpseId = $state("");
   let sectionId = $state("");
   let message = $state<string | null>(null);
+  let pending = $state.raw<PendingDelete | null>(null);
 
   async function run(action: () => Promise<string>) {
     message = null;
@@ -54,10 +66,19 @@
   }
 
   function removeCorpse() {
-    if (!corpseId || !confirm("you sure you want to delete corpse?")) return;
+    const id = corpseId;
+    if (!id) return;
     return run(async () => {
-      await deleteCorpse(corpseId);
-      return `removed corpse ${corpseId}`;
+      const corpse = await corpseDeletePreview(id);
+      pending = {
+        summary: "deletes this corpse (its sections stay)",
+        items: [{ collection: "corpses", ref: corpse }],
+        confirm: async () => {
+          await deleteCorpse(id);
+          return `removed corpse ${id}`;
+        },
+      };
+      return "check what will be deleted below";
     });
   }
 
@@ -69,12 +90,33 @@
     });
   }
 
+  /** Looks up everything a section delete takes with it before asking. */
   function removeSection() {
-    if (!sectionId || !confirm("you sure you want to delete section?")) return;
+    const id = sectionId;
+    if (!id) return;
     return run(async () => {
-      await deleteSection(sectionId);
-      return `removed section ${sectionId}`;
+      const preview = await sectionDeletePreview(id);
+      const count = preview.corpses.length;
+      pending = {
+        summary: `deletes 1 section + ${count} corpse${count === 1 ? "" : "s"} it's in`,
+        items: [
+          { collection: "sections", ref: preview.section },
+          ...preview.corpses.map((corpse) => ({ collection: "corpses" as const, ref: corpse })),
+        ],
+        confirm: async () => {
+          const result = await deleteSection(id);
+          return `removed section ${id} and ${result.corpseIds.length} corpse(s)`;
+        },
+      };
+      return "check what will be deleted below";
     });
+  }
+
+  function confirmDelete() {
+    const current = pending;
+    if (!current) return;
+    pending = null;
+    return run(current.confirm);
   }
 
   function exportPaths() {
@@ -155,6 +197,24 @@
     </form>
   </Panel>
 
+  {#if pending}
+    <Panel color="red" class="admin-index delete-preview">
+      <h1>{pending.summary}</h1>
+      <div class="preview-grid">
+        {#each pending.items as item (item.collection + item.ref.id)}
+          <figure>
+            <img {...thumbAttrs(item.collection, item.ref)} alt={item.ref.title} />
+            <figcaption>{item.collection === "sections" ? "section" : "corpse"}: {item.ref.title}</figcaption>
+          </figure>
+        {/each}
+      </div>
+      <div class="input-wrap">
+        <Button color="red" onclick={confirmDelete} text="delete" />
+        <Button onclick={() => (pending = null)} text="cancel" />
+      </div>
+    </Panel>
+  {/if}
+
   {#if message}
     <Panel class="admin-index status">
       <p>{message}</p>
@@ -198,6 +258,24 @@
       &:not(:first-child) {
         margin-top: 1rem;
       }
+    }
+  }
+
+  .preview-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+
+    img {
+      width: 100%;
+      height: auto;
+      border: 2px solid var(--black);
+    }
+
+    figcaption {
+      font-size: 0.75rem;
+      overflow-wrap: anywhere;
     }
   }
 

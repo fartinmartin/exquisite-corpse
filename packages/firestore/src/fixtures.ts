@@ -322,17 +322,31 @@ export function likeState(collection: "sections" | "corpses", id: string, liker?
   };
 }
 
-export function removeSection(id: string): true {
+/** Same shape as `Admin.previewSectionDelete`. */
+export function previewSectionDelete(id: string): { section: Section; corpses: Corpse[] } | null {
   seed();
-  const index = store.sections.findIndex((entry) => entry.id === id);
-  if (index >= 0) store.sections.splice(index, 1);
-  return true;
+  const record = store.sections.find((entry) => entry.id === id);
+  if (!record) return null;
+  const corpses = store.corpses.filter((corpse) => record.featuredIn.includes(corpse.id));
+  return { section: listItem(record), corpses: corpses.map(corpseSummary) };
+}
+
+/** Deletes a section and the corpses it's in; returns the deleted corpse ids. */
+export function removeSection(id: string): { corpseIds: string[] } | null {
+  const preview = previewSectionDelete(id);
+  if (!preview) return null;
+  const corpseIds = preview.corpses.map((corpse) => corpse.id);
+  for (const corpseId of corpseIds) removeCorpse(corpseId);
+  store.sections = store.sections.filter((entry) => entry.id !== id);
+  return { corpseIds };
 }
 
 export function removeCorpse(id: string): true {
   seed();
-  const index = store.corpses.findIndex((entry) => entry.id === id);
-  if (index >= 0) store.corpses.splice(index, 1);
+  store.corpses = store.corpses.filter((entry) => entry.id !== id);
+  for (const section of store.sections) {
+    section.featuredIn = section.featuredIn.filter((corpseId) => corpseId !== id);
+  }
   return true;
 }
 

@@ -1,5 +1,6 @@
 import { fail, redirect } from "@sveltejs/kit";
-import { ADMIN_COOKIE, adminToken, isAdmin } from "#lib/server/admin.ts";
+import { ADMIN_COOKIE, adminToken, checkPassword, isAdmin, SESSION_MS } from "#lib/server/admin.ts";
+import { lockedFor, recordFailure, recordSuccess } from "#lib/server/login-throttle.ts";
 import type { Actions, PageServerLoad } from "./$types";
 
 export const load: PageServerLoad = ({ cookies }) => {
@@ -8,20 +9,23 @@ export const load: PageServerLoad = ({ cookies }) => {
 };
 
 export const actions: Actions = {
-  default: async ({ request, cookies }) => {
-    const form = await request.formData();
-    const password = String(form.get("password") ?? "");
-    const expected = process.env.ECC_ADMIN_PASSWORD;
+  default: async ({ request, cookies, getClientAddress }) => {
+    const ip = getClientAddress();
+    const minutes = await lockedFor(ip);
+    if (minutes > 0) return fail(429, { error: `too many tries, wait ${minutes} min` });
 
-    if (!expected || password !== expected) {
+    const form = await request.formData();
+    if (!checkPassword(String(form.get("password") ?? ""))) {
+      await recordFailure(ip);
       return fail(401, { error: "sry, wrong" });
     }
 
+    await recordSuccess(ip);
     cookies.set(ADMIN_COOKIE, adminToken(), {
       path: "/",
       httpOnly: true,
       sameSite: "lax",
-      maxAge: 60 * 60 * 24,
+      maxAge: SESSION_MS / 1000,
     });
 
     redirect(303, "/admin");

@@ -16,6 +16,7 @@
     "@fartinmartin/canvas-paint": "^1.2.0",
     "@napi-rs/canvas": "^1.2.1",
     "@netlify/blobs": "^11.1.11",
+    "@netlify/cache": "^4.2.2",
     "errore": "^0.14.1",
     "firebase-admin": "^14.5.1",
     "google-auth-library": "^11.3.4",

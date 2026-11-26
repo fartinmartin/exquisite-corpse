@@ -35,5 +35,9 @@ export default defineConfig({
   ssr: {
     // native addon / server-only SDK — cannot be bundled by Vite
     external: ["@napi-rs/canvas", "firebase-admin"],
+    // ...or pre-bundled by the dev server's dependency optimizer, which tries
+    // to read the `.node` binary as source and crashes `vite dev`.
+    optimizeDeps: { exclude: ["@napi-rs/canvas"] },
   },
+  optimizeDeps: { exclude: ["@napi-rs/canvas"] },
 });

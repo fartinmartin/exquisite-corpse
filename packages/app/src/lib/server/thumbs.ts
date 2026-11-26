@@ -57,3 +57,43 @@ export async function readCached(key: string): Promise<Uint8Array<ArrayBuffer> |
 export async function writeCached(key: string, bytes: Uint8Array<ArrayBuffer>): Promise<void> {
   await store()?.set(key, bytes.buffer).catch(() => {});
 }
+
+export interface ThumbTarget {
+  collection: "sections" | "corpses";
+  id: string;
+}
+
+/**
+ * After a delete (or hide): drop every stored render of these thumbs and purge
+ * them from the CDN. Thumbs are cached for a year and the `/thumbs` route
+ * checks Blobs before Firestore, so without this a deleted drawing keeps
+ * being served at its old URL.
+ *
+ * Best-effort: failures are logged, not thrown. The delete itself has already
+ * happened and shouldn't be reported as failed.
+ */
+export async function forgetThumbs(targets: ThumbTarget[]): Promise<void> {
+  if (targets.length === 0) return;
+
+  const blobs = store();
+  const removals = blobs
+    ? targets.map(async ({ collection, id }) => {
+        const { blobs: entries } = await blobs.list({ prefix: `${collection}/${id}/` });
+        await Promise.all(entries.map((entry) => blobs.delete(entry.key)));
+      })
+    : [];
+
+  const purge = import("@netlify/cache")
+    .then(({ purgeCache }) =>
+      purgeCache({ tags: targets.map(({ collection, id }) => `thumb:${collection}:${id}`) })
+    )
+    .catch((cause: unknown) => {
+      // Throws outside Netlify (no purge token). Nothing is cached locally anyway.
+      if (process.env.NETLIFY) throw cause;
+    });
+
+  const results = await Promise.allSettled([...removals, purge]);
+  for (const result of results) {
+    if (result.status === "rejected") console.error("forgetThumbs:", result.reason);
+  }
+}

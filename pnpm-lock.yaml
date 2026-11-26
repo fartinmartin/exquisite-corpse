@@ -35,6 +35,9 @@ importers:
       '@netlify/blobs':
         specifier: ^11.1.11
         version: 11.1.11
+      '@netlify/cache':
+        specifier: ^4.2.2
+        version: 4.2.2
       errore:
         specifier: ^0.14.1
         version: 0.14.1
@@ -907,6 +910,10 @@ packages:
 
   '@netlify/blobs@11.1.11':
     resolution: {integrity: sha512-lwAANKM/FKG8GdLRbDQy2ttGBPSFacF41rdMuC/AnMUI39VKDC7uCkBd0IlsP8H3/LDcC/OqwgmXvjgy22m5Og==}
+    engines: {node: '>=22.12.0'}
+
+  '@netlify/cache@4.2.2':
+    resolution: {integrity: sha512-465pszTiI4m5b+K92Akg3F2Bh59FQWWV5jPEOwDdwcWdsCRwWkYlzhFD5kJc9mFGj8snaQ0SShFEK+BVJxM3bw==}
     engines: {node: '>=22.12.0'}
 
   '@netlify/dev-utils@6.1.1':
@@ -3050,6 +3057,10 @@ snapshots:
       '@netlify/runtime-utils': 3.1.0
     transitivePeerDependencies:
       - supports-color
+
+  '@netlify/cache@4.2.2':
+    dependencies:
+      '@netlify/runtime-utils': 3.1.0
 
   '@netlify/dev-utils@6.1.1':
     dependencies:

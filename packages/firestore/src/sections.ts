@@ -259,18 +259,6 @@ export async function save(
   }
 }
 
-/** Deletes a section. Corpse cleanup lives in `Admin.removeSection`. */
-export async function remove(id: string): Promise<true | FirestoreError> {
-  if (Fixtures.enabled()) return Fixtures.removeSection(id);
-
-  try {
-    await db().collection("sections").doc(id).delete();
-    return true;
-  } catch (cause) {
-    return new FirestoreError({ cause });
-  }
-}
-
 /** Total number of sections — used by the admin screen. */
 export async function count(): Promise<number> {
   if (Fixtures.enabled()) return Fixtures.count().sections;
