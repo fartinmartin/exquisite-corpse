@@ -38,6 +38,9 @@ restore local dev credentials in 1Password.
 - [x] Disable Firebase anonymous sign-in (guests are cookie-based)
 - [x] Redirect `exquisite-corpse-club.netlify.app` to the custom domain; deploy previews off
 - [x] Account cleanup: unused Google Cloud projects shut down, old branches tagged `archive/*` and deleted, unused Netlify site and DNS zones removed
+- [x] Rate limit saves (5/min) and likes (30/min) per IP with two edge functions
+- [x] Remember a typed artist name in the guest handle cookie
+- [ ] Update dependencies for the open Dependabot alerts on `pnpm-lock.yaml`
 
 ## Decisions
 
