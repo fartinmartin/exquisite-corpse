@@ -2,9 +2,12 @@
   base = "packages/app"
   command = "pnpm build"
   publish = "build"
+  # Runs from `base`. Exit 0 skips the build. Netlify's default only watches
+  # `base`, which would miss changes to the workspace packages the app imports.
+  ignore = "[ \"$CACHED_COMMIT_REF\" != \"$COMMIT_REF\" ] && git diff --quiet $CACHED_COMMIT_REF $COMMIT_REF -- . ../firestore ../lexicons ../../package.json ../../pnpm-lock.yaml ../../pnpm-workspace.yaml ../../netlify.toml"
 
 [build.environment]
   NODE_VERSION = "22"
 
 # Server-side env (set in the Netlify UI, not committed):
-#   FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL, FIREBASE_PRIVATE_KEY, ECC_ADMIN_PASSWORD
+#   FIREBASE_SERVICE_ACCOUNT (raw or base64 JSON), ECC_ADMIN_PASSWORD
