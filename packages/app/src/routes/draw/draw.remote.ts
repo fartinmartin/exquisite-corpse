@@ -59,6 +59,7 @@ const SaveInput = v.object({
     mid: v.optional(v.string()),
     bot: v.optional(v.string()),
   }),
+  corpseThumb: v.optional(v.pipe(v.string(), v.maxLength(1_000_000))),
 });
 
 export const saveDrawing = command(SaveInput, async (input) => {
@@ -75,6 +76,7 @@ export const saveDrawing = command(SaveInput, async (input) => {
     drawing: input.drawing,
     thumb: input.thumb,
     siblings: input.siblings,
+    corpseThumb: input.corpseThumb,
     liker: event.cookies.get("ecc_guest_token"),
   });
 

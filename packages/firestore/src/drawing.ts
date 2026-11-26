@@ -1,6 +1,5 @@
 export * as Drawing from "./drawing.js";
 
-import { createCanvas, loadImage } from "canvas";
 import type { DrawingData, Path, Point } from "@ecc/lexicons";
 import type { LegacyDrawing, LegacyPoint, StoredDrawing } from "./types.js";
 
@@ -115,6 +114,9 @@ function legacyPointToPath(point: LegacyPoint): Path {
  * Used when a corpse is assembled so the gallery never renders three panels.
  */
 export async function composeThumbs(thumbs: (string | null | undefined)[]): Promise<string> {
+  // Native module: import lazily so the rest of the app can run on hosts where
+  // node-canvas is unavailable (Netlify functions, for example).
+  const { createCanvas, loadImage } = await import("canvas");
   const images = await Promise.all(
     thumbs.map((thumb) => (thumb ? loadImage(thumb) : Promise.resolve(null)))
   );

@@ -51,6 +51,8 @@ export interface SaveInput {
   thumb: string;
   /** Ids of the two sections shown while drawing (all three get set on the corpse). */
   siblings: Partial<Record<SectionType, string>>;
+  /** Pre-composed corpse thumbnail (browser). Falls back to node-canvas when absent. */
+  corpseThumb?: string;
   liker?: string;
 }
 
@@ -194,6 +196,13 @@ export async function save(
     });
   }
 
+  if (input.corpseThumb && input.corpseThumb.length > DOCUMENT_BUDGET) {
+    return new DrawingTooLargeError({
+      kb: Math.round(input.corpseThumb.length / 1000),
+      limit: Math.round(DOCUMENT_BUDGET / 1000),
+    });
+  }
+
   const siblingTypes = SECTION_TYPES.filter((type) => type !== input.type);
   const siblingIds = siblingTypes.map((type) => input.siblings[type]).filter(Boolean) as string[];
 
@@ -226,7 +235,9 @@ export async function save(
     panelIds[type] = record.id;
   }
 
-  const corpseThumb = await Drawing.composeThumbs([thumbs.top, thumbs.mid, thumbs.bot]);
+  const corpseThumb =
+    input.corpseThumb ??
+    (await Drawing.composeThumbs([thumbs.top, thumbs.mid, thumbs.bot]));
   const corpseTitle = mashupTitle([
     titles.top ?? input.title,
     titles.mid ?? input.title,

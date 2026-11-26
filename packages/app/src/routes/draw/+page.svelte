@@ -9,7 +9,7 @@
   import SectionPicker from "$lib/components/section-picker.svelte";
   import Toolbar from "$lib/components/toolbar.svelte";
   import { drawState, GUEST_HANDLE_COOKIE } from "$lib/draw/state.svelte";
-  import { drawingToThumb } from "$lib/render";
+  import { drawingToThumb, mergeThumbs } from "$lib/render";
   import { getSiblings, randomTitle, saveDrawing, type Sibling } from "./draw.remote";
 
   const TYPES: SectionType[] = ["top", "mid", "bot"];
@@ -64,6 +64,19 @@
     const drawing = paint.save() as unknown as DrawingData;
     const thumb = await drawingToThumb(drawing);
 
+    // Compose the corpse preview in the browser — no native canvas on the server.
+    const panelThumbs: Partial<Record<SectionType, string>> = {
+      top: siblings.top?.thumb,
+      mid: siblings.mid?.thumb,
+      bot: siblings.bot?.thumb,
+      [section]: thumb,
+    };
+    const corpseThumb = await mergeThumbs([
+      panelThumbs.top,
+      panelThumbs.mid,
+      panelThumbs.bot,
+    ]);
+
     const result = await saveDrawing({
       type: section,
       title,
@@ -71,6 +84,7 @@
       drawing,
       thumb,
       siblings: siblingIds(),
+      corpseThumb,
     });
 
     await goto(`/gallery/corpse/${result.corpseId}`);
