@@ -1,0 +1,10 @@
+[build]
+  base = "packages/app"
+  command = "pnpm build"
+  publish = "build"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+# Server-side env (set in the Netlify UI, not committed):
+#   FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL, FIREBASE_PRIVATE_KEY, ECC_ADMIN_PASSWORD

@@ -1,8 +1,7 @@
 <script lang="ts">
-  import { Paint } from "@fartinmartin/canvas-paint";
   import type { DrawingData } from "@ecc/lexicons";
   import { drawState } from "$lib/draw/state.svelte";
-  import { asLoadData, drawStatic } from "$lib/render";
+  import { drawReplay, drawStatic } from "$lib/render";
   import Panel from "./panel.svelte";
 
   type Mode = "draw" | "display" | "pixelate";
@@ -17,68 +16,85 @@
 
   let { id, mode, drawing, meta, duration = 500 }: Props = $props();
 
-  let root: HTMLElement | undefined = $state();
-  let canvas: HTMLCanvasElement | undefined = $state();
+  let root = $state<HTMLElement>();
+  let canvas = $state<HTMLCanvasElement>();
 
   $effect(() => {
     const currentMode = mode;
     const data = drawing;
-    if (!root) return;
+    const host = root;
 
     if (currentMode === "draw") {
-      const paint = new Paint(root, {
-        width: 1080,
-        height: 360,
-        bgColor: "#ffffff",
-        debounce: 100,
-        ui: { show: false },
-        grid: { show: false },
-        brush: {
-          size: drawState.size * 2,
-          color: drawState.color,
-          mode: drawState.mode,
-        },
-      });
+      if (!host) return;
 
-      drawState.attach(paint);
-      const sync = () => drawState.refresh();
-      paint.events.on("end", sync);
-      paint.events.on("drawn", sync);
-      paint.events.on("start", sync);
+      let cancelled = false;
+      let cleanup = () => {};
+
+      (async () => {
+        // canvas-paint touches `document` at import time — browser only.
+        const { Paint } = await import("@fartinmartin/canvas-paint");
+        if (cancelled || !host) return;
+
+        const paint = new Paint(host, {
+          width: 1080,
+          height: 360,
+          bgColor: "#ffffff",
+          debounce: 100,
+          ui: { show: false },
+          grid: { show: false },
+          brush: {
+            size: drawState.size * 2,
+            color: drawState.color,
+            mode: drawState.mode,
+          },
+        });
+
+        // Paint measures its own canvas before CSS applies, so fit it explicitly.
+        const fit = () => void paint.resize({ target: host } as unknown as ResizeObserverEntry);
+        fit();
+        const resizeObserver = new ResizeObserver(fit);
+        resizeObserver.observe(host);
+
+        drawState.attach(paint);
+        const sync = () => drawState.refresh();
+        paint.events.on("end", sync);
+        paint.events.on("drawn", sync);
+        paint.events.on("start", sync);
+
+        cleanup = () => {
+          resizeObserver.disconnect();
+          drawState.attach(null);
+          paint.destroy();
+          paint.removeListeners();
+        };
+      })();
 
       return () => {
-        drawState.attach(null);
-        paint.destroy();
-        paint.removeListeners();
+        cancelled = true;
+        cleanup();
       };
     }
 
-    if (!data) return;
+    const target = canvas;
+    if (!target || !data) return;
 
-    if (currentMode === "pixelate") {
-      const target = canvas;
-      if (!target) return;
-      const observer = new ResizeObserver(() => drawStatic(target, data, { pixelate: true }));
-      observer.observe(target);
-      drawStatic(target, data, { pixelate: true });
-      return () => observer.disconnect();
-    }
+    let animating = true;
 
-    // display: replay strokes exactly like the live site (paths animate in)
-    const paint = new Paint(root, {
-      width: data.width,
-      height: data.height,
-      bgColor: data.bgColor ?? "#ffffff",
-      debounce: 100,
-      ui: { show: false },
-      grid: { show: false },
-    });
-    paint.load(asLoadData(data), { duration });
-
-    return () => {
-      paint.destroy();
-      paint.removeListeners();
+    const render = () => {
+      if (animating && currentMode === "display") {
+        void drawReplay(target, data, { duration }).finally(() => (animating = false));
+      } else {
+        void drawStatic(target, data, { pixelate: currentMode === "pixelate" });
+      }
     };
+
+    const observer = new ResizeObserver(() => {
+      if (!animating) render();
+    });
+    observer.observe(target);
+    render();
+
+    return () => observer.disconnect();
   });
 
   // keep the brush in sync with the toolbar
@@ -93,10 +109,10 @@
 
 <Panel {id} color="blue" noPadding>
   <div class="canvas-wrap">
-    {#if mode === "pixelate"}
-      <canvas bind:this={canvas}></canvas>
-    {:else}
+    {#if mode === "draw"}
       <div class="paint-host" bind:this={root}></div>
+    {:else}
+      <canvas bind:this={canvas}></canvas>
     {/if}
 
     {#if meta}

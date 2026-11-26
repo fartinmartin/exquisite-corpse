@@ -1,35 +1,39 @@
 <script lang="ts">
   type Props = {
     id: string;
+    name?: string;
     label?: string;
     note?: string;
     placeholder?: string;
     maxlength?: number;
     type?: "text" | "password";
+    temp?: boolean;
     value?: string;
     onfocus?: () => void;
   };
 
   let {
     id,
+    name,
     label,
     note,
     placeholder,
     maxlength,
     type = "text",
+    temp = false,
     value = $bindable(""),
     onfocus,
   }: Props = $props();
 </script>
 
-<div class="input-wrap">
+<div class="input-wrap" class:temp>
   {#if label}
     <label for={id}>
       {label}
       {#if note}<span class="note">{note}</span>{/if}
     </label>
   {/if}
-  <input {id} {type} {placeholder} {maxlength} bind:value {onfocus} />
+  <input {id} {name} {type} {placeholder} {maxlength} bind:value {onfocus} />
 </div>
 
 <style lang="scss">
@@ -53,7 +57,8 @@
     }
   }
 
-  ::placeholder {
+  ::placeholder,
+  .temp input {
     color: #7f7f7f;
     opacity: 1;
   }

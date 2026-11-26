@@ -1,50 +1,66 @@
-# @ecc/app — SvelteKit app
+# @ecc/app — SvelteKit app (Firestore migration)
+
+The live site's Nuxt/Vue app is being replaced by this SvelteKit app, reading and
+writing the **existing Firebase project** (`exquisite-corpse-club`). atproto is
+deferred — that work lives on the `atproto` branch.
 
 ## Experimental flags (svelte.config.js)
 
-Both are enabled and required:
-- `compilerOptions.experimental.async` — `await` in component markup and `$derived`
-- `kit.experimental.remoteFunctions` — `.remote.ts` files (`query`, `form`, `command`, `prerender` from `$app/server`)
+Both are enabled and documented as experimental:
+- `compilerOptions.experimental.async` — `await` in components and `$derived`
+- `kit.experimental.remoteFunctions` — `.remote.ts` files (`query`, `command` from `$app/server`)
 
-## Route conventions
+## Data flow
 
-- **Data fetching** → `.remote.ts` files with `query`. Prefer over `+page.server.ts` load functions.
-- **Mutations** → `.remote.ts` files with `form` (spreads onto `<form>`) or `command` (called from event handlers).
-- **Auth-required server logic** → `+page.server.ts` / `+server.ts` only when needed (OAuth flow, redirects, cookie writes).
-- **Loading/error states** → `<svelte:boundary>` with `pending` snippet.
+- **Reads** — `query` in a colocated `*.remote.ts` (e.g. `draw/draw.remote.ts`).
+- **Writes** — `command` in the same place, called from event handlers.
+- **SSR** — page data uses `$derived(await query(...))` **without** a
+  `<svelte:boundary pending>` wrapper: a boundary with a `pending` snippet renders
+  only that snippet on the server. Use boundaries only for intentionally
+  client-loaded UI.
+- **Auth-less identity** — `hooks.server.ts` sets `ecc_guest_token` (httpOnly) and
+  `ecc_guest_handle` cookies. Likes are keyed by the token; the handle is the default
+  artist name.
+- **Admin** — `/admin` is guarded in `+page.server.ts`; the cookie is an HMAC of a
+  timestamp keyed by `ECC_ADMIN_PASSWORD` (`src/lib/server/admin.ts`).
 
-## Auth
+## Firestore package
 
-atproto OAuth — two-step by nature, cannot be a remote function:
-1. `login/+page.server.ts` — form action resolves handle → redirects to Bluesky
-2. `oauth/callback/+server.ts` — receives code, sets `did` cookie
-3. `oauth/jwks.json/+server.ts` — serves public JWK for OAuth client registration
-4. `client-metadata.json/+server.ts` — serves OAuth client metadata
+`@ecc/firestore` (in `packages/firestore`) owns all Firestore reads/writes:
+`Sections`, `Corpses`, `Likes`, `Admin`, plus `Drawing` (legacy drawing adapter and
+server-side thumbnail composition).
 
-Session helpers are in `src/lib/atproto/auth.ts`: `getAuthContext`, `requireAuth`, `setSessionCookie`, `clearSessionCookie`.
+The 2020 app stored `sections.drawing` as `{ [pathIndex]: PointCommand[] }`. New
+drawings store canvas-paint `DrawingData`; `Drawing.toDrawingData()` normalizes both
+shapes at read time. Don't write the legacy shape.
 
-Logged-in user's DID is available in all layouts/pages via `data.user?.did` (set in `+layout.server.ts`).
+## Drawing (canvas-paint)
 
-## Secrets / env
+`@fartinmartin/canvas-paint` touches `document` at module scope, so it is imported
+**dynamically inside `$effect`** (see `src/lib/components/canvas-panel.svelte`).
+Display and pixelated previews use `render()` from `canvas-paint/render` and are
+drawn by `src/lib/render.ts`; only the active panel mounts a `Paint` instance.
 
-`pnpm dev` runs `varlock run -- vite dev` which injects secrets from 1Password. Never run `vite dev` directly. Schema is at `.env.schema`.
+Paint measures its own canvas before CSS applies and can initialize at the document
+width (1080px) instead of the CSS width. `canvas-panel.svelte` calls
+`paint.resize({ target: host })` after creating it, and on host resize.
 
-## Ideas / future work
+## Dev
 
-### Drawing data storage (atproto record size)
-Currently `drawing: DrawingData` is stored inline in the atproto section record as JSON. For complex drawings this could hit PDS record size limits.
+```bash
+pnpm dev             # varlock injects secrets, then vite
+ECC_FIXTURES=1 pnpm dev   # in-memory sample data, no Firebase credentials needed
+```
 
-**Why a blob attachment?** atproto distinguishes between *record data* (typed JSON fields, size-limited, indexed) and *blobs* (arbitrary binary, referenced by CID). Large or binary payloads belong in blobs — it's the same reason the rendered PNG is already a blob. Gzip the drawing JSON, upload it as `application/octet-stream`, store the CID in the record. The record stays small; the drawing data can be as large as the PDS allows for blobs.
+Fixture mode lives in `packages/firestore/src/fixtures.ts` and is only active when
+`ECC_FIXTURES=1`.
 
-**Why it's a significant change:**
-- `SectionRecordSchema` and the atproto lexicon need `drawing` changed from an inline `DrawingData` object to a blob reference (`{ $type: "blob", ref, mimeType, size }`)
-- `Section.buildRecord()` no longer receives `drawing: DrawingData` — it receives a blob CID after a separate upload step
-- `Render.toPng()` currently receives a `DrawingData` directly; it would instead need to fetch + decompress the blob first
-- Any code that reads a section record to replay or display the drawing (e.g. gallery, video export) needs a blob download + decompress step before it has usable data
-- Requires a migration for any existing records that have `drawing` inline
+Firestore emulator: set `FIRESTORE_EMULATOR_HOST` + `GCLOUD_PROJECT` instead of the
+service-account variables.
 
-### Canvas texture
-Idea: apply a procedural paper/grain texture to the drawing canvas (see https://shaders.paper.design/ for the approach). Two options:
-- **Pre-baked tile**: ship a small (256×256) paper grain PNG, composite it over the canvas using `multiply` blend mode. Replicate in `Render.toPng()` / `Render.composite()` using node-canvas `drawImage`. Zero storage cost, works today.
-- **Procedural noise**: port Simplex noise to JS, run identically in browser and server. Store `texture: { seed, intensity }` in the record so every render is deterministic.
-The pre-baked approach is the right starting point.
+## Deploy
+
+Netlify (SSR functions) via `@sveltejs/adapter-netlify`; `netlify.toml` at the repo
+root sets `base = packages/app`. Set `FIREBASE_PROJECT_ID`, `FIREBASE_CLIENT_EMAIL`,
+`FIREBASE_PRIVATE_KEY`, `ECC_ADMIN_PASSWORD` in the Netlify UI. Firebase keeps the
+data; it no longer serves the app.

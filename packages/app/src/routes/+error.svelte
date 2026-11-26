@@ -30,12 +30,12 @@
     min-height: 100vh;
   }
 
-  .error-msg {
+  :global(.error-msg) {
     :global(.content) {
       flex-direction: column;
     }
 
-    a {
+    :global(a) {
       text-decoration: underline;
       color: var(--blue);
     }

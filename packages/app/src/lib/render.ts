@@ -1,6 +1,11 @@
-import { render } from "@fartinmartin/canvas-paint/render";
 import type { RenderData } from "@fartinmartin/canvas-paint/render";
 import type { DrawingData } from "@ecc/lexicons";
+
+// canvas-paint touches `document` at module scope, so it can only be imported
+// in the browser.
+async function canvasPaint() {
+  return import("@fartinmartin/canvas-paint/render");
+}
 
 /** Lexicon paths keep cap/join/tolerance optional; canvas-paint always has them. */
 export function asRenderData(drawing: DrawingData): RenderData {
@@ -45,11 +50,12 @@ function prepare(canvas: HTMLCanvasElement) {
  * Draws a stored drawing onto an existing canvas. `pixelate` reproduces the
  * live site's blurred, half-opacity sibling preview.
  */
-export function drawStatic(
+export async function drawStatic(
   canvas: HTMLCanvasElement,
   drawing: DrawingData,
   { pixelate = false } = {}
-): void {
+): Promise<void> {
+  const { render } = await canvasPaint();
   const { ctx, width, height } = prepare(canvas);
   const source = render(asRenderData(drawing));
 
@@ -74,7 +80,8 @@ export function drawStatic(
 }
 
 /** Renders a drawing to a 1080×360 PNG data URL for gallery thumbnails. */
-export function drawingToThumb(drawing: DrawingData): string {
+export async function drawingToThumb(drawing: DrawingData): Promise<string> {
+  const { render } = await canvasPaint();
   const canvas = render(asRenderData(drawing));
   return canvas.toDataURL("image/png");
 }
@@ -118,4 +125,39 @@ export async function mergeThumbs(thumbs: (string | undefined)[]): Promise<strin
   }
 
   return canvas.toDataURL("image/png");
+}
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+/**
+ * Replays a drawing onto a canvas. Renders a bounded number of frames so long
+ * drawings stay cheap, then settles on the final image.
+ */
+export async function drawReplay(
+  canvas: HTMLCanvasElement,
+  drawing: DrawingData,
+  { duration = 500, frames = 40 } = {}
+): Promise<void> {
+  const { render } = await canvasPaint();
+  const total = drawing.paths.length;
+
+  if (total === 0) {
+    await drawStatic(canvas, drawing);
+    return;
+  }
+
+  const steps = Math.min(frames, total);
+  const delay = duration / steps;
+
+  for (let step = 1; step <= steps; step++) {
+    const upto = Math.ceil((step / steps) * total);
+    const { ctx, width, height } = prepare(canvas);
+    const source = render(asRenderData({ ...drawing, paths: drawing.paths.slice(0, upto) }));
+    ctx.imageSmoothingEnabled = false;
+    ctx.drawImage(source, 0, 0, width, height);
+
+    if (step < steps && delay > 0) await sleep(delay);
+  }
 }

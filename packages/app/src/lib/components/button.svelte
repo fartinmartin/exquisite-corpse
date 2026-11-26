@@ -80,7 +80,7 @@
       color: var(--black);
     }
 
-    a {
+    :global(a) {
       text-decoration: none;
 
       &:hover {

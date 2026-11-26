@@ -7,6 +7,7 @@
     color?: "yellow" | "blue" | "red" | "green";
     throttle?: number;
     style?: string;
+    class?: string;
   };
 
   let {
@@ -15,8 +16,10 @@
     color = "blue",
     throttle = 0,
     style,
+    class: className,
   }: Props = $props();
 
+  // svelte-ignore state_referenced_locally
   let visible = $state(throttle === 0);
 
   $effect(() => {
@@ -29,7 +32,7 @@
   });
 </script>
 
-<div class="loading-wrap mw-canvas" class:transparent={!visible} {style}>
+<div class={["loading-wrap", "mw-canvas", className]} class:transparent={!visible} {style}>
   <Panel
     class="loading body-bg"
     {color}
@@ -55,7 +58,7 @@
     position: relative;
     padding-top: 100%;
 
-    .loading {
+    :global(.loading) {
       position: absolute;
       left: 0;
       top: 0;
@@ -65,7 +68,7 @@
     }
   }
 
-  .loading {
+  :global(.loading) {
     display: flex;
     align-items: center;
     justify-content: center;

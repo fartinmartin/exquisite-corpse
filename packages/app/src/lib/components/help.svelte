@@ -78,8 +78,8 @@
     }
   }
 
-  .section,
-  .step {
+  :global(.section),
+  :global(.step) {
     height: 91px;
 
     @media screen and (max-width: 765px) {
@@ -87,12 +87,12 @@
     }
   }
 
-  .section {
+  :global(.section) {
     width: 272px;
     overflow: hidden;
   }
 
-  .step {
+  :global(.step) {
     display: grid;
     place-items: center;
     text-align: center;
@@ -101,7 +101,7 @@
       font-size: 1rem;
     }
 
-    &:last-child a {
+    &:last-child :global(a) {
       display: flex;
       align-items: center;
     }

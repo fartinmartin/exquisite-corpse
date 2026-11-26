@@ -33,7 +33,7 @@
     display: none;
   }
 
-  .radio-wrap.active .icon {
+  :global(.radio-wrap.active .icon) {
     border: 2px solid var(--light-blue);
     border-top: 2px solid var(--lighter-blue);
     border-left: 2px solid var(--lighter-blue);

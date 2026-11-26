@@ -35,14 +35,15 @@
     left: 0;
   }
 
-  .nav,
-  .me {
+  :global(.nav),
+  :global(.me) {
     position: absolute;
     top: calc(40px / 3);
     z-index: 950;
   }
 
-  .nav {
+  :global(.nav.mw-canvas) {
+    width: auto;
     left: calc(40px / 3);
     width: auto;
     padding: 0 1rem !important;
@@ -58,7 +59,7 @@
     }
   }
 
-  .me {
+  :global(.me.mw-canvas) {
     right: calc(40px / 3);
     width: 60px;
     z-index: 955;

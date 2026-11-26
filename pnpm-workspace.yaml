@@ -1,6 +1,8 @@
 packages:
   - "packages/*"
-onlyBuiltDependencies:
-  - esbuild
-  - protobufjs
-  - "@firebase/util"
+allowBuilds:
+  '@firebase/util': true
+  '@parcel/watcher': true
+  canvas: true
+  esbuild: true
+  protobufjs: true

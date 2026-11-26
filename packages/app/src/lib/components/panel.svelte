@@ -8,7 +8,7 @@
     id?: string;
     class?: string;
     style?: string;
-    children: Snippet;
+    children?: Snippet;
   };
 
   let {
@@ -31,7 +31,7 @@
   class:pointer={interactive}
 >
   <div class="content">
-    {@render children()}
+    {@render children?.()}
   </div>
 </div>
 

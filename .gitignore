@@ -21,3 +21,6 @@ packages/lexicons/generated/
 
 # Logs
 *.log
+
+# Netlify build output
+.netlify/
