@@ -5,7 +5,7 @@ import { joyful } from "joyful";
 import { Sections } from "@ecc/firestore";
 import { DrawingDataSchema, SectionTypeSchema, type DrawingData } from "@ecc/lexicons";
 import type { SectionType } from "@ecc/firestore";
-import { GUEST_HANDLE_COOKIE } from "$lib/draw/state.svelte";
+import { COOKIE_OPTIONS, GUEST_HANDLE_COOKIE } from "$lib/draw/state.svelte";
 
 const SIBLING_TYPES: Record<SectionType, SectionType[]> = {
   top: ["mid", "bot"],
@@ -82,5 +82,11 @@ export const saveDrawing = command(SaveInput, async (input) => {
 
   if (result instanceof Sections.DrawingTooLargeError) error(413, result.message);
   if (result instanceof Error) error(500, result.message);
+
+  // Remember a typed artist name as the default for this visitor's next drawing.
+  if (input.artist.trim()) {
+    // The draw page reads this one, so it can't be httpOnly (SvelteKit's default).
+    event.cookies.set(GUEST_HANDLE_COOKIE, artist, { ...COOKIE_OPTIONS, httpOnly: false });
+  }
   return result;
 });
