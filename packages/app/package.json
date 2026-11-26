@@ -22,7 +22,7 @@
   "devDependencies": {
     "@sveltejs/adapter-netlify": "^6.0.4",
     "@sveltejs/adapter-node": "^5.5.4",
-    "@sveltejs/kit": "^2.55.0",
+    "@sveltejs/kit": "^3.1.1",
     "@sveltejs/vite-plugin-svelte": "^7.0.0",
     "@varlock/1password-plugin": "^0.2.3",
     "sass": "^1.108.2",
