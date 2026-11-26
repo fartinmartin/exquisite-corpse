@@ -106,8 +106,8 @@ importers:
         specifier: ^0.14.0
         version: 0.14.0
       nanoid:
-        specifier: ^5.1.7
-        version: 5.1.7
+        specifier: ^5.1.16
+        version: 5.1.16
     devDependencies:
       '@types/node':
         specifier: ^25.5.0
@@ -1962,8 +1962,8 @@ packages:
     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
     hasBin: true
 
-  nanoid@5.1.7:
-    resolution: {integrity: sha512-ua3NDgISf6jdwezAheMOk4mbE1LXjm1DfMUDMuJf4AqxLFK3ccGpgWizwa5YV7Yz9EpXwEaWoRXSb/BnV0t5dQ==}
+  nanoid@5.1.16:
+    resolution: {integrity: sha512-kVrnsrJqMR8+oLJnGEmSWw9BivK5mt7H3FZatVRjrc5wGqFYuBxX1yG7+A7Gi5AefkX6t/oCkizcQgpu0cY1dQ==}
     engines: {node: ^18 || >=20}
     hasBin: true
 
@@ -2413,7 +2413,7 @@ snapshots:
       '@atcute/multibase': 1.1.8
       '@atcute/uint8array': 1.1.1
       '@badrap/valita': 0.4.6
-      nanoid: 5.1.7
+      nanoid: 5.1.16
 
   '@atcute/oauth-keyset@0.1.0':
     dependencies:
@@ -2430,7 +2430,7 @@ snapshots:
       '@atcute/oauth-types': 0.1.1
       '@atcute/util-fetch': 1.0.5
       '@badrap/valita': 0.4.6
-      nanoid: 5.1.7
+      nanoid: 5.1.16
 
   '@atcute/oauth-types@0.1.1':
     dependencies:
@@ -3880,7 +3880,7 @@ snapshots:
 
   nanoid@3.3.11: {}
 
-  nanoid@5.1.7: {}
+  nanoid@5.1.16: {}
 
   napi-build-utils@2.0.0: {}
 

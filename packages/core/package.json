@@ -30,7 +30,7 @@
     "canvas": "^3.2.1",
     "drizzle-orm": "^0.45.1",
     "errore": "^0.14.0",
-    "nanoid": "^5.1.7"
+    "nanoid": "^5.1.16"
   },
   "devDependencies": {
     "@types/node": "^25.5.0",
