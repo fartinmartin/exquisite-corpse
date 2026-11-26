@@ -1,29 +1,42 @@
 # Performance audit — 2026-11-26 (`firestore` branch)
 
-**Status:** in-progress (fixing #1–#8 on branch `perf/audit-fixes`, worktree `../exquisite-corpse-perf`). Updated 2026-11-26.
+**Status:** in-progress: #1–#8 done and committed on `perf/audit-fixes` (worktree `../exquisite-corpse-perf`); needs a deploy preview. Updated 2026-11-26.
 
 ## Resume here
 
-Starting #3 + #4 (data layer) first, since #1/#2/#6 build on the new summary types: `packages/firestore/src/records.ts`.
+Push `perf/audit-fixes` and open a Netlify deploy preview (it's an outward-facing step, so it's left for Martin). On the preview, check the two Netlify-only items under Open questions. If `/.netlify/images?url=/thumbs/...` fails, set `__NETLIFY_IMAGE_CDN__` to `false` in `packages/app/vite.config.ts`. After that, the remaining audit items are #9–#16 below. #10 (drop node-canvas) is the natural next one: corpse thumbs now always come from the browser, so only the admin `rebuildThumb`/`createFromSection` still need it.
 
 ## Steps
 
-- [ ] #3 `select()` projections + lazy drawing conversion (`records.ts`, `sections.ts`, `corpses.ts`)
-- [ ] #4 one fetch per detail page (`Sections.detail`, `Corpses.detail`), parallel `getSiblings`
-- [ ] #1 thumbs served from `/thumbs/[collection]/[id]` with immutable caching
-- [ ] #2 small WebP/JPEG thumbs for new saves; legacy thumbs resized via Netlify Image CDN; download renders from drawings
-- [ ] #6 home/corpse/draw payloads drop thumb data
-- [ ] #5 cache headers on public pages, lazy guest cookie, like state fetched client-side
-- [ ] #7 compact legacy paths (pixel-diffed)
-- [ ] #8 incremental replay + cached resize blit
+- [x] #3 `select()`/`fieldMask` on every read; legacy drawing conversion only when the drawing is read (`records.ts`: `toSection` vs `toSectionWithDrawing`)
+- [x] #4 section page = 2 round trips (`Sections.detail`), corpse page = 2 (`Corpses.get`). Removed both `+page.server.ts` loads (head tags now come from the query result). `getSiblings` runs in parallel.
+- [x] #1 summaries carry `thumbVersion` instead of image data; `/thumbs/[collection]/[id]?v=` serves bytes with `immutable` caching (`routes/thumbs/.../+server.ts`, `Thumbs.get`); `rebuildThumb` bumps `thumbVersion`
+- [x] #2 new thumbs are 540px WebP (JPEG on Safari), rendered from drawings (`render.ts`: `drawingToThumb`, `corpseToThumb`). Legacy thumbs go through Netlify Image CDN with `srcset` (`lib/thumbs.ts`, enabled when `NETLIFY=true` at build). Download renders a 1080px PNG from the drawings (`drawingsToPng`). Gallery `<img>` have width/height, lazy below the first 9.
+- [x] #6 home/corpse/draw payloads have no thumb data (falls out of #1); draw page composes the corpse thumb from drawings, not sibling thumbs
+- [x] #5 `hooks.server.ts`: CDN cache headers (60s + SWR) on `/gallery`, section/corpse pages and their remote queries; guest handle cookie only on `/draw`; guest token issued by `toggleLike`; like state is a separate client-only `getLikeState` query (`like-button.svelte`); `netlify.toml` caches `/fonts` and `/img`
+- [x] #7 **rejected path merging** (pixel diff below); kept the lazy-conversion part (#3)
+- [x] #8 `render.ts` `replay()`: paints only new paths per rAF frame onto one canvas (via `paintOnto`), aborts on unmount, skips under reduced motion; `canvas-panel.svelte` re-blits the cached render on resize
+- [x] smoke test with fixtures (`ECC_FIXTURES=1 npx vite dev`). Covered: every page 200 with no `data:image` thumbs in HTML; unknown ids 404; `/thumbs` immutable; cookie only on `/draw`; like toggle persists across reload; download gives a 1080px PNG; draw → save produced a 540×540 WebP corpse thumb (11 KB) and section thumb (3.7 KB); no console errors. `pnpm check` clean; `NETLIFY=true vite build` OK.
+- [x] committed (one code commit: the type change from thumb data to `thumbVersion` couples the data layer, pages and like button, so they don't split into commits that each compile)
+- [ ] deploy preview: verify Image CDN + CDN caching (Open questions)
+- [ ] after merge: compare against the "Measurements" table (gallery HTML was 1.4 MB gzipped)
 
 ## Decisions
 
 - **2026-11-26**: kept the progress log in this file (the user asked for it here) instead of `docs/plans/`.
+- **2026-11-26**: #8 incremental replay verified pixel-identical to a full `render()`. Test: 16 real legacy drawings scraped from the live home page, node-canvas, random uneven chunks, 0 differing pixels in every one. Script: `diff.mjs` in the session scratchpad. It's a node-canvas harness around `canvas-paint/render`; re-create it if needed.
+- **2026-11-26**: #7 merging contiguous legacy segments into one polyline is **not** pixel-identical. Separate strokes double-composite their anti-aliased edges at every joint; one polyline doesn't. Across the same 16 drawings: 0.01–1.85% of pixels change, by up to 169/255. Size savings were only 1–6% for 12 of 16 drawings (37–43% for the other 4). Per the "keep at-rest fidelity" rule, not shipped. Gzip already removes most of the repetition (home: 1 MB raw → 322 KB).
+- **2026-11-26**: like state moved out of page data into `getLikeState` (browser-only `$effect`) so the cached HTML/query responses have no per-visitor data. Trade-off: one small extra request per detail page, and the heart fills in after hydration.
+- **2026-11-26**: thumbs live at `/thumbs/...`, not `/img/...`, because `static/img` already holds icons.
+- **2026-11-26**: `paintOnto` feeds our canvas to canvas-paint's `render()` via `createCanvas` and swallows its initial background `fillRect`, because `drawPathToContext` isn't exported from `@fartinmartin/canvas-paint/render`. That's a hack that depends on render internals (commented in code). Proper fix: export it from canvas-paint.
 
 ## Open questions
 
-- none yet
+- **Non-blocking, verify on a deploy preview:** does Netlify Image CDN accept a function-served source (`/.netlify/images?url=/thumbs/...`)? If not, set `__NETLIFY_IMAGE_CDN__` to false in `vite.config.ts` and legacy thumbs are served full-size (still cached, no longer inlined).
+- **Non-blocking, verify on a deploy preview:** does Netlify's CDN honour `netlify-cdn-cache-control` on the SSR function and remote query responses? Look for `cache-status: "Netlify Edge"; hit` on a second request.
+- **Non-blocking:** export `drawPathToContext` from canvas-paint (your package, needs a publish) so `paintOnto` can drop the Proxy.
+- **Non-blocking, found while testing:** `app.html` has a static `<title>`/description *before* `%sveltekit.head%`, so SSR'd pages have two titles and crawlers/link previews see the generic one. Not perf, so not fixed here; predates this branch.
+- **Non-blocking:** backfill legacy 1080px PNG thumbs to small WebP? It writes production data, so I didn't do it. The Image CDN covers display in the meantime.
 
 ---
 
