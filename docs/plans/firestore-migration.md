@@ -1,12 +1,12 @@
 # Migrate the live Nuxt site to SvelteKit + Firestore
 
-**Status:** in-progress — updated 2026-11-26
+**Status:** done — updated 2026-11-26
 
 ## Resume here
 
 `https://exquisitecorpse.club` runs the SvelteKit app on Netlify against the live
-Firestore data. The Nuxt app is retired and the accounts are cleaned up. Remaining:
-restore local dev credentials in 1Password.
+Firestore data. The Nuxt app is retired, the accounts are cleaned up, and local dev
+reads its credentials from 1Password. The next phase is the atproto data move.
 
 ## Steps
 
@@ -27,7 +27,7 @@ restore local dev credentials in 1Password.
 - [x] Backfill decision: keep the read-time adapter; optional `pnpm convert:drawings` script added
 - [x] Reuse the existing Netlify site (`exquisite-corpse-club`, `00f3062d-7e5d-4686-9dda-136bcb1f07d9`); remote Linux builds work, functions bundle, fixture draft verified
 - [x] Rotate the exposed Firebase service-account key and set Netlify secret env vars
-- [ ] Store the new key fields in 1Password (`firebase-private-key`, `firebase-client-email`, `admin-password`) for local dev
+- [x] Store the key fields (`firebase-private-key`, `firebase-client-email`) and admin password (`password`) in the 1Password item for local dev
 - [x] Production deploy with live data (Netlify secrets: `FIREBASE_SERVICE_ACCOUNT`, `ECC_ADMIN_PASSWORD`)
 - [x] Set the Netlify production branch to `firestore` in the UI (API left it at `nuxt`)
 - [x] Draw/save smoke test against live data (kept: "the night shift" by "claude (smoke test)")
@@ -67,7 +67,6 @@ restore local dev credentials in 1Password.
 
 ## Open questions
 
-- Firebase service-account credentials need real 1Password item names (the `op://` refs in `.env.schema` are placeholders).
 - Optional: backfill only sub-limit records with `convert:drawings --write --backup`? Not needed for correctness; keep the adapter.
 - Old likes were keyed by Firebase anonymous UIDs. Counts are preserved, but current visitors can't "unlike" someone else's old like (each cookie only toggles its own).
 
