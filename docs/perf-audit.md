@@ -1,10 +1,10 @@
 # Performance audit — 2026-11-26 (`firestore` branch)
 
-**Status:** in-progress: #1–#8 + SEO shipped; #9–#16 open. Updated 2026-11-26.
+**Status:** in-progress: #1–#8 + SEO shipped; round 2 (#11, #15, #16) ready to ship; #10 on hold; #14 moved to the admin plan. Updated 2026-11-26.
 
 ## Resume here
 
-#1–#8 shipped to production on 2026-11-26 (`effa7ac`, deploy `6b087f22`). Next, in this order: #11 (`preferRest` + check the function region; uncached TTFB is still ~0.7–0.9 s), #10 (drop node-canvas), #14 (admin bulk ops break past 500 docs), then #15/#16. Skip #12/#13 unless the atproto cut-over is far off. The striped thumbs (Open questions) can be fixed from /admin now.
+Round 2 (#11, #15, #16) is committed on `perf/round-2` (worktree `../exquisite-corpse-perf2`) and verified on draft deploy https://6b0880c0df5de4075d96c1b1--exquisite-corpse-club.netlify.app. Waiting on Martin to ship it (fast-forward `firestore`, push). #10 is on hold pending the thumbnail discussion; #14 moved into `docs/plans/admin-rebuild.md`. #9, #12 and #13 are skipped for now (see Decisions).
 
 ## Steps
 
@@ -27,6 +27,7 @@
   - CDN caching: second request to gallery/corpse/section pages is a `Netlify Durable` hit, TTFB ~0.3 s vs 0.7–0.9 s on a miss; home stays `no-cache` (random) as intended; no `Set-Cookie` on public pages
   - og tags: one set per page; corpse og:image is a 65 KB JPEG via the Image CDN
   - browser: section page replays, `getLikeState` 200, gallery 9/9 images load, no console errors
+- [x] round 2: #11 `preferRest: true` (`client.ts`); #15 gallery resets `page` in the same update as the filter/sort change, and uses `MediaQuery` instead of a matchMedia effect; #16 cursor tooltip width via `bind:offsetWidth` (no forced layout on mousemove), cursor images warmed after mount on hover devices, draw page serializes the drawing once when the save modal opens, regular font preloaded, `.woff` fallbacks deleted. Verified locally: a filter change on page 2 makes one request (page 0) instead of two.
 - [x] shipped (`firestore` fast-forwarded to `effa7ac`). Production vs the Measurements table, gzipped HTML: `/` 322 → 20 KB, `/gallery` 1,418 → 4 KB, corpse 210 → 25 KB, section 292 → 7 KB. Repeat `/gallery` hits the durable cache at 0.22 s TTFB.
 
 ## Decisions
@@ -36,6 +37,9 @@
 - **2026-11-26**: #7 merging contiguous legacy segments into one polyline is **not** pixel-identical. Separate strokes double-composite their anti-aliased edges at every joint; one polyline doesn't. Across the same 16 drawings: 0.01–1.85% of pixels change, by up to 169/255. Size savings were only 1–6% for 12 of 16 drawings (37–43% for the other 4). Per the "keep at-rest fidelity" rule, not shipped. Gzip already removes most of the repetition (home: 1 MB raw → 322 KB).
 - **2026-11-26**: like state moved out of page data into `getLikeState` (browser-only `$effect`) so the cached HTML/query responses have no per-visitor data. Trade-off: one small extra request per detail page, and the heart fills in after hydration.
 - **2026-11-26**: the canvas-paint Proxy workaround is replaced by the upstream `drawPaths` export (canvas-paint 1.2.0). Supersedes the `paintOnto`-Proxy entry below.
+- **2026-11-26**: #11 measured on draft deploys (one cold sample each, cache-busted section page): gRPC cold 1.07 s → REST cold 0.74 s; warm unchanged (~0.5 s). Region left alone: functions are in us-east-1 and Firestore in nam5 (US multi-region), and server-side time for a section page is only ~0.2 s (`/draw`, no DB, 0.22 s vs section 0.41 s from the same client).
+- **2026-11-26**: correction to the audit text for #14: production has 247 sections / 238 corpses, so the 500-write batch limit isn't hit yet. Reading every full doc still is. Folded into the admin plan (Phase 4).
+- **2026-11-26**: skipping #12 (cursor pagination) and #13 (likes out of the main doc) until the atproto plan is clearer; both get replaced there. #9 is mostly covered: uploads are ~15 KB of thumbs now.
 - **2026-11-26**: npm now holds a new version for a few minutes (malware scan) before listing it. Re-running `publish` in that window returns `409 Cannot publish over previously staged version`, which means the first publish succeeded (npm/cli#9889). Wait and check `npm view`; don't bump the version.
 - **2026-11-26**: the atproto version keeps the same idea (a caching image route on our domain) but keys it by blob: `/thumbs/{did}/{cid}` proxying `com.atproto.sync.getBlob` from the record's PDS. A CID is content-addressed, so it replaces `?v=` and is immutable by definition. Only `lib/thumbs.ts` builds thumb URLs, so the swap is local. Records must hold real `blob` refs (not CID strings like `CorpseRecordSchema.renderedBlob` today) or the PDS garbage-collects the blob.
 - **2026-11-26**: thumbs live at `/thumbs/...`, not `/img/...`, because `static/img` already holds icons.
