@@ -1,10 +1,10 @@
 # Admin rebuild
 
-**Status:** in-progress: Phase 3a (server-rendered thumbs) built on `feat/server-thumbs` and verified on a draft deploy, not shipped. Purge scope confirmed. Updated 2026-11-26.
+**Status:** in-progress: Phase 3a shipped; Phases 1, 2 and 4 not started. Updated 2026-11-26.
 
 ## Resume here
 
-Phase 3a is on `feat/server-thumbs` (worktree `../exquisite-corpse-thumbs`), verified on https://6b08b2d19ec5874994e7cb44--exquisite-corpse-club.netlify.app. Next: Martin approves shipping (fast-forward `firestore`, push). After that: Phase 1 (cache purge via `@netlify/cache` `purgeCache({ tags: ["thumb:<collection>:<id>"] })` on delete, plus auth hardening). Open question 2 (hide vs delete) still blocks Phase 2.
+Phase 3a shipped (`99d701a`). Next: Phase 1 in a new worktree. First, `purgeCache({ tags: ["thumb:<collection>:<id>"] })` from `@netlify/cache` in `deleteSection`/`deleteCorpse` (thumb responses already send that `Netlify-Cache-ID`); then auth hardening; then the cascade preview. Open question 2 (hide vs delete) blocks Phase 2.
 
 ## Steps
 
@@ -32,7 +32,7 @@ Phase 3a is on `feat/server-thumbs` (worktree `../exquisite-corpse-thumbs`), ver
 - [x] node-canvas removed from `app` and `firestore` (`Drawing.composeThumbs` deleted). It's still a dependency of the unused atproto `core` package. The stored `thumb` field is now read only as a fallback when rendering fails (`Thumbs.stored`, short cache).
 - [x] Striped legacy thumbs fixed by construction: `5HNVUa4bAsDiTPJkGj5r` and corpse `JQT4p3gLjQ7YuT7WzJxu` render correctly from their drawings on the draft.
 - [x] Verified on draft deploys (live data, read-only): gallery 9/9 thumbs, no console errors. Timings: render miss 1.0–2.8 s (includes cold start + Firestore), Blobs hit ~0.46 s, durable-cache hit ~0.33 s, edge hit ~0.14 s.
-- [ ] Ship.
+- [x] Shipped 2026-11-26 (`99d701a`). Production: all gallery thumbs are WebP via the Image CDN; home 0.85 s / corpse 0.69 s warm median after the deploy's cold start (3.9 s first hit).
 
 ### Phase 3: thumbnail tools (replaces the node-canvas admin paths, audit #10)
 

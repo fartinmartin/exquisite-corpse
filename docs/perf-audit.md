@@ -1,10 +1,10 @@
 # Performance audit — 2026-11-26 (`firestore` branch)
 
-**Status:** in-progress: #1–#8, SEO, #15 and #16 shipped; #11 tried and reverted; #10 and #14 moved to the admin plan. Updated 2026-11-26.
+**Status:** effectively done: #1–#8, #10, #15, #16 and SEO shipped; #11 reverted; #14 tracked in the admin plan. Updated 2026-11-26.
 
 ## Resume here
 
-Round 2 shipped (`6bee29f`) with `preferRest` reverted in production (`02eb67b`, see Decisions). Remaining: #10 is now part of the thumbnail rework in `docs/plans/admin-rebuild.md` (render thumbs server-side on demand); #14 is in that plan too. #9, #12 and #13 are skipped. This audit is effectively done once the admin plan's thumbnail phase lands; delete this file then.
+Done except #14, which lives in `docs/plans/admin-rebuild.md` (Phase 4). #10 shipped as part of server-rendered thumbs. #9, #12 and #13 are skipped. Delete this file when the admin plan's Phase 4 lands, or now if the plan is the better home.
 
 ## Steps
 
