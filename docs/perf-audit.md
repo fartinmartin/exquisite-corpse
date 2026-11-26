@@ -1,12 +1,10 @@
 # Performance audit — 2026-11-26 (`firestore` branch)
 
-**Status:** in-progress: #1–#8 and SEO committed on `perf/audit-fixes` (worktree `../exquisite-corpse-perf`); waiting on the canvas-paint 1.2.0 publish, then a deploy preview. Updated 2026-11-26.
+**Status:** in-progress: #1–#8, SEO and the canvas-paint 1.2.0 switch committed on `perf/audit-fixes` (worktree `../exquisite-corpse-perf`); needs a deploy preview. Updated 2026-11-26.
 
 ## Resume here
 
-1. **canvas-paint 1.2.0 isn't on npm yet** (registry still shows 1.1.0). The source is committed and pushed (`e16d6bb`…`0ba036d` on canvas-paint `main`) and the dist is built from it. Publish with `cd ~/code/fartinmartin/canvas-paint && pnpm publish --access public --no-git-checks` (it asks for a 2FA code).
-2. Then, in this worktree, run `pnpm install`. That locks `^1.2.0`; `packages/app/package.json` and `src/lib/render.ts` (`paintOnto` now calls `drawPaths`) are already changed but uncommitted. Run `pnpm check`, re-test the replay on a corpse page with `ECC_FIXTURES=1`, and commit.
-3. Push `perf/audit-fixes` and open a deploy preview. Verify the Netlify-only items under Open questions, plus link previews (og tags) on a corpse URL.
+Push `perf/audit-fixes` and open a Netlify deploy preview. On it, verify the Netlify-only items under Open questions, plus link previews (og tags) on a corpse URL. After that, the remaining audit items are #9–#16. #10 (drop node-canvas) is the natural next one.
 
 ## Steps
 
@@ -22,7 +20,7 @@
 - [x] committed (one code commit: the type change from thumb data to `thumbVersion` couples the data layer, pages and like button, so they don't split into commits that each compile)
 - [x] SEO: removed the static title/description/og tags from `app.html`; every page renders one set via `lib/components/seo.svelte` (title, description, canonical, og:*, twitter:card). Corpse/section pages use their thumb as og:image (JPEG via the Image CDN on Netlify); admin and error pages are `noindex`.
 - [x] canvas-paint: added a `drawPaths(ctx, data)` export (paths onto an existing context, no background fill); `render()` uses it. Verified with the 16-drawing harness: 0 differing bytes against `render()`. Committed and pushed to canvas-paint `main` as 1.2.0.
-- [ ] publish canvas-paint 1.2.0, then commit the app switch from the Proxy to `drawPaths` (Resume here)
+- [x] canvas-paint 1.2.0 published (live 18:37 UTC); app and core now depend on `^1.2.0` and `paintOnto` calls `drawPaths`. Replay re-tested with fixtures: final pixels identical to the Proxy version.
 - [ ] deploy preview: verify Image CDN + CDN caching (Open questions)
 - [ ] after merge: compare against the "Measurements" table (gallery HTML was 1.4 MB gzipped)
 
@@ -33,6 +31,7 @@
 - **2026-11-26**: #7 merging contiguous legacy segments into one polyline is **not** pixel-identical. Separate strokes double-composite their anti-aliased edges at every joint; one polyline doesn't. Across the same 16 drawings: 0.01–1.85% of pixels change, by up to 169/255. Size savings were only 1–6% for 12 of 16 drawings (37–43% for the other 4). Per the "keep at-rest fidelity" rule, not shipped. Gzip already removes most of the repetition (home: 1 MB raw → 322 KB).
 - **2026-11-26**: like state moved out of page data into `getLikeState` (browser-only `$effect`) so the cached HTML/query responses have no per-visitor data. Trade-off: one small extra request per detail page, and the heart fills in after hydration.
 - **2026-11-26**: the canvas-paint Proxy workaround is replaced by the upstream `drawPaths` export (canvas-paint 1.2.0). Supersedes the `paintOnto`-Proxy entry below.
+- **2026-11-26**: npm now holds a new version for a few minutes (malware scan) before listing it. Re-running `publish` in that window returns `409 Cannot publish over previously staged version`, which means the first publish succeeded (npm/cli#9889). Wait and check `npm view`; don't bump the version.
 - **2026-11-26**: the atproto version keeps the same idea (a caching image route on our domain) but keys it by blob: `/thumbs/{did}/{cid}` proxying `com.atproto.sync.getBlob` from the record's PDS. A CID is content-addressed, so it replaces `?v=` and is immutable by definition. Only `lib/thumbs.ts` builds thumb URLs, so the swap is local. Records must hold real `blob` refs (not CID strings like `CorpseRecordSchema.renderedBlob` today) or the PDS garbage-collects the blob.
 - **2026-11-26**: thumbs live at `/thumbs/...`, not `/img/...`, because `static/img` already holds icons.
 - **2026-11-26**: `paintOnto` feeds our canvas to canvas-paint's `render()` via `createCanvas` and swallows its initial background `fillRect`, because `drawPathToContext` isn't exported from `@fartinmartin/canvas-paint/render`. That's a hack that depends on render internals (commented in code). Proper fix: export it from canvas-paint.
