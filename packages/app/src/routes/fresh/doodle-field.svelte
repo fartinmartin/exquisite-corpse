@@ -1,6 +1,7 @@
 <script lang="ts">
+  import { untrack } from "svelte";
   import { Spring } from "svelte/motion";
-  import { doodles as doodleState } from "./doodle-settings.svelte.ts";
+  import { doodles as doodleState, type Press, type Release } from "./doodle-settings.svelte.ts";
   import { tint } from "./ink.ts";
 
   type Doodle = { id: string; thumb: string };
@@ -54,17 +55,79 @@
     return () => clearInterval(timer);
   });
 
-  // A small shuffle on every tap.
+  /*
+   * Press, hold, release. Pressing leans every doodle toward the press point,
+   * slowly, so a long hold winds them up (and they tremble, see CSS). Letting
+   * go flings them the other way, scaled by how long you held, and they wobble
+   * back to rest on an underdamped spring.
+   */
+  type Phase = "rest" | "hold" | "fling" | "settle";
+  let phase = $state<Phase>("rest");
   let jiggle = $state(SPOTS.map(() => ({ x: 0, y: 0, r: 0 })));
+  let innerWidth = $state(1280);
+
+  const reducedMotion = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /** Unit vector from a doodle's centre toward a point on screen. */
+  function toward(slot: number, point: { x: number; y: number }) {
+    const spot = SPOTS[slot];
+    const width = Math.min(260, Math.max(96, (spot.w / 100) * innerWidth));
+    const cx = (spot.x / 100) * innerWidth + width / 2;
+    const cy = (spot.y / 100) * innerHeight + parallax(spot) + width / 6;
+    const dx = point.x - cx;
+    const dy = point.y - cy;
+    const length = Math.hypot(dx, dy) || 1;
+    return { x: dx / length, y: dy / length, near: Math.max(0.35, 1 - length / Math.max(innerWidth, innerHeight)) };
+  }
+
+  function hold(press: Press) {
+    phase = "hold";
+    jiggle = SPOTS.map((_, slot) => {
+      const dir = toward(slot, press);
+      return { x: dir.x * 14 * dir.near, y: dir.y * 14 * dir.near, r: dir.x * 3 };
+    });
+  }
+
+  let timers: ReturnType<typeof setTimeout>[] = [];
+
+  function fling(release: Release) {
+    for (const timer of timers) clearTimeout(timer);
+    const push = 10 + release.strength * 46;
+    const spin = 2 + release.strength * 12;
+    phase = "fling";
+    jiggle = SPOTS.map((_, slot) => {
+      const dir = toward(slot, release);
+      const side = Math.random() < 0.5 ? -1 : 1;
+      return { x: -dir.x * push * dir.near, y: -dir.y * push * dir.near, r: side * spin * (0.6 + Math.random() * 0.4) };
+    });
+    timers = [
+      setTimeout(() => {
+        phase = "settle";
+        jiggle = SPOTS.map(() => ({ x: 0, y: 0, r: 0 }));
+      }, 160),
+      setTimeout(() => (phase = "rest"), 160 + 1400),
+    ];
+  }
+
+  // Only a new press or release triggers these; the layout reads inside
+  // (size, scroll) are untracked so scrolling doesn't re-fling.
+  $effect(() => {
+    const press = doodleState.held;
+    if (press && !reducedMotion()) untrack(() => hold(press));
+  });
 
   $effect(() => {
-    if (doodleState.pulse === 0) return;
-    jiggle = SPOTS.map(() => ({
-      x: (Math.random() * 2 - 1) * 16,
-      y: (Math.random() * 2 - 1) * 16,
-      r: (Math.random() * 2 - 1) * 7,
-    }));
+    const release = doodleState.released;
+    if (release && !reducedMotion()) untrack(() => fling(release));
   });
+
+  $effect(() => () => timers.forEach(clearTimeout));
+
+  /** An underdamped spring as a CSS linear() easing: overshoots and wobbles a few times. */
+  const SPRING = `linear(${Array.from({ length: 41 }, (_, i) => {
+    const t = i / 40;
+    return (1 - Math.exp(-5 * t) * Math.cos(13 * t)).toFixed(3);
+  }).join(", ")})`;
 
   // Scroll: doodles move up with the page on a spring and wrap round the viewport.
   let scrollY = $state(0);
@@ -99,9 +162,15 @@
   around the edge of the page. They drift, follow scroll on a spring, jiggle
   when you tap, and leave while you draw.
 -->
-<svelte:window bind:scrollY bind:innerHeight />
+<svelte:window bind:scrollY bind:innerHeight bind:innerWidth />
 
-<div class="field" aria-hidden="true" data-scattered={doodleState.scattered || undefined}>
+<div
+  class="field"
+  aria-hidden="true"
+  data-scattered={doodleState.scattered || undefined}
+  data-phase={phase}
+  style:--spring={SPRING}
+>
   {#each shown as id, slot (id)}
     {@const spot = SPOTS[slot]}
     {#if byId[id] && tinted[id] && spot}
@@ -141,6 +210,65 @@
       translate 600ms cubic-bezier(0.34, 1.56, 0.64, 1),
       rotate 600ms cubic-bezier(0.34, 1.56, 0.64, 1),
       opacity 300ms ease;
+  }
+
+  /* press and hold: a slow lean toward the press point, tension building */
+  @property --tension {
+    syntax: "<number>";
+    inherits: true;
+    initial-value: 0;
+  }
+
+  .field {
+    --tension: 0;
+    transition: --tension 250ms ease-out;
+  }
+
+  .field[data-phase="hold"] {
+    --tension: 1;
+    transition: --tension 1200ms cubic-bezier(0.3, 0, 0.6, 1);
+  }
+
+  [data-phase="hold"] .doodle {
+    transition:
+      translate 1200ms cubic-bezier(0.3, 0, 0.6, 1),
+      rotate 1200ms cubic-bezier(0.3, 0, 0.6, 1),
+      opacity 300ms ease;
+  }
+
+  /* let go: out fast… */
+  [data-phase="fling"] .doodle {
+    transition:
+      translate 160ms cubic-bezier(0.2, 0.8, 0.3, 1),
+      rotate 160ms cubic-bezier(0.2, 0.8, 0.3, 1),
+      opacity 300ms ease;
+  }
+
+  /* …and wobble home */
+  [data-phase="settle"] .doodle {
+    transition:
+      translate 1400ms var(--spring),
+      rotate 1400ms var(--spring),
+      opacity 300ms ease;
+  }
+
+  .doodle img {
+    scale: calc(1 - var(--tension) * 0.06);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    [data-phase="hold"] .doodle img {
+      animation: tremble 90ms linear infinite alternate;
+    }
+  }
+
+  @keyframes tremble {
+    from {
+      translate: calc(var(--tension) * -1.5px) calc(var(--tension) * 1px);
+    }
+    to {
+      translate: calc(var(--tension) * 1.5px) calc(var(--tension) * -1px);
+    }
   }
 
   /* leaving for drawing mode: quicker, no bounce */

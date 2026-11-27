@@ -3,6 +3,9 @@
   import DoodleField from "./doodle-field.svelte";
   import { doodles as doodleState } from "./doodle-settings.svelte.ts";
   import { doodles } from "./doodles.remote";
+  import Arrow from "./ui/arrow.svelte";
+  import { learned } from "./ui/learned.svelte.ts";
+  import { highlight } from "./ui/marks.ts";
 
   let { children } = $props();
 
@@ -10,18 +13,27 @@
 
   let about = $state(false);
 
-  const links = [
-    { href: "/fresh/draw", label: "draw" },
-    { href: "/fresh/look", label: "look" },
-  ];
+  $effect(() => learned.load());
 
-  // Doodles give a small shuffle on every tap or click.
-  function tapped() {
-    doodleState.nudge();
+  const drawing = $derived(page.url.pathname.startsWith("/fresh/draw"));
+  const looking = $derived(page.url.pathname.startsWith("/fresh/look"));
+
+  // Doodles wind up while you hold a press and spring away when you let go.
+  function pressed(event: PointerEvent) {
+    if (event.isPrimary) doodleState.press(event.clientX, event.clientY);
+  }
+
+  function released(event: PointerEvent) {
+    if (event.isPrimary) doodleState.release();
   }
 </script>
 
-<svelte:window onpointerdown={tapped} />
+<svelte:window
+  onpointerdown={pressed}
+  onpointerup={released}
+  onpointercancel={released}
+  onblur={() => doodleState.release()}
+/>
 
 <svelte:head>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -37,11 +49,9 @@
   <header>
     <a class="mark" href="/fresh">exquisite corpse club</a>
     <nav>
-      {#each links as link (link.href)}
-        <a class="squiggle" href={link.href} aria-current={page.url.pathname.startsWith(link.href) ? "page" : undefined}>
-          {link.label}
-        </a>
-      {/each}
+      <a class="squiggle" href="/fresh/look" aria-current={looking ? "page" : undefined}>look</a>
+      <!-- the one call to action, on every page -->
+      <a class="hl cta" href="/fresh/draw" style={highlight("draw")} aria-current={drawing ? "page" : undefined}>draw{#if !drawing}<Arrow />{/if}</a>
       <button type="button" class="squiggle" aria-expanded={about} onclick={() => (about = !about)}>?</button>
     </nav>
   </header>
@@ -164,16 +174,32 @@
 
   nav {
     display: flex;
+    align-items: baseline;
     gap: 20px;
     font-family: var(--mono);
     font-size: 0.875rem;
   }
 
   /* the page you're on keeps its squiggle in blue */
-  nav a[aria-current="page"],
+  nav .squiggle[aria-current="page"],
   nav button[aria-expanded="true"] {
     color: var(--blue);
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='4' viewBox='0 0 16 4'%3E%3Cpath d='M0 2 Q 4 0.2 8 2 T 16 2' fill='none' stroke='%230064ff' stroke-width='1.4' stroke-linecap='round'/%3E%3C/svg%3E");
+  }
+
+  /* draw is a highlighter, in the sans like the other calls to action */
+  nav .cta {
+    font-family: var(--sans);
+    font-size: 1rem;
+    font-weight: 600;
+    /* room for the highlighter's tail before the ? */
+    margin-right: 4px;
+  }
+
+  /* already drawing: the mark stays, but it doesn't invite you again */
+  nav .cta[aria-current="page"]::before {
+    height: 0.3em;
+    opacity: 0.45;
   }
 
   .about {
@@ -196,6 +222,19 @@
     font-family: var(--mono);
     font-size: 0.8125rem;
     color: var(--ink-soft);
+  }
+
+  /* a gesture hint: arrives after a beat, gone once you've done the thing (ui/learned) */
+  .fresh :global(.hint) {
+    font-size: 0.75rem;
+    animation: hint-in 600ms ease 1.2s backwards;
+  }
+
+  @keyframes hint-in {
+    from {
+      opacity: 0;
+      translate: 0 4px;
+    }
   }
 
   /*

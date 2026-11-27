@@ -2,8 +2,7 @@
   import { backFor } from "#lib/corpse/backs.ts";
   import Fold from "#lib/corpse/fold.svelte";
   import { hash, prng, randomFold } from "#lib/corpse/folds.ts";
-  import Arrow from "./ui/arrow.svelte";
-  import { highlight } from "./ui/marks.ts";
+  import { learned } from "./ui/learned.svelte.ts";
   import { randomCorpse } from "../home.remote";
 
   // Home: one creature at a time; tap for another. Who drew it lives on its own page.
@@ -15,6 +14,7 @@
   /** Swap in the next creature; it arrives folded and unfolds itself. */
   async function another() {
     if (shuffling) return;
+    learned.learn("another");
     shuffling = true;
     try {
       await randomCorpse().refresh();
@@ -37,8 +37,7 @@
 
   <div class="below">
     <h1><a class="squiggle" href={`/fresh/c/${corpse.id}`}>{corpse.title}</a></h1>
-    <p class="mono hint">tap the drawing for another</p>
-    <a class="next hl" href="/fresh/draw" style={highlight("draw the next one")}>draw the next one <Arrow /></a>
+    {#if learned.needs("another")}<p class="mono hint">tap the drawing for another</p>{/if}
   </div>
 </main>
 
@@ -93,12 +92,10 @@
     background-size: 22px 6px;
   }
 
-  .hint {
-    font-size: 0.75rem;
+  /* a title first; the pencil line only shows when you reach for it */
+  h1 .squiggle:not(:hover, :focus-visible) {
+    background-image: none;
   }
 
-  .next {
-    margin-top: 14px;
-    font-size: 1.125rem;
-  }
+
 </style>

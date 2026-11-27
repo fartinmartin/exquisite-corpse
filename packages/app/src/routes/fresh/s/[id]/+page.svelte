@@ -1,11 +1,10 @@
 <script lang="ts">
   import { page } from "$app/state";
+  import { learned } from "../../ui/learned.svelte.ts";
   import { thumbUrl } from "#lib/thumbs.ts";
   import { tiltFor } from "#lib/corpse/folds.ts";
   import { artistHref, LABELS } from "#lib/corpse/types.ts";
   import Actions from "../../ui/actions.svelte";
-  import Arrow from "../../ui/arrow.svelte";
-  import { highlight } from "../../ui/marks.ts";
   import Printed from "../../ui/printed.svelte";
   import StripSheet from "../../ui/strip-sheet.svelte";
   import { getSection } from "../../../gallery/section/[id]/section.remote";
@@ -15,6 +14,11 @@
   const section = $derived(result.section);
 
   let turned = $state(false);
+
+  // Turning a sheet over once is enough to know how.
+  $effect(() => {
+    if (turned) learned.learn("turn");
+  });
 
   const date = (iso: string) =>
     new Date(iso).toLocaleDateString("en", { year: "numeric", month: "short", day: "numeric" }).toLowerCase();
@@ -47,7 +51,6 @@
 
     <div class="below">
       <h1>{section.title}</h1>
-      <p class="mono hint">{turned ? "tap to turn it back" : "tap the drawing to see who drew it"}</p>
       <Actions
         collection="sections"
         {id}
@@ -55,6 +58,7 @@
         drawings={[section.drawing]}
         filename={`${section.title}.png`}
       />
+      {#if learned.needs("turn")}<p class="mono hint">tap the drawing to see who drew it</p>{/if}
     </div>
   </div>
 
@@ -89,8 +93,6 @@
       </ul>
     </section>
   {/if}
-
-  <a class="next hl" href="/fresh/draw" style={highlight("draw the next one")}>draw the next one <Arrow /></a>
 </main>
 
 <style>
@@ -118,10 +120,6 @@
     font-size: clamp(1.75rem, 5vw, 2.75rem);
     letter-spacing: -0.035em;
     line-height: 1.05;
-  }
-
-  .hint {
-    font-size: 0.75rem;
   }
 
   .below :global(.actions) {
@@ -195,9 +193,4 @@
     }
   }
 
-  .next {
-    align-self: flex-start;
-    font-size: 1.125rem;
-    font-weight: 500;
-  }
 </style>
