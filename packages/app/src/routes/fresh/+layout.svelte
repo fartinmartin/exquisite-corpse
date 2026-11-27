@@ -88,6 +88,8 @@
 
     /* tokens the shared paper/drawing components (lib/corpse, lib/draw) read */
     --paper: #ffffff;
+    --paper-ink: var(--ink);
+    --fold: var(--sky);
     --fold-ink: var(--blue);
     --surface-sunk: var(--sky);
     --text-muted: var(--ink-soft);
@@ -111,6 +113,16 @@
     place-items: normal;
     padding: 0;
     min-height: 100vh;
+  }
+
+  /* The drawing sheet: one continuous surface the thirds sit on, creased by
+     dashed folds rather than split into boxes. Light-blue edge, blue hard shadow. */
+  :global(:where(.fresh) .paper) {
+    color: var(--paper-ink);
+    background: var(--paper);
+    border: 2px solid var(--tone-blue-border);
+    box-shadow: 2px 2px 0 0 var(--tone-blue-shadow);
+    overflow: clip;
   }
 
   /* zero-specificity base, so page styles always win */
