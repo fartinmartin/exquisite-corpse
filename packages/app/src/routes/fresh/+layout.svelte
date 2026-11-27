@@ -61,6 +61,7 @@
       three people each draw a third of a creature.<br />
       you only see where the others' lines cross the fold.<br />
       then it unfolds.
+      <span class="keys"><kbd>→</kbd> another creature · <kbd>←</kbd> back</span>
     </p>
   {/if}
 
@@ -211,6 +212,25 @@
     line-height: 1.7;
     text-align: right;
     color: var(--ink-soft);
+  }
+
+  /* keyboard keys only mean something where there's a keyboard */
+  .keys {
+    display: none;
+    margin-top: 6px;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .keys {
+      display: block;
+    }
+  }
+
+  kbd {
+    font: inherit;
+    padding: 0 4px;
+    border: 1px solid var(--sky-line);
+    border-radius: 3px;
   }
 
   .content {

@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { LikeState } from "@ecc/firestore";
   import type { DrawingData } from "@ecc/lexicons";
+  import type { Snippet } from "svelte";
   import { getLikeState, toggleLike } from "#lib/likes.remote.ts";
   import { drawingsToPng } from "#lib/render.ts";
   import Swap from "./swap.svelte";
@@ -13,9 +14,13 @@
     /** Panels to stack top to bottom for the download: one for a section, three for a creature. */
     drawings: DrawingData[];
     filename: string;
+    /** Path that "copy link" copies. Home shows a creature without its own URL, so it's passed in. */
+    href: string;
+    /** More stamps, after download. */
+    children?: Snippet;
   };
 
-  let { collection, id, likes: publicLikes, drawings, filename }: Props = $props();
+  let { collection, id, likes: publicLikes, drawings, filename, href, children }: Props = $props();
 
   /** This visitor's state for `id`; `null` until fetched after hydration. */
   let own = $state<(LikeState & { id: string }) | null>(null);
@@ -61,7 +66,7 @@
 
   async function copy() {
     // only claim "copied!" when it really was
-    const ok = await navigator.clipboard?.writeText(location.href).then(() => true, () => false);
+    const ok = await navigator.clipboard?.writeText(new URL(href, location.origin).href).then(() => true, () => false);
     if (!ok) return;
     copied = true;
     setTimeout(() => (copied = false), 1500);
@@ -101,6 +106,7 @@
     <Swap labels={["copy link", "copied!"]} active={copied ? 1 : 0} />
   </button>
   <button class="stamp" style:--r="2deg" onclick={download}>download</button>
+  {@render children?.()}
 </p>
 
 <style>

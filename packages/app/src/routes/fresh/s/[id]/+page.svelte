@@ -57,6 +57,7 @@
         likes={section.likes}
         drawings={[section.drawing]}
         filename={`${section.title}.png`}
+        href={`/fresh/s/${section.id}`}
       />
       {#if learned.needs("turn")}<p class="mono hint">tap the drawing to see who drew it</p>{/if}
     </div>

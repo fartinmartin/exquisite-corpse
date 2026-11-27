@@ -5,6 +5,12 @@ declare global {
     // interface Locals {}
     // interface PageData {}
     // interface Platform {}
+    interface PageState {
+      /** /fresh: this creature came from "another", so ← can step back to the previous one. */
+      another?: boolean;
+      /** /fresh home, left via "another": the creature it was showing, so back returns to it. */
+      pinned?: string;
+    }
   }
 }
 

@@ -82,6 +82,21 @@ export async function random(): Promise<CorpseWithSections | null> {
   return { ...corpse, panels: await panelsFor(corpse.sections) };
 }
 
+/**
+ * The id of a random visible corpse, without loading its drawings: for
+ * "another", which then navigates to that corpse's page. Tries once more if
+ * it lands on `excludeId` (the one already on screen).
+ */
+export async function randomId(excludeId?: string): Promise<string | null> {
+  for (let attempt = 0; attempt < 2; attempt++) {
+    const id = Fixtures.enabled()
+      ? (Fixtures.randomCorpse()?.id ?? null)
+      : ((await Records.randomSnapshot("corpses", { fields: ["title"] }))?.id ?? null);
+    if (id !== excludeId) return id;
+  }
+  return null;
+}
+
 export async function list(options: {
   sort: "date" | "likes";
   page: number;
