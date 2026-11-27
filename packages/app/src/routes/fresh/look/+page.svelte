@@ -22,28 +22,31 @@
 
   const first = $derived(await listGallery({ filter: part, sort: "date", page: 0 }));
 
-  let more = $state<(Corpse | Section)[]>([]);
-  let nextPage = $state(1);
-  let hasMore = $state<boolean | null>(null);
+  /**
+   * Pages loaded past the first, tagged with the shelf they belong to. Derived
+   * rather than reset in an effect, so a shelf switch never renders the old
+   * shelf's items (with the wrong thumbnail collection) for a frame.
+   */
+  let loaded = $state<{ part: Part; items: (Corpse | Section)[]; nextPage: number; hasMore: boolean } | null>(null);
   let loading = $state(false);
 
-  // a new shelf starts from its first page
-  $effect(() => {
-    void part;
-    more = [];
-    nextPage = 1;
-    hasMore = null;
-  });
-
-  const items = $derived([...(first.items as (Corpse | Section)[]), ...more]);
+  const extra = $derived(loaded?.part === part ? loaded : null);
+  const items = $derived([...(first.items as (Corpse | Section)[]), ...(extra?.items ?? [])]);
+  const hasMore = $derived(extra ? extra.hasMore : first.hasMore);
 
   async function loadMore() {
+    const shelf = part;
+    const page = extra?.nextPage ?? 1;
     loading = true;
     try {
-      const result = await listGallery({ filter: part, sort: "date", page: nextPage });
-      more = [...more, ...(result.items as (Corpse | Section)[])];
-      hasMore = result.hasMore;
-      nextPage += 1;
+      const result = await listGallery({ filter: shelf, sort: "date", page });
+      const before = loaded?.part === shelf ? loaded.items : [];
+      loaded = {
+        part: shelf,
+        items: [...before, ...(result.items as (Corpse | Section)[])],
+        nextPage: page + 1,
+        hasMore: result.hasMore,
+      };
     } finally {
       loading = false;
     }
@@ -80,7 +83,7 @@
     {/each}
   </ul>
 
-  {#if hasMore ?? first.hasMore}
+  {#if hasMore}
     <button class="stamp more" onclick={loadMore} disabled={loading}><Swap labels={["more", "…"]} active={loading ? 1 : 0} /></button>
   {/if}
 </main>
