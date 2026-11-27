@@ -1,10 +1,10 @@
 # Admin rebuild
 
-**Status:** in-progress: Phases 1 and 3a and the budget gate shipped; Phases 2 and 4 not started. Updated 2026-11-26.
+**Status:** in-progress: Phases 1, 3a and the budget gate shipped; Phase 2 built on `feat/admin-hide` and verified on a staging copy, waiting for production rollout; Phase 4 not started. Updated 2026-11-26.
 
 ## Resume here
 
-Phase 1 shipped (`340566c`). Open check: after the first real delete in /admin, its old thumb URL should 404 (purge + Blobs cleanup has only run locally). Next: Phase 2, which starts with the `hidden` migration and Firestore indexes. Both change production, so confirm with Martin before running them.
+Phase 2 is on `feat/admin-hide` (worktree `../exquisite-corpse-hide`), verified on the `ecc-staging` database. Next is the production rollout, **in this order** (Phase 2 steps): indexes → wait READY → migration → ship → re-run migration → delete `ecc-staging`. Shipping before the migration would empty every gallery: Firestore never matches docs without `hidden`. Needs Martin's go-ahead (production data + settings).
 
 ## Steps
 
@@ -29,14 +29,22 @@ Phase 1 shipped (`340566c`). Open check: after the first real delete in /admin, 
 - [x] Shipped 2026-11-26 (`340566c`). Production check: all pages 200, `/admin` → login, thumbs render, a wrong password → 401 through the new lockout path.
 - [ ] Verify purge + Blobs cleanup on the first real delete.
 
-### Phase 2: browse instead of pasting ids
+### Phase 2: browse and moderate (hide first, delete second)
 
-- [ ] `/admin` becomes a dashboard: counts (the `counts` query already exists but isn't shown), the newest submissions (moderation feed), and a thumb health summary.
-- [ ] `/admin/sections` and `/admin/corpses`: paginated grids (cursor-based, `select()`-masked: summaries only), filter by type, artist, hidden and date, search by title/artist prefix, newest first.
-- [ ] Detail drawer per item: the drawing rendered from data next to the stored thumb (mismatch is obvious at a glance), metadata, links to the public page, related corpses/sections, and all actions.
-- [ ] Multi-select + bulk actions (hide, delete, regenerate thumb) and artist-level actions ("everything by this artist").
-- [ ] Keyboard: `j`/`k` move, `h` hide, `r` regenerate, `⌫` delete (with confirm), `/` search.
-- [ ] Paste an id or a public URL into search to jump straight to an item (keeps the current workflow fast).
+- [x] Data: `hidden: boolean` on sections and corpses; corpses also get `hiddenBy` (`manual` or `section:<id>`). Every public read filters hidden: lists/random via `Records.visible()` (`where hidden == false`), `Sections.get`/`Corpses.get` treat hidden as not found unless `{ includeHidden }`, featured-in filters in code. New saves and admin-made corpses write `hidden: false`.
+- [x] `Admin.setHidden`: hiding a section hides every visible corpse it's in (`hiddenBy: section:<id>`); unhiding it unhides only those. Hiding runs `forgetThumbs` (Blobs + CDN purge). Pages self-heal within ~60 s (decided purge scope).
+- [x] `/thumbs`: hidden → 404 publicly; admins get it rendered with `private, no-store` and it's never written to Blobs, so the Blobs-first lookup can't leak it.
+- [x] Admin UI (`routes/admin/`: `+page.svelte`, `browser.svelte`, `item-panel.svelte`, `admin-items.ts`): site mode on top; browser with sections/corpses, all/visible/hidden, newest/likes, type, search (title/artist/id, or a pasted public link); a grid of thumbs (hidden dimmed + badge); multi-select + bulk hide/unhide (≤100 ids per call); keyboard `j/k` move, `enter` open, `x` select, `h` hide/unhide, `/` search, `esc` close. The item panel has meta, related corpses/sections (click to open), artist → filters by artist, public link, hide/unhide, make corpse + download paths (sections), re-render thumb (corpses), delete with preview. Old id-paste forms removed; reset likes + sign out under "tools".
+- [x] Browse loads all summaries (`Admin.summaries`, no drawings, ~0.2 KB each) and filters client-side: no index per filter combination. Revisit past a few thousand docs.
+- [x] Scripts (`packages/scripts`): `pnpm indexes [db]` (6 composite indexes), `pnpm migrate:hidden [-- --write]` (idempotent, dry run by default), `pnpm copy:database` (prod → named DB, refuses the default). `FIRESTORE_DATABASE_ID` selects a named database in `Client.db()`.
+- [x] Verified on fixtures (keyboard hide, cascade, unhide, pasted-link search, bulk) and on **`ecc-staging`** (a copy of production in the same project): indexes built READY; migration 485 updated then 0 on re-run; every public query shape works (gallery corpses/top/mid/bot × date/likes, home random, draw random siblings, section page incl. more-by-artist); hiding real section `5HNVUa4bAsDiTPJkGj5r` → it and its 2 corpses 404 publicly (pages + thumb), gallery drops them, others unaffected; unhide restores. Production untouched throughout (dry run: 485 missing `hidden`).
+- [ ] **Production rollout, in order:**
+  1. `pnpm --filter @ecc/scripts indexes` and wait until `gcloud firestore indexes composite list --project=exquisite-corpse-club` shows all READY. Additive; current queries are unaffected.
+  2. `pnpm --filter @ecc/scripts migrate:hidden -- --write`. Adds `hidden: false`; the live code ignores it.
+  3. Ship (fast-forward `firestore`, push, wait for the deploy).
+  4. `pnpm --filter @ecc/scripts migrate:hidden -- --write` again: catches drawings saved by the old code between steps 2 and 3 (they'd be invisible otherwise).
+  5. `gcloud firestore databases delete --database=ecc-staging --project=exquisite-corpse-club`.
+- [ ] Follow-ups: the item panel's delete preview could show which corpses are hidden; the draw page's section-picker buttons have no accessible names (screen readers announce empty buttons); a `report` button (Open question 3).
 
 ### Phase 3a: server-rendered thumbs (decided 2026-11-26, do first)
 
