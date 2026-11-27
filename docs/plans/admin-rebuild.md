@@ -1,10 +1,10 @@
 # Admin rebuild
 
-**Status:** in-progress: Phases 1, 2, 3a and the budget gate shipped; Phase 4 shipped (`dd0c7ef`). Updated 2026-11-27.
+**Status:** in-progress: all planned phases shipped; two production checks and the optional report button remain. Updated 2026-11-27.
 
 ## Resume here
 
-Phase 4 shipped 2026-11-27 (`dd0c7ef`). Production check: home/gallery/draw 200, `/admin` → login, picker aria-labels live. Next, in /admin: run the data check and "repair references" (production has 9 sections listing 4 deleted corpses; see Phase 4). Open check, still: first real hide/delete should 404 its thumb.
+Everything planned has shipped (Phase 4: `dd0c7ef`, 2026-11-27). Left, both done by Martin in /admin: (1) data check → "repair references" (see Phase 4); (2) hide any item and confirm its public thumb URL 404s, then undo. Optional, undecided: the report button (Open question 3).
 
 ## Steps
 
@@ -27,7 +27,7 @@ Phase 4 shipped 2026-11-27 (`dd0c7ef`). Production check: home/gallery/draw 200,
 - [x] Fixed `vite dev` crashing in the dependency optimizer on the `@napi-rs/canvas` binary (a regression from Phase 3a, only seen when Vite's cache is rebuilt): excluded it from `optimizeDeps` and `ssr.optimizeDeps`.
 - [x] Removed `Sections.remove` (unused; admin deletes go through `Admin.*`).
 - [x] Shipped 2026-11-26 (`340566c`). Production check: all pages 200, `/admin` → login, thumbs render, a wrong password → 401 through the new lockout path.
-- [ ] Verify purge + Blobs cleanup on the first real delete.
+- [ ] Verify purge + Blobs cleanup on the first real hide or delete (both call `forgetThumbs`).
 
 ### Phase 2: browse and moderate (hide first, delete second)
 
@@ -44,7 +44,7 @@ Phase 4 shipped 2026-11-27 (`dd0c7ef`). Production check: home/gallery/draw 200,
   3. Ship (fast-forward `firestore`, push, wait for the deploy).
   4. `pnpm --filter @ecc/scripts migrate:hidden -- --write` again: catches drawings saved by the old code between steps 2 and 3 (they'd be invisible otherwise).
   5. `gcloud firestore databases delete --database=ecc-staging --project=exquisite-corpse-club`.
-- [ ] Follow-ups: the item panel's delete preview could show which corpses are hidden; the draw page's section-picker buttons have no accessible names (screen readers announce empty buttons); a `report` button (Open question 3).
+- [x] Follow-ups: the delete preview marks hidden corpses and the section-picker buttons have accessible names (both in Phase 4). The `report` button is still Open question 3.
 
 ### Phase 3a: server-rendered thumbs (decided 2026-11-26, do first)
 
@@ -57,13 +57,12 @@ Phase 4 shipped 2026-11-27 (`dd0c7ef`). Production check: home/gallery/draw 200,
 - [x] Verified on draft deploys (live data, read-only): gallery 9/9 thumbs, no console errors. Timings: render miss 1.0–2.8 s (includes cold start + Firestore), Blobs hit ~0.46 s, durable-cache hit ~0.33 s, edge hit ~0.14 s.
 - [x] Shipped 2026-11-26 (`99d701a`). Production: all gallery thumbs are WebP via the Image CDN; home 0.85 s / corpse 0.69 s warm median after the deploy's cold start (3.9 s first hit).
 
-### Phase 3: thumbnail tools (replaces the node-canvas admin paths, audit #10)
+### Phase 3: thumbnail tools (closed 2026-11-27: superseded by Phase 3a)
 
-- [ ] **Regenerate section thumb from its drawing** in the browser (`drawingToThumb`, 540px WebP), and bump `thumbVersion` on sections too (only corpses bump it today). This is the fix for the striped thumbs: `5HNVUa4bAsDiTPJkGj5r`'s stored thumb is stripes while its drawing is fine, so "update thumb" on a corpse, which restacks section thumbs, can't fix it.
-- [ ] **Recompose corpse thumb from the three drawings** (`corpseToThumb`), not from section thumbs.
-- [ ] **Health scan:** for each section, render the drawing at ~64px, decode the stored thumb at the same size, and flag large differences (broken, striped, blank, mismatched). Runs in the browser in batches; results are listed with one-click regenerate.
-- [ ] **Backfill job:** regenerate every legacy 1080px PNG thumb as 540px WebP (247 sections + 238 corpses at time of writing). Client-driven chunks of ~10 ids per command, so no request gets near Netlify's function timeout. Resumable (skips items whose `thumbVersion` is newer than the job start) with a progress bar and pause. Afterwards the Image CDN step in `lib/thumbs.ts` becomes optional.
-- [ ] Then delete `Drawing.composeThumbs`, `Corpses.rebuildThumb`'s server path, and the `canvas` dependency (audit #10).
+Thumbs render from drawings, so there are no stored thumbs to regenerate.
+
+- [x] Not needed: section regenerate, corpse recompose, health scan, legacy backfill. Both known striped corpses (`JQT4p3gLjQ7YuT7WzJxu`, `ktzR92nJQi8UJZxZeS9v`) render correctly in production's render path (the latter checked 2026-11-27).
+- [x] Cleanup (done in 3a): `composeThumbs` and node-canvas are gone from `app` and `firestore`; `Corpses.rebuildThumb` only bumps `thumbVersion` ("re-render thumb"). `canvas` remains in the unused atproto `core` package.
 
 ### Phase 4: data hygiene and bulk ops
 
@@ -102,4 +101,20 @@ Phase 4 shipped 2026-11-27 (`dd0c7ef`). Production check: home/gallery/draw 200,
 
 The current `/admin` is one page with id text fields for six actions: make corpse, delete corpse, update corpse thumb, delete section, download paths, reset all likes. There's no way to see what's in the database without opening public pages and copying ids from URLs. Moderation is a real need: offensive names and drawings do show up. Auth is a shared password plus an HMAC-signed cookie (`lib/server/admin.ts`).
 
-Related: `docs/perf-audit.md` items #10 (node-canvas) and #14 (bulk ops) are folded into Phases 3 and 4.
+The 2026-11-26 performance audit (formerly `docs/perf-audit.md`; full text in git history at `c7528ca`) is finished. Its "#10" and "#14" became Phases 3a and 4.
+
+## Carried over from the perf audit
+
+Production, gzipped HTML, before → after: `/` 322 → 20 KB, `/gallery` 1,418 → 4 KB, corpse 210 → 25 KB, section 292 → 7 KB.
+
+For the atproto version:
+
+- Serve thumbs from a caching route on our domain, keyed by blob: `/thumbs/{did}/{cid}` proxying `com.atproto.sync.getBlob`. The CID replaces `?v=`. Only `lib/thumbs.ts` builds thumb URLs.
+- Records must hold real `blob` refs, not CID strings (`CorpseRecordSchema.renderedBlob` at audit time), or the PDS garbage-collects the blob.
+- Don't carry the client-uploaded `corpseThumb` over; compose at view time.
+- Build pagination around cursors, and make likes records instead of a `likedBy` array. Both were skipped on Firestore.
+
+Don't retry without new evidence:
+
+- Merging legacy path segments changes pixels (0.01–1.85% across 16 drawings) for little size gain.
+- Firestore `preferRest` made the 3-drawing corpse page ~2x slower (shipped, then reverted in `02eb67b`). Measure the heaviest read path.
