@@ -3,6 +3,7 @@ import { error } from "@sveltejs/kit";
 import * as v from "valibot";
 import { Likes } from "@ecc/firestore";
 import { COOKIE_OPTIONS, GUEST_TOKEN_COOKIE } from "#lib/draw/state.svelte.ts";
+import { requireWritable } from "#lib/server/writable.ts";
 
 const LikeTarget = v.object({
   collection: v.picklist(["sections", "corpses"]),
@@ -20,6 +21,7 @@ export const getLikeState = query(LikeTarget, async (input) => {
 
 /** Toggles a like for the current guest cookie and returns the new state. */
 export const toggleLike = command(LikeTarget, async (input) => {
+  await requireWritable();
   const event = getRequestEvent();
   let liker = event.cookies.get(GUEST_TOKEN_COOKIE);
 

@@ -6,6 +6,7 @@ import { Sections } from "@ecc/firestore";
 import { DrawingDataSchema, SectionTypeSchema, type DrawingData } from "@ecc/lexicons";
 import type { SectionType } from "@ecc/firestore";
 import { COOKIE_OPTIONS, GUEST_HANDLE_COOKIE } from "#lib/draw/state.svelte.ts";
+import { requireWritable } from "#lib/server/writable.ts";
 
 const SIBLING_TYPES: Record<SectionType, SectionType[]> = {
   top: ["mid", "bot"],
@@ -58,6 +59,7 @@ const SaveInput = v.object({
 });
 
 export const saveDrawing = command(SaveInput, async (input) => {
+  await requireWritable();
   const event = getRequestEvent();
   const artist =
     input.artist.trim() ||

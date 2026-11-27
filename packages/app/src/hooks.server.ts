@@ -22,16 +22,16 @@ const PUBLIC_CACHE = {
   "netlify-cdn-cache-control": "public, s-maxage=60, stale-while-revalidate=600, durable",
 };
 
-/** Remote commands that write data; refused while the site is read-only. */
-const WRITE_COMMANDS = new Set(["saveDrawing", "toggleLike"]);
-
 /**
  * Always reachable, whatever the mode: admin (to reopen), the budget hook and
  * thumbs. Signed-in admins bypass the gate entirely, so they can check the
  * site while it's closed.
+ *
+ * Goes by the requested URL, not `event.url`: for remote calls SvelteKit sets
+ * that to the calling page, from a header the client controls.
  */
 function isExempt(event: Parameters<Handle>[0]["event"]): boolean {
-  const { pathname } = event.url;
+  const { pathname } = new URL(event.request.url);
   return (
     pathname.startsWith("/admin") ||
     pathname === "/api/budget" ||
@@ -47,9 +47,12 @@ function remoteName(pathname: string): string | null {
 
 function isPublic(event: Parameters<Handle>[0]["event"]): boolean {
   if (event.request.method !== "GET") return false;
-  if (event.route.id && PUBLIC_ROUTES.has(event.route.id)) return true;
 
-  return PUBLIC_QUERIES.has(remoteName(event.url.pathname) ?? "");
+  // A remote call is judged by its own name, whatever page it claims to be from.
+  const remote = remoteName(new URL(event.request.url).pathname);
+  if (remote !== null) return PUBLIC_QUERIES.has(remote);
+
+  return !!event.route.id && PUBLIC_ROUTES.has(event.route.id);
 }
 
 export const handle: Handle = async ({ event, resolve }) => {
@@ -59,13 +62,11 @@ export const handle: Handle = async ({ event, resolve }) => {
     redirect(301, `https://exquisitecorpse.club${event.url.pathname}${event.url.search}`, { external: true });
   }
 
-  // Site mode gate: closed serves a holding page; read-only refuses writes.
+  // Site mode gate: closed serves a holding page. Read-only is enforced by the
+  // write commands themselves (`requireWritable`).
   if (!isExempt(event)) {
     const state = await getSiteState(event.platform);
     if (state.mode === "closed") return closedPage(state);
-    if (state.mode === "read-only" && WRITE_COMMANDS.has(remoteName(event.url.pathname) ?? "")) {
-      return new Response("drawing is paused", { status: 503, headers: { "retry-after": "3600" } });
-    }
   }
 
   // The draw page shows this as the default artist name. Other pages don't
