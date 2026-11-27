@@ -1,10 +1,10 @@
 # Admin rebuild
 
-**Status:** in-progress: Phases 1, 2, 3a and the budget gate shipped; Phase 3 leftovers and Phase 4 not started. Updated 2026-11-26.
+**Status:** in-progress: Phases 1, 2, 3a and the budget gate shipped; Phase 4 built on `feat/admin-phase4`, not shipped. Updated 2026-11-26.
 
 ## Resume here
 
-Phase 2 rolled out to production (`21885f3`). Open checks: the first real delete or hide should 404 its thumb (purge + Blobs cleanup has only run locally). Next options: Phase 2 follow-ups (bottom of Phase 2), what's left of Phase 3 (the health scan is mostly moot now that thumbs render from drawings), or Phase 4 (integrity check, audit log + undo, rewrite `resetAll`/`clearFeaturedInRefs`).
+Phase 4 is on `feat/admin-phase4` (worktree `../exquisite-corpse-p4`), tested with fixtures; draft https://6b09272a6d04d4a06775760b--exquisite-corpse-club.netlify.app builds and serves. Next: Martin ships it. Then, in /admin: run the data check and "repair references" (production has 9 sections listing 4 deleted corpses; see Phase 4). Open check, still: first real hide/delete should 404 its thumb.
 
 ## Steps
 
@@ -67,10 +67,13 @@ Phase 2 rolled out to production (`21885f3`). Open checks: the first real delete
 
 ### Phase 4: data hygiene and bulk ops
 
-- [ ] Rewrite `Likes.resetAll` and `Admin.clearFeaturedInRefs`: today they read every full document (drawings included) and put all writes in one batch, which fails past 500 docs (we have 247/238, so not yet). Use `.select()` with no fields plus `BulkWriter`, client-driven in chunks like the backfill. Or drop "reset all likes" (Open question 4).
-- [ ] `Admin.removeSection` deletes its corpses one at a time; make it one batch (≤500 ops is plenty here).
-- [ ] Integrity check: corpses pointing at missing sections, `featuredIn` refs to missing corpses, sections with no corpse. List them, with fix-up actions.
-- [ ] Audit log: an `adminActions` collection (`{ at, action, ids, before? }`), shown on the dashboard, with undo for hide/unhide and thumb regenerations (keep the previous thumb in `before`).
+- [x] `Likes.resetAll` reads ids only (`select()`) and writes via `BulkWriter`: no 500-write batch limit, no drawings read. `Admin.clearFeaturedInRefs` deleted (unused). `Admin.removeSection` was already one batch (Phase 1).
+- [x] Integrity check (`Integrity.check`, `firestore/src/integrity.ts`): `featuredIn` mismatches (auto-repairable: `Integrity.repair` rewrites each to exactly the corpses that use the section, oldest first), broken corpse panels (missing or wrong-type section; listed, never auto-fixed), sections in no corpse (info). In /admin as "data check" (runs on demand) with "repair references"; ids open in the browser. CLI: `pnpm --filter @ecc/scripts integrity` (read-only).
+  - Production at 2026-11-26 (read-only run): 247 sections / 238 corpses; **9 sections list 4 corpses that no longer exist** (harmless: lookups skip missing docs); 0 broken panels; 2 unused sections.
+- [x] Audit log (`Audit`, `firestore/src/audit.ts`, collection `adminActions`): every admin mutation is recorded (hide, unhide, delete with cascade, make corpse, re-render thumb, site mode, reset likes, repair refs). Best-effort: a log failure never fails the action. /admin "recent activity" shows the last 50; ids open in the browser; **undo** for hide/unhide (re-applies the opposite through the same path, so cascades and thumb cleanup match), linked both ways (`undoes`/`undoneBy`). Deletes are logged but not undoable.
+- [x] Follow-ups from Phase 2: section-picker buttons have `aria-label`s ("draw the top/middle/bottom"); the delete preview marks corpses that are already hidden.
+- [x] Verified with fixtures: hide → logged → undo → logged + marked undone; reveal from the log; clean check; a fixture-made mismatch (2 sections) → repair → 0, logged. Draft deploy: public pages + `/admin/login` 200, picker labels present.
+- [ ] Ship, then run the data check + repair on production from /admin.
 
 ## Decisions
 
