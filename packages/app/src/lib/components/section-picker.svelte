@@ -28,7 +28,11 @@
   <div class="mw-canvas">
     {#each sections as section (section.type)}
       <Panel class="section-template mt" color="blue" interactive noPadding>
-        <button class="section-button" onclick={() => onpick(section.type)}>
+        <button
+          class="section-button"
+          aria-label={`draw the ${section.label}`}
+          onclick={() => onpick(section.type)}
+        >
           <span class="meta-box">
             <span class="info">{section.label}</span>
           </span>

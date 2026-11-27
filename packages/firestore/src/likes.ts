@@ -72,18 +72,24 @@ export async function state(input: {
   return snap ? Records.toLikeState(snap, input.liker) : { likes: 0, liked: false };
 }
 
-/** Admin helper: zero out likes on every corpse and section. */
-export async function resetAll(): Promise<true | FirestoreError> {
-  if (Fixtures.enabled()) return true;
+/**
+ * Admin helper: zero out likes on every corpse and section. Reads only document
+ * ids (no drawings) and writes through a BulkWriter, so it isn't bound by the
+ * 500-write batch limit.
+ */
+export async function resetAll(): Promise<{ updated: number } | FirestoreError> {
+  if (Fixtures.enabled()) return { updated: 0 };
 
   try {
-    const batch = db().batch();
+    const writer = db().bulkWriter();
+    let updated = 0;
     for (const collection of ["corpses", "sections"] as const) {
-      const snap = await db().collection(collection).get();
-      snap.forEach((doc) => batch.update(doc.ref, { likes: 0, likedBy: [] }));
+      const snap = await db().collection(collection).select().get();
+      for (const doc of snap.docs) void writer.update(doc.ref, { likes: 0, likedBy: [] });
+      updated += snap.size;
     }
-    await batch.commit();
-    return true;
+    await writer.close();
+    return { updated };
   } catch (cause) {
     return new FirestoreError({ cause });
   }

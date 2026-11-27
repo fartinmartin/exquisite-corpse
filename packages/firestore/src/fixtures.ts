@@ -3,6 +3,7 @@ export * as Fixtures from "./fixtures.js";
 import type { DrawingData } from "@ecc/lexicons";
 import type { CorpseRecord, SectionRecord } from "./records.js";
 import type { Collection, Corpse, Section, SectionType, SectionWithDrawing } from "./types.js";
+import type { Entry as AuditEntry, NewEntry as NewAuditEntry } from "./audit.js";
 import { Drawing } from "./drawing.js";
 import { SECTION_TYPES } from "./types.js";
 
@@ -409,4 +410,29 @@ export function setHidden(collection: "sections" | "corpses", id: string, hidden
     }
   }
   return changed;
+}
+
+/** In-memory audit log (newest first). */
+const actions: AuditEntry[] = [];
+
+export function recordAction(entry: NewAuditEntry): string {
+  const id = `act_fixture_${actions.length}`;
+  actions.unshift({ ...entry, id, at: new Date().toISOString() });
+  return id;
+}
+
+export function recentActions(limit: number): AuditEntry[] {
+  return actions.slice(0, limit);
+}
+
+export function markActionUndone(id: string, undoneBy: string): true {
+  const entry = actions.find((item) => item.id === id);
+  if (entry) entry.undoneBy = undoneBy;
+  return true;
+}
+
+export function setFeaturedIn(sectionId: string, corpseIds: string[]): void {
+  seed();
+  const record = store.sections.find((entry) => entry.id === sectionId);
+  if (record) record.featuredIn = [...corpseIds];
 }

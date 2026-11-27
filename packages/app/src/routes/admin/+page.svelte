@@ -3,7 +3,10 @@
   import Button from "#lib/components/button.svelte";
   import Panel from "#lib/components/panel.svelte";
   import type { SiteMode } from "#lib/site-mode.ts";
+  import type { Collection } from "@ecc/firestore";
+  import Activity from "./activity.svelte";
   import Browser from "./browser.svelte";
+  import Integrity from "./integrity.svelte";
   import { resetLikes, setSiteMode, siteMode } from "./admin.remote";
 
   const MODES: { mode: SiteMode; color: "green" | "yellow" | "red" }[] = [
@@ -14,6 +17,11 @@
 
   const site = $derived(await siteMode());
   let message = $state<string | null>(null);
+  let browser = $state<ReturnType<typeof Browser>>();
+
+  function reveal(collection: Collection, id: string) {
+    browser?.reveal(collection, id);
+  }
 
   async function run(action: () => Promise<string>) {
     message = null;
@@ -35,8 +43,8 @@
   function reset() {
     if (!confirm("reset likes on every corpse and section?")) return;
     return run(async () => {
-      await resetLikes();
-      return "likes reset";
+      const { updated } = await resetLikes();
+      return `likes reset on ${updated} drawings`;
     });
   }
 </script>
@@ -64,7 +72,11 @@
     </div>
   </Panel>
 
-  <Browser />
+  <Browser bind:this={browser} />
+
+  <Activity onreveal={reveal} />
+
+  <Integrity onreveal={reveal} />
 
   <details class="tools">
     <summary>tools</summary>

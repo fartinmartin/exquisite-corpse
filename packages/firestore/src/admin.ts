@@ -123,19 +123,6 @@ export async function removeCorpse(id: string): Promise<true | AdminError> {
   }
 }
 
-/** Removes the `featuredIn` back-reference from every section. */
-export async function clearFeaturedInRefs(): Promise<true | FirestoreError> {
-  try {
-    const snap = await db().collection("sections").get();
-    const batch = db().batch();
-    snap.forEach((doc) => batch.update(doc.ref, { featuredIn: FieldValue.delete() }));
-    await batch.commit();
-    return true;
-  } catch (cause) {
-    return new FirestoreError({ cause });
-  }
-}
-
 /** Returns the raw legacy path commands for a section (admin export). */
 export async function sectionDrawing(id: string): Promise<unknown | NotFoundError> {
   const snap = await Records.loadOne("sections", id, ["drawing"]);

@@ -6,6 +6,8 @@ export * as Admin from "./admin.js";
 export * as Client from "./client.js";
 export * as Records from "./records.js";
 export * as Thumbs from "./thumbs.js";
+export * as Integrity from "./integrity.js";
+export * as Audit from "./audit.js";
 
 export type {
   SectionType,

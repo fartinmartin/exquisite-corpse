@@ -65,6 +65,21 @@
     });
   }
 
+  /**
+   * Opens an item from outside the browser (activity log, data check): shows
+   * its collection with every filter cleared and opens it in the panel.
+   */
+  export function reveal(target: Collection, id: string) {
+    filter(() => {
+      collection = target;
+      visibility = "all";
+      type = "all";
+      search = "";
+    });
+    open = { collection: target, id };
+    document.querySelector(".workspace")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
   function openAt(index: number) {
     const item = shown[index];
     if (item) open = { collection, id: item.id };

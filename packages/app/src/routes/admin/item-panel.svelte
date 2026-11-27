@@ -193,7 +193,10 @@
             <img src={adminThumb("sections", pendingDelete.section)} alt={pendingDelete.section.title} />
           {/if}
           {#each pendingDelete.corpses as corpse (corpse.id)}
-            <img src={adminThumb("corpses", corpse)} alt={corpse.title} />
+            <figure>
+              <img src={adminThumb("corpses", corpse)} alt={corpse.title} />
+              {#if corpse.hidden}<figcaption>already hidden</figcaption>{/if}
+            </figure>
           {/each}
         </div>
         <div class="actions">
@@ -290,6 +293,11 @@
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
     gap: 0.5rem;
+  }
+
+  figure figcaption {
+    font-size: 0.75rem;
+    opacity: 0.7;
   }
 
   .message {

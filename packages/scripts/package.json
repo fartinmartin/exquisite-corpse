@@ -7,7 +7,8 @@
     "convert:drawings": "tsx src/convert-legacy-drawings.ts",
     "migrate:hidden": "varlock run --path ../app/ -- tsx src/migrate-hidden.ts",
     "copy:database": "varlock run --path ../app/ -- tsx src/copy-to-database.ts",
-    "indexes": "sh src/firestore-indexes.sh"
+    "indexes": "sh src/firestore-indexes.sh",
+    "integrity": "varlock run --path ../app/ -- tsx src/integrity.ts"
   },
   "dependencies": {
     "@ecc/firestore": "workspace:*",
