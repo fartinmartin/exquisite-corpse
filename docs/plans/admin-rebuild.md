@@ -1,10 +1,10 @@
 # Admin rebuild
 
-**Status:** in-progress: Phases 1, 2, 3a and the budget gate shipped; Phase 4 built on `feat/admin-phase4`, not shipped. Updated 2026-11-26.
+**Status:** in-progress: Phases 1, 2, 3a and the budget gate shipped; Phase 4 shipped (`dd0c7ef`). Updated 2026-11-27.
 
 ## Resume here
 
-Phase 4 is on `feat/admin-phase4` (worktree `../exquisite-corpse-p4`), tested with fixtures; draft https://6b09272a6d04d4a06775760b--exquisite-corpse-club.netlify.app builds and serves. Next: Martin ships it. Then, in /admin: run the data check and "repair references" (production has 9 sections listing 4 deleted corpses; see Phase 4). Open check, still: first real hide/delete should 404 its thumb.
+Phase 4 shipped 2026-11-27 (`dd0c7ef`). Production check: home/gallery/draw 200, `/admin` → login, picker aria-labels live. Next, in /admin: run the data check and "repair references" (production has 9 sections listing 4 deleted corpses; see Phase 4). Open check, still: first real hide/delete should 404 its thumb.
 
 ## Steps
 
@@ -73,7 +73,8 @@ Phase 4 is on `feat/admin-phase4` (worktree `../exquisite-corpse-p4`), tested wi
 - [x] Audit log (`Audit`, `firestore/src/audit.ts`, collection `adminActions`): every admin mutation is recorded (hide, unhide, delete with cascade, make corpse, re-render thumb, site mode, reset likes, repair refs). Best-effort: a log failure never fails the action. /admin "recent activity" shows the last 50; ids open in the browser; **undo** for hide/unhide (re-applies the opposite through the same path, so cascades and thumb cleanup match), linked both ways (`undoes`/`undoneBy`). Deletes are logged but not undoable.
 - [x] Follow-ups from Phase 2: section-picker buttons have `aria-label`s ("draw the top/middle/bottom"); the delete preview marks corpses that are already hidden.
 - [x] Verified with fixtures: hide → logged → undo → logged + marked undone; reveal from the log; clean check; a fixture-made mismatch (2 sections) → repair → 0, logged. Draft deploy: public pages + `/admin/login` 200, picker labels present.
-- [ ] Ship, then run the data check + repair on production from /admin.
+- [x] Shipped 2026-11-27 (`dd0c7ef`, fast-forward; no new indexes needed: the audit log only orders by `at`).
+- [ ] Run the data check + repair on production from /admin.
 
 ## Decisions
 
