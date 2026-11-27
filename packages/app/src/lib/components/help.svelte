@@ -78,8 +78,10 @@
     }
   }
 
-  :global(.section),
-  :global(.step) {
+  /* Scoped under .help-wrap: the panels are child components, and bare
+     :global(.section) would leak to every page that ships this stylesheet. */
+  .help-wrap :global(.section),
+  .help-wrap :global(.step) {
     height: 91px;
 
     @media screen and (max-width: 765px) {
@@ -87,12 +89,12 @@
     }
   }
 
-  :global(.section) {
+  .help-wrap :global(.section) {
     width: 272px;
     overflow: hidden;
   }
 
-  :global(.step) {
+  .help-wrap :global(.step) {
     display: grid;
     place-items: center;
     text-align: center;
@@ -107,11 +109,11 @@
     }
   }
 
-  :global(.step:last-child .content) {
+  .help-wrap :global(.step:last-child .content) {
     justify-content: stretch;
   }
 
-  :global(.step:last-child .content > *) {
+  .help-wrap :global(.step:last-child .content > *) {
     width: 50%;
   }
 

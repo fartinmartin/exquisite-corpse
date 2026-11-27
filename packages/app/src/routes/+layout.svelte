@@ -10,6 +10,8 @@
 
   const isIndex = $derived(page.route.id === "/");
   const busy = $derived(navigating.to !== null);
+  // /fresh has its own chrome (header, about, brush cursor).
+  const fresh = $derived(page.route.id?.startsWith("/fresh") ?? false);
 
   $effect(() => {
     const html = document.documentElement;
@@ -17,7 +19,7 @@
   });
 </script>
 
-{#if !isIndex}
+{#if !isIndex && !fresh}
   <Nav />
 {/if}
 
@@ -27,8 +29,10 @@
 
 {@render children()}
 
-{#if help.open}
+{#if help.open && !fresh}
   <Help />
 {/if}
 
-<Cursor />
+{#if !fresh}
+  <Cursor />
+{/if}

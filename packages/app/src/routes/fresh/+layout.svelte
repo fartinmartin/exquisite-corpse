@@ -1,0 +1,332 @@
+<script lang="ts">
+  import { page } from "$app/state";
+  import DoodleField from "./doodle-field.svelte";
+  import { doodles as doodleState } from "./doodle-settings.svelte.ts";
+  import { doodles } from "./doodles.remote";
+
+  let { children } = $props();
+
+  const field = $derived(await doodles());
+
+  let about = $state(false);
+
+  const links = [
+    { href: "/fresh/draw", label: "draw" },
+    { href: "/fresh/look", label: "look" },
+  ];
+
+  // Doodles give a small shuffle on every tap or click.
+  function tapped() {
+    doodleState.nudge();
+  }
+</script>
+
+<svelte:window onpointerdown={tapped} />
+
+<svelte:head>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link
+    rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap"
+  />
+</svelte:head>
+
+<div class="fresh">
+  <DoodleField doodles={field} />
+
+  <header>
+    <a class="mark" href="/fresh">exquisite corpse club</a>
+    <nav>
+      {#each links as link (link.href)}
+        <a class="squiggle" href={link.href} aria-current={page.url.pathname.startsWith(link.href) ? "page" : undefined}>
+          {link.label}
+        </a>
+      {/each}
+      <button type="button" class="squiggle" aria-expanded={about} onclick={() => (about = !about)}>?</button>
+    </nav>
+  </header>
+
+  {#if about}
+    <p class="about">
+      three people each draw a third of a creature.<br />
+      you only see where the others' lines cross the fold.<br />
+      then it unfolds.
+    </p>
+  {/if}
+
+  <div class="content">
+    {@render children()}
+  </div>
+</div>
+
+<style>
+  /*
+   * /fresh — a from-scratch take.
+   * One idea: a sheet of paper on a sky-blue desk, doodles drifting around it.
+   * One framed object per page (the paper). Everything else is plain type.
+   */
+  :global(html:has(.fresh)) {
+    --ink: #231f20;
+    --ink-soft: #6d7690;
+    --sky: #deebff;
+    --sky-line: #b9d0f7;
+    --blue: #0064ff;
+    --light-blue: #81b2ff;
+    --yellow: #fcda00;
+    --orange: #fb9200;
+    --red: #f44e3b;
+    --green: #a4dd00;
+    --marker: rgba(252, 218, 0, 0.6);
+
+    --sans: "IBM Plex Sans", system-ui, sans-serif;
+    --mono: "IBM Plex Mono", ui-monospace, monospace;
+
+    /* the paper keeps the original signature: light-blue edge, blue hard shadow */
+    --tone-blue-border: var(--light-blue);
+    --tone-blue-shadow: var(--blue);
+    --crease: var(--light-blue);
+
+    /* tokens the shared paper/drawing components (lib/corpse, lib/draw) read */
+    --paper: #ffffff;
+    --fold-ink: var(--blue);
+    --surface-sunk: var(--sky);
+    --text-muted: var(--ink-soft);
+    --focus: var(--blue);
+    --tone-yellow-border: var(--yellow);
+    --font-ui: var(--mono);
+    --s-2: 8px;
+    --s-3: calc(40px / 3);
+    --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+    --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+
+    font-family: var(--sans);
+    color: var(--ink);
+    word-spacing: 0;
+  }
+
+  /* /fresh lays out its own page; drop the old site's padded, centred #app */
+  :global(html:has(.fresh) #app) {
+    display: block;
+    /* place-items also centres (and shrinks) block children in current browsers */
+    place-items: normal;
+    padding: 0;
+    min-height: 100vh;
+  }
+
+  /* zero-specificity base, so page styles always win */
+  :global(:where(.fresh) :where(h1, h2, h3)) {
+    font-size: inherit;
+    line-height: 1.2;
+  }
+
+  :global(:where(.fresh) :where(p)) {
+    line-height: 1.5;
+  }
+
+  .fresh {
+    position: relative;
+    min-height: 100vh;
+  }
+
+  header,
+  .about,
+  .content {
+    position: relative;
+    z-index: 1;
+  }
+
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 24px;
+    padding: 24px clamp(20px, 4vw, 48px);
+  }
+
+  .mark {
+    font-weight: 600;
+    font-size: 1rem;
+    text-decoration: none;
+    letter-spacing: -0.01em;
+  }
+
+  nav {
+    display: flex;
+    gap: 20px;
+    font-family: var(--mono);
+    font-size: 0.875rem;
+  }
+
+  /* the page you're on keeps its squiggle in blue */
+  nav a[aria-current="page"],
+  nav button[aria-expanded="true"] {
+    color: var(--blue);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='4' viewBox='0 0 16 4'%3E%3Cpath d='M0 2 Q 4 0.2 8 2 T 16 2' fill='none' stroke='%230064ff' stroke-width='1.4' stroke-linecap='round'/%3E%3C/svg%3E");
+  }
+
+  .about {
+    margin: -8px clamp(20px, 4vw, 48px) 0 auto;
+    width: max-content;
+    max-width: calc(100% - 40px);
+    font-family: var(--mono);
+    font-size: 0.8125rem;
+    line-height: 1.7;
+    text-align: right;
+    color: var(--ink-soft);
+  }
+
+  .content {
+    padding: 0 clamp(20px, 4vw, 48px) 96px;
+  }
+
+  /* shared bits for the /fresh pages */
+  .fresh :global(.mono) {
+    font-family: var(--mono);
+    font-size: 0.8125rem;
+    color: var(--ink-soft);
+  }
+
+  /*
+   * Links and buttons, one job each:
+   *   .hl        the one thing to do next: a hand-drawn highlighter (see ui/marks.ts)
+   *   .squiggle  takes you somewhere: a pencil underline
+   *   .stamp     does something right here: a crooked ink stamp
+   */
+  .fresh :global(.hl) {
+    position: relative;
+    isolation: isolate;
+    display: inline-flex;
+    align-items: center;
+    padding: 0 3px;
+    font-weight: 500;
+    color: var(--ink);
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  .fresh :global(.hl::before) {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    left: -4px;
+    right: -6px;
+    bottom: 0.05em;
+    height: 0.55em;
+    background: var(--yellow);
+    opacity: 0.7;
+    border-radius: var(--radius, 6px 3px 8px 4px);
+    rotate: var(--r, -1deg);
+    transition: height 200ms cubic-bezier(0.23, 1, 0.32, 1);
+  }
+
+  .fresh :global(.hl:hover),
+  .fresh :global(.hl:focus-visible) {
+    color: var(--ink);
+    outline: none;
+  }
+
+  .fresh :global(.hl:not(:disabled):hover::before),
+  .fresh :global(.hl:focus-visible::before) {
+    height: 1.15em;
+  }
+
+  .fresh :global(.hl:disabled) {
+    opacity: 0.35;
+  }
+
+  .fresh :global(.squiggle) {
+    color: var(--ink);
+    text-decoration: none;
+    padding-bottom: 3px;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='4' viewBox='0 0 16 4'%3E%3Cpath d='M0 2 Q 4 0.2 8 2 T 16 2' fill='none' stroke='%236d7690' stroke-width='1.2' stroke-linecap='round'/%3E%3C/svg%3E")
+      repeat-x 0 100% / 16px 4px;
+  }
+
+  .fresh :global(.squiggle:hover),
+  .fresh :global(.squiggle:focus-visible) {
+    color: var(--blue);
+    outline: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='4' viewBox='0 0 16 4'%3E%3Cpath d='M0 2 Q 4 0.2 8 2 T 16 2' fill='none' stroke='%230064ff' stroke-width='1.4' stroke-linecap='round'/%3E%3C/svg%3E");
+    animation: squiggle 600ms linear infinite;
+  }
+
+  @keyframes squiggle {
+    to {
+      background-position-x: 16px;
+    }
+  }
+
+  .fresh :global(.stamp) {
+    display: inline-block;
+    padding: 3px 9px;
+    font-family: var(--mono);
+    font-size: 0.8125rem;
+    letter-spacing: 0.03em;
+    color: var(--blue);
+    text-decoration: none;
+    border: 1.5px solid rgba(0, 100, 255, 0.55);
+    border-radius: 3px;
+    rotate: var(--r, -2deg);
+    transition:
+      scale 120ms ease,
+      rotate 200ms cubic-bezier(0.34, 1.56, 0.64, 1),
+      color 150ms,
+      border-color 150ms,
+      background-color 150ms;
+  }
+
+  .fresh :global(.stamp:hover) {
+    color: var(--blue);
+    background: rgba(0, 100, 255, 0.06);
+  }
+
+  .fresh :global(.stamp:active) {
+    scale: 0.9;
+    rotate: calc(var(--r, -2deg) * -1);
+  }
+
+  .fresh :global(.stamp[data-done]) {
+    color: var(--red);
+    border-color: rgba(244, 78, 59, 0.6);
+    rotate: -6deg;
+  }
+
+  .fresh :global(.stamp:focus-visible) {
+    outline: 2px dashed var(--blue);
+    outline-offset: 3px;
+  }
+
+  .fresh :global(.arrow) {
+    width: 1.1em;
+    height: 0.6em;
+    margin-left: 0.2em;
+    flex: none;
+    overflow: visible;
+    transition: translate 200ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .fresh :global(.arrow[data-back]) {
+    margin: 0 0.2em 0 0;
+    scale: -1 1;
+  }
+
+  .fresh :global(.arrow path) {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .fresh :global(:is(a, button):not(:disabled):hover .arrow) {
+    translate: 4px 0;
+  }
+
+  .fresh :global(:is(a, button):not(:disabled):hover .arrow[data-back]) {
+    translate: -4px 0;
+  }
+
+  .fresh :global(a:hover) {
+    color: var(--blue);
+  }
+</style>

@@ -37,9 +37,10 @@ function dpr(): number {
  * white. The backing store is only reallocated when the size actually changes.
  */
 function prepare(canvas: HTMLCanvasElement) {
-  const rect = canvas.getBoundingClientRect();
-  const width = Math.max(1, Math.round(rect.width));
-  const height = Math.max(1, Math.round(rect.height));
+  // Layout size, not getBoundingClientRect: that one shrinks under CSS
+  // transforms (e.g. mid-unfold), which would bake a blurry low-res frame.
+  const width = Math.max(1, Math.round(canvas.clientWidth));
+  const height = Math.max(1, Math.round(canvas.clientHeight));
   const ratio = dpr();
   const backingWidth = Math.round(width * ratio);
   const backingHeight = Math.round(height * ratio);

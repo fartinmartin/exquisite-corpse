@@ -92,6 +92,11 @@
   });
 
   $effect(() => {
+    document.documentElement.classList.add("pixel-cursor");
+    return () => document.documentElement.classList.remove("pixel-cursor");
+  });
+
+  $effect(() => {
     window.addEventListener("mousemove", move, { passive: true });
     window.addEventListener("mousedown", down);
     window.addEventListener("mouseup", up);
@@ -131,7 +136,9 @@
 </div>
 
 <style lang="scss">
-  :global(html:not(.touch) *) {
+  /* Component CSS stays loaded after unmount (and ships with the root layout),
+     so only hide the system cursor while this component is actually mounted. */
+  :global(html.pixel-cursor:not(.touch) *) {
     cursor: none;
   }
 

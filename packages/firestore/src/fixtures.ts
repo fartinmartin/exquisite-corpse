@@ -1,5 +1,6 @@
 export * as Fixtures from "./fixtures.js";
 
+import { existsSync, readFileSync } from "node:fs";
 import type { DrawingData } from "@ecc/lexicons";
 import type { CorpseRecord, SectionRecord } from "./records.js";
 import type { Collection, Corpse, Section, SectionType, SectionWithDrawing } from "./types.js";
@@ -15,59 +16,130 @@ export function enabled(): boolean {
   return process.env.ECC_FIXTURES === "1";
 }
 
-function panelSvg(label: string, color: string): string {
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="360"><rect width="1080" height="360" fill="${color}"/><text x="540" y="200" font-family="monospace" font-size="90" text-anchor="middle" fill="#231f20">${label}</text></svg>`;
-  return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
-}
+type FixturePoint = { x: number; y: number; color: string; size: number };
 
-function corpseSvg(colors: string[]): string {
-  const rows = colors
-    .map((color, index) => `<rect y="${index * 360}" width="1080" height="360" fill="${color}"/>`)
-    .join("");
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1080">${rows}</svg>`;
-  return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
-}
+const INKS = ["#231f20", "#f44e3b", "#fe9200", "#0064ff", "#68ccca", "#aea1ff", "#fda1ff", "#86b500"];
 
-function drawingFor(type: SectionType): DrawingData {
-  const y = type === "top" ? 50 : type === "mid" ? 90 : 130;
-  return {
-    width: 540,
-    height: 180,
-    version: "fixture",
-    bgColor: "#ffffff",
-    paths: [
-      {
-        mode: "draw",
-        cap: "round",
-        join: "round",
-        tolerance: 30,
-        points: [
-          { x: 40, y, color: "#0064ff", size: 12 },
-          { x: 160, y: y - 60, color: "#0064ff", size: 12 },
-          { x: 300, y, color: "#f44e3b", size: 12 },
-          { x: 440, y: y + 40, color: "#f44e3b", size: 12 },
-        ],
-      },
-      {
-        mode: "draw",
-        cap: "round",
-        join: "round",
-        tolerance: 30,
-        points: [
-          { x: 220, y: y - 40, color: "#231f20", size: 8 },
-          { x: 250, y: y - 30, color: "#231f20", size: 8 },
-          { x: 280, y: y - 40, color: "#231f20", size: 8 },
-        ],
-      },
-      {
-        mode: "draw",
-        cap: "round",
-        join: "round",
-        tolerance: 30,
-        points: [{ x: 480, y: y + 30, color: "#fcda00", size: 40 }],
-      },
-    ],
+/** Small seeded PRNG so fixture drawings are varied but stable between reloads. */
+function prng(seed: number): () => number {
+  let a = seed + 0x6d2b79f5;
+  return () => {
+    a = (a + 0x6d2b79f5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
   };
+}
+
+function stroke(points: [number, number][], color: string, size: number) {
+  return {
+    mode: "draw" as const,
+    cap: "round" as const,
+    join: "round" as const,
+    tolerance: 30,
+    points: points.map(([x, y]): FixturePoint => ({ x: Math.round(x), y: Math.round(y), color, size })),
+  };
+}
+
+function wobble(rand: () => number, points: [number, number][], amount = 6): [number, number][] {
+  return points.map(([x, y]) => [x + (rand() - 0.5) * amount, y + (rand() - 0.5) * amount]);
+}
+
+function ellipse(cx: number, cy: number, rx: number, ry: number, steps = 18): [number, number][] {
+  return Array.from({ length: steps + 1 }, (_, i) => {
+    const t = (i / steps) * Math.PI * 2;
+    return [cx + Math.cos(t) * rx, cy + Math.sin(t) * ry];
+  });
+}
+
+/**
+ * A doodled creature part. Lines run off the top/bottom edges at roughly the
+ * same x positions for every section, so random combinations still "connect"
+ * across the folds — the way paper exquisite corpses do.
+ */
+function drawingFor(type: SectionType, seed = 0): DrawingData {
+  const rand = prng(seed * 31 + type.length * 7 + (type === "mid" ? 3 : 0));
+  const ink = () => INKS[Math.floor(rand() * INKS.length)];
+  const cx = 270 + (rand() - 0.5) * 30;
+  const paths = [];
+
+  if (type === "top") {
+    const rx = 60 + rand() * 60;
+    const ry = 45 + rand() * 25;
+    const cy = 95;
+    const line = ink();
+    paths.push(stroke(wobble(rand, ellipse(cx, cy, rx, ry)), line, 6));
+    // eyes
+    const eye = ink();
+    paths.push(stroke([[cx - rx * 0.4, cy - 10]], eye, 14 + rand() * 10));
+    paths.push(stroke([[cx + rx * 0.4, cy - 10]], eye, 14 + rand() * 10));
+    // mouth
+    paths.push(stroke(wobble(rand, [[cx - 25, cy + 20], [cx, cy + 30 + rand() * 10], [cx + 25, cy + 20]]), ink(), 5));
+    // hair / antenna
+    const hair = ink();
+    for (let i = 0; i < 4 + Math.floor(rand() * 5); i++) {
+      const hx = cx - rx * 0.7 + (i / 6) * rx * 1.4;
+      paths.push(stroke(wobble(rand, [[hx, cy - ry + 4], [hx + (rand() - 0.5) * 40, cy - ry - 25 - rand() * 20]]), hair, 4));
+    }
+    // neck crossing the fold
+    paths.push(stroke(wobble(rand, [[cx - 22, cy + ry - 2], [cx - 24, 180]], 3), line, 6));
+    paths.push(stroke(wobble(rand, [[cx + 22, cy + ry - 2], [cx + 24, 180]], 3), line, 6));
+  } else if (type === "mid") {
+    const line = ink();
+    const width = 90 + rand() * 70;
+    paths.push(stroke(wobble(rand, [[cx - 24, 0], [cx - 30, 20], [cx - width, 50], [cx - width + 20, 150], [cx - 55, 180]]), line, 6));
+    paths.push(stroke(wobble(rand, [[cx + 24, 0], [cx + 30, 20], [cx + width, 50], [cx + width - 20, 150], [cx + 55, 180]]), line, 6));
+    // arms
+    const arm = ink();
+    paths.push(stroke(wobble(rand, [[cx - width, 60], [cx - width - 60, 40 + rand() * 60], [cx - width - 110, 30 + rand() * 100]], 12), arm, 6));
+    paths.push(stroke(wobble(rand, [[cx + width, 60], [cx + width + 60, 40 + rand() * 60], [cx + width + 110, 30 + rand() * 100]], 12), arm, 6));
+    // buttons / belly
+    const dots = ink();
+    for (let i = 0; i < 2 + Math.floor(rand() * 3); i++) {
+      paths.push(stroke([[cx + (rand() - 0.5) * 20, 55 + i * 28]], dots, 10 + rand() * 8));
+    }
+  } else {
+    const line = ink();
+    const spread = 30 + rand() * 50;
+    paths.push(stroke(wobble(rand, [[cx - 55, 0], [cx - 60, 30], [cx - spread - 40, 140], [cx - spread - 90, 150]]), line, 6));
+    paths.push(stroke(wobble(rand, [[cx + 55, 0], [cx + 60, 30], [cx + spread + 40, 140], [cx + spread + 90, 150]]), line, 6));
+    paths.push(stroke(wobble(rand, [[cx - 60, 30], [cx + 60, 30]]), line, 6));
+    // ground
+    paths.push(stroke(wobble(rand, [[20, 162], [180, 158], [360, 166], [520, 160]], 4), ink(), 4));
+    // a sun-ish blob somewhere
+    if (rand() > 0.4) paths.push(stroke([[60 + rand() * 60, 50 + rand() * 40]], ink(), 30 + rand() * 20));
+  }
+
+  return { width: 540, height: 180, version: "fixture", bgColor: "#ffffff", paths } as DrawingData;
+}
+
+/** SVG markup for a drawing's strokes, scaled to the 1080-wide thumbnail space. */
+function strokesSvg(drawing: DrawingData, offsetY = 0): string {
+  const scale = 1080 / drawing.width;
+  return drawing.paths
+    .map((path) => {
+      const points = path.points as FixturePoint[];
+      const first = points[0];
+      if (!first) return "";
+      const width = first.size * scale;
+      if (points.length === 1) {
+        return `<circle cx="${first.x * scale}" cy="${first.y * scale + offsetY}" r="${width / 2}" fill="${first.color}"/>`;
+      }
+      const d = points.map((p) => `${p.x * scale},${p.y * scale + offsetY}`).join(" ");
+      return `<polyline points="${d}" fill="none" stroke="${first.color}" stroke-width="${width}" stroke-linecap="round" stroke-linejoin="round"/>`;
+    })
+    .join("");
+}
+
+function panelSvg(drawing: DrawingData): string {
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="360"><rect width="1080" height="360" fill="#fff"/>${strokesSvg(drawing)}</svg>`;
+  return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+}
+
+function corpseSvg(drawings: (DrawingData | undefined)[]): string {
+  const rows = drawings.map((drawing, index) => (drawing ? strokesSvg(drawing, index * 360) : "")).join("");
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1080"><rect width="1080" height="1080" fill="#fff"/>${rows}</svg>`;
+  return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
 }
 
 interface Store {
@@ -80,13 +152,41 @@ const store: Store = { sections: [], corpses: [], seeded: false };
 
 const CORPSE_ADJECTIVES = ["odd", "lumpy", "quiet", "bright", "crooked", "soft"];
 
+/**
+ * Real corpses copied out of Firestore by `packages/scripts/src/pull-fixtures.ts`
+ * (git-ignored). Loaded first, so dev runs exercise real, messy drawings.
+ */
+function seedReal(): boolean {
+  const file = new URL("../fixtures/real.json", import.meta.url);
+  if (!existsSync(file)) return false;
+  const data = JSON.parse(readFileSync(file, "utf8")) as {
+    corpses: Corpse[];
+    sections: SectionWithDrawing[];
+  };
+  for (const section of data.sections) {
+    // older pulls predate thumbVersion/hidden
+    store.sections.push({ thumb: "", ...section, thumbVersion: section.thumbVersion ?? 0, hidden: section.hidden ?? false, likedBy: [], featuredIn: [] });
+  }
+  for (const corpse of data.corpses) {
+    store.corpses.push({ thumb: "", ...corpse, thumbVersion: corpse.thumbVersion ?? 0, hidden: corpse.hidden ?? false, likedBy: [] });
+    for (const id of Object.values(corpse.sections)) {
+      const section = store.sections.find((entry) => entry.id === id);
+      if (section && !section.featuredIn.includes(corpse.id)) section.featuredIn.push(corpse.id);
+    }
+  }
+  return data.corpses.length > 0;
+}
+
 function seed(): void {
   if (store.seeded) return;
   store.seeded = true;
+  // Real data wins: generated creatures only fill in when there's none.
+  if (seedReal()) return;
 
   const artists = ["anon-a", "anon-b", "anon-c", "@inked", "pixel-pal", "doodle"];
-  const titles = ["soft start", "middle mash", "heavy ending", "tiny shapes", "big feelings"];
+  const titles = ["soft start", "middle mash", "heavy ending", "tiny shapes", "big feelings", "wobbly hello", "sunday legs"];
 
+  const generatedFrom = store.sections.length;
   for (let i = 0; i < 30; i++) {
     const type: SectionType = SECTION_TYPES[i % 3];
     const id = `sec_fixture_${i}`;
@@ -98,28 +198,30 @@ function seed(): void {
       date: new Date(Date.now() - i * 3_600_000).toISOString(),
       likes: (i * 7) % 13,
       likedBy: [],
-      thumb: panelSvg(type, ["#deebff", "#fff29d", "#d1ee7f"][i % 3]),
+      thumb: "",
       thumbVersion: 0,
       hidden: false,
       featuredIn: [],
-      drawing: drawingFor(type),
+      drawing: drawingFor(type, i),
     });
+    const record = store.sections[store.sections.length - 1];
+    record.thumb = panelSvg(record.drawing);
   }
 
   for (let i = 0; i < 12; i++) {
     const panels = SECTION_TYPES.map((type, offset) => {
-      const section = store.sections[(i * 3 + offset) % store.sections.length];
-      return { ...section, type, drawing: drawingFor(type) };
+      const section = store.sections[generatedFrom + ((i * 3 + offset) % 30)];
+      return section;
     });
 
     const corpseId = `corpse_fixture_${i}`;
     store.corpses.push({
       id: corpseId,
-      title: CORPSE_ADJECTIVES[i % CORPSE_ADJECTIVES.length] + " creature",
+      title: ["odd", "lumpy", "quiet", "bright", "crooked", "soft", "tall", "shy"][i % 8] + " " + ["creature", "fellow", "beast", "friend"][i % 4],
       date: new Date(Date.now() - i * 7_200_000).toISOString(),
       likes: i * 3,
       likedBy: [],
-      thumb: corpseSvg(["#deebff", "#fff29d", "#d1ee7f"]),
+      thumb: corpseSvg(panels.map((panel) => panel.drawing)),
       thumbVersion: 0,
       hidden: false,
       sections: {
@@ -209,7 +311,7 @@ export function saveSection(input: {
     date: new Date().toISOString(),
     likes: 0,
     likedBy: [],
-    thumb: panelSvg(input.type, "#ffffff"),
+    thumb: panelSvg(input.drawing),
     thumbVersion: 0,
     hidden: false,
     featuredIn: [corpseId],
@@ -231,7 +333,9 @@ export function saveSection(input: {
     date: new Date().toISOString(),
     likes: 0,
     likedBy: [],
-    thumb: corpseSvg(["#deebff", "#fff29d", "#d1ee7f"]),
+    thumb: corpseSvg(
+      SECTION_TYPES.map((type) => store.sections.find((entry) => entry.id === (panels[type] ?? sectionId))?.drawing)
+    ),
     thumbVersion: 0,
     hidden: false,
     sections: {
