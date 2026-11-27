@@ -75,4 +75,4 @@ reads its credentials from 1Password. The next phase is the atproto data move, o
 
 ## Context
 
-The retired Nuxt 2 + Firestore app is tagged `archive/firebase`; `firestore` is the default branch. `atproto` is a ground-up atproto rewrite (SvelteKit + remote functions + canvas-paint) kept for later. This branch migrates the live app to SvelteKit first, against the live data, so the atproto data move can happen on top of a working app.
+The retired Nuxt 2 + Firestore app is tagged `archive/firebase`; `firestore` is the default branch. `archive/atproto` (tag) is a ground-up atproto rewrite (SvelteKit + remote functions + canvas-paint) kept for later. This branch migrates the live app to SvelteKit first, against the live data, so the atproto data move can happen on top of a working app.
