@@ -66,6 +66,7 @@ reads its credentials from 1Password. The next phase is the atproto data move, o
 - **2026-11-26** — Firestore rules deny all client access; the server uses the Admin SDK and guests are identified by cookie. Don't delete the Firebase project: the data lives there.
 - **2026-11-26** — Netlify's `ignore` command watches the workspace packages the app imports, not only `packages/app`.
 - **2026-11-27** — The atproto move waits until <https://happyproto.at/> and <https://protobase.at/> are live.
+- **2026-11-27** — `atproto` is frozen (tag `archive/atproto`, `68ffd99`). Don't merge `firestore` into it: it has no commits of its own, so that would drop its login routes, auth code and components. When the move starts, branch from `firestore` and bring those over from the tag.
 
 ## Open questions
 
