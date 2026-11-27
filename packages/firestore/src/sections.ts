@@ -142,6 +142,20 @@ export async function list(options: {
   return { items: docs.map(Records.toSection).filter(Records.isPresent), page: options.page, hasMore };
 }
 
+/**
+ * Every visible corpse a section is in, newest first (capped at `limit`, the
+ * most recent): the section page plays through them one by one.
+ */
+export async function creatures(id: string, limit = 60): Promise<Corpse[] | SectionError> {
+  const section = await get(id);
+  if (section instanceof Error) return section;
+  if (Fixtures.enabled()) return Fixtures.creaturesOf(id);
+
+  const corpses = await featuredIn(section, limit).catch((cause: unknown) => new FirestoreError({ cause }));
+  if (corpses instanceof Error) return corpses;
+  return corpses.sort((a, b) => b.date.localeCompare(a.date));
+}
+
 /** The most recent corpses a section appears in (its `featuredIn` refs). */
 async function featuredIn(section: Section, limit: number): Promise<Corpse[]> {
   if (Fixtures.enabled()) return Fixtures.featuredIn(section.id);

@@ -3,7 +3,8 @@
   import { backFor } from "#lib/corpse/backs.ts";
   import Fold from "#lib/corpse/fold.svelte";
   import { hash, prng, randomFold } from "#lib/corpse/folds.ts";
-  import { artistHref, TYPES } from "#lib/corpse/types.ts";
+  import { TYPES } from "#lib/corpse/types.ts";
+  import Artist from "./artist.svelte";
   import Printed from "./printed.svelte";
 
   type Props = {
@@ -37,13 +38,7 @@
         <p>
           <a class="squiggle" href={`/fresh/s/${panel.id}`} tabindex={turned ? 0 : -1}>{panel.title}</a>
           <span class="by">by</span>
-          {#if artistHref(panel.artist)}
-            <a class="squiggle" href={artistHref(panel.artist)} target="_blank" rel="noopener noreferrer" tabindex={turned ? 0 : -1}
-              >{panel.artist}</a
-            >
-          {:else}
-            {panel.artist}
-          {/if}
+          <Artist name={panel.artist} tabindex={turned ? 0 : -1} />
         </p>
       {/each}
     </Printed>

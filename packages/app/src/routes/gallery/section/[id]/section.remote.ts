@@ -10,3 +10,11 @@ export const getSection = query(v.string(), async (id) => {
   if (detail instanceof Error) error(500, detail.message);
   return detail;
 });
+
+/** Every creature the section is in, newest first: the /fresh section page plays through them. */
+export const getSectionCreatures = query(v.string(), async (id) => {
+  const corpses = await Sections.creatures(id);
+  if (corpses instanceof Sections.SectionNotFoundError) error(404, "section not found");
+  if (corpses instanceof Error) error(500, corpses.message);
+  return corpses;
+});

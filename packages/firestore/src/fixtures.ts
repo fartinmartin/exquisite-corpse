@@ -358,6 +358,16 @@ export function featuredIn(sectionId: string): Corpse[] {
     .map(corpseSummary);
 }
 
+export function creaturesOf(sectionId: string): Corpse[] {
+  seed();
+  const record = store.sections.find((entry) => entry.id === sectionId);
+  if (!record) return [];
+  return store.corpses
+    .filter((corpse) => !corpse.hidden && record.featuredIn.includes(corpse.id))
+    .map(corpseSummary)
+    .sort((a, b) => b.date.localeCompare(a.date));
+}
+
 export function moreByArtist(artist: string, excludeId?: string): Section[] {
   seed();
   return store.sections
