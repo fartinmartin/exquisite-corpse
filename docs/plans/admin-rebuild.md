@@ -1,10 +1,10 @@
 # Admin rebuild
 
-**Status:** in-progress: all planned phases shipped; two production checks and the optional report button remain. Updated 2026-11-27.
+**Status:** done: all planned phases shipped and checked in production; the report button is deferred to the atproto version. Updated 2026-11-27.
 
 ## Resume here
 
-Everything planned has shipped (Phase 4: `dd0c7ef`, 2026-11-27). Left, both done by Martin in /admin: (1) data check → "repair references" (see Phase 4); (2) hide any item and confirm its public thumb URL 404s, then undo. Optional, undecided: the report button (Open question 3).
+Everything planned has shipped (Phase 4: `dd0c7ef`) and the production checks passed on 2026-11-27. In progress: click-to-copy ids in /admin on branch `feat/admin-copy-ids` (not shipped). The report button waits for the atproto version (see Open question 3).
 
 ## Steps
 
@@ -27,7 +27,7 @@ Everything planned has shipped (Phase 4: `dd0c7ef`, 2026-11-27). Left, both done
 - [x] Fixed `vite dev` crashing in the dependency optimizer on the `@napi-rs/canvas` binary (a regression from Phase 3a, only seen when Vite's cache is rebuilt): excluded it from `optimizeDeps` and `ssr.optimizeDeps`.
 - [x] Removed `Sections.remove` (unused; admin deletes go through `Admin.*`).
 - [x] Shipped 2026-11-26 (`340566c`). Production check: all pages 200, `/admin` → login, thumbs render, a wrong password → 401 through the new lockout path.
-- [ ] Verify purge + Blobs cleanup on the first real hide or delete (both call `forgetThumbs`).
+- [x] Purge + Blobs cleanup verified 2026-11-27 on the first real hide: section `w95tccvVhR9AMSnwifmc` (cascaded to corpse `ruyyQiuZxIfh2pCh9gUS`), public pages and thumb URLs 404. Left hidden on purpose.
 
 ### Phase 2: browse and moderate (hide first, delete second)
 
@@ -73,7 +73,7 @@ Thumbs render from drawings, so there are no stored thumbs to regenerate.
 - [x] Follow-ups from Phase 2: section-picker buttons have `aria-label`s ("draw the top/middle/bottom"); the delete preview marks corpses that are already hidden.
 - [x] Verified with fixtures: hide → logged → undo → logged + marked undone; reveal from the log; clean check; a fixture-made mismatch (2 sections) → repair → 0, logged. Draft deploy: public pages + `/admin/login` 200, picker labels present.
 - [x] Shipped 2026-11-27 (`dd0c7ef`, fast-forward; no new indexes needed: the audit log only orders by `at`).
-- [ ] Run the data check + repair on production from /admin.
+- [x] Data check + repair run on production 2026-11-27 (9 sections). Re-check: 248 sections / 239 corpses, 0 mismatches, 0 broken panels, 2 unused sections.
 
 ## Decisions
 
@@ -92,7 +92,12 @@ Thumbs render from drawings, so there are no stored thumbs to regenerate.
 
 1. ~~Where do thumbnails come from?~~ Decided: server-rendered (see Decisions). See the thumbnail discussion in chat (2026-11-26). Options: (a) keep browser-rendered thumbs uploaded with the save, plus admin regenerate/scan (this plan as written); (b) render on the server at save time with a prebuilt canvas (`@napi-rs/canvas`); (c) don't store thumbs at all: the `/thumbs` route renders from the drawing on a cache miss and the CDN keeps it forever. If (c), most of Phase 3 disappears.
 2. ~~Hide vs delete?~~ Decided: hide first, delete second (see Decisions). Original question: Add a `hidden` flag (reversible, keeps history) and filter it out of public queries? Firestore needs every doc to have the field for `where("hidden", "==", false)`, so that's a one-time migration plus composite indexes for each list query. Or keep hard delete only?
-3. **Non-blocking:** user-facing "report" button feeding the moderation feed? Small to build, but it needs rate limiting and spam handling.
+3. **Deferred to the atproto version:** user-facing "report" button. Recommendation (2026-11-27):
+   - Start with our own queue: the button saves to our database and reports show in `/admin` next to hide. Less to run, works for anonymous visitors, and moderators see the drawings. Needs rate limiting and spam handling.
+   - Store each report with the record's URI + CID and an atproto `reasonType`, so it can be forwarded to a labeler later.
+   - Add a labeler / [Ozone](https://github.com/bluesky-social/ozone/blob/main/HOSTING.md) only for more moderators or for other apps to respect our decisions. Self-hosting needs its own account and a server with Postgres (2+ GB RAM, 2+ cores recommended).
+   - Protocol route: [`com.atproto.moderation.createReport`](https://raw.githubusercontent.com/bluesky-social/atproto/main/lexicons/com/atproto/moderation/createReport.json) with a strongRef subject ([tutorial](https://atproto.com/guides/labels-tutorial)). Requires login and an OAuth scope `rpc:com.atproto.moderation.createReport?aud=<labeler-did>#atproto_labeler`. [Labels](https://atproto.com/specs/label) don't delete records: our app has to hide labelled items, including cached thumbs.
+   - Unverified: whether Ozone previews our custom drawing records as pictures.
 4. **Non-blocking:** is "reset all likes" still wanted? It's destructive and rarely the right tool; per-item reset may be enough.
 5. **Non-blocking:** how much to invest before the atproto move? Phase 1 and the thumbnail decision carry over. The browse UI carries over if it sits on a thin data interface. Firestore-specific hygiene (Phase 4) doesn't.
 6. **Non-blocking:** stay password-only, or sign in with atproto OAuth and a DID allowlist once that exists?
