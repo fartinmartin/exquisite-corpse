@@ -57,7 +57,7 @@
 
   /*
    * Press, hold, release. Pressing leans every doodle toward the press point,
-   * slowly, so a long hold winds them up (and they tremble, see CSS). Letting
+   * slowly, so a long hold winds them up (and squashes them a little). Letting
    * go flings them the other way, scaled by how long you held, and they wobble
    * back to rest on an underdamped spring.
    */
@@ -212,7 +212,7 @@
       opacity 300ms ease;
   }
 
-  /* press and hold: a slow lean toward the press point, tension building */
+  /* press and hold: a slow lean toward the press point and a slight squash (anticipation) */
   @property --tension {
     syntax: "<number>";
     inherits: true;
@@ -254,21 +254,6 @@
 
   .doodle img {
     scale: calc(1 - var(--tension) * 0.06);
-  }
-
-  @media (prefers-reduced-motion: no-preference) {
-    [data-phase="hold"] .doodle img {
-      animation: tremble 90ms linear infinite alternate;
-    }
-  }
-
-  @keyframes tremble {
-    from {
-      translate: calc(var(--tension) * -1.5px) calc(var(--tension) * 1px);
-    }
-    to {
-      translate: calc(var(--tension) * 1.5px) calc(var(--tension) * -1px);
-    }
   }
 
   /* leaving for drawing mode: quicker, no bounce */
