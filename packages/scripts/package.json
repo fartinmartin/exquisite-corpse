@@ -4,7 +4,10 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "convert:drawings": "tsx src/convert-legacy-drawings.ts"
+    "convert:drawings": "tsx src/convert-legacy-drawings.ts",
+    "migrate:hidden": "varlock run --path ../app/ -- tsx src/migrate-hidden.ts",
+    "copy:database": "varlock run --path ../app/ -- tsx src/copy-to-database.ts",
+    "indexes": "sh src/firestore-indexes.sh"
   },
   "dependencies": {
     "@ecc/firestore": "workspace:*",

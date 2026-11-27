@@ -46,8 +46,7 @@ export async function previewSectionDelete(id: string): Promise<SectionDeletePre
 /** The corpse a delete would remove, for the confirm step. Its sections stay. */
 export async function previewCorpseDelete(id: string): Promise<Corpse | AdminError> {
   if (Fixtures.enabled()) {
-    const corpse = Fixtures.corpse(id);
-    return corpse.id === id ? corpse : new NotFoundError({ collection: "corpses", id });
+    return Fixtures.corpse(id) ?? new NotFoundError({ collection: "corpses", id });
   }
 
   try {
@@ -142,4 +141,82 @@ export async function sectionDrawing(id: string): Promise<unknown | NotFoundErro
   const snap = await Records.loadOne("sections", id, ["drawing"]);
   if (!snap) return new NotFoundError({ collection: "sections", id });
   return snap.get("drawing");
+}
+
+export interface Summaries {
+  sections: Section[];
+  corpses: Corpse[];
+}
+
+/**
+ * Every section and corpse, hidden included, as summaries (no drawings or
+ * thumbs: ~0.2 KB each). Admin browse/search filters this in the browser,
+ * which avoids an index per filter combination. Fine up to a few thousand
+ * docs; past that, page it.
+ */
+export async function summaries(): Promise<Summaries | FirestoreError> {
+  if (Fixtures.enabled()) return Fixtures.summaries();
+
+  try {
+    const [sections, corpses] = await Promise.all([
+      db().collection("sections").select(...Records.SECTION_SUMMARY_FIELDS).get(),
+      db().collection("corpses").select(...Records.CORPSE_SUMMARY_FIELDS).get(),
+    ]);
+    const byNewest = <T extends { date: string }>(a: T, b: T) => b.date.localeCompare(a.date);
+    return {
+      sections: sections.docs.map(Records.toSection).filter(Records.isPresent).sort(byNewest),
+      corpses: corpses.docs.map(Records.toCorpse).filter(Records.isPresent).sort(byNewest),
+    };
+  } catch (cause) {
+    return new FirestoreError({ cause });
+  }
+}
+
+/**
+ * Hides or unhides an item. Hiding a section also hides every visible corpse
+ * it's in (marked `hiddenBy: section:<id>`); unhiding it unhides only those,
+ * not corpses that were hidden on their own. Returns the corpse ids that
+ * changed alongside it, so callers can clean up thumbs.
+ */
+export async function setHidden(
+  collection: "sections" | "corpses",
+  id: string,
+  hidden: boolean
+): Promise<{ cascaded: string[] } | AdminError> {
+  if (Fixtures.enabled()) {
+    const cascaded = Fixtures.setHidden(collection, id, hidden);
+    return cascaded ? { cascaded } : new NotFoundError({ collection, id });
+  }
+
+  try {
+    if (collection === "corpses") {
+      const snap = await Records.loadOne("corpses", id, ["hidden"]);
+      if (!snap) return new NotFoundError({ collection, id });
+      await snap.ref.update(hidden ? { hidden, hiddenBy: "manual" } : { hidden, hiddenBy: FieldValue.delete() });
+      return { cascaded: [] };
+    }
+
+    const snap = await Records.loadOne("sections", id, Records.SECTION_SUMMARY_FIELDS);
+    const section = snap ? Records.toSection(snap) : null;
+    if (!snap || !section) return new NotFoundError({ collection, id });
+
+    const by = `section:${id}`;
+    const corpses = (await Records.loadMany("corpses", section.featuredIn, Records.CORPSE_SUMMARY_FIELDS))
+      .map(Records.toCorpse)
+      .filter(Records.isPresent);
+    const affected = corpses.filter((corpse) => (hidden ? !corpse.hidden : corpse.hiddenBy === by));
+
+    const batch = db().batch();
+    batch.update(snap.ref, { hidden });
+    for (const corpse of affected) {
+      batch.update(
+        db().collection("corpses").doc(corpse.id),
+        hidden ? { hidden: true, hiddenBy: by } : { hidden: false, hiddenBy: FieldValue.delete() }
+      );
+    }
+    await batch.commit();
+    return { cascaded: affected.map((corpse) => corpse.id) };
+  } catch (cause) {
+    return new FirestoreError({ cause });
+  }
 }

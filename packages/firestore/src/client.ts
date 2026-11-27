@@ -111,7 +111,10 @@ export function db(): Firestore {
         : { credential: credentials(), projectId: projectId() }
     );
 
-  instance = getFirestore(app);
+  // `FIRESTORE_DATABASE_ID` points scripts (or a local app) at a named database,
+  // e.g. a staging copy. Unset means the production `(default)` database.
+  const database = process.env.FIRESTORE_DATABASE_ID;
+  instance = database ? getFirestore(app, database) : getFirestore(app);
   instance.settings({ ignoreUndefinedProperties: true });
   return instance;
 }

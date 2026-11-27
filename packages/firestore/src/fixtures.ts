@@ -99,6 +99,7 @@ function seed(): void {
       likedBy: [],
       thumb: panelSvg(type, ["#deebff", "#fff29d", "#d1ee7f"][i % 3]),
       thumbVersion: 0,
+      hidden: false,
       featuredIn: [],
       drawing: drawingFor(type),
     });
@@ -119,6 +120,7 @@ function seed(): void {
       likedBy: [],
       thumb: corpseSvg(["#deebff", "#fff29d", "#d1ee7f"]),
       thumbVersion: 0,
+      hidden: false,
       sections: {
         top: panels[0].id,
         mid: panels[1].id,
@@ -163,7 +165,7 @@ export function section(id: string): SectionWithDrawing | null {
 
 export function randomSection(type: SectionType): SectionWithDrawing | null {
   seed();
-  const pool = store.sections.filter((entry) => entry.type === type);
+  const pool = store.sections.filter((entry) => entry.type === type && !entry.hidden);
   if (pool.length === 0) return null;
   return summary(pool[Math.floor(Math.random() * pool.length)]);
 }
@@ -176,7 +178,7 @@ export function listSections(options: {
 }): { items: Section[]; page: number; hasMore: boolean } {
   seed();
   const filtered = store.sections
-    .filter((entry) => !options.type || entry.type === options.type)
+    .filter((entry) => !entry.hidden && (!options.type || entry.type === options.type))
     .sort((a, b) =>
       options.sort === "likes" ? b.likes - a.likes : Date.parse(b.date) - Date.parse(a.date)
     );
@@ -208,6 +210,7 @@ export function saveSection(input: {
     likedBy: [],
     thumb: panelSvg(input.type, "#ffffff"),
     thumbVersion: 0,
+    hidden: false,
     featuredIn: [corpseId],
     drawing: input.drawing,
   });
@@ -229,6 +232,7 @@ export function saveSection(input: {
     likedBy: [],
     thumb: corpseSvg(["#deebff", "#fff29d", "#d1ee7f"]),
     thumbVersion: 0,
+    hidden: false,
     sections: {
       top: panels.top ?? sectionId,
       mid: panels.mid ?? sectionId,
@@ -244,7 +248,7 @@ export function featuredIn(sectionId: string): Corpse[] {
   const record = store.sections.find((entry) => entry.id === sectionId);
   if (!record) return [];
   return store.corpses
-    .filter((corpse) => record.featuredIn.includes(corpse.id))
+    .filter((corpse) => !corpse.hidden && record.featuredIn.includes(corpse.id))
     .slice(-3)
     .map(corpseSummary);
 }
@@ -252,15 +256,16 @@ export function featuredIn(sectionId: string): Corpse[] {
 export function moreByArtist(artist: string, excludeId?: string): Section[] {
   seed();
   return store.sections
-    .filter((entry) => entry.artist === artist && entry.id !== excludeId)
+    .filter((entry) => !entry.hidden && entry.artist === artist && entry.id !== excludeId)
     .sort((a, b) => b.likes - a.likes)
     .slice(0, 6)
     .map(listItem);
 }
 
-export function corpse(id: string): Corpse & { panels: Partial<Record<SectionType, SectionWithDrawing>> } {
+export function corpse(id: string): (Corpse & { panels: Partial<Record<SectionType, SectionWithDrawing>> }) | null {
   seed();
-  const record = store.corpses.find((entry) => entry.id === id) ?? store.corpses[0];
+  const record = store.corpses.find((entry) => entry.id === id);
+  if (!record) return null;
   const panels: Partial<Record<SectionType, SectionWithDrawing>> = {};
 
   for (const type of SECTION_TYPES) {
@@ -271,12 +276,11 @@ export function corpse(id: string): Corpse & { panels: Partial<Record<SectionTyp
   return { ...corpseSummary(record), panels };
 }
 
-export function randomCorpse(): Corpse & {
-  panels: Partial<Record<SectionType, SectionWithDrawing>>;
-} {
+export function randomCorpse(): (Corpse & { panels: Partial<Record<SectionType, SectionWithDrawing>> }) | null {
   seed();
-  const record = store.corpses[Math.floor(Math.random() * store.corpses.length)];
-  return corpse(record.id);
+  const pool = store.corpses.filter((entry) => !entry.hidden);
+  if (pool.length === 0) return null;
+  return corpse(pool[Math.floor(Math.random() * pool.length)].id);
 }
 
 export function listCorpses(options: {
@@ -285,7 +289,7 @@ export function listCorpses(options: {
   pageSize: number;
 }): { items: Corpse[]; page: number; hasMore: boolean } {
   seed();
-  const sorted = [...store.corpses].sort((a, b) =>
+  const sorted = store.corpses.filter((entry) => !entry.hidden).sort((a, b) =>
     options.sort === "likes" ? b.likes - a.likes : Date.parse(b.date) - Date.parse(a.date)
   );
   const start = options.page * options.pageSize;
@@ -370,3 +374,39 @@ export function count(): { sections: number; corpses: number } {
 }
 
 export { Drawing };
+
+/** Every section and corpse, hidden included (admin browse). */
+export function summaries(): { sections: Section[]; corpses: Corpse[] } {
+  seed();
+  return { sections: store.sections.map(listItem), corpses: store.corpses.map(corpseSummary) };
+}
+
+/** Same rules as `Admin.setHidden`. */
+export function setHidden(collection: "sections" | "corpses", id: string, hidden: boolean): string[] | null {
+  seed();
+  if (collection === "corpses") {
+    const record = store.corpses.find((entry) => entry.id === id);
+    if (!record) return null;
+    record.hidden = hidden;
+    record.hiddenBy = hidden ? "manual" : undefined;
+    return [];
+  }
+
+  const record = store.sections.find((entry) => entry.id === id);
+  if (!record) return null;
+  record.hidden = hidden;
+  const by = `section:${id}`;
+  const changed: string[] = [];
+  for (const corpse of store.corpses.filter((entry) => record.featuredIn.includes(entry.id))) {
+    if (hidden && !corpse.hidden) {
+      corpse.hidden = true;
+      corpse.hiddenBy = by;
+      changed.push(corpse.id);
+    } else if (!hidden && corpse.hiddenBy === by) {
+      corpse.hidden = false;
+      corpse.hiddenBy = undefined;
+      changed.push(corpse.id);
+    }
+  }
+  return changed;
+}

@@ -23,27 +23,31 @@ export type ThumbError = ThumbNotFoundError | FirestoreError;
 
 /**
  * The drawings a thumbnail is rendered from, top to bottom: one for a
- * section, the three panels for a corpse.
+ * section, the three panels for a corpse. Hidden items count as not found
+ * unless `includeHidden` (admin), and `hidden` says whether this one is.
  */
 export async function drawings(
   collection: Collection,
-  id: string
-): Promise<DrawingData[] | ThumbError> {
+  id: string,
+  { includeHidden = false }: { includeHidden?: boolean } = {}
+): Promise<{ drawings: DrawingData[]; hidden: boolean } | ThumbError> {
   if (collection === "sections") {
-    const section = await Sections.get(id);
+    const section = await Sections.get(id, { includeHidden });
     if (section instanceof Sections.SectionNotFoundError) return new ThumbNotFoundError({ collection, id });
     if (section instanceof Error) return new FirestoreError({ cause: section });
-    return [section.drawing];
+    return { drawings: [section.drawing], hidden: section.hidden };
   }
 
-  const corpse = await Corpses.get(id);
+  const corpse = await Corpses.get(id, { includeHidden });
   if (corpse instanceof Corpses.CorpseNotFoundError) return new ThumbNotFoundError({ collection, id });
   if (corpse instanceof Error) return new FirestoreError({ cause: corpse });
 
   const panels = SECTION_TYPES.map((type) => corpse.panels[type]?.drawing).filter(
     (drawing): drawing is DrawingData => drawing !== undefined
   );
-  return panels.length > 0 ? panels : new ThumbNotFoundError({ collection, id });
+  return panels.length > 0
+    ? { drawings: panels, hidden: corpse.hidden }
+    : new ThumbNotFoundError({ collection, id });
 }
 
 /** Splits a `data:` URL into its content type and bytes. `null` when malformed. */

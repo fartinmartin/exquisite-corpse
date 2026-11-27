@@ -77,17 +77,19 @@ function sortField(sort: "date" | "likes"): string {
   return sort === "likes" ? "likes" : "date";
 }
 
-export async function get(id: string): Promise<SectionWithDrawing | SectionError> {
-  if (Fixtures.enabled()) {
-    const section = Fixtures.section(id);
-    return section ?? new SectionNotFoundError({ id });
-  }
-
-  const snap = await Records.loadOne("sections", id, Records.SECTION_DRAWING_FIELDS).catch(
-    (cause: unknown) => new FirestoreError({ cause })
-  );
-  if (snap instanceof Error) return snap;
-  return (snap && Records.toSectionWithDrawing(snap)) ?? new SectionNotFoundError({ id });
+/** A section with its drawing. Hidden sections count as not found unless `includeHidden`. */
+export async function get(
+  id: string,
+  { includeHidden = false }: { includeHidden?: boolean } = {}
+): Promise<SectionWithDrawing | SectionError> {
+  const section = Fixtures.enabled()
+    ? Fixtures.section(id)
+    : await Records.loadOne("sections", id, Records.SECTION_DRAWING_FIELDS)
+        .then((snap) => (snap ? Records.toSectionWithDrawing(snap) : null))
+        .catch((cause: unknown) => new FirestoreError({ cause }));
+  if (section instanceof Error) return section;
+  if (!section || (section.hidden && !includeHidden)) return new SectionNotFoundError({ id });
+  return section;
 }
 
 /**
@@ -128,7 +130,9 @@ export async function list(options: {
 
   let query = db().collection("sections") as FirebaseFirestore.Query;
   if (options.type) query = query.where("type", "==", options.type);
-  query = query.orderBy(sortField(options.sort), "desc").select(...Records.SECTION_SUMMARY_FIELDS);
+  query = Records.visible(query)
+    .orderBy(sortField(options.sort), "desc")
+    .select(...Records.SECTION_SUMMARY_FIELDS);
 
   const { docs, hasMore } = await Records.paginate(query, {
     page: options.page,
@@ -144,7 +148,10 @@ async function featuredIn(section: Section, limit: number): Promise<Corpse[]> {
 
   const ids = section.featuredIn.slice(-limit);
   const snaps = await Records.loadMany("corpses", ids, Records.CORPSE_SUMMARY_FIELDS);
-  return snaps.map(Records.toCorpse).filter(Records.isPresent);
+  return snaps
+    .map(Records.toCorpse)
+    .filter(Records.isPresent)
+    .filter((corpse) => !corpse.hidden);
 }
 
 /** Other sections by the same artist, most liked first. */
@@ -155,9 +162,7 @@ async function moreByArtist(
   if (Fixtures.enabled()) return Fixtures.moreByArtist(artist, excludeId);
 
   if (!artist) return [];
-  const snap = await db()
-    .collection("sections")
-    .where("artist", "==", artist)
+  const snap = await Records.visible(db().collection("sections").where("artist", "==", artist))
     .orderBy("likes", "desc")
     .select(...Records.SECTION_SUMMARY_FIELDS)
     .limit(limit + 1)
@@ -227,6 +232,7 @@ export async function save(
     date: now,
     likes: 0,
     likedBy: [],
+    hidden: false,
     drawing: input.drawing,
     featuredIn: [corpseRef],
   });
@@ -236,6 +242,7 @@ export async function save(
     date: now,
     likes: 0,
     likedBy: [],
+    hidden: false,
     sections: {
       top: db().collection("sections").doc(panelIds.top ?? sectionRef.id),
       mid: db().collection("sections").doc(panelIds.mid ?? sectionRef.id),

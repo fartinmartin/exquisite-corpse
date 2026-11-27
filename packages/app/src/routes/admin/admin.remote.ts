@@ -99,3 +99,42 @@ export const setSiteMode = command(v.picklist(["open", "read-only", "closed"]), 
   await siteMode().set(state);
   return state;
 });
+
+/** Every section and corpse (hidden included) for browse/search; filtered client-side. */
+export const summaries = query(async () => {
+  context();
+  const result = await Admin.summaries();
+  if (result instanceof Error) fail(result);
+  return result;
+});
+
+const HideInput = v.object({
+  collection: v.picklist(["sections", "corpses"]),
+  ids: v.pipe(v.array(v.string()), v.minLength(1), v.maxLength(100)),
+  hidden: v.boolean(),
+});
+
+/**
+ * Hides or unhides one or more items (hiding a section also hides its corpses).
+ * Hiding clears their thumbs from Blobs and the CDN; pages drop them within
+ * about a minute as their cache refreshes.
+ */
+export const setHidden = command(HideInput, async ({ collection, ids, hidden }) => {
+  context();
+  const cascaded: string[] = [];
+  for (const id of ids) {
+    const result = await Admin.setHidden(collection, id, hidden);
+    if (result instanceof Error) fail(result);
+    cascaded.push(...result.cascaded);
+  }
+
+  if (hidden) {
+    await forgetThumbs([
+      ...ids.map((id) => ({ collection, id })),
+      ...cascaded.map((id) => ({ collection: "corpses" as const, id })),
+    ]);
+  }
+
+  await summaries().refresh();
+  return { cascaded };
+});

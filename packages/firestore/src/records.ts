@@ -33,9 +33,10 @@ export const SECTION_SUMMARY_FIELDS = [
   "likes",
   "featuredIn",
   "thumbVersion",
+  "hidden",
 ];
 export const SECTION_DRAWING_FIELDS = [...SECTION_SUMMARY_FIELDS, "drawing"];
-export const CORPSE_SUMMARY_FIELDS = ["title", "date", "likes", "sections", "thumbVersion"];
+export const CORPSE_SUMMARY_FIELDS = ["title", "date", "likes", "sections", "thumbVersion", "hidden", "hiddenBy"];
 export const LIKE_FIELDS = ["likes", "likedBy"];
 
 /** Full stored shape. Only fixtures hold whole records in memory. */
@@ -95,6 +96,7 @@ export function toSection(snap: DocumentSnapshot): Section | null {
     likes: typeof data.likes === "number" ? data.likes : 0,
     thumbVersion: typeof data.thumbVersion === "number" ? data.thumbVersion : 0,
     featuredIn: strings(data.featuredIn),
+    hidden: data.hidden === true,
   };
 }
 
@@ -122,6 +124,8 @@ export function toCorpse(snap: DocumentSnapshot): Corpse | null {
       mid: refId(sections.mid),
       bot: refId(sections.bot),
     },
+    hidden: data.hidden === true,
+    hiddenBy: typeof data.hiddenBy === "string" ? data.hiddenBy : undefined,
   };
 }
 
@@ -173,7 +177,7 @@ export async function randomSnapshot(
   const randomKey = base.doc().id;
 
   const build = (op: ">=" | "<"): Query => {
-    let query: Query = base.where(FieldPath.documentId(), op, randomKey);
+    let query: Query = visible(base).where(FieldPath.documentId(), op, randomKey);
     if (filter) query = query.where(filter.field, "==", filter.value);
     return query.select(...fields).limit(1);
   };
@@ -184,6 +188,16 @@ export async function randomSnapshot(
   const second = await build("<").get();
   if (!second.empty) return second.docs[0];
   return null;
+}
+
+/**
+ * Restricts a public query to documents that aren't hidden. Every document has
+ * a `hidden` field (scripts/src/migrate-hidden.ts), because Firestore can only
+ * match fields that exist. Each public query shape needs a composite index
+ * (scripts/src/firestore-indexes.sh).
+ */
+export function visible(query: Query): Query {
+  return query.where("hidden", "==", false);
 }
 
 /** Offset-paged query helper. Requests one extra doc to know if more exist. */

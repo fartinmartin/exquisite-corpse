@@ -37,6 +37,8 @@ export interface Section {
   likes: number;
   thumbVersion: number;
   featuredIn: string[];
+  /** Hidden by a moderator: excluded from every public query and page. */
+  hidden: boolean;
 }
 
 export interface SectionWithDrawing extends Section {
@@ -50,6 +52,12 @@ export interface Corpse {
   likes: number;
   thumbVersion: number;
   sections: Record<SectionType, string>;
+  hidden: boolean;
+  /**
+   * Why a hidden corpse is hidden: `manual`, or `section:<id>` when hiding one
+   * of its sections hid it (so unhiding that section can unhide it again).
+   */
+  hiddenBy?: string;
 }
 
 export interface CorpseWithSections extends Corpse {

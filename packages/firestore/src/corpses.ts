@@ -50,14 +50,23 @@ async function panelsFor(sections: Corpse["sections"]): Promise<CorpseWithSectio
   return panels;
 }
 
-/** A corpse and its three panels' drawings, in two round trips. */
-export async function get(id: string): Promise<CorpseWithSections | CorpseError> {
-  if (Fixtures.enabled()) return Fixtures.corpse(id);
+/**
+ * A corpse and its three panels' drawings, in two round trips. Hidden corpses
+ * count as not found unless `includeHidden`.
+ */
+export async function get(
+  id: string,
+  { includeHidden = false }: { includeHidden?: boolean } = {}
+): Promise<CorpseWithSections | CorpseError> {
+  if (Fixtures.enabled()) {
+    const corpse = Fixtures.corpse(id);
+    return corpse && (!corpse.hidden || includeHidden) ? corpse : new CorpseNotFoundError({ id });
+  }
 
   try {
     const snap = await Records.loadOne("corpses", id, Records.CORPSE_SUMMARY_FIELDS);
     const corpse = snap ? Records.toCorpse(snap) : null;
-    if (!corpse) return new CorpseNotFoundError({ id });
+    if (!corpse || (corpse.hidden && !includeHidden)) return new CorpseNotFoundError({ id });
     return { ...corpse, panels: await panelsFor(corpse.sections) };
   } catch (cause) {
     return new FirestoreError({ cause });
@@ -80,8 +89,7 @@ export async function list(options: {
 }): Promise<GalleryPage<Corpse>> {
   if (Fixtures.enabled()) return Fixtures.listCorpses(options);
 
-  const query = db()
-    .collection("corpses")
+  const query = Records.visible(db().collection("corpses"))
     .orderBy(options.sort === "likes" ? "likes" : "date", "desc")
     .select(...Records.CORPSE_SUMMARY_FIELDS);
 
@@ -154,6 +162,7 @@ export async function createFromSection(sectionId: string): Promise<{ corpseId: 
     date: Timestamp.now(),
     likes: 0,
     likedBy: [],
+    hidden: false,
     sections: Object.fromEntries(
       SECTION_TYPES.map((type) => [
         type,
