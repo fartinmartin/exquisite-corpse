@@ -1,10 +1,10 @@
 # Admin rebuild
 
-**Status:** in-progress: Phases 1, 3a and the budget gate shipped; Phase 2 built on `feat/admin-hide` and verified on a staging copy, waiting for production rollout; Phase 4 not started. Updated 2026-11-26.
+**Status:** in-progress: Phases 1, 2, 3a and the budget gate shipped; Phase 3 leftovers and Phase 4 not started. Updated 2026-11-26.
 
 ## Resume here
 
-Phase 2 is on `feat/admin-hide` (worktree `../exquisite-corpse-hide`), verified on the `ecc-staging` database. Next is the production rollout, **in this order** (Phase 2 steps): indexes → wait READY → migration → ship → re-run migration → delete `ecc-staging`. Shipping before the migration would empty every gallery: Firestore never matches docs without `hidden`. Needs Martin's go-ahead (production data + settings).
+Phase 2 rolled out to production (`21885f3`). Open checks: the first real delete or hide should 404 its thumb (purge + Blobs cleanup has only run locally). Next options: Phase 2 follow-ups (bottom of Phase 2), what's left of Phase 3 (the health scan is mostly moot now that thumbs render from drawings), or Phase 4 (integrity check, audit log + undo, rewrite `resetAll`/`clearFeaturedInRefs`).
 
 ## Steps
 
@@ -38,7 +38,7 @@ Phase 2 is on `feat/admin-hide` (worktree `../exquisite-corpse-hide`), verified 
 - [x] Browse loads all summaries (`Admin.summaries`, no drawings, ~0.2 KB each) and filters client-side: no index per filter combination. Revisit past a few thousand docs.
 - [x] Scripts (`packages/scripts`): `pnpm indexes [db]` (6 composite indexes), `pnpm migrate:hidden [-- --write]` (idempotent, dry run by default), `pnpm copy:database` (prod → named DB, refuses the default). `FIRESTORE_DATABASE_ID` selects a named database in `Client.db()`.
 - [x] Verified on fixtures (keyboard hide, cascade, unhide, pasted-link search, bulk) and on **`ecc-staging`** (a copy of production in the same project): indexes built READY; migration 485 updated then 0 on re-run; every public query shape works (gallery corpses/top/mid/bot × date/likes, home random, draw random siblings, section page incl. more-by-artist); hiding real section `5HNVUa4bAsDiTPJkGj5r` → it and its 2 corpses 404 publicly (pages + thumb), gallery drops them, others unaffected; unhide restores. Production untouched throughout (dry run: 485 missing `hidden`).
-- [ ] **Production rollout, in order:**
+- [x] **Production rollout** (2026-11-26), in this order: 6 indexes → all 9 READY; migration wrote 485; shipped `21885f3`; re-run wrote 0 (nothing saved in between); `ecc-staging` deleted. Production check: every page 200, gallery corpses/top/mid/bot × date/likes all return items, draw siblings load, no console errors. The steps, for reference:
   1. `pnpm --filter @ecc/scripts indexes` and wait until `gcloud firestore indexes composite list --project=exquisite-corpse-club` shows all READY. Additive; current queries are unaffected.
   2. `pnpm --filter @ecc/scripts migrate:hidden -- --write`. Adds `hidden: false`; the live code ignores it.
   3. Ship (fast-forward `firestore`, push, wait for the deploy).
