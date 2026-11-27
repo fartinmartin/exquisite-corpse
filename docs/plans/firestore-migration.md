@@ -1,12 +1,13 @@
 # Migrate the live Nuxt site to SvelteKit + Firestore
 
-**Status:** done — updated 2026-11-26
+**Status:** done — updated 2026-11-27
 
 ## Resume here
 
 `https://exquisitecorpse.club` runs the SvelteKit app on Netlify against the live
 Firestore data. The Nuxt app is retired, the accounts are cleaned up, and local dev
-reads its credentials from 1Password. The next phase is the atproto data move.
+reads its credentials from 1Password. The next phase is the atproto data move, on hold until
+<https://happyproto.at/> and <https://protobase.at/> are live (see Decisions).
 
 ## Steps
 
@@ -64,6 +65,7 @@ reads its credentials from 1Password. The next phase is the atproto data move.
 - **2026-11-26** — Namecheap keeps DNS. The domain has no email, so it publishes `v=spf1 -all` and DMARC `p=reject`.
 - **2026-11-26** — Firestore rules deny all client access; the server uses the Admin SDK and guests are identified by cookie. Don't delete the Firebase project: the data lives there.
 - **2026-11-26** — Netlify's `ignore` command watches the workspace packages the app imports, not only `packages/app`.
+- **2026-11-27** — The atproto move waits until <https://happyproto.at/> and <https://protobase.at/> are live.
 
 ## Open questions
 

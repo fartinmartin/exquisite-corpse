@@ -4,7 +4,7 @@
 
 ## Resume here
 
-Everything planned has shipped (Phase 4: `dd0c7ef`) and the production checks passed on 2026-11-27. In progress: click-to-copy ids in /admin on branch `feat/admin-copy-ids` (not shipped). The report button waits for the atproto version (see Open question 3).
+Everything planned has shipped (Phase 4: `dd0c7ef`) and the production checks passed on 2026-11-27. Click-to-copy ids in /admin shipped the same day (`646a326`). Known bug: the "made corpse …" message never shows, because the item panel remounts when it switches to the new corpse. The report button waits for the atproto version (see Open question 3).
 
 ## Steps
 
