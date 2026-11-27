@@ -3,6 +3,7 @@
   import Button from "#lib/components/button.svelte";
   import Panel from "#lib/components/panel.svelte";
   import { integrityReport, repairReferences } from "./admin.remote";
+  import CopyId from "./copy-id.svelte";
 
   type Props = {
     onreveal: (collection: Collection, id: string) => void;
@@ -48,9 +49,14 @@
         <ul>
           {#each report.featuredIn as item (item.sectionId)}
             <li>
-              <button class="link" onclick={() => onreveal("sections", item.sectionId)}>{item.sectionId}</button>
-              {#if item.extra.length}<small>extra: {item.extra.join(", ")}</small>{/if}
-              {#if item.missing.length}<small>missing: {item.missing.join(", ")}</small>{/if}
+              <CopyId id={item.sectionId} onopen={() => onreveal("sections", item.sectionId)} />
+              {#if item.extra.length}
+                <!-- keyed by index: a bad list can name the same corpse twice -->
+                <small>extra: {#each item.extra as id, index (index)}<CopyId {id} />{/each}</small>
+              {/if}
+              {#if item.missing.length}
+                <small>missing: {#each item.missing as id (id)}<CopyId {id} />{/each}</small>
+              {/if}
             </li>
           {/each}
         </ul>
@@ -63,8 +69,12 @@
         <ul>
           {#each report.brokenPanels as item (item.corpseId + item.type)}
             <li>
-              <button class="link" onclick={() => onreveal("corpses", item.corpseId)}>{item.corpseId}</button>
-              <small>{item.type} → {item.sectionId} ({item.problem})</small>
+              <CopyId id={item.corpseId} onopen={() => onreveal("corpses", item.corpseId)} />
+              <small>
+                {item.type} →
+                {#if item.sectionId}<CopyId id={item.sectionId} />{/if}
+                ({item.problem})
+              </small>
             </li>
           {/each}
         </ul>
@@ -75,7 +85,7 @@
         <p class="note">not an error (left behind when a corpse is deleted). "make corpse" gives them a new one.</p>
         <ul>
           {#each report.unused as id (id)}
-            <li><button class="link" onclick={() => onreveal("sections", id)}>{id}</button></li>
+            <li><CopyId {id} onopen={() => onreveal("sections", id)} /></li>
           {/each}
         </ul>
       {/if}
@@ -117,8 +127,16 @@
   li {
     display: flex;
     flex-wrap: wrap;
+    align-items: baseline;
     gap: 0 0.5rem;
     overflow-wrap: anywhere;
+  }
+
+  li small {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0 0.5rem;
   }
 
   .link {

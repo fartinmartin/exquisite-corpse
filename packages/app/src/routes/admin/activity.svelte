@@ -2,6 +2,7 @@
   import type { Collection } from "@ecc/firestore";
   import Panel from "#lib/components/panel.svelte";
   import { recentActions, undoAction } from "./admin.remote";
+  import CopyId from "./copy-id.svelte";
 
   type Props = {
     /** Opens an item in the browser. */
@@ -20,6 +21,9 @@
     "reset-likes": "reset all likes",
     "repair-refs": "repaired references",
   };
+
+  /** How a "make-corpse" entry's detail names its source section. */
+  const FROM_SECTION = "from section ";
 
   const entries = $derived(await recentActions());
   let busy = $state<string | null>(null);
@@ -48,13 +52,18 @@
           <time datetime={entry.at}>{new Date(entry.at).toLocaleString()}</time>
           <span>
             {entry.undoes ? "undo: " : ""}{LABELS[entry.action] ?? entry.action}
-            {#if entry.detail}{entry.detail}{/if}
+            {#if entry.detail?.startsWith(FROM_SECTION)}
+              {FROM_SECTION}<CopyId id={entry.detail.slice(FROM_SECTION.length)} />
+            {:else if entry.detail}
+              {entry.detail}
+            {/if}
             {#each entry.ids as id (id)}
-              {#if entry.collection && entry.action !== "delete"}
-                <button class="link" onclick={() => onreveal(entry.collection!, id)}>{id}</button>
-              {:else}
-                <code>{id}</code>
-              {/if}
+              <CopyId
+                {id}
+                onopen={entry.collection && entry.action !== "delete"
+                  ? () => onreveal(entry.collection!, id)
+                  : undefined}
+              />
             {/each}
             {#if entry.cascaded?.length}
               <small>(+{entry.cascaded.length} corpse{entry.cascaded.length === 1 ? "" : "s"})</small>
@@ -119,10 +128,6 @@
     flex-wrap: wrap;
     gap: 0 0.375rem;
     overflow-wrap: anywhere;
-  }
-
-  .link {
-    text-decoration: underline;
   }
 
   .chip {

@@ -13,6 +13,10 @@
     setHidden,
     updateThumb,
   } from "./admin.remote";
+  import CopyId from "./copy-id.svelte";
+
+  /** A status line; `id` is shown click-to-copy between `text` and `after`. */
+  type Message = { text: string; id?: string; after?: string };
 
   type Props = {
     collection: Collection;
@@ -29,17 +33,18 @@
   /** Everything a pending delete would remove, shown before confirming. */
   let pendingDelete = $state.raw<{ section?: Section; corpses: Corpse[] } | null>(null);
   let busy = $state(false);
-  let message = $state<string | null>(null);
+  let message = $state.raw<Message | null>(null);
 
   const date = $derived(new Date(item.date).toLocaleString());
 
-  async function run(action: () => Promise<string>) {
+  async function run(action: () => Promise<string | Message>) {
     busy = true;
     message = null;
     try {
-      message = await action();
+      const result = await action();
+      message = typeof result === "string" ? { text: result } : result;
     } catch (cause) {
-      message = cause instanceof Error ? cause.message : "request failed";
+      message = { text: cause instanceof Error ? cause.message : "request failed" };
     } finally {
       busy = false;
     }
@@ -85,7 +90,7 @@
     return run(async () => {
       const { corpseId } = await makeCorpse(item.id);
       onopen("corpses", corpseId);
-      return `made corpse ${corpseId}`;
+      return { text: "made corpse", id: corpseId };
     });
   }
 
@@ -98,7 +103,7 @@
       link.download = `${item.id}.json`;
       link.click();
       URL.revokeObjectURL(link.href);
-      return `downloaded ${item.id}.json`;
+      return { text: "downloaded", id: item.id, after: ".json" };
     });
   }
 </script>
@@ -126,7 +131,7 @@
         <dd>{item.type}</dd>
       {/if}
       <dt>id</dt>
-      <dd><code>{item.id}</code></dd>
+      <dd><CopyId id={item.id} /></dd>
       <dt>date</dt>
       <dd>{date}</dd>
       <dt>likes</dt>
@@ -136,10 +141,9 @@
         {#if !item.hidden}
           visible
         {:else if !isSection(item) && item.hiddenBy?.startsWith("section:")}
+          {@const sectionId = item.hiddenBy.slice(8)}
           hidden with section
-          <button class="link" onclick={() => onopen("sections", item.hiddenBy!.slice(8))}>
-            {item.hiddenBy.slice(8)}
-          </button>
+          <CopyId id={sectionId} onopen={() => onopen("sections", sectionId)} />
         {:else}
           hidden
         {/if}
@@ -148,7 +152,7 @@
         <dt>in corpses</dt>
         <dd class="links">
           {#each item.featuredIn as id (id)}
-            <button class="link" onclick={() => onopen("corpses", id)}>{id}</button>
+            <CopyId {id} onopen={() => onopen("corpses", id)} />
           {:else}
             none
           {/each}
@@ -207,7 +211,10 @@
     {/if}
 
     {#if message}
-      <p class="message" role="status">{message}</p>
+      <p class="message" role="status">
+        {message.text}
+        {#if message.id}<CopyId id={message.id} />{message.after}{/if}
+      </p>
     {/if}
   </div>
 </Panel>
@@ -264,7 +271,7 @@
   .links {
     display: flex;
     flex-wrap: wrap;
-    gap: 0 0.5rem;
+    gap: 0.25rem 0.75rem;
   }
 
   .actions {
