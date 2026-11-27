@@ -62,7 +62,7 @@
       <a
         href={entry.value === "corpses" ? "/fresh/look" : `/fresh/look?part=${entry.value}`}
         aria-current={entry.value === part ? "page" : undefined}
-        data-sveltekit-noscroll
+        data-sveltekit-reset="false"
       >
         {entry.label}
       </a>
