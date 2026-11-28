@@ -120,16 +120,29 @@ Pass 1 (done):
 - The draw page is centred too: the drawing step is measured once, and sign
   and reveal keep that top so the reveal still unfolds in place.
 
-Pass 2 (next):
-- Phone landscape (756×252 to draw in, vs 346×115 in portrait): hide the
-  header while drawing, controls as a vertical rail on the side, left/right
-  handed (remembered). A "turn sideways for more room" hint in portrait.
-- Apple Pencil: once a pen touches, ignore fingers/palm for drawing;
-  pressure for line width (optional).
-- Two-finger tap undo, three-finger redo.
-- Swipe on the creature sheet (another / back) and the section player (steps).
-- Needs real devices: palm rejection, pressure and gestures can't be judged
-  in an emulator.
+Pass 2 (done):
+- **Phone landscape** (701×234 to draw in on an iPhone-size screen, vs 346×115
+  in portrait): the header hides while drawing and the dock becomes a rail
+  down one side; the colour sheet opens beside it. "⇆ left/right side" in the
+  sheet flips the rail (`ui/hand.svelte.ts`, remembered per device). Portrait
+  shows "↻ turn your phone sideways for more room" until you have once.
+- **Input layer** (`lib/draw/touch-input.ts`, capture phase in front of
+  canvas-paint): a pen draws immediately (Apple Pencil via `touchType`,
+  other styluses via `pointerType: "pen"`); once a pen has touched, fingers
+  and palms don't draw (palm rejection). One finger draws after ≤70ms / 6px
+  so a second finger can make it a gesture without a stray dot. Two-finger
+  tap undoes, three-finger tap redoes.
+- **Swipe** (`ui/swipe.ts`): creature (left another, right back), section
+  player (steps), look (shelves). The sheet follows the finger and springs
+  back if it doesn't count; vertical scroll still works; a swipe is never
+  also a tap; edge swipes are left to iOS.
+- **No stray scroll on phones:** heights use `svh`, not `vh` (vh is the
+  height with the address bar hidden).
+- **Not done: pencil pressure.** canvas-paint renders a stroke at one width
+  (its first point's size). Pressure needs variable-width rendering in
+  canvas-paint, which also renders server thumbnails, so it would bump
+  `RENDER_VERSION`. Possible, separately.
+- Still needs real devices: Pencil palm rejection, gesture feel, rail reach.
 
 ## Artists (waiting on atproto)
 
@@ -171,4 +184,5 @@ change in that one component.
 - [ ] Real-device check on a phone (only checked in 390px frames so far),
       including the doodles' press/hold/release.
 - [ ] Artist page, with atproto (see "Artists").
-- [ ] Touch pass 2 (see "Touch").
+- [x] Touch pass 2 (see "Touch"). Try on a real phone and iPad.
+- [ ] Pencil pressure: variable-width strokes in canvas-paint (renderer + thumbs).

@@ -13,6 +13,9 @@
   import Arrow from "../ui/arrow.svelte";
   import { brushCursor } from "../ui/brush-cursor.ts";
   import Tools from "../ui/tools.svelte";
+  import { hand } from "../ui/hand.svelte.ts";
+  import { learned } from "../ui/learned.svelte.ts";
+  import { MediaQuery } from "svelte/reactivity";
   import Swap from "../ui/swap.svelte";
   import { highlight } from "../ui/marks.ts";
   import { doodles as doodleState } from "../doodle-settings.svelte.ts";
@@ -83,6 +86,14 @@
   $effect(() => {
     doodleState.scattered = step === "draw" || step === "sign";
     return () => (doodleState.scattered = false);
+  });
+
+  // Phones draw best on their side (the 3:1 strip triples in size). In
+  // portrait, suggest it once; seeing landscape while drawing counts as learned.
+  const phonePortrait = new MediaQuery("(pointer: coarse) and (max-width: 719px) and (orientation: portrait)");
+  const phoneLandscape = new MediaQuery("(pointer: coarse) and (max-height: 500px) and (orientation: landscape)");
+  $effect(() => {
+    if (step === "draw" && phoneLandscape.current) learned.learn("sideways");
   });
 
   // While drawing, the page can't scroll or bounce (no pull-to-refresh wiping a drawing).
@@ -200,6 +211,7 @@
 <main
   class="draw"
   data-step={step}
+  data-hand={hand.side}
   class:middle={step === "pick"}
   bind:this={main}
   style:margin-top={step === "pick" ? undefined : `${stageTop}px`}
@@ -247,6 +259,9 @@
     {#if failed}<p class="mono error">{failed}</p>{/if}
 
     {#if step === "draw"}
+      {#if phonePortrait.current && learned.needs("sideways")}
+        <p class="mono hint sideways">↻ turn your phone sideways for more room</p>
+      {/if}
       <Tools enabled={!loading} ondone={() => (step = "sign")} />
 
       <div class="below">
@@ -448,5 +463,35 @@
     .draw[data-step="draw"] {
       padding-bottom: 88px;
     }
+  }
+
+  /* phones on their side: no header while drawing, and room for the rail */
+  @media (pointer: coarse) and (max-height: 500px) and (orientation: landscape) {
+    :global(html:has(.draw[data-step="draw"]) .fresh > header) {
+      display: none;
+    }
+
+    .draw[data-step="draw"] {
+      max-width: none;
+      padding-block: 8px;
+      padding-inline-end: 72px;
+    }
+
+    .draw[data-step="draw"][data-hand="left"] {
+      padding-inline: 72px 0;
+    }
+
+    .draw[data-step="draw"] .sheet {
+      /* as wide as fits under the screen's height (3:1 third + its two slivers) */
+      max-width: min(100%, calc((100svh - 110px) * 3));
+    }
+
+    .draw[data-step="draw"] .below .done {
+      display: none;
+    }
+  }
+
+  .sideways {
+    margin-top: -8px;
   }
 </style>

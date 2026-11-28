@@ -2,6 +2,7 @@
   import { MediaQuery } from "svelte/reactivity";
   import { drawState } from "#lib/draw/state.svelte.ts";
   import Arrow from "./arrow.svelte";
+  import { hand } from "./hand.svelte.ts";
   import { highlight } from "./marks.ts";
 
   type Mode = "draw" | "erase" | "fill";
@@ -32,7 +33,12 @@
    */
   const coarse = new MediaQuery("(pointer: coarse)");
   const narrow = new MediaQuery("(max-width: 719px)");
-  const dock = $derived(coarse.current && narrow.current);
+  // a phone on its side: short and wide. The dock becomes a rail down one side.
+  const short = new MediaQuery("(max-height: 500px) and (orientation: landscape)");
+  const rail = $derived(coarse.current && short.current);
+  const dock = $derived(coarse.current && (narrow.current || short.current));
+
+  $effect(() => hand.load());
 
   let sheetOpen = $state(false);
   let tucked = $state(false);
@@ -132,7 +138,16 @@
 
 {#if dock}
   <!-- phones: the dock -->
-  <div class="dock" data-tucked={tucked || undefined} bind:this={dockElement} role="toolbar" aria-label="drawing tools">
+  <div
+    class="dock"
+    data-rail={rail || undefined}
+    data-hand={hand.side}
+    data-tucked={tucked || undefined}
+    bind:this={dockElement}
+    role="toolbar"
+    aria-label="drawing tools"
+    aria-orientation={rail ? "vertical" : "horizontal"}
+  >
     <button class="grip" aria-label={tucked ? "show the tools" : "tuck the tools away"} aria-expanded={!tucked} onclick={() => ((tucked = !tucked), (sheetOpen = false))}>
       <span aria-hidden="true"></span>
     </button>
@@ -145,6 +160,9 @@
           {@render addColour("+ colour")}
           <button class="word" onclick={() => drawState.redo()} disabled={!drawState.canRedo}>redo</button>
           <button class="word" onclick={() => drawState.clear()} disabled={drawState.empty}>clear</button>
+          {#if rail}
+            <button class="word" onclick={() => hand.swap()}>⇆ {hand.side === "right" ? "left" : "right"} side</button>
+          {/if}
         </div>
       </div>
     {/if}
@@ -581,6 +599,83 @@
   .panel .word {
     min-width: 44px;
     min-height: 44px;
+  }
+
+  /* ---- phones on their side: the dock as a rail down one edge ---- */
+  .dock[data-rail] {
+    top: 0;
+    bottom: 0;
+    left: auto;
+    right: 0;
+    display: flex;
+    flex-direction: row;
+    padding: 0 env(safe-area-inset-right) 0 0;
+    border-top: none;
+    border-left: 1px solid var(--sky-line);
+  }
+
+  .dock[data-rail][data-hand="left"] {
+    left: 0;
+    right: auto;
+    flex-direction: row-reverse;
+    padding: 0 0 0 env(safe-area-inset-left);
+    border-left: none;
+    border-right: 1px solid var(--sky-line);
+  }
+
+  .dock[data-rail][data-tucked] {
+    translate: calc(100% - 24px) 0;
+  }
+
+  .dock[data-rail][data-hand="left"][data-tucked] {
+    translate: calc(-100% + 24px) 0;
+  }
+
+  .dock[data-rail] .grip {
+    width: 24px;
+    height: 100%;
+  }
+
+  .dock[data-rail] .grip span {
+    width: 5px;
+    height: 40px;
+  }
+
+  .dock[data-rail] .bar {
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    width: 60px;
+    min-height: 0;
+    padding: 10px 4px;
+  }
+
+  .dock[data-rail] .modes {
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .dock[data-rail] .done {
+    margin: 0 0 6px;
+  }
+
+  /* the colour sheet opens beside the rail */
+  .dock[data-rail] .panel {
+    position: absolute;
+    top: 50%;
+    right: calc(100% + 8px);
+    translate: 0 -50%;
+    width: min(320px, 60vw);
+    margin: 0;
+    padding: 12px;
+    background: color-mix(in srgb, var(--sky) 96%, transparent);
+    border: 1px solid var(--sky-line);
+    border-radius: 10px;
+  }
+
+  .dock[data-rail][data-hand="left"] .panel {
+    right: auto;
+    left: calc(100% + 8px);
   }
 
   /* ---- narrow windows with a mouse: one row, scroll sideways, pinned to the bottom ---- */
