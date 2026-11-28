@@ -4,6 +4,7 @@
   import type { Snippet } from "svelte";
   import { getLikeState, toggleLike } from "#lib/likes.remote.ts";
   import { drawingsToPng } from "#lib/render.ts";
+  import { copyText } from "./copy.ts";
   import Swap from "./swap.svelte";
 
   type Props = {
@@ -80,9 +81,8 @@
       }
       return;
     }
-    // only claim "copied!" when it really was
-    const ok = await navigator.clipboard?.writeText(url).then(() => true, () => false);
-    if (!ok) return;
+    // only claim "copied!" when it really was; otherwise show the link to copy by hand
+    if (!(await copyText(url))) return void prompt("copy the link:", url);
     copied = true;
     setTimeout(() => (copied = false), 1500);
   }

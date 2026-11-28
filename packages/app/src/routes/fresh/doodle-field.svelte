@@ -18,22 +18,39 @@
   const wide = new MediaQuery("(min-width: 1280px)");
   const COUNT = $derived(density === "sparse" ? 4 : wide.current ? 12 : 9);
 
-  // Spots around the edges of the viewport (vw/vh), so the centre stays clear.
+  // Spots around the sheet. x/y are vw/vh at the edges of the screen; `reach`
+  // is how far a doodle comes in from there toward the clear zone (1 = right up
+  // to it), which only has room to matter on wide screens.
   const SPOTS = [
-    { x: 1, y: 14, w: 17, r: -9, d: 9 },
-    { x: 79, y: 10, w: 15, r: 7, d: 11 },
-    { x: 3, y: 52, w: 13, r: 5, d: 8 },
-    { x: 83, y: 44, w: 16, r: -6, d: 10 },
-    { x: 0, y: 84, w: 15, r: 8, d: 12 },
-    { x: 80, y: 80, w: 17, r: -4, d: 9 },
-    { x: 60, y: 1, w: 11, r: 11, d: 13 },
-    { x: 24, y: 2, w: 10, r: -12, d: 10 },
-    { x: 66, y: 93, w: 12, r: -8, d: 11 },
+    { x: 1, y: 14, w: 17, r: -9, d: 9, reach: 0.65 },
+    { x: 79, y: 10, w: 15, r: 7, d: 11, reach: 0.4 },
+    { x: 3, y: 52, w: 13, r: 5, d: 8, reach: 0.95 },
+    { x: 83, y: 44, w: 16, r: -6, d: 10, reach: 0.75 },
+    { x: 0, y: 84, w: 15, r: 8, d: 12, reach: 0.45 },
+    { x: 80, y: 80, w: 17, r: -4, d: 9, reach: 0.9 },
+    { x: 60, y: 1, w: 11, r: 11, d: 13, reach: 0 },
+    { x: 24, y: 2, w: 10, r: -12, d: 10, reach: 0 },
+    { x: 66, y: 93, w: 12, r: -8, d: 11, reach: 0.8 },
     // wide screens only (the first nine are the rest)
-    { x: 12, y: 33, w: 11, r: 6, d: 12 },
-    { x: 88, y: 26, w: 10, r: -10, d: 10 },
-    { x: 30, y: 90, w: 12, r: 4, d: 13 },
+    { x: 12, y: 33, w: 11, r: 6, d: 12, reach: 0.2 },
+    { x: 88, y: 26, w: 10, r: -10, d: 10, reach: 0.95 },
+    { x: 30, y: 90, w: 12, r: 4, d: 13, reach: 0.9 },
   ];
+
+  /** Half the width kept clear down the middle: the sheet (560px) and a little air. */
+  const CLEAR = 310;
+
+  const widthOf = (spot: (typeof SPOTS)[number]) => Math.min(260, Math.max(96, (spot.w / 100) * innerWidth));
+
+  /** A spot's left edge in px: at the edge of the screen, or pulled in toward the sheet. */
+  function leftOf(spot: (typeof SPOTS)[number]): number {
+    const edge = (spot.x / 100) * innerWidth;
+    const onLeft = spot.x < 50;
+    const near = onLeft ? innerWidth / 2 - CLEAR - widthOf(spot) : innerWidth / 2 + CLEAR;
+    const pull = (near - edge) * spot.reach;
+    // only ever inward: narrow screens have no room, and keep the edge spot
+    return edge + (onLeft ? Math.max(0, pull) : Math.min(0, pull));
+  }
 
   const byId = $derived(Object.fromEntries(doodles.map((doodle) => [doodle.id, doodle])));
 
@@ -82,8 +99,8 @@
   /** Unit vector from a doodle's centre toward a point on screen. */
   function toward(slot: number, point: { x: number; y: number }) {
     const spot = SPOTS[slot];
-    const width = Math.min(260, Math.max(96, (spot.w / 100) * innerWidth));
-    const cx = (spot.x / 100) * innerWidth + width / 2;
+    const width = widthOf(spot);
+    const cx = leftOf(spot) + width / 2;
     const cy = (spot.y / 100) * innerHeight + parallax(spot) + width / 6;
     const dx = point.x - cx;
     const dy = point.y - cy;
@@ -164,7 +181,8 @@
     const spot = SPOTS[slot];
     const nudge = jiggle[slot];
     if (!doodleState.scattered) return `${nudge.x}px ${nudge.y}px`;
-    return `${spot.x < 50 ? -45 : 45}vw ${(spot.y - 50) * 0.3}vh`;
+    const out = spot.x < 50 ? -(leftOf(spot) + widthOf(spot) + 40) : innerWidth - leftOf(spot) + 40;
+    return `${out}px ${(spot.y - 50) * 0.3}vh`;
   }
 </script>
 
@@ -188,7 +206,7 @@
     {#if byId[id] && tinted[id] && spot}
       <span
         class="doodle"
-        style:left="{spot.x}vw"
+        style:left="{leftOf(spot)}px"
         style:top="calc({spot.y}vh + {parallax(spot)}px)"
         style:width="clamp(96px, {spot.w}vw, 260px)"
         style:--r="{spot.r + jiggle[slot].r}deg"

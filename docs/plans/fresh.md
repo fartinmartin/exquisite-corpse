@@ -60,40 +60,48 @@ Settled details:
   the press point and squashes them a little (anticipation); release flings
   them away, harder the longer you held (up to 1.2s), and they wobble home on
   an underdamped spring. No tremble while holding.
-- Doodles: 9 around the edges, 12 on wide screens (≥1280px) where the desk
-  is mostly empty, 4 fainter ones on look (already full of drawings).
+- Doodles: 9 around the sheet, 12 on wide screens (≥1280px) where the desk
+  is mostly empty, 4 fainter ones on look (already full of drawings). On wide
+  screens they come in toward the sheet (each has a `reach`; `CLEAR` in
+  `doodle-field.svelte` is the empty zone's half-width).
+- Side room: `--gutter` (at least 24–32px on phones) and `overflow-x: clip` on
+  `.fresh`, so tilted, folding or turning sheets never scroll sideways. The
+  draw page keeps narrower sides for the canvas.
 - Look wall: images reserve their aspect ratio (square / 3:1) and show one of
   the quiet paper backs (dots, graph, ruled, scuffs) until they load.
 
 ## Creature view (home and /c/[id])
 
 `ui/creature-view.svelte`. The sheet, title, then heart · share · download ·
-replay · **random**. Tapping the sheet turns it over (credits) everywhere.
+replay · **random** (no arrow: it has no direction). Tapping the sheet turns it over (credits) everywhere.
 
 - The heart stays bare (no stamp): it reads as a control on its own; stamps
   are for actions on the thing. 44px to tap.
 - **share**: the system share sheet on touch devices, otherwise copies the
-  link ("copied!"). Always the creature's own URL.
+  link ("copied!"). Always the creature's own URL. Over plain http (the dev
+  server on Wi-Fi) there's no share sheet or Clipboard API: it copies the
+  old way (`ui/copy.ts`), and shows the link in a prompt if even that fails.
 - **replay** (the old site's playback): the creature blanks and redraws
   itself stroke by stroke, third by third *in the order they were drawn*
   (`lib/corpse/playback.ts`). A section page's solo step draws itself in on
   arrival. Not at reveal time.
-- **random** (was "another"; still `another` in code and `page.state`).
-
-- **another** asks for a random id (`anotherCorpseId`, a command so it's never
-  cached; `Corpses.randomId` loads no drawings) and navigates to
-  `/fresh/c/<id>`. Every creature you land on is shareable, and back walks
+- **random** (was "another"; still `another` in code and `page.state`) asks
+  for a random id (`anotherCorpseId`, a command so it's never cached;
+  `Corpses.randomId` loads no drawings) and navigates to `/fresh/c/<id>`.
+  Every creature you land on is shareable, and the browser's back walks
   through them.
-- Home keeps its URL (`/fresh`) on arrival. Leaving it via another pins home's
+- Home keeps its URL (`/fresh`) on arrival. Leaving it via random pins home's
   history entry to the creature it showed (`replaceState` with
   `page.state.pinned`), so back returns to that creature instead of dealing a
   new random one.
 - copy link always copies the creature's own URL, also from home.
-- Keys: → another, ← back through creatures that another dealt (only those,
-  so ← never leaves the site).
-- **Toss:** creature to creature (another, back/forward) the sheet is tossed
-  aside left and the next lands from the right, still folded, then unfolds;
-  back runs it the other way (view transitions in `fresh/+layout.svelte`,
+- Either direction deals a new one (2026-11-28): swipe left or → brings it
+  from the right, swipe right or ← from the left, the button picks a side.
+  Going back is the browser's job (button, iOS edge swipe).
+- **Toss:** creature to creature (random, back/forward) the sheet is tossed
+  aside and the next lands from the opposite side (`ui/toss.ts`), still
+  folded, then unfolds; back sends it out the way it came in (view
+  transitions in `fresh/+layout.svelte`,
   names `creature` / `creature-meta`). Rule: toss when one sheet is replaced
   by a *different* sheet; not when the same sheet changes state, so the
   section playlist only folds and unfolds.
@@ -115,8 +123,9 @@ replay · **random**. Tapping the sheet turns it over (credits) everywhere.
 - **Visible arrows** either side of the sheet (under it, around the caption,
   on phones), plus ←/→ keys. Same keys as the creature view with a different
   meaning (next in this list vs. another random): fine, it's per page.
-- Caption: "on its own · in N creatures", then "in <creature> · 2 of 6" with a
-  link to the creature. ("on its own" is a placeholder; alternatives pending.)
+- Caption: "in N creatures" (touch adds ", swipe to see them"; with a mouse
+  the arrows say it), then "in <creature> · 2 of 6" with a link to the
+  creature.
 - `?in=<creatureId>` opens straight to a step; stepping updates it in place
   (`replaceState`, no history entries).
 - Below: title, "a middle by <artist>", the section's heart / copy link /
@@ -154,7 +163,7 @@ Pass 2 (done):
   and palms don't draw (palm rejection). One finger draws after ≤70ms / 6px
   so a second finger can make it a gesture without a stray dot. Two-finger
   tap undoes, three-finger tap redoes.
-- **Swipe** (`ui/swipe.ts`): creature (left another, right back), section
+- **Swipe** (`ui/swipe.ts`): creature (either way for a new one), section
   player (steps), look (shelves). The sheet follows the finger and fades
   with the distance, and springs back if it doesn't count. When it counts:
   the creature/look item fades out and the next fades in (where there are
@@ -199,6 +208,8 @@ change in that one component.
 
 ## Resume here
 
+- [ ] Pick the call-to-action look (`.hl`). Six options on an uncommitted
+      workshop page, `routes/fresh/lab/hl` (delete once picked).
 - [x] Paper backs: keep all 8.
 - [ ] Measure ink bleed-through, which renders each folded panel twice.
 - [ ] Promote `/fresh` onto the main routes (`/`, `/draw`, `/gallery/...`),

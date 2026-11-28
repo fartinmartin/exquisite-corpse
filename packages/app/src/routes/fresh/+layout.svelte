@@ -7,6 +7,7 @@
   import Pencil from "./ui/pencil.svelte";
   import { learned } from "./ui/learned.svelte.ts";
   import { highlight } from "./ui/marks.ts";
+  import { toss, type Side } from "./ui/toss.ts";
 
   let { children } = $props();
 
@@ -16,14 +17,19 @@
   $effect(() => learned.load());
 
   /*
-   * Creature to creature (home, /c/[id], "another", back/forward): the sheet
-   * is tossed aside and the next one lands, still folded, then unfolds. Back
-   * runs it the other way. Only between creature views: other navigations
-   * just swap. Browsers without view transitions swap too.
+   * Creature to creature (home, /c/[id], "random", back/forward): the sheet
+   * is tossed aside and the next one lands, still folded, then unfolds. A
+   * dealt creature says which side it comes in from; back sends it out that
+   * way again. Only between creature views: other navigations just swap.
+   * Browsers without view transitions swap too.
    */
   const CREATURE_ROUTES = new Set(["/fresh", "/fresh/c/[id]"]);
 
+  const opposite = (side: Side): Side => (side === "left" ? "right" : "left");
+
   onNavigate((navigation) => {
+    const dealt = toss.next;
+    toss.next = undefined;
     if (!document.startViewTransition) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const from = navigation.from?.route.id ?? "";
@@ -34,7 +40,9 @@
     if (navigation.from?.url.href === navigation.to?.url.href) return;
 
     const back = navigation.type === "popstate" && navigation.delta < 0;
-    document.documentElement.dataset.toss = settle ? "settle" : back ? "back" : "forward";
+    // where the next one comes in from (page.state is still the one leaving)
+    const side = back ? opposite(page.state.another ?? "right") : (dealt ?? "right");
+    document.documentElement.dataset.toss = settle ? "settle" : `from-${side}`;
     return new Promise((resolve) => {
       const transition = document.startViewTransition(async () => {
         resolve();
@@ -76,7 +84,7 @@
   />
 </svelte:head>
 
-<div class="fresh" style:--header="{headerHeight}px">
+<div class="fresh" style:--header="{headerHeight}px" data-drawing={drawing || undefined}>
   <DoodleField doodles={field} density={page.url.pathname.startsWith("/fresh/look") ? "sparse" : "full"} />
 
   <header bind:clientHeight={headerHeight}>
@@ -180,6 +188,10 @@
 
   /* a full-height column, so a page can sit in the middle of what's under the header */
   .fresh {
+    /* room either side: sheets are tilted, throw a shadow, and grow as they fold or turn */
+    --gutter: max(clamp(24px, 8vw, 32px), min(4vw, 48px));
+    /* …and whatever still pokes out (a turning sheet in perspective) never scrolls sideways */
+    overflow-x: clip;
     position: relative;
     min-height: 100svh;
     display: flex;
@@ -226,16 +238,16 @@
     animation: none;
   }
 
-  :global(html[data-toss="forward"]::view-transition-old(creature)) {
+  :global(html[data-toss="from-right"]::view-transition-old(creature)) {
     animation: 260ms cubic-bezier(0.55, 0, 0.75, 0.2) both toss-out-left;
   }
-  :global(html[data-toss="forward"]::view-transition-new(creature)) {
+  :global(html[data-toss="from-right"]::view-transition-new(creature)) {
     animation: 420ms cubic-bezier(0.2, 0.9, 0.3, 1.15) 120ms both toss-in-right;
   }
-  :global(html[data-toss="back"]::view-transition-old(creature)) {
+  :global(html[data-toss="from-left"]::view-transition-old(creature)) {
     animation: 260ms cubic-bezier(0.55, 0, 0.75, 0.2) both toss-out-right;
   }
-  :global(html[data-toss="back"]::view-transition-new(creature)) {
+  :global(html[data-toss="from-left"]::view-transition-new(creature)) {
     animation: 420ms cubic-bezier(0.2, 0.9, 0.3, 1.15) 120ms both toss-in-left;
   }
 
@@ -285,7 +297,7 @@
     justify-content: space-between;
     align-items: baseline;
     gap: 24px;
-    padding: 24px clamp(20px, 4vw, 48px);
+    padding: 24px var(--gutter);
   }
 
   .mark {
@@ -337,7 +349,12 @@
     flex: 1;
     display: flex;
     flex-direction: column;
-    padding: 0 clamp(20px, 4vw, 48px) 64px;
+    padding: 0 var(--gutter) 64px;
+  }
+
+  /* drawing: the canvas gets the width instead (the header stays put) */
+  .fresh[data-drawing] .content {
+    padding-inline: clamp(20px, 4vw, 48px);
   }
 
   /* one-sheet pages: centred vertically under the header (no effect once taller than the screen) */

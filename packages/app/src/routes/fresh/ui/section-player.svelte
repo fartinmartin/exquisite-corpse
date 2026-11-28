@@ -183,9 +183,9 @@
       in <a class="squiggle" href={`/fresh/c/${current.id}`}>{current.title}</a>
       <span class="count">{step} of {last}</span>
     {:else if last > 0}
-      on its own <span class="count">· in {last} {last === 1 ? "creature" : "creatures"}</span>
+      in {last} {last === 1 ? "creature" : "creatures"}<span class="touch">, <span class="together">swipe to see {last === 1 ? "it" : "them"}</span></span>
     {:else}
-      on its own <span class="count">· not in a creature yet</span>
+      not in a creature yet
     {/if}
   </p>
 </div>
@@ -245,6 +245,22 @@
 
   .count {
     margin-left: 6px;
+  }
+
+  /* with a mouse the arrows say it; "swipe" is for fingers */
+  .touch {
+    display: none;
+  }
+
+  /* too long for one line on a phone: break after the comma, not mid-phrase */
+  .together {
+    white-space: nowrap;
+  }
+
+  @media (pointer: coarse) {
+    .touch {
+      display: inline;
+    }
   }
 
   /* phones: the sheet takes the width; the arrows sit either side of the caption */

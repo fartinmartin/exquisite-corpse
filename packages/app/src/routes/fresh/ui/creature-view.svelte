@@ -7,11 +7,11 @@
   import { getCorpse } from "../../gallery/corpse/[id]/corpse.remote";
   import { anotherCorpseId } from "../../home.remote";
   import Actions from "./actions.svelte";
-  import Arrow from "./arrow.svelte";
   import CreatureSheet from "./creature-sheet.svelte";
   import { learned } from "./learned.svelte.ts";
   import Swap from "./swap.svelte";
   import { swipe } from "./swipe.ts";
+  import { toss, type Side } from "./toss.ts";
 
   type Props = { corpse: CorpseWithSections };
 
@@ -20,9 +20,8 @@
   /*
    * One view for a creature, on home (a random one, URL stays /fresh so a
    * reload deals a new one) and on its own page. "random" (internally
-   * `another`) navigates to the
-   * next creature's own URL, so every creature you land on is shareable and
-   * the back button walks back through them.
+   * `another`) navigates to the next creature's own URL, so every creature you
+   * land on is shareable and the back button walks back through them.
    */
   const href = $derived(`/fresh/c/${corpse.id}`);
 
@@ -89,7 +88,11 @@
     return () => clearTimeout(timer);
   });
 
-  async function another() {
+  /**
+   * Deals a random creature, which comes in from `from`: the side the finger
+   * (or arrow key) brings it from, or either one for the button.
+   */
+  async function another(from: Side = Math.random() < 0.5 ? "left" : "right") {
     if (dealing) return;
     dealing = true;
     failed = false;
@@ -98,7 +101,8 @@
       // Leaving home: pin its history entry to this creature, so back returns
       // to it rather than dealing a different random one.
       if (page.route.id === "/fresh") await goto(href, { state: { pinned: corpse.id }, shallow: true, replace: true });
-      await goto(`/fresh/c/${id}`, { state: { another: true } });
+      toss.next = from;
+      await goto(`/fresh/c/${id}`, { state: { another: from } });
     } catch {
       failed = true;
     } finally {
@@ -106,17 +110,14 @@
     }
   }
 
-  // → deals another; ← steps back, but only through creatures "another" dealt.
+  // → and ← both deal another, brought in from that side. Back is the browser's.
   function keydown(event: KeyboardEvent) {
     if (event.metaKey || event.ctrlKey || event.altKey || event.shiftKey) return;
     const target = event.target as HTMLElement | null;
     if (target?.closest("input, textarea, select, [contenteditable]")) return;
-    if (event.key === "ArrowRight") {
+    if (event.key === "ArrowRight" || event.key === "ArrowLeft") {
       event.preventDefault();
-      void another();
-    } else if (event.key === "ArrowLeft" && page.state.another) {
-      event.preventDefault();
-      history.back();
+      void another(event.key === "ArrowRight" ? "right" : "left");
     }
   }
 </script>
@@ -124,8 +125,8 @@
 <svelte:window onkeydown={keydown} />
 
 <main class="creature middle">
-  <!-- swipe the sheet: left deals another, right goes back (when "another" brought you here) -->
-  <div class="swipe-area" {@attach swipe({ left: another, right: page.state.another ? () => history.back() : undefined, follow: true, fade: "out", key: corpse.id })}>
+  <!-- swipe the sheet either way to deal another, which follows your finger in -->
+  <div class="swipe-area" {@attach swipe({ left: () => another("right"), right: () => another("left"), follow: true, fade: "out", key: corpse.id })}>
     <CreatureSheet {corpse} bind:turned {drawn} {replayKey} />
   </div>
 
@@ -143,8 +144,8 @@
       <button class="stamp" style:--r="1.5deg" onclick={replay} disabled={replaying} aria-label="replay: watch it being drawn">
         <Swap labels={["replay", "…"]} active={replaying ? 1 : 0} />
       </button>
-      <button class="stamp another" style:--r="-1.5deg" onclick={another} disabled={dealing} aria-label="a random creature" aria-keyshortcuts="ArrowRight">
-        <Swap labels={["random", "…"]} active={dealing ? 1 : 0} /><Arrow />
+      <button class="stamp" style:--r="-1.5deg" onclick={() => another()} disabled={dealing} aria-label="a random creature" aria-keyshortcuts="ArrowLeft ArrowRight">
+        <Swap labels={["random", "…"]} active={dealing ? 1 : 0} />
       </button>
     </Actions>
     {#if failed}<p class="mono">couldn't find one, try again?</p>{/if}
@@ -194,10 +195,5 @@
 
   .drew {
     margin-top: -4px;
-  }
-
-  .another {
-    display: inline-flex;
-    align-items: center;
   }
 </style>

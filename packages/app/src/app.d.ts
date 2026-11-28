@@ -6,9 +6,9 @@ declare global {
     // interface PageData {}
     // interface Platform {}
     interface PageState {
-      /** /fresh: this creature came from "another", so ← can step back to the previous one. */
-      another?: boolean;
-      /** /fresh home, left via "another": the creature it was showing, so back returns to it. */
+      /** /fresh: this creature was dealt by "random", and came in from this side. */
+      another?: "left" | "right";
+      /** /fresh home, left via "random": the creature it was showing, so back returns to it. */
       pinned?: string;
       /** /fresh/c/[id], arriving from the draw page: the third this visitor just drew. */
       drawn?: "top" | "mid" | "bot";
