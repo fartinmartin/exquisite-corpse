@@ -35,6 +35,30 @@
   let sheet = $state<HTMLElement>();
   let liveWidth = $state(0);
 
+  /*
+   * Centring. The pick step centres like any one-sheet page (.middle). The
+   * later steps can't: the reveal unfolds in place from where you drew, so
+   * the sheet's top must not move between draw, sign and reveal. So the draw
+   * step is centred by measuring it once, and sign and reveal keep that top.
+   */
+  let main = $state<HTMLElement>();
+  let stageTop = $state(0);
+  let innerHeight = $state(800);
+
+  $effect(() => {
+    if (step !== "draw" || !main) return;
+    const element = main;
+    const place = () => {
+      const contentTop = (element.parentElement?.getBoundingClientRect().top ?? 0) + window.scrollY;
+      // 64px: the content's bottom padding, matching .middle pages
+      stageTop = Math.max(0, Math.round((innerHeight - contentTop - 64 - element.offsetHeight) / 2));
+    };
+    place();
+    const observer = new ResizeObserver(place);
+    observer.observe(element);
+    return () => observer.disconnect();
+  });
+
   /** The cursor over the drawing previews the brush (canvas-paint draws on a 1080-wide canvas). */
   const cursor = $derived(
     brushCursor({ mode: drawState.mode, size: drawState.size, color: drawState.color, scale: liveWidth / 1080 })
@@ -162,10 +186,14 @@
   <title>exquisite corpse club ▪ draw</title>
 </svelte:head>
 
-<svelte:window onkeydown={keydown} />
+<svelte:window onkeydown={keydown} bind:innerHeight />
 
-<!-- only the pick step is centred: the reveal unfolds in place from where you drew, so later steps keep their top -->
-<main class="draw" class:middle={step === "pick"}>
+<main
+  class="draw"
+  class:middle={step === "pick"}
+  bind:this={main}
+  style:margin-top={step === "pick" ? undefined : `${stageTop}px`}
+>
   {#if step === "pick" || !section}
     <h1>pick a third</h1>
     <div class="paper sheet pick">
