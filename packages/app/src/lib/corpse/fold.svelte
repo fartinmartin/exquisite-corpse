@@ -128,7 +128,7 @@
 {#snippet panel(type: SectionType)}
   {@const drawing = panels[type]?.drawing}
   <div class="panel" data-type={type}>
-    <div class="face front" data-crease={creases[type]}>
+    <div class="face front" data-crease={creases[type]} data-blank={drawing ? undefined : ""}>
       {#if drawing}<Drawing {drawing} />{/if}
     </div>
     <div class="face back" class:marked={type === marked}>
@@ -209,6 +209,12 @@
   .face :global(canvas) {
     width: 100%;
     height: 100%;
+  }
+
+  /* a third nobody has drawn here (e.g. a section page before it unfolds
+     into a creature): the draw page's "someone else's third" hatching */
+  .front[data-blank] {
+    background: repeating-linear-gradient(-45deg, var(--fold, #deebff) 0 6px, var(--paper, #fff) 6px 12px);
   }
 
   /* the outer edges of the whole sheet */

@@ -19,9 +19,10 @@
   let { section, creatures }: Props = $props();
 
   /*
-   * A section page plays like a playlist. First the third on its own, in its
-   * slot of the square, with the other two thirds folded away behind it (the
-   * view its artist had). → unfolds it into the newest creature it's in, →
+   * A section page plays like a playlist. First the third on its own: it
+   * unfolds in its slot of the square with the other two thirds hatched
+   * (the draw page's "someone else's third"). → folds it up and unfolds it
+   * into the newest creature it's in, →
    * again folds it back up and opens the next one; ← goes back. `?in=<id>`
    * opens straight to a creature, so any step can be shared.
    */
@@ -36,7 +37,8 @@
   let step = $state(0);
   // svelte-ignore state_referenced_locally
   let panels = $state<Panels>({ [section.type]: section });
-  let open = $state(false);
+  // the solo step unfolds on arrival too
+  let open = $state(true);
   let busy = $state(false);
   let failed = $state(false);
 
@@ -46,7 +48,7 @@
   $effect.pre(() => {
     void section.id;
     step = 0;
-    open = false;
+    open = true;
     panels = { [section.type]: section };
   });
 
@@ -86,6 +88,7 @@
       } else {
         panels = solo;
         step = 0;
+        open = true;
       }
       const url = new URL(page.url.href);
       if (step > 0) url.searchParams.set("in", creatures[step - 1].id);

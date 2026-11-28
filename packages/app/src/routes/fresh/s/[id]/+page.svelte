@@ -55,17 +55,21 @@
 
 <style>
   .section {
+    width: 100%;
     max-width: 1000px;
-    margin: 1vh auto 0;
+    margin-inline: auto;
     display: flex;
     flex-direction: column;
     gap: 56px;
   }
 
+  /* the player fills the first screen, centred; "more by" comes after a scroll */
   .head {
+    min-height: calc(100svh - var(--header, 72px) - 64px);
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
     gap: 20px;
   }
 

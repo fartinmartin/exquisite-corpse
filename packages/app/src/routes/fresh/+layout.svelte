@@ -1,9 +1,10 @@
 <script lang="ts">
+  import { onNavigate } from "$app/navigation";
   import { page } from "$app/state";
   import DoodleField from "./doodle-field.svelte";
   import { doodles as doodleState } from "./doodle-settings.svelte.ts";
   import { doodles } from "./doodles.remote";
-  import Arrow from "./ui/arrow.svelte";
+  import Pencil from "./ui/pencil.svelte";
   import { learned } from "./ui/learned.svelte.ts";
   import { highlight } from "./ui/marks.ts";
 
@@ -11,10 +12,35 @@
 
   const field = $derived(await doodles());
 
-  let about = $state(false);
 
   $effect(() => learned.load());
 
+  /*
+   * Creature to creature (home, /c/[id], "another", back/forward): the sheet
+   * is tossed aside and the next one lands, still folded, then unfolds. Back
+   * runs it the other way. Only between creature views: other navigations
+   * just swap. Browsers without view transitions swap too.
+   */
+  const CREATURE_ROUTES = new Set(["/fresh", "/fresh/c/[id]"]);
+
+  onNavigate((navigation) => {
+    if (!document.startViewTransition) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (!CREATURE_ROUTES.has(navigation.from?.route.id ?? "") || !CREATURE_ROUTES.has(navigation.to?.route.id ?? "")) return;
+    if (navigation.from?.url.href === navigation.to?.url.href) return;
+
+    const back = navigation.type === "popstate" && navigation.delta < 0;
+    document.documentElement.dataset.toss = back ? "back" : "forward";
+    return new Promise((resolve) => {
+      const transition = document.startViewTransition(async () => {
+        resolve();
+        await navigation.complete;
+      });
+      transition.finished.finally(() => delete document.documentElement.dataset.toss);
+    });
+  });
+
+  let headerHeight = $state(72);
   const drawing = $derived(page.url.pathname.startsWith("/fresh/draw"));
   const looking = $derived(page.url.pathname.startsWith("/fresh/look"));
 
@@ -43,27 +69,18 @@
   />
 </svelte:head>
 
-<div class="fresh">
+<div class="fresh" style:--header="{headerHeight}px">
   <DoodleField doodles={field} />
 
-  <header>
+  <header bind:clientHeight={headerHeight}>
     <a class="mark" href="/fresh">exquisite corpse club</a>
     <nav>
       <a class="squiggle" href="/fresh/look" aria-current={looking ? "page" : undefined}>look</a>
       <!-- the one call to action, on every page -->
-      <a class="hl cta" href="/fresh/draw" style={highlight("draw")} aria-current={drawing ? "page" : undefined}>draw{#if !drawing}<Arrow />{/if}</a>
-      <button type="button" class="squiggle" aria-expanded={about} onclick={() => (about = !about)}>?</button>
+      <a class="hl cta" href="/fresh/draw" style={highlight("draw")} aria-current={drawing ? "page" : undefined}>draw{#if !drawing}<Pencil />{/if}</a>
     </nav>
   </header>
 
-  {#if about}
-    <p class="about">
-      three people each draw a third of a creature.<br />
-      you only see where the others' lines cross the fold.<br />
-      then it unfolds.
-      <span class="keys"><kbd>→</kbd> another creature · <kbd>←</kbd> back</span>
-    </p>
-  {/if}
 
   <div class="content">
     {@render children()}
@@ -146,13 +163,78 @@
     line-height: 1.5;
   }
 
+  /* a full-height column, so a page can sit in the middle of what's under the header */
   .fresh {
     position: relative;
     min-height: 100vh;
+    min-height: 100svh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ---- toss: one creature out, the next one in (see onNavigate) ---- */
+  :global(html[data-toss]::view-transition-old(root)),
+  :global(html[data-toss]::view-transition-new(root)) {
+    animation: none;
+  }
+
+  :global(html[data-toss]::view-transition-old(creature-meta)) {
+    animation: 140ms ease-in both toss-fade-out;
+  }
+
+  :global(html[data-toss]::view-transition-new(creature-meta)) {
+    animation: 220ms ease-out 160ms both toss-fade-in;
+  }
+
+  :global(html[data-toss="forward"]::view-transition-old(creature)) {
+    animation: 260ms cubic-bezier(0.55, 0, 0.75, 0.2) both toss-out-left;
+  }
+  :global(html[data-toss="forward"]::view-transition-new(creature)) {
+    animation: 420ms cubic-bezier(0.2, 0.9, 0.3, 1.15) 120ms both toss-in-right;
+  }
+  :global(html[data-toss="back"]::view-transition-old(creature)) {
+    animation: 260ms cubic-bezier(0.55, 0, 0.75, 0.2) both toss-out-right;
+  }
+  :global(html[data-toss="back"]::view-transition-new(creature)) {
+    animation: 420ms cubic-bezier(0.2, 0.9, 0.3, 1.15) 120ms both toss-in-left;
+  }
+
+  @keyframes -global-toss-out-left {
+    to {
+      transform: translateX(-14vw) rotate(-9deg) scale(0.86);
+      opacity: 0;
+    }
+  }
+  @keyframes -global-toss-out-right {
+    to {
+      transform: translateX(14vw) rotate(9deg) scale(0.86);
+      opacity: 0;
+    }
+  }
+  @keyframes -global-toss-in-right {
+    from {
+      transform: translateX(10vw) rotate(7deg) scale(0.9);
+      opacity: 0;
+    }
+  }
+  @keyframes -global-toss-in-left {
+    from {
+      transform: translateX(-10vw) rotate(-7deg) scale(0.9);
+      opacity: 0;
+    }
+  }
+  @keyframes -global-toss-fade-out {
+    to {
+      opacity: 0;
+    }
+  }
+  @keyframes -global-toss-fade-in {
+    from {
+      opacity: 0;
+    }
   }
 
   header,
-  .about,
   .content {
     position: relative;
     z-index: 1;
@@ -182,8 +264,7 @@
   }
 
   /* the page you're on keeps its squiggle in blue */
-  nav .squiggle[aria-current="page"],
-  nav button[aria-expanded="true"] {
+  nav .squiggle[aria-current="page"] {
     color: var(--blue);
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='4' viewBox='0 0 16 4'%3E%3Cpath d='M0 2 Q 4 0.2 8 2 T 16 2' fill='none' stroke='%230064ff' stroke-width='1.4' stroke-linecap='round'/%3E%3C/svg%3E");
   }
@@ -193,8 +274,6 @@
     font-family: var(--sans);
     font-size: 1rem;
     font-weight: 600;
-    /* room for the highlighter's tail before the ? */
-    margin-right: 4px;
   }
 
   /* already drawing: the mark stays, but it doesn't invite you again */
@@ -203,38 +282,18 @@
     opacity: 0.45;
   }
 
-  .about {
-    margin: -8px clamp(20px, 4vw, 48px) 0 auto;
-    width: max-content;
-    max-width: calc(100% - 40px);
-    font-family: var(--mono);
-    font-size: 0.8125rem;
-    line-height: 1.7;
-    text-align: right;
-    color: var(--ink-soft);
-  }
 
-  /* keyboard keys only mean something where there's a keyboard */
-  .keys {
-    display: none;
-    margin-top: 6px;
-  }
-
-  @media (hover: hover) and (pointer: fine) {
-    .keys {
-      display: block;
-    }
-  }
-
-  kbd {
-    font: inherit;
-    padding: 0 4px;
-    border: 1px solid var(--sky-line);
-    border-radius: 3px;
-  }
 
   .content {
-    padding: 0 clamp(20px, 4vw, 48px) 96px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 0 clamp(20px, 4vw, 48px) 64px;
+  }
+
+  /* one-sheet pages: centred vertically under the header (no effect once taller than the screen) */
+  .fresh :global(.middle) {
+    margin-block: auto;
   }
 
   /* shared bits for the /fresh pages */

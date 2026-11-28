@@ -164,7 +164,8 @@
 
 <svelte:window onkeydown={keydown} />
 
-<main class="draw">
+<!-- only the pick step is centred: the reveal unfolds in place from where you drew, so later steps keep their top -->
+<main class="draw" class:middle={step === "pick"}>
   {#if step === "pick" || !section}
     <h1>pick a third</h1>
     <div class="paper sheet pick">
@@ -242,8 +243,9 @@
 
 <style>
   .draw {
+    width: 100%;
     max-width: 760px;
-    margin: 2vh auto 0;
+    margin-inline: auto;
     display: flex;
     flex-direction: column;
     align-items: center;

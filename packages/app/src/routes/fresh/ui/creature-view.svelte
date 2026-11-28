@@ -1,8 +1,9 @@
 <script lang="ts">
-  import { goto, replaceState } from "$app/navigation";
+  import { goto, preloadCode, replaceState } from "$app/navigation";
   import { page } from "$app/state";
   import type { CorpseWithSections } from "@ecc/firestore";
   import { TYPES } from "#lib/corpse/types.ts";
+  import { getCorpse } from "../../gallery/corpse/[id]/corpse.remote";
   import { anotherCorpseId } from "../../home.remote";
   import Actions from "./actions.svelte";
   import Arrow from "./arrow.svelte";
@@ -37,12 +38,37 @@
     if (turned) learned.learn("turn");
   });
 
+  /*
+   * The next creature, dealt ahead of time: a beat after one settles, pick
+   * the next id and load its drawings, so "another" (and →) can toss
+   * straight away instead of waiting on two round trips. Holding the query
+   * keeps it in the client cache until the creature page asks for it.
+   */
+  let upcoming: { from: string; id: string; corpse: ReturnType<typeof getCorpse> } | null = null;
+
+  $effect(() => {
+    const current = corpse.id;
+    upcoming = null;
+    const timer = setTimeout(async () => {
+      try {
+        const id = await anotherCorpseId(current);
+        if (corpse.id !== current) return;
+        const next = { from: current, id, corpse: getCorpse(id) };
+        upcoming = next;
+        await Promise.all([next.corpse, preloadCode("/fresh/c/[id]")]);
+      } catch {
+        upcoming = null; // "another" falls back to asking when pressed
+      }
+    }, 1000);
+    return () => clearTimeout(timer);
+  });
+
   async function another() {
     if (dealing) return;
     dealing = true;
     failed = false;
     try {
-      const id = await anotherCorpseId(corpse.id);
+      const id = upcoming?.from === corpse.id ? upcoming.id : await anotherCorpseId(corpse.id);
       // Leaving home: pin its history entry to this creature, so back returns
       // to it rather than dealing a different random one.
       if (page.route.id === "/fresh") replaceState(href, { pinned: corpse.id });
@@ -71,7 +97,7 @@
 
 <svelte:window onkeydown={keydown} />
 
-<main class="creature">
+<main class="creature middle">
   <CreatureSheet {corpse} bind:turned />
 
   <div class="below">
@@ -99,10 +125,15 @@
     flex-direction: column;
     align-items: center;
     gap: 28px;
-    padding-top: 1vh;
+  }
+
+  /* named for the toss between creatures (fresh/+layout.svelte) */
+  .creature > :global(.turnable) {
+    view-transition-name: creature;
   }
 
   .below {
+    view-transition-name: creature-meta;
     display: flex;
     flex-direction: column;
     align-items: center;

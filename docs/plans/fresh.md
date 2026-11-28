@@ -22,8 +22,14 @@ yellow only as a highlighter.
 - `/fresh/draw`: pick a third → draw (doodles leave) → name it in a sentence →
   unfolds in place from where you drew.
 - `/fresh/look`: creatures / tops / middles / bottoms, sheets set down askew.
-- Nav: `look`, then `draw →` as the site's one call to action (a highlighter on
-  every page), then `?` (about, plus the keys on devices with a keyboard).
+- Nav: `look`, then `draw` as the site's one call to action: a highlighter
+  with a drawn pencil (`ui/pencil.svelte`) that scribbles on hover. No `?`
+  menu (removed 2026-11-27); keys are on the buttons (`aria-keyshortcuts`).
+- Layout: everything is centred horizontally. One-sheet pages (home and
+  creature, the draw page's pick step, the section page's player) sit in
+  the middle of the space under the header (`.middle`), slightly above true
+  centre. The look wall doesn't (a short shelf would look stranded), and the
+  draw page's later steps keep their top so the reveal unfolds in place.
 
 Settled details:
 - Folds (`lib/corpse/folds.ts`, picked in the fold lab): physically possible, flaps open only once their
@@ -63,13 +69,24 @@ Settled details:
 - copy link always copies the creature's own URL, also from home.
 - Keys: → another, ← back through creatures that another dealt (only those,
   so ← never leaves the site).
+- **Toss:** creature to creature (another, back/forward) the sheet is tossed
+  aside left and the next lands from the right, still folded, then unfolds;
+  back runs it the other way (view transitions in `fresh/+layout.svelte`,
+  names `creature` / `creature-meta`). Rule: toss when one sheet is replaced
+  by a *different* sheet; not when the same sheet changes state, so the
+  section playlist only folds and unfolds.
+- The next creature is dealt ahead: a second after one settles, its id,
+  drawings and the page code are fetched, so the toss starts in ~20ms
+  instead of waiting ~700ms on two round trips.
 
 ## Section page: a playlist (/s/[id])
 
 `ui/section-player.svelte`, decided 2026-11-27.
 
-- Step 0: the third on its own, in its slot of the square, the other two
-  thirds folded away behind it (the view its artist had while drawing).
+- Step 0: the third on its own, unfolded in its slot of the square with the
+  other two thirds hatched (the draw page's "someone else's third" stripes;
+  blank white would read as unfinished). Blank thirds render hatched anywhere
+  a fold has no drawing (`.front[data-blank]` in `lib/corpse/fold.svelte`).
 - → unfolds it into the creatures it's in, **newest first**
   (`Sections.creatures`, capped at the 60 most recent); → again folds it back
   up and opens the next; ← goes back, to the solo step at the start.
