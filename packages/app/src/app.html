@@ -10,6 +10,14 @@
     <link rel="preload" href="/fonts/spacemono/SpaceMono-Regular.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="icon" href="/icon.png" />
     <link rel="apple-touch-icon" href="/icon.png" />
+    <!-- Never turned a drawing over: /fresh home holds its buttons back. Known
+         before first paint, so they don't flash (see routes/fresh/ui). -->
+    <script>
+      try {
+        if (!JSON.parse(localStorage.getItem("ecc-learned") || "[]").includes("turn"))
+          document.documentElement.dataset.firstVisit = "";
+      } catch {}
+    </script>
     <script
       id="counterscale-script"
       data-site-id="exquisitecorpse.club"

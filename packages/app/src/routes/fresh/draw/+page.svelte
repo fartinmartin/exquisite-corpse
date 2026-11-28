@@ -8,13 +8,13 @@
   import Surface from "#lib/draw/surface.svelte";
   import { getSiblings, randomTitle, saveDrawing, type Sibling } from "../../draw/draw.remote";
   import Arrow from "../ui/arrow.svelte";
+  import Circled from "../ui/circled.svelte";
   import { brushCursor } from "../ui/brush-cursor.ts";
   import Tools from "../ui/tools.svelte";
   import { hand } from "../ui/hand.svelte.ts";
   import { learned } from "../ui/learned.svelte.ts";
   import { MediaQuery } from "svelte/reactivity";
   import Swap from "../ui/swap.svelte";
-  import { highlight } from "../ui/marks.ts";
   import { doodles as doodleState } from "../doodle-settings.svelte.ts";
 
   type Step = "pick" | "draw" | "sign";
@@ -232,7 +232,7 @@
 
       <div class="below">
         <button class="squiggle mono-link" onclick={restart}><Arrow back />another third</button>
-        <button class="hl done" style={highlight("done")} disabled={drawState.empty} onclick={() => (step = "sign")}>done <Arrow /></button>
+        <button class="circled done" disabled={drawState.empty} onclick={() => (step = "sign")}>done <Arrow /><Circled /></button>
       </div>
     {:else if step === "sign"}
       <form class="sentence" onsubmit={save}>
@@ -246,7 +246,7 @@
           placeholder={rememberedArtist}
           size={Math.max(8, (artist || rememberedArtist).length)}
         />
-        <button class="hl" style={highlight("reveal")} type="submit" disabled={saving}><Swap labels={["reveal", "revealing…"]} active={saving ? 1 : 0} /> <Arrow /></button>
+        <button class="circled" type="submit" disabled={saving}><Swap labels={["reveal", "…"]} active={saving ? 1 : 0} /> <Arrow /><Circled /></button>
       </form>
       <button class="squiggle mono-link" onclick={() => (step = "draw")}><Arrow back />keep drawing</button>
     {/if}
@@ -255,7 +255,7 @@
   {#if corpseId && stuck}
     <div class="below">
       <button class="squiggle mono-link" onclick={restart}>draw another</button>
-      <a class="hl done" href={`/fresh/c/${corpseId}`} style={highlight("meet it")}>meet it <Arrow /></a>
+      <a class="circled done" href={`/fresh/c/${corpseId}`}>meet it <Arrow /><Circled /></a>
     </div>
   {/if}
 </main>
@@ -349,6 +349,8 @@
   }
 
   .done {
+    /* room for the loop at the edge */
+    margin-right: 12px;
     font-size: 1.25rem;
     font-weight: 500;
   }
@@ -392,9 +394,19 @@
   }
 
   .sentence button {
-    margin-left: 10px;
+    margin-inline: 22px 14px;
     vertical-align: middle;
     font-size: 1rem;
+  }
+
+  /* phones: on its own line, so the loop doesn't cross the blanks */
+  @media (max-width: 599px) {
+    /* (.circled for weight: the shared inline-flex would otherwise win) */
+    .sentence button.circled {
+      display: flex;
+      width: fit-content;
+      margin: 20px auto 0;
+    }
   }
 
   .error {

@@ -14,7 +14,8 @@ with `ux-playground`'s polish of the old pages.
 
 A sheet of paper on a sky-blue desk. One framed object per page (the paper),
 everything else plain type: IBM Plex Sans + Plex Mono, the original palette,
-yellow only as a highlighter.
+orange pencil for the one call to action, yellow kept for marking where you
+are (the shelf on look) and hover.
 
 - `/fresh` home: a random creature in the creature view (below). Reload deals a new one.
 - `/fresh/c/[id]` creature page: the same view, for one creature.
@@ -30,11 +31,18 @@ yellow only as a highlighter.
   Without view transitions (Safari < 18, e.g. older iPads) there's no zoom:
   the creature page appears with your third folded in its slot, then unfolds.
 - `/fresh/look`: creatures / tops / middles / bottoms, sheets set down askew.
-- Nav: `look`, then `draw` as the site's one call to action: a highlighter
-  with a drawn pencil (`ui/pencil.svelte`) that scribbles on hover. The
-  highlight draws itself in once on arrival and is re-marked left to right
-  on hover (all `.hl` buttons). No squiggle under it as well: one mark per job. No `?`
-  menu (removed 2026-11-27); keys are on the buttons (`aria-keyshortcuts`).
+- Nav: `look`, then `draw` as the site's one call to action: circled by
+  hand, with a drawn pencil. No squiggle under it as well: one mark per job.
+  No `?` menu (removed 2026-11-27); keys are on the buttons
+  (`aria-keyshortcuts`).
+- The circle (`ui/circled.svelte`, inside any `.circled` button or link; shapes
+  and pencil moves in `ui/loops.ts`; picked 2026-11-28, replacing the
+  highlighter, which nothing else on the site used): "draw", "done", "reveal".
+  Orange, one of five loops at a random tilt, picked when the button appears
+  and kept while it's there; draws itself once, and again on hover (not for
+  touch) or keyboard focus, which also presses it harder. The pencil starts
+  with no line, then does one of five things: squiggle, curls, underline the
+  word, a tiny face, or draw the loop itself. Reduced motion: drawn already.
 - Layout: everything is centred horizontally. One-sheet pages (home and
   creature, the draw page's pick step, the section page's player) sit in
   the middle of the space under the header (`.middle`), slightly above true
@@ -47,7 +55,7 @@ Settled details:
   paper (`showsBack`) — except your own third in the draw reveal.
 - Paper backs (`lib/corpse/backs.ts`): 8 CSS textures, one per creature, seeded.
 - Links and buttons (`routes/fresh/+layout.svelte`, `routes/fresh/ui/`), one job each:
-  `.hl` the next thing to do, `.squiggle` takes you somewhere, `.stamp` acts
+  `.circled` the next thing to do, `.squiggle` takes you somewhere, `.stamp` acts
   right here (no paper-tab buttons); doodled `Arrow`, like heart in
   `Actions`, `Swap` for labels that change without resizing.
 - Creature credits live on the back of the paper (tap the sheet to turn it
@@ -75,6 +83,11 @@ Settled details:
 `ui/creature-view.svelte`. The sheet, title, then heart · share · download ·
 replay · **random** (no arrow: it has no direction). Tapping the sheet turns it over (credits) everywhere.
 
+- **First visit to home** (never turned a drawing over): only the sheet, the
+  title and the hint; the buttons fade in after the first turn, in the space
+  held for them. Swipe and arrow keys still deal another. `app.html` reads the
+  same memory before first paint so nothing flashes. Other creature pages
+  always show them.
 - The heart stays bare (no stamp): it reads as a control on its own; stamps
   are for actions on the thing. 44px to tap.
 - **share**: the system share sheet on touch devices, otherwise copies the
@@ -208,11 +221,6 @@ change in that one component.
 
 ## Resume here
 
-- [ ] Pick the call-to-action look (`.hl`). Heading toward a hand-drawn loop
-      (the highlighter isn't a metaphor used anywhere else), with a pencil
-      that starts without a line and draws once. Loop and pencil variants on
-      an uncommitted workshop page, `routes/fresh/lab/loop` (first round:
-      `lab/hl`; delete both once picked).
 - [x] Paper backs: keep all 8.
 - [ ] Measure ink bleed-through, which renders each folded panel twice.
 - [ ] Promote `/fresh` onto the main routes (`/`, `/draw`, `/gallery/...`),

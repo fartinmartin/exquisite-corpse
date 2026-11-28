@@ -4,9 +4,8 @@
   import DoodleField from "./doodle-field.svelte";
   import { doodles as doodleState } from "./doodle-settings.svelte.ts";
   import { doodles } from "./doodles.remote";
-  import Pencil from "./ui/pencil.svelte";
+  import Circled from "./ui/circled.svelte";
   import { learned } from "./ui/learned.svelte.ts";
-  import { highlight } from "./ui/marks.ts";
   import { toss, type Side } from "./ui/toss.ts";
 
   let { children } = $props();
@@ -92,7 +91,7 @@
     <nav>
       <a class="squiggle" href="/fresh/look" aria-current={looking ? "page" : undefined}>look</a>
       <!-- the one call to action, on every page -->
-      <a class="hl cta" href="/fresh/draw" style={highlight("draw")} aria-current={drawing ? "page" : undefined}>draw{#if !drawing}<Pencil />{/if}</a>
+      <a class="circled cta" href="/fresh/draw" aria-current={drawing ? "page" : undefined}>draw<Circled pencil={!drawing} /></a>
     </nav>
   </header>
 
@@ -321,29 +320,19 @@
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='4' viewBox='0 0 16 4'%3E%3Cpath d='M0 2 Q 4 0.2 8 2 T 16 2' fill='none' stroke='%230064ff' stroke-width='1.4' stroke-linecap='round'/%3E%3C/svg%3E");
   }
 
-  /* draw is a highlighter, in the sans like the other calls to action */
+  /* draw is the call to action: in the sans, circled */
   nav .cta {
+    /* room for the loop, clear of "look" */
+    margin-inline: 10px 6px;
     font-family: var(--sans);
     font-size: 1rem;
     font-weight: 600;
-    transition: scale 120ms ease;
   }
 
-  /* on arrival, the one call to action draws its own highlight once */
-  @media (prefers-reduced-motion: no-preference) {
-    nav .cta:not([aria-current="page"])::before {
-      /* its own name: hover's "marker" must be a different animation to replay */
-      animation: marker-in 520ms cubic-bezier(0.3, 0, 0.2, 1) 350ms backwards;
-    }
-  }
-
-  /* already drawing: the mark stays, but it doesn't invite you again */
-  nav .cta[aria-current="page"]::before {
-    height: 0.3em;
+  /* already drawing: the loop stays, but it doesn't invite you again */
+  nav .cta[aria-current="page"] :global(.loop) {
     opacity: 0.45;
   }
-
-
 
   .content {
     flex: 1;
@@ -384,13 +373,12 @@
 
   /*
    * Links and buttons, one job each:
-   *   .hl        the one thing to do next: a hand-drawn highlighter (see ui/marks.ts)
+   *   .circled   the one thing to do next: circled by hand (ui/circled.svelte, inside it)
    *   .squiggle  takes you somewhere: a pencil underline
    *   .stamp     does something right here: a crooked ink stamp
    */
-  .fresh :global(.hl) {
+  .fresh :global(.circled) {
     position: relative;
-    isolation: isolate;
     display: inline-flex;
     align-items: center;
     padding: 0 3px;
@@ -398,65 +386,25 @@
     color: var(--ink);
     text-decoration: none;
     white-space: nowrap;
+    transition: scale 120ms ease;
   }
 
-  .fresh :global(.hl::before) {
-    content: "";
-    position: absolute;
-    z-index: -1;
-    left: -4px;
-    right: -6px;
-    bottom: 0.05em;
-    height: 0.55em;
-    background: var(--yellow);
-    opacity: 0.7;
-    border-radius: var(--radius, 6px 3px 8px 4px);
-    rotate: var(--r, -1deg);
-    transition: height 200ms cubic-bezier(0.23, 1, 0.32, 1);
-  }
-
-  .fresh :global(.hl:hover),
-  .fresh :global(.hl:focus-visible) {
+  .fresh :global(.circled:hover),
+  .fresh :global(.circled:focus-visible) {
     color: var(--ink);
     outline: none;
   }
 
-  .fresh :global(.hl:not(:disabled):hover::before),
-  .fresh :global(.hl:focus-visible::before) {
-    height: 1.15em;
+  /* keyboard focus: the loop is pressed harder, and stays that way */
+  .fresh :global(.circled:focus-visible .loop path) {
+    stroke-width: 3.4;
   }
 
-  /* hover: the marker goes over it again, left to right, as it thickens */
-  @media (prefers-reduced-motion: no-preference) {
-    .fresh :global(.hl:not(:disabled):hover::before),
-    .fresh :global(.hl:focus-visible::before) {
-      animation: marker 320ms cubic-bezier(0.3, 0, 0.2, 1);
-    }
-  }
-
-  .fresh :global(.hl:not(:disabled):active) {
+  .fresh :global(.circled:not(:disabled):active) {
     scale: 0.96;
   }
 
-  @keyframes -global-marker {
-    from {
-      clip-path: inset(0 100% 0 0);
-    }
-    to {
-      clip-path: inset(0 0 0 0);
-    }
-  }
-
-  @keyframes -global-marker-in {
-    from {
-      clip-path: inset(0 100% 0 0);
-    }
-    to {
-      clip-path: inset(0 0 0 0);
-    }
-  }
-
-  .fresh :global(.hl:disabled) {
+  .fresh :global(.circled:disabled) {
     opacity: 0.35;
   }
 

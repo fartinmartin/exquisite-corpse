@@ -2,8 +2,8 @@
   import { MediaQuery } from "svelte/reactivity";
   import { drawState } from "#lib/draw/state.svelte.ts";
   import Arrow from "./arrow.svelte";
+  import Circled from "./circled.svelte";
   import { hand } from "./hand.svelte.ts";
-  import { highlight } from "./marks.ts";
 
   type Mode = "draw" | "erase" | "fill";
 
@@ -177,7 +177,7 @@
         aria-expanded={sheetOpen}
         onclick={() => (sheetOpen = !sheetOpen)}
       ><span style:--s="{Math.max(8, drawState.size * 2.6)}px"></span></button>
-      <button class="hl done" style={highlight("done")} disabled={drawState.empty} onclick={() => ondone?.()}>done <Arrow /></button>
+      <button class="circled done" disabled={drawState.empty} onclick={() => ondone?.()}>done <Arrow /><Circled snug /></button>
     </div>
   </div>
 {:else}
@@ -545,10 +545,11 @@
       0 0 0 3.5px var(--blue);
   }
 
-  /* natural height, so the highlighter sits under the word; the tap area is widened instead */
+  /* natural height, so the loop hugs the word; the tap area is widened instead */
   .done {
     position: relative;
-    margin-right: 8px;
+    /* room for its loop */
+    margin-inline: 8px 10px;
     font-weight: 600;
     white-space: nowrap;
   }
@@ -557,6 +558,13 @@
     content: "";
     position: absolute;
     inset: -12px -8px;
+  }
+
+  /* the smallest phones: no room for the arrow beside the tools */
+  @media (max-width: 359px) {
+    .dock:not([data-rail]) .done :global(.arrow) {
+      display: none;
+    }
   }
 
   .panel {
@@ -656,7 +664,12 @@
   }
 
   .dock[data-rail] .done {
-    margin: 0 0 6px;
+    margin: 0 0 8px;
+  }
+
+  /* the rail is too narrow for the word, the arrow and a loop round both */
+  .dock[data-rail] .done :global(.arrow) {
+    display: none;
   }
 
   /* the colour sheet opens beside the rail */

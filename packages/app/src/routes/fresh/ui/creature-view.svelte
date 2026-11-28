@@ -58,6 +58,14 @@
     replaying = false;
   });
 
+  /*
+   * A first visit to home asks for one thing: turn the drawing over. The
+   * buttons wait until that's happened (their space is kept, with the hint in
+   * it). Other creature pages always have them.
+   */
+  const home = $derived(page.route.id === "/fresh");
+  const waiting = $derived(home && learned.needs("turn"));
+
   // Turning a sheet over once is enough to know how.
   $effect(() => {
     if (turned) learned.learn("turn");
@@ -133,23 +141,25 @@
   <div class="below">
     <h1>{corpse.title}</h1>
     {#if drawn}<p class="mono drew">you drew the {LABELS[drawn]}</p>{/if}
-    <Actions
-      collection="corpses"
-      id={corpse.id}
-      likes={corpse.likes}
-      drawings={TYPES.flatMap((type) => corpse.panels[type]?.drawing ?? [])}
-      filename={`${corpse.title}.png`}
-      {href}
-    >
-      <button class="stamp" style:--r="1.5deg" onclick={replay} disabled={replaying} aria-label="replay: watch it being drawn">
-        <Swap labels={["replay", "…"]} active={replaying ? 1 : 0} />
-      </button>
-      <button class="stamp" style:--r="-1.5deg" onclick={() => another()} disabled={dealing} aria-label="a random creature" aria-keyshortcuts="ArrowLeft ArrowRight">
-        <Swap labels={["random", "…"]} active={dealing ? 1 : 0} />
-      </button>
-    </Actions>
+    <div class="controls" data-waiting={waiting || undefined} data-unsure={(home && !learned.loaded) || undefined}>
+      <Actions
+        collection="corpses"
+        id={corpse.id}
+        likes={corpse.likes}
+        drawings={TYPES.flatMap((type) => corpse.panels[type]?.drawing ?? [])}
+        filename={`${corpse.title}.png`}
+        {href}
+      >
+        <button class="stamp" style:--r="1.5deg" onclick={replay} disabled={replaying} aria-label="replay: watch it being drawn">
+          <Swap labels={["replay", "…"]} active={replaying ? 1 : 0} />
+        </button>
+        <button class="stamp" style:--r="-1.5deg" onclick={() => another()} disabled={dealing} aria-label="a random creature" aria-keyshortcuts="ArrowLeft ArrowRight">
+          <Swap labels={["random", "…"]} active={dealing ? 1 : 0} />
+        </button>
+      </Actions>
+      {#if learned.needs("turn")}<p class="mono hint">tap the drawing to see who drew it</p>{/if}
+    </div>
     {#if failed}<p class="mono">couldn't find one, try again?</p>{/if}
-    {#if learned.needs("turn")}<p class="mono hint">tap the drawing to see who drew it</p>{/if}
   </div>
 </main>
 
@@ -188,9 +198,34 @@
     line-height: 1.05;
   }
 
-  .below :global(.actions) {
+  .controls {
+    display: grid;
+    justify-items: center;
+    gap: 10px;
+  }
+
+  .controls :global(.actions) {
     margin-top: 6px;
     justify-content: center;
+    /* arriving after the first turn: once the sheet is most of the way over */
+    transition:
+      visibility 0s 600ms,
+      opacity 300ms ease 600ms,
+      translate 300ms ease 600ms;
+  }
+
+  /* before the page knows who's visiting, app.html's early check decides */
+  .controls[data-waiting] :global(.actions),
+  :global(html[data-first-visit]) .controls[data-unsure] :global(.actions) {
+    visibility: hidden;
+    opacity: 0;
+    translate: 0 6px;
+    transition: none;
+  }
+
+  .controls[data-waiting] > :global(*) {
+    grid-area: 1 / 1;
+    align-self: center;
   }
 
   .drew {

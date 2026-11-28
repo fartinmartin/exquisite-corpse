@@ -3,7 +3,7 @@
  * Starts as "not known yet" (no hint on the server-rendered page, so nothing
  * flashes for people who've learned it); the hint fades in on the client.
  */
-const KEY = "ecc-learned";
+const KEY = "ecc-learned"; // app.html reads it too, before first paint
 
 function read(): Set<string> {
   try {
@@ -17,6 +17,10 @@ function createLearned() {
   let known = $state<Set<string> | null>(null);
 
   return {
+    /** Whether the browser's memory has been read yet (never on the server). */
+    get loaded(): boolean {
+      return known !== null;
+    },
     /** `true` once the hint for `gesture` should show: on the client, and not yet used. */
     needs(gesture: string): boolean {
       return known !== null && !known.has(gesture);
