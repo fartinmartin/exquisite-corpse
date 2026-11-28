@@ -28,7 +28,7 @@
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const from = navigation.from?.route.id ?? "";
     const to = navigation.to?.route.id ?? "";
-    // the draw page's reveal glides into the creature page (same sheet, so no toss)
+    // reveal: the drawn third zooms into the creature page (no toss)
     const settle = from === "/fresh/draw" && to === "/fresh/c/[id]";
     if (!settle && (!CREATURE_ROUTES.has(from) || !CREATURE_ROUTES.has(to))) return;
     if (navigation.from?.url.href === navigation.to?.url.href) return;
@@ -200,21 +200,24 @@
     animation: 220ms ease-out 160ms both toss-fade-in;
   }
 
-  /* the reveal settling into the creature page: the sheet glides and shrinks into place */
-  :global(html[data-toss="settle"]::view-transition-group(creature)) {
-    animation-duration: 700ms;
+  /*
+   * reveal: the third you drew zooms out into its slot on the creature page
+   * (folded, the others behind it), and then the creature unfolds there.
+   * One picture throughout: the new one is fully there at once and the old
+   * one fades off on top, so the zoom never shows a washed-out double.
+   */
+  :global(html[data-toss="settle"]::view-transition-group(drawn-third)) {
+    animation-duration: 650ms;
     animation-timing-function: cubic-bezier(0.77, 0, 0.175, 1);
   }
-  /* swap pictures quickly and opaquely: the new one is fully there at once and
-     the old one fades off on top, so the glide never shows a washed-out double */
-  :global(html[data-toss="settle"]::view-transition-old(creature)) {
+  :global(html[data-toss="settle"]::view-transition-old(drawn-third)) {
     animation: 150ms ease both toss-fade-out;
   }
-  :global(html[data-toss="settle"]::view-transition-new(creature)) {
+  :global(html[data-toss="settle"]::view-transition-new(drawn-third)) {
     animation: none;
   }
   :global(html[data-toss="settle"]::view-transition-new(creature-meta)) {
-    animation: 300ms ease-out 450ms both toss-fade-in;
+    animation: 350ms ease-out 900ms both toss-fade-in;
   }
   :global(html[data-toss="settle"]::view-transition-old(root)) {
     animation: 250ms ease both toss-fade-out;

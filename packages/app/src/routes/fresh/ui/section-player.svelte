@@ -145,6 +145,7 @@
       left: step < last ? () => go(step + 1) : undefined,
       right: step > 0 ? () => go(step - 1) : undefined,
       follow: true,
+      fade: "drag",
     })}
     aria-label={current ? `${section.title} in ${current.title}` : `${section.title}, on its own`} role="img">
     <Fold {panels} {plan} {open} onfolded={folded} delay={0} back={backFor(section.id)} />

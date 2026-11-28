@@ -20,12 +20,15 @@ yellow only as a highlighter.
 - `/fresh/c/[id]` creature page: the same view, for one creature.
 - `/fresh/s/[id]` section page: a playlist of the creatures the third is in (below).
 - `/fresh/draw`: pick a third → draw (doodles leave) → name it in a sentence
-  ("this middle is called ___ by ___ **reveal →**") → it unfolds in place
-  from where you drew, then glides and shrinks into the creature's own page
-  (no "meet it" step). The creature page arrives already open (`startOpen`)
-  and says "you drew the middle" (`page.state.drawn`); its data is fetched
-  while the sheet unfolds. "reveal" over "save"/"unfold": it names the moment,
-  and it's what happens (saved, then revealed).
+  ("this middle is called ___ by ___ **reveal →**") → straight to the
+  creature's own page: your third zooms out into its slot of the square (the
+  others folded behind it; view transition `drawn-third`), *then* the
+  creature unfolds there, and the title arrives. The reveal is the last thing
+  that happens, in its final place. No "meet it" step; "you drew the middle"
+  under the title (`page.state.drawn`). "reveal" over "save"/"unfold": it
+  names the moment, and it's what happens (saved, then revealed).
+  Without view transitions (Safari < 18, e.g. older iPads) there's no zoom:
+  the creature page appears with your third folded in its slot, then unfolds.
 - `/fresh/look`: creatures / tops / middles / bottoms, sheets set down askew.
 - Nav: `look`, then `draw` as the site's one call to action: a highlighter
   with a drawn pencil (`ui/pencil.svelte`) that scribbles on hover. No `?`
@@ -138,8 +141,11 @@ Pass 2 (done):
   so a second finger can make it a gesture without a stray dot. Two-finger
   tap undoes, three-finger tap redoes.
 - **Swipe** (`ui/swipe.ts`): creature (left another, right back), section
-  player (steps), look (shelves). The sheet follows the finger and springs
-  back if it doesn't count; vertical scroll still works; a swipe is never
+  player (steps), look (shelves). The sheet follows the finger and fades
+  with the distance, and springs back if it doesn't count. When it counts:
+  the creature/look item fades out and the next fades in (where there are
+  no view transitions; otherwise the toss carries it); the section sheet
+  comes back as it folds over. Vertical scroll still works; a swipe is never
   also a tap; edge swipes are left to iOS.
 - **No stray scroll on phones:** heights use `svh`, not `vh` (vh is the
   height with the address bar hidden). No rubber-band either

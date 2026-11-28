@@ -27,8 +27,10 @@
     back?: BackId;
     /** Turn the whole sheet over: top-over-bottom ("v") or side-to-side ("h"). */
     flip?: "h" | "v" | null;
-    /** Start already open, with no unfold (e.g. arriving from a reveal that just played). */
+    /** Start already open, with no unfold. */
     startOpen?: boolean;
+    /** A view-transition name for the base slot (the third that stays on the desk). */
+    baseName?: string;
   };
 
   let {
@@ -43,6 +45,7 @@
     back = "plain",
     flip = null,
     startOpen = false,
+    baseName,
   }: Props = $props();
 
   // svelte-ignore state_referenced_locally
@@ -122,6 +125,7 @@
   <div
     class="slot"
     data-flipped={flip ?? undefined}
+    style:view-transition-name={baseName}
     style:top="{(TYPES.indexOf(plan.base) * 100) / 3}%"
     style:transform-origin="50% {(1.5 - TYPES.indexOf(plan.base)) * 100}%"
   >

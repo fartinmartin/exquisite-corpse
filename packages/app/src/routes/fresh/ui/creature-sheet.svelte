@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { CorpseWithSections } from "@ecc/firestore";
+  import type { CorpseWithSections, SectionType } from "@ecc/firestore";
   import { backFor } from "#lib/corpse/backs.ts";
   import Fold from "#lib/corpse/fold.svelte";
   import { hash, prng, randomFold } from "#lib/corpse/folds.ts";
@@ -11,14 +11,22 @@
     corpse: CorpseWithSections;
     /** Face down, showing what's printed on the back. */
     turned?: boolean;
-    /** Already unfolded (arriving from the draw page's reveal): no unfold on arrival. */
-    startOpen?: boolean;
+    /**
+     * The third this visitor just drew (arriving from the draw page): fold the
+     * others away behind it, so the folded sheet shows their third. It zooms
+     * into place (view transition `drawn-third`), then unfolds.
+     */
+    drawn?: SectionType;
   };
 
-  let { corpse, turned = $bindable(false), startOpen = false }: Props = $props();
+  let { corpse, turned = $bindable(false), drawn }: Props = $props();
 
   // Each creature arrives folded its own (physically possible) way, at its own angle.
-  const plan = $derived(randomFold({ rand: prng(hash(corpse.id)) }));
+  const plan = $derived(
+    drawn
+      ? randomFold({ rand: prng(hash(corpse.id)), base: drawn, side: -1, face: "any" })
+      : randomFold({ rand: prng(hash(corpse.id)) })
+  );
 
   const credits = $derived(TYPES.flatMap((type) => (corpse.panels[type] ? [corpse.panels[type]!] : [])));
 
@@ -30,7 +38,14 @@
 <div class="turnable">
   <button class="sheet" onclick={() => (turned = !turned)} aria-label={turned ? "turn it face up" : "turn it over"}>
     {#key corpse.id}
-      <Fold panels={corpse.panels} {plan} {startOpen} flip={turned ? "v" : null} back={turned ? "plain" : backFor(corpse.id)} />
+      <Fold
+        panels={corpse.panels}
+        {plan}
+        delay={drawn ? 750 : 250}
+        baseName={drawn ? "drawn-third" : undefined}
+        flip={turned ? "v" : null}
+        back={turned ? "plain" : backFor(corpse.id)}
+      />
     {/key}
   </button>
 

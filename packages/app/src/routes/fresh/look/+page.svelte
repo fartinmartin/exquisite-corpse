@@ -71,7 +71,7 @@
   <title>exquisite corpse club ▪ look</title>
 </svelte:head>
 
-<main class="look" {@attach swipe({ left: toShelf(shelfIndex + 1), right: toShelf(shelfIndex - 1) })}>
+<main class="look" {@attach swipe({ left: toShelf(shelfIndex + 1), right: toShelf(shelfIndex - 1), fade: "out", key: part })}>
   <nav class="parts">
     {#each PARTS as entry (entry.value)}
       <a

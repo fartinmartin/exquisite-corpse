@@ -103,8 +103,8 @@
 
 <main class="creature middle">
   <!-- swipe the sheet: left deals another, right goes back (when "another" brought you here) -->
-  <div class="swipe-area" {@attach swipe({ left: another, right: page.state.another ? () => history.back() : undefined, follow: true })}>
-    <CreatureSheet {corpse} bind:turned startOpen={!!drawn} />
+  <div class="swipe-area" {@attach swipe({ left: another, right: page.state.another ? () => history.back() : undefined, follow: true, fade: "out", key: corpse.id })}>
+    <CreatureSheet {corpse} bind:turned {drawn} />
   </div>
 
   <div class="below">

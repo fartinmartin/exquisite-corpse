@@ -1,13 +1,9 @@
 <script lang="ts">
   import { beforeNavigate, goto } from "$app/navigation";
-  import { getCorpse } from "../../gallery/corpse/[id]/corpse.remote";
   import type { SectionType } from "@ecc/firestore";
   import type { DrawingData } from "@ecc/lexicons";
-  import { backFor } from "#lib/corpse/backs.ts";
-  import Fold from "#lib/corpse/fold.svelte";
-  import { randomFold, type FoldPlan } from "#lib/corpse/folds.ts";
   import Peek from "#lib/corpse/peek.svelte";
-  import { LABELS, TYPES, type Panels } from "#lib/corpse/types.ts";
+  import { LABELS, TYPES } from "#lib/corpse/types.ts";
   import { drawState, GUEST_HANDLE_COOKIE } from "#lib/draw/state.svelte.ts";
   import Surface from "#lib/draw/surface.svelte";
   import { getSiblings, randomTitle, saveDrawing, type Sibling } from "../../draw/draw.remote";
@@ -21,7 +17,7 @@
   import { highlight } from "../ui/marks.ts";
   import { doodles as doodleState } from "../doodle-settings.svelte.ts";
 
-  type Step = "pick" | "draw" | "sign" | "reveal";
+  type Step = "pick" | "draw" | "sign";
 
 
   let step = $state<Step>("pick");
@@ -35,15 +31,14 @@
   let rememberedArtist = $state("anonymous");
   let saving = $state(false);
   let corpseId = $state<string | null>(null);
-  let finished = $state<{ panels: Panels; plan: FoldPlan } | null>(null);
   let sheet = $state<HTMLElement>();
   let liveWidth = $state(0);
 
   /*
    * Centring. The pick step centres like any one-sheet page (.middle). The
-   * later steps can't: the reveal unfolds in place from where you drew, so
-   * the sheet's top must not move between draw, sign and reveal. So the draw
-   * step is centred by measuring it once, and sign and reveal keep that top.
+   * later steps keep the drawing step's top, so the sheet doesn't jump when
+   * the tools give way to the naming sentence (and the third zooms out from
+   * where you drew it). So the draw step is centred by measuring it once.
    */
   let main = $state<HTMLElement>();
   let stageTop = $state(0);
@@ -68,37 +63,12 @@
     brushCursor({ mode: drawState.mode, size: drawState.size, color: drawState.color, scale: liveWidth / 1080 })
   );
 
-  /**
-   * The reveal starts exactly where the drawing was: same width, your third in
-   * the same spot, no tilt. Once unfolded it settles to fit the screen.
-   */
-  let from = $state<{ width: number; offset: number } | null>(null);
-  let settled = $state(false);
 
-  /*
-   * After the reveal: straight to the creature's own page, no "meet it" step.
-   * The unfolded sheet carries the view-transition name `creature`, so it
-   * glides (and zooms out) into its place on the creature page, which
-   * arrives already open (page.state.drawn). Its data is fetched while the
-   * sheet unfolds, held here so it's still cached when the page asks.
-   */
-  let arriving: ReturnType<typeof getCorpse> | null = null;
   let stuck = $state(false);
+  /** Saved: leaving now is expected, not a lost drawing. */
+  let saved = $state(false);
 
-  function arrive() {
-    if (!corpseId || !section) return;
-    const id = corpseId;
-    const drawn = section;
-    setTimeout(async () => {
-      try {
-        await goto(`/fresh/c/${id}`, { state: { drawn } });
-      } catch {
-        stuck = true; // offer the link instead
-      }
-    }, 450);
-  }
-
-  const dirty = $derived((step === "draw" || step === "sign") && !drawState.empty);
+  const dirty = $derived((step === "draw" || step === "sign") && !drawState.empty && !saved);
 
   $effect(() => {
     const match = document.cookie.match(new RegExp(`(?:^|; )${GUEST_HANDLE_COOKIE}=([^;]*)`));
@@ -160,8 +130,8 @@
     section = null;
     siblings = {};
     corpseId = null;
-    finished = null;
-    from = null;
+    saved = false;
+    stuck = false;
     drawState.reset();
   }
 
@@ -182,25 +152,14 @@
         siblings: { top: siblings.top?.id, mid: siblings.mid?.id, bot: siblings.bot?.id },
       });
       corpseId = result.corpseId;
-      arriving = getCorpse(result.corpseId);
-      const live = sheet?.querySelector(".live");
-      if (sheet && live) {
-        const outer = sheet.getBoundingClientRect();
-        const inner = live.getBoundingClientRect();
-        // the base slot sits index/3 of the way down the square
-        from = { width: outer.width, offset: inner.top - outer.top - (TYPES.indexOf(section) * outer.width) / 3 };
+      saved = true;
+      // Straight to the creature page: this third zooms into its slot there
+      // (view transition `drawn-third`), then the creature unfolds around it.
+      try {
+        await goto(`/fresh/c/${result.corpseId}`, { state: { drawn: section } });
+      } catch {
+        stuck = true; // offer the link instead
       }
-      settled = false;
-      // Your third stays on the desk; the others were folded away behind it.
-      finished = {
-        panels: {
-          ...siblings,
-          [section]: { id: result.sectionId, title, artist: artist || rememberedArtist, drawing },
-        },
-        // your own third face-up on the desk is fine: you've seen it
-        plan: { ...randomFold({ base: section, side: -1, face: "any" }), tilt: 0 },
-      };
-      step = "reveal";
     } catch (cause) {
       failed = cause instanceof Error ? cause.message : "that didn't save — try again?";
     } finally {
@@ -249,29 +208,14 @@
       {/each}
     </div>
     <p class="mono">someone else has drawn the other two</p>
-  {:else if step === "reveal" && finished}
-    <div
-      class="unfolded"
-      data-settled={settled || undefined}
-      style:width={from && !settled ? `${from.width}px` : undefined}
-      style:margin-top={from && !settled ? `${from.offset}px` : undefined}
-    >
-      <Fold
-        panels={finished.panels}
-        plan={finished.plan}
-        back={backFor(corpseId ?? "")}
-        delay={150}
-        onunfolded={arrive}
-      />
-    </div>
   {:else}
     <div class="paper sheet" data-step={step} bind:this={sheet}>
       {#each TYPES as type (type)}
         {#if type === section}
-          <div class="live" bind:clientWidth={liveWidth} style:--brush={cursor}><Surface locked={step !== "draw" || loading} /></div>
+          <div class="live" bind:clientWidth={liveWidth} style:--brush={cursor} style:view-transition-name={saving || saved ? "drawn-third" : undefined}><Surface locked={step !== "draw" || loading} /></div>
         {:else}
           {@const { edge, sliver } = fold(type)}
-          <Peek {type} drawing={siblings[type]?.drawing} {edge} {sliver} open={step === "reveal"}>
+          <Peek {type} drawing={siblings[type]?.drawing} {edge} {sliver} open={false}>
             {loading ? "…" : siblings[type] ? `someone's ${LABELS[type]}` : `no ${LABELS[type]} yet`}
           </Peek>
         {/if}
@@ -308,7 +252,7 @@
     {/if}
   {/if}
 
-  {#if step === "reveal" && corpseId && stuck}
+  {#if corpseId && stuck}
     <div class="below">
       <button class="squiggle mono-link" onclick={restart}>draw another</button>
       <a class="hl done" href={`/fresh/c/${corpseId}`} style={highlight("meet it")}>meet it <Arrow /></a>
@@ -340,19 +284,6 @@
     transition: max-width 700ms cubic-bezier(0.77, 0, 0.175, 1);
   }
 
-  /* unfolded, the sheet is square: size it so the whole creature fits on screen */
-  .unfolded {
-    /* the creature page's sheet has the same name: the reveal glides into it */
-    view-transition-name: creature;
-    width: min(100%, 560px, calc(100svh - 280px));
-    margin: 12px 0 28px; /* room for the tilt */
-  }
-
-  .unfolded[data-settled] {
-    transition:
-      width 700ms cubic-bezier(0.77, 0, 0.175, 1),
-      margin-top 700ms cubic-bezier(0.77, 0, 0.175, 1);
-  }
 
   .pick {
     display: flex;
@@ -392,7 +323,7 @@
     box-shadow: 0 0 0 2px var(--yellow);
   }
 
-  .sheet[data-step="reveal"] .live {
+  .sheet[data-step="never"] .live {
     box-shadow: none;
     transition: box-shadow 400ms;
   }
