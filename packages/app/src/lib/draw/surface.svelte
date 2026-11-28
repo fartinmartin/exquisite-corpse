@@ -1,5 +1,6 @@
 <script lang="ts">
   import { drawState } from "./state.svelte.ts";
+  import { attachTouchInput } from "./touch-input.ts";
 
   type Props = {
     /** Ignore pointer input (while signing or after saving). */
@@ -43,12 +44,19 @@
       observer.observe(target);
 
       drawState.attach(paint);
+
+      // Pencil, palm rejection, two/three-finger undo/redo (see touch-input.ts).
+      const detachTouch = attachTouchInput(target, paint.brush as never, {
+        undo: () => drawState.undo(),
+        redo: () => drawState.redo(),
+      });
       const sync = () => drawState.refresh();
       paint.events.on("end", sync);
       paint.events.on("drawn", sync);
       paint.events.on("start", sync);
 
       cleanup = () => {
+        detachTouch();
         observer.disconnect();
         drawState.attach(null);
         paint.destroy();
