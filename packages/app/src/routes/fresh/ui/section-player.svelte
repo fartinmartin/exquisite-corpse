@@ -9,6 +9,7 @@
   import type { Panels } from "#lib/corpse/types.ts";
   import { getCorpse } from "../../gallery/corpse/[id]/corpse.remote";
   import Arrow from "./arrow.svelte";
+  import { swipe } from "./swipe.ts";
 
   type Props = {
     section: SectionWithDrawing;
@@ -138,7 +139,14 @@
     <Arrow back />
   </button>
 
-  <div class="sheet" aria-label={current ? `${section.title} in ${current.title}` : `${section.title}, on its own`} role="img">
+  <div
+    class="sheet"
+    {@attach swipe({
+      left: step < last ? () => go(step + 1) : undefined,
+      right: step > 0 ? () => go(step - 1) : undefined,
+      follow: true,
+    })}
+    aria-label={current ? `${section.title} in ${current.title}` : `${section.title}, on its own`} role="img">
     <Fold {panels} {plan} {open} onfolded={folded} delay={0} back={backFor(section.id)} />
   </div>
 

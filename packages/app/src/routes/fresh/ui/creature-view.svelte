@@ -10,6 +10,7 @@
   import CreatureSheet from "./creature-sheet.svelte";
   import { learned } from "./learned.svelte.ts";
   import Swap from "./swap.svelte";
+  import { swipe } from "./swipe.ts";
 
   type Props = { corpse: CorpseWithSections };
 
@@ -98,7 +99,10 @@
 <svelte:window onkeydown={keydown} />
 
 <main class="creature middle">
-  <CreatureSheet {corpse} bind:turned />
+  <!-- swipe the sheet: left deals another, right goes back (when "another" brought you here) -->
+  <div class="swipe-area" {@attach swipe({ left: another, right: page.state.another ? () => history.back() : undefined, follow: true })}>
+    <CreatureSheet {corpse} bind:turned />
+  </div>
 
   <div class="below">
     <h1>{corpse.title}</h1>
@@ -128,7 +132,13 @@
   }
 
   /* named for the toss between creatures (fresh/+layout.svelte) */
-  .creature > :global(.turnable) {
+  .swipe-area {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+  }
+
+  .swipe-area > :global(.turnable) {
     view-transition-name: creature;
   }
 

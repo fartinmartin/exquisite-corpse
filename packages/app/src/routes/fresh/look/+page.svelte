@@ -5,6 +5,8 @@
   import { backFor } from "#lib/corpse/backs.ts";
   import { tiltFor } from "#lib/corpse/folds.ts";
   import { thumbUrl } from "#lib/thumbs.ts";
+  import { goto } from "$app/navigation";
+  import { swipe } from "../ui/swipe.ts";
   import { listGallery } from "../../gallery/gallery.remote";
 
   type Part = "corpses" | "top" | "mid" | "bot";
@@ -56,6 +58,12 @@
     }
   }
 
+  // swipe between shelves: left goes on to the next (creatures → tops → middles → bottoms)
+  const shelfHref = (value: Part) => (value === "corpses" ? "/fresh/look" : `/fresh/look?part=${value}`);
+  const shelfIndex = $derived(PARTS.findIndex((entry) => entry.value === part));
+  const toShelf = (index: number) =>
+    index >= 0 && index < PARTS.length ? () => goto(shelfHref(PARTS[index].value)) : undefined;
+
   const href = (item: Corpse | Section) => (isCorpses ? `/fresh/c/${item.id}` : `/fresh/s/${item.id}`);
 </script>
 
@@ -63,7 +71,7 @@
   <title>exquisite corpse club ▪ look</title>
 </svelte:head>
 
-<main class="look">
+<main class="look" {@attach swipe({ left: toShelf(shelfIndex + 1), right: toShelf(shelfIndex - 1) })}>
   <nav class="parts">
     {#each PARTS as entry (entry.value)}
       <a

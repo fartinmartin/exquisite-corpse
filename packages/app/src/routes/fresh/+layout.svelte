@@ -36,6 +36,9 @@
         resolve();
         await navigation.complete;
       });
+      // the browser may skip it (e.g. the viewport resized as a phone's address
+      // bar moved); the navigation still happens, just without the toss
+      transition.ready.catch(() => {});
       transition.finished.finally(() => delete document.documentElement.dataset.toss);
     });
   });
