@@ -14,7 +14,7 @@
     /** Panels to stack top to bottom for the download: one for a section, three for a creature. */
     drawings: DrawingData[];
     filename: string;
-    /** Path that "copy link" copies. Home shows a creature without its own URL, so it's passed in. */
+    /** Path that "share" shares. Home shows a creature without its own URL, so it's passed in. */
     href: string;
     /** More stamps, after download. */
     children?: Snippet;
@@ -64,9 +64,24 @@
     }
   }
 
-  async function copy() {
+  /**
+   * Share: the system share sheet on touch devices (phones, tablets), where
+   * it's the expected thing; elsewhere copy the link and say so. The link is
+   * always the item's own URL (home included).
+   */
+  async function share() {
+    const url = new URL(href, location.origin).href;
+    const touch = matchMedia("(pointer: coarse)").matches;
+    if (touch && navigator.share) {
+      try {
+        await navigator.share({ title: document.title, url });
+      } catch {
+        // dismissed: nothing to do
+      }
+      return;
+    }
     // only claim "copied!" when it really was
-    const ok = await navigator.clipboard?.writeText(new URL(href, location.origin).href).then(() => true, () => false);
+    const ok = await navigator.clipboard?.writeText(url).then(() => true, () => false);
     if (!ok) return;
     copied = true;
     setTimeout(() => (copied = false), 1500);
@@ -102,8 +117,8 @@
     </span>
     <span class="count">{likes}</span>
   </button>
-  <button class="stamp" style:--r="-3deg" data-done={copied || undefined} onclick={copy}>
-    <Swap labels={["copy link", "copied!"]} active={copied ? 1 : 0} />
+  <button class="stamp" style:--r="-3deg" data-done={copied || undefined} onclick={share}>
+    <Swap labels={["share", "copied!"]} active={copied ? 1 : 0} />
   </button>
   <button class="stamp" style:--r="2deg" onclick={download}>download</button>
   {@render children?.()}
@@ -117,11 +132,20 @@
     gap: 14px;
   }
 
+  /* bare on purpose (a heart reads as a control without a stamp), but a full 44px to tap */
   .like {
     display: inline-flex;
     align-items: center;
     gap: 6px;
+    min-width: 44px;
+    min-height: 44px;
+    padding: 0 6px;
+    margin-inline: -6px;
     color: var(--ink);
+  }
+
+  .like:active .heart {
+    scale: 0.85;
   }
 
   .count {

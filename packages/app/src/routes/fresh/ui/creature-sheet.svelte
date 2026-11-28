@@ -5,6 +5,7 @@
   import { hash, prng, randomFold } from "#lib/corpse/folds.ts";
   import { TYPES } from "#lib/corpse/types.ts";
   import Artist from "./artist.svelte";
+  import { playbackPlan } from "#lib/corpse/playback.ts";
   import Printed from "./printed.svelte";
 
   type Props = {
@@ -17,9 +18,13 @@
      * into place (view transition `drawn-third`), then unfolds.
      */
     drawn?: SectionType;
+    /** Bump to play the creature back, third by third in the order they were drawn. */
+    replayKey?: number;
   };
 
-  let { corpse, turned = $bindable(false), drawn }: Props = $props();
+  let { corpse, turned = $bindable(false), drawn, replayKey = 0 }: Props = $props();
+
+  const playback = $derived({ key: replayKey, thirds: replayKey ? playbackPlan(corpse.panels).thirds : {} });
 
   // Each creature arrives folded its own (physically possible) way, at its own angle.
   const plan = $derived(
@@ -43,6 +48,7 @@
         {plan}
         delay={drawn ? 750 : 250}
         baseName={drawn ? "drawn-third" : undefined}
+        {playback}
         flip={turned ? "v" : null}
         back={turned ? "plain" : backFor(corpse.id)}
       />

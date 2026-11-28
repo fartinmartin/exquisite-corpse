@@ -1,15 +1,22 @@
 <script lang="ts">
   import { untrack } from "svelte";
   import { Spring } from "svelte/motion";
+  import { MediaQuery } from "svelte/reactivity";
   import { doodles as doodleState, type Press, type Release } from "./doodle-settings.svelte.ts";
   import { tint } from "./ink.ts";
 
   type Doodle = { id: string; thumb: string };
-  type Props = { doodles: Doodle[] };
+  type Props = {
+    doodles: Doodle[];
+    /** "sparse": a few, fainter (pages full of drawings already, like look). */
+    density?: "full" | "sparse";
+  };
 
-  let { doodles }: Props = $props();
+  let { doodles, density = "full" }: Props = $props();
 
-  const COUNT = 9;
+  // More on wide screens, where the desk around the sheet is mostly empty.
+  const wide = new MediaQuery("(min-width: 1280px)");
+  const COUNT = $derived(density === "sparse" ? 4 : wide.current ? 12 : 9);
 
   // Spots around the edges of the viewport (vw/vh), so the centre stays clear.
   const SPOTS = [
@@ -22,6 +29,10 @@
     { x: 60, y: 1, w: 11, r: 11, d: 13 },
     { x: 24, y: 2, w: 10, r: -12, d: 10 },
     { x: 66, y: 93, w: 12, r: -8, d: 11 },
+    // wide screens only (the first nine are the rest)
+    { x: 12, y: 33, w: 11, r: 6, d: 12 },
+    { x: 88, y: 26, w: 10, r: -10, d: 10 },
+    { x: 30, y: 90, w: 12, r: 4, d: 13 },
   ];
 
   const byId = $derived(Object.fromEntries(doodles.map((doodle) => [doodle.id, doodle])));
@@ -167,6 +178,7 @@
 <div
   class="field"
   aria-hidden="true"
+  data-density={density}
   data-scattered={doodleState.scattered || undefined}
   data-phase={phase}
   style:--spring={SPRING}
@@ -291,6 +303,11 @@
     to {
       transform: translate(6px, -10px) rotate(2deg);
     }
+  }
+
+  /* sparse (look): fewer and fainter, the page is full of drawings already */
+  [data-density="sparse"] .doodle {
+    opacity: 0.28;
   }
 
   /* phones: fewer, quieter doodles */

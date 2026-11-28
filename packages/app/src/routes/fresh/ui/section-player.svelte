@@ -45,6 +45,13 @@
 
   const current = $derived(step > 0 ? creatures[step - 1] : null);
 
+  // The solo third draws itself in when you arrive (playback), once per section.
+  let arrival = $state(0);
+  $effect(() => {
+    void section.id;
+    arrival = untrack(() => arrival) + 1;
+  });
+
   // A different section (navigating between section pages) starts over, solo.
   $effect.pre(() => {
     void section.id;
@@ -148,7 +155,15 @@
       fade: "drag",
     })}
     aria-label={current ? `${section.title} in ${current.title}` : `${section.title}, on its own`} role="img">
-    <Fold {panels} {plan} {open} onfolded={folded} delay={0} back={backFor(section.id)} />
+    <Fold
+      {panels}
+      {plan}
+      {open}
+      onfolded={folded}
+      delay={0}
+      back={backFor(section.id)}
+      playback={step === 0 ? { key: arrival, thirds: { [section.type]: { delay: 250, duration: Math.min(2400, Math.max(900, 700 + section.drawing.paths.length * 45)) } } } : undefined}
+    />
   </div>
 
   <button
@@ -168,7 +183,7 @@
       in <a class="squiggle" href={`/fresh/c/${current.id}`}>{current.title}</a>
       <span class="count">{step} of {last}</span>
     {:else if last > 0}
-      on its own <span class="count">· in {last} {last === 1 ? "creature" : "creatures"}, → to see</span>
+      on its own <span class="count">· in {last} {last === 1 ? "creature" : "creatures"}</span>
     {:else}
       on its own <span class="count">· not in a creature yet</span>
     {/if}
@@ -203,7 +218,8 @@
     grid-area: next;
   }
 
-  .step {
+  /* (.player for weight: the shared .stamp style would otherwise win and left-align the arrow) */
+  .player .step {
     display: grid;
     place-items: center;
     width: 44px;
@@ -212,7 +228,7 @@
     font-size: 1.25rem;
   }
 
-  .step :global(.arrow) {
+  .player .step :global(.arrow) {
     margin: 0;
   }
 

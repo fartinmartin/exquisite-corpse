@@ -4,16 +4,16 @@ import { thumbUrl } from "#lib/thumbs.ts";
 
 /**
  * Real sections to scatter around the page as loose doodles — a few of each
- * kind, interleaved so neighbours differ. A small pool (12) so rotation has
+ * kind, interleaved so neighbours differ. A small pool (18) so rotation has
  * something to swap in. Thumbs are server-rendered PNGs (/thumbs).
  */
 export const doodles = query(async () => {
   const lists = await Promise.all(
-    (["top", "mid", "bot"] as const).map((type) => Sections.list({ type, sort: "date", page: 0, pageSize: 4 }))
+    (["top", "mid", "bot"] as const).map((type) => Sections.list({ type, sort: "date", page: 0, pageSize: 6 }))
   );
 
   const picked: { id: string; thumb: string }[] = [];
-  for (let i = 0; i < 4; i++) {
+  for (let i = 0; i < 6; i++) {
     for (const list of lists) {
       const item = list.items[i];
       if (item) picked.push({ id: item.id, thumb: thumbUrl("sections", item) });

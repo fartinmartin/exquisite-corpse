@@ -77,7 +77,7 @@
 </svelte:head>
 
 <div class="fresh" style:--header="{headerHeight}px">
-  <DoodleField doodles={field} />
+  <DoodleField doodles={field} density={page.url.pathname.startsWith("/fresh/look") ? "sparse" : "full"} />
 
   <header bind:clientHeight={headerHeight}>
     <a class="mark" href="/fresh">exquisite corpse club</a>
@@ -314,6 +314,15 @@
     font-family: var(--sans);
     font-size: 1rem;
     font-weight: 600;
+    transition: scale 120ms ease;
+  }
+
+  /* on arrival, the one call to action draws its own highlight once */
+  @media (prefers-reduced-motion: no-preference) {
+    nav .cta:not([aria-current="page"])::before {
+      /* its own name: hover's "marker" must be a different animation to replay */
+      animation: marker-in 520ms cubic-bezier(0.3, 0, 0.2, 1) 350ms backwards;
+    }
   }
 
   /* already drawing: the mark stays, but it doesn't invite you again */
@@ -398,6 +407,36 @@
   .fresh :global(.hl:not(:disabled):hover::before),
   .fresh :global(.hl:focus-visible::before) {
     height: 1.15em;
+  }
+
+  /* hover: the marker goes over it again, left to right, as it thickens */
+  @media (prefers-reduced-motion: no-preference) {
+    .fresh :global(.hl:not(:disabled):hover::before),
+    .fresh :global(.hl:focus-visible::before) {
+      animation: marker 320ms cubic-bezier(0.3, 0, 0.2, 1);
+    }
+  }
+
+  .fresh :global(.hl:not(:disabled):active) {
+    scale: 0.96;
+  }
+
+  @keyframes -global-marker {
+    from {
+      clip-path: inset(0 100% 0 0);
+    }
+    to {
+      clip-path: inset(0 0 0 0);
+    }
+  }
+
+  @keyframes -global-marker-in {
+    from {
+      clip-path: inset(0 100% 0 0);
+    }
+    to {
+      clip-path: inset(0 0 0 0);
+    }
   }
 
   .fresh :global(.hl:disabled) {

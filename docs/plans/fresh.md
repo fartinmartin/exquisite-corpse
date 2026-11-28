@@ -31,7 +31,9 @@ yellow only as a highlighter.
   the creature page appears with your third folded in its slot, then unfolds.
 - `/fresh/look`: creatures / tops / middles / bottoms, sheets set down askew.
 - Nav: `look`, then `draw` as the site's one call to action: a highlighter
-  with a drawn pencil (`ui/pencil.svelte`) that scribbles on hover. No `?`
+  with a drawn pencil (`ui/pencil.svelte`) that scribbles on hover. The
+  highlight draws itself in once on arrival and is re-marked left to right
+  on hover (all `.hl` buttons). No squiggle under it as well: one mark per job. No `?`
   menu (removed 2026-11-27); keys are on the buttons (`aria-keyshortcuts`).
 - Layout: everything is centred horizontally. One-sheet pages (home and
   creature, the draw page's pick step, the section page's player) sit in
@@ -58,13 +60,25 @@ Settled details:
   the press point and squashes them a little (anticipation); release flings
   them away, harder the longer you held (up to 1.2s), and they wobble home on
   an underdamped spring. No tremble while holding.
+- Doodles: 9 around the edges, 12 on wide screens (≥1280px) where the desk
+  is mostly empty, 4 fainter ones on look (already full of drawings).
 - Look wall: images reserve their aspect ratio (square / 3:1) and show one of
   the quiet paper backs (dots, graph, ruled, scuffs) until they load.
 
 ## Creature view (home and /c/[id])
 
-`ui/creature-view.svelte`. The sheet, title, then heart · copy link · download
-· **another**. Tapping the sheet turns it over (credits) everywhere.
+`ui/creature-view.svelte`. The sheet, title, then heart · share · download ·
+replay · **random**. Tapping the sheet turns it over (credits) everywhere.
+
+- The heart stays bare (no stamp): it reads as a control on its own; stamps
+  are for actions on the thing. 44px to tap.
+- **share**: the system share sheet on touch devices, otherwise copies the
+  link ("copied!"). Always the creature's own URL.
+- **replay** (the old site's playback): the creature blanks and redraws
+  itself stroke by stroke, third by third *in the order they were drawn*
+  (`lib/corpse/playback.ts`). A section page's solo step draws itself in on
+  arrival. Not at reveal time.
+- **random** (was "another"; still `another` in code and `page.state`).
 
 - **another** asks for a random id (`anotherCorpseId`, a command so it's never
   cached; `Corpses.randomId` loads no drawings) and navigates to
@@ -102,7 +116,7 @@ Settled details:
   on phones), plus ←/→ keys. Same keys as the creature view with a different
   meaning (next in this list vs. another random): fine, it's per page.
 - Caption: "on its own · in N creatures", then "in <creature> · 2 of 6" with a
-  link to the creature.
+  link to the creature. ("on its own" is a placeholder; alternatives pending.)
 - `?in=<creatureId>` opens straight to a step; stepping updates it in place
   (`replaceState`, no history entries).
 - Below: title, "a middle by <artist>", the section's heart / copy link /

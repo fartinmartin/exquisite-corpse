@@ -2,6 +2,7 @@
   import { goto, preloadCode } from "$app/navigation";
   import { page } from "$app/state";
   import type { CorpseWithSections } from "@ecc/firestore";
+  import { playbackPlan } from "#lib/corpse/playback.ts";
   import { LABELS, TYPES } from "#lib/corpse/types.ts";
   import { getCorpse } from "../../gallery/corpse/[id]/corpse.remote";
   import { anotherCorpseId } from "../../home.remote";
@@ -18,7 +19,8 @@
 
   /*
    * One view for a creature, on home (a random one, URL stays /fresh so a
-   * reload deals a new one) and on its own page. "another" navigates to the
+   * reload deals a new one) and on its own page. "random" (internally
+   * `another`) navigates to the
    * next creature's own URL, so every creature you land on is shareable and
    * the back button walks back through them.
    */
@@ -28,13 +30,33 @@
   const drawn = $derived(page.state.drawn);
 
   let turned = $state(false);
+
+  /*
+   * Playback (the old site's): watch the creature being drawn again, third by
+   * third in the order the artists drew them. Turns the sheet face up first.
+   */
+  let replayKey = $state(0);
+  let replaying = $state(false);
+  let replayTimer: ReturnType<typeof setTimeout> | undefined;
+
+  function replay() {
+    turned = false;
+    replayKey += 1;
+    replaying = true;
+    clearTimeout(replayTimer);
+    replayTimer = setTimeout(() => (replaying = false), playbackPlan(corpse.panels).total + 200);
+  }
+
+  $effect(() => () => clearTimeout(replayTimer));
   let dealing = $state(false);
   let failed = $state(false);
 
-  // A new creature arrives face up.
+  // A new creature arrives face up, and not mid-replay.
   $effect.pre(() => {
     void corpse.id;
     turned = false;
+    replayKey = 0;
+    replaying = false;
   });
 
   // Turning a sheet over once is enough to know how.
@@ -104,7 +126,7 @@
 <main class="creature middle">
   <!-- swipe the sheet: left deals another, right goes back (when "another" brought you here) -->
   <div class="swipe-area" {@attach swipe({ left: another, right: page.state.another ? () => history.back() : undefined, follow: true, fade: "out", key: corpse.id })}>
-    <CreatureSheet {corpse} bind:turned {drawn} />
+    <CreatureSheet {corpse} bind:turned {drawn} {replayKey} />
   </div>
 
   <div class="below">
@@ -118,11 +140,14 @@
       filename={`${corpse.title}.png`}
       {href}
     >
-      <button class="stamp another" style:--r="-1.5deg" onclick={another} disabled={dealing} aria-keyshortcuts="ArrowRight">
-        <Swap labels={["another", "…"]} active={dealing ? 1 : 0} /><Arrow />
+      <button class="stamp" style:--r="1.5deg" onclick={replay} disabled={replaying} aria-label="replay: watch it being drawn">
+        <Swap labels={["replay", "…"]} active={replaying ? 1 : 0} />
+      </button>
+      <button class="stamp another" style:--r="-1.5deg" onclick={another} disabled={dealing} aria-label="a random creature" aria-keyshortcuts="ArrowRight">
+        <Swap labels={["random", "…"]} active={dealing ? 1 : 0} /><Arrow />
       </button>
     </Actions>
-    {#if failed}<p class="mono">couldn't find another one, try again?</p>{/if}
+    {#if failed}<p class="mono">couldn't find one, try again?</p>{/if}
     {#if learned.needs("turn")}<p class="mono hint">tap the drawing to see who drew it</p>{/if}
   </div>
 </main>

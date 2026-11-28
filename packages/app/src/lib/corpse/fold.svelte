@@ -31,6 +31,11 @@
     startOpen?: boolean;
     /** A view-transition name for the base slot (the third that stays on the desk). */
     baseName?: string;
+    /**
+     * Playback: bump `key` to have the listed thirds blank and redraw
+     * themselves stroke by stroke, each after its own delay.
+     */
+    playback?: { key: number; thirds: Partial<Record<SectionType, { delay: number; duration: number }>> };
   };
 
   let {
@@ -46,6 +51,7 @@
     flip = null,
     startOpen = false,
     baseName,
+    playback,
   }: Props = $props();
 
   // svelte-ignore state_referenced_locally
@@ -137,7 +143,10 @@
   {@const drawing = panels[type]?.drawing}
   <div class="panel" data-type={type}>
     <div class="face front" data-crease={creases[type]} data-blank={drawing ? undefined : ""}>
-      {#if drawing}<Drawing {drawing} />{/if}
+      {#if drawing}
+        {@const play = playback?.thirds[type]}
+        <Drawing {drawing} replayKey={play ? playback!.key : 0} delay={play?.delay} duration={play?.duration} />
+      {/if}
     </div>
     <div class="face back" class:marked={type === marked}>
       {#if back === "bleed" && drawing}
