@@ -101,6 +101,36 @@ Settled details:
   download, then "more by <artist>". The old "lives in" grid is gone; the
   playlist replaces it.
 
+## Touch (phones, iPad)
+
+Decided 2026-11-27. Controls go in thumb reach by default; they are not
+freely movable or dockable (most people draw once, on a device they've never
+drawn on here; floating palettes are a power-user idea). They can get out of
+the way instead.
+
+Pass 1 (done):
+- **Phones** (touch + narrow): a dock fixed to the bottom of the screen
+  (`ui/tools.svelte`): undo · draw/erase/fill · current colour (sized like the
+  brush) · done. The colour opens a sheet above it: palette, size, + colour,
+  redo, clear (clear one step away on purpose). Starting a stroke closes the
+  sheet. A grip tucks the dock down to a sliver and back.
+- **iPad** (touch + wide): the desktop row with 44px targets (colour dots
+  keep their size, with a 44px tap area) and a sheet up to 1000px wide.
+- Every touch target ≥ 44px. The page can't scroll or bounce while drawing.
+- The draw page is centred too: the drawing step is measured once, and sign
+  and reveal keep that top so the reveal still unfolds in place.
+
+Pass 2 (next):
+- Phone landscape (756×252 to draw in, vs 346×115 in portrait): hide the
+  header while drawing, controls as a vertical rail on the side, left/right
+  handed (remembered). A "turn sideways for more room" hint in portrait.
+- Apple Pencil: once a pen touches, ignore fingers/palm for drawing;
+  pressure for line width (optional).
+- Two-finger tap undo, three-finger redo.
+- Swipe on the creature sheet (another / back) and the section player (steps).
+- Needs real devices: palm rejection, pressure and gestures can't be judged
+  in an emulator.
+
 ## Artists (waiting on atproto)
 
 An artist page is wanted, but it waits for atproto (itself on hold until
@@ -141,3 +171,4 @@ change in that one component.
 - [ ] Real-device check on a phone (only checked in 390px frames so far),
       including the doodles' press/hold/release.
 - [ ] Artist page, with atproto (see "Artists").
+- [ ] Touch pass 2 (see "Touch").

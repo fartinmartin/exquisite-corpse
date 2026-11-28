@@ -85,6 +85,15 @@
     return () => (doodleState.scattered = false);
   });
 
+  // While drawing, the page can't scroll or bounce (no pull-to-refresh wiping a drawing).
+  $effect(() => {
+    if (step !== "draw") return;
+    const html = document.documentElement;
+    const previous = html.style.overscrollBehavior;
+    html.style.overscrollBehavior = "none";
+    return () => (html.style.overscrollBehavior = previous);
+  });
+
   beforeNavigate(({ cancel, type }) => {
     if (!dirty) return;
     // For "leave" (reload, tab close, external link) cancel() asks the browser
@@ -190,6 +199,7 @@
 
 <main
   class="draw"
+  data-step={step}
   class:middle={step === "pick"}
   bind:this={main}
   style:margin-top={step === "pick" ? undefined : `${stageTop}px`}
@@ -418,5 +428,25 @@
 
   .error {
     color: var(--red);
+  }
+
+  /* touch tablets: let the sheet use the width (the canvas keeps its 3:1) */
+  @media (pointer: coarse) and (min-width: 720px) {
+    .draw,
+    .sheet {
+      max-width: min(1000px, 100%);
+    }
+  }
+
+  /* phones: "done" lives in the dock (ui/tools.svelte), which is fixed to the
+     bottom, so leave room for it */
+  @media (pointer: coarse) and (max-width: 719px) {
+    .draw[data-step="draw"] .below .done {
+      display: none;
+    }
+
+    .draw[data-step="draw"] {
+      padding-bottom: 88px;
+    }
   }
 </style>
