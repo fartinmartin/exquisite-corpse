@@ -208,8 +208,11 @@ change in that one component.
 
 ## Resume here
 
-- [ ] Pick the call-to-action look (`.hl`). Six options on an uncommitted
-      workshop page, `routes/fresh/lab/hl` (delete once picked).
+- [ ] Pick the call-to-action look (`.hl`). Heading toward a hand-drawn loop
+      (the highlighter isn't a metaphor used anywhere else), with a pencil
+      that starts without a line and draws once. Loop and pencil variants on
+      an uncommitted workshop page, `routes/fresh/lab/loop` (first round:
+      `lab/hl`; delete both once picked).
 - [x] Paper backs: keep all 8.
 - [ ] Measure ink bleed-through, which renders each folded panel twice.
 - [ ] Promote `/fresh` onto the main routes (`/`, `/draw`, `/gallery/...`),
