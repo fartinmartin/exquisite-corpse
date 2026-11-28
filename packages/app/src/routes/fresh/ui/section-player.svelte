@@ -181,7 +181,7 @@
 
   .sheet {
     grid-area: sheet;
-    width: min(100%, calc(100vh - 320px));
+    width: min(100%, calc(100svh - 320px));
     min-width: min(100%, 280px);
     justify-self: center;
   }

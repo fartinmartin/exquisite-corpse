@@ -140,7 +140,9 @@
     /* place-items also centres (and shrinks) block children in current browsers */
     place-items: normal;
     padding: 0;
-    min-height: 100vh;
+    /* svh, not vh: on phones vh is the height with the address bar hidden,
+       so anything 100vh tall scrolls by the bar's height */
+    min-height: 100svh;
   }
 
   /* The drawing sheet: one continuous surface the thirds sit on, creased by
@@ -166,7 +168,6 @@
   /* a full-height column, so a page can sit in the middle of what's under the header */
   .fresh {
     position: relative;
-    min-height: 100vh;
     min-height: 100svh;
     display: flex;
     flex-direction: column;

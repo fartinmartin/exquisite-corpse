@@ -305,7 +305,7 @@
 
   /* unfolded, the sheet is square: size it so the whole creature fits on screen */
   .unfolded {
-    width: min(100%, 560px, calc(100vh - 280px));
+    width: min(100%, 560px, calc(100svh - 280px));
     margin: 12px 0 28px; /* room for the tilt */
   }
 

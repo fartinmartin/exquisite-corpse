@@ -48,7 +48,7 @@
 <style>
   .turnable {
     position: relative;
-    width: min(100%, 560px, calc(100vh - 300px));
+    width: min(100%, 560px, calc(100svh - 300px));
     min-width: min(100%, 280px);
     container-type: inline-size;
   }
