@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { goto, preloadCode, replaceState } from "$app/navigation";
+  import { goto, preloadCode } from "$app/navigation";
   import { page } from "$app/state";
   import type { CorpseWithSections } from "@ecc/firestore";
   import { LABELS, TYPES } from "#lib/corpse/types.ts";
@@ -75,7 +75,7 @@
       const id = upcoming?.from === corpse.id ? upcoming.id : await anotherCorpseId(corpse.id);
       // Leaving home: pin its history entry to this creature, so back returns
       // to it rather than dealing a different random one.
-      if (page.route.id === "/fresh") replaceState(href, { pinned: corpse.id });
+      if (page.route.id === "/fresh") await goto(href, { state: { pinned: corpse.id }, shallow: true, replace: true });
       await goto(`/fresh/c/${id}`, { state: { another: true } });
     } catch {
       failed = true;

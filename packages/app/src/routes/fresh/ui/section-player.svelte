@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { replaceState } from "$app/navigation";
+  import { goto } from "$app/navigation";
   import { page } from "$app/state";
   import { untrack } from "svelte";
   import type { Corpse, CorpseWithSections, SectionWithDrawing } from "@ecc/firestore";
@@ -94,7 +94,7 @@
       const url = new URL(page.url.href);
       if (step > 0) url.searchParams.set("in", creatures[step - 1].id);
       else url.searchParams.delete("in");
-      replaceState(url, page.state);
+      await goto(url, { state: page.state, shallow: true, replace: true });
     } catch {
       failed = true;
     } finally {
