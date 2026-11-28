@@ -19,8 +19,13 @@ yellow only as a highlighter.
 - `/fresh` home: a random creature in the creature view (below). Reload deals a new one.
 - `/fresh/c/[id]` creature page: the same view, for one creature.
 - `/fresh/s/[id]` section page: a playlist of the creatures the third is in (below).
-- `/fresh/draw`: pick a third → draw (doodles leave) → name it in a sentence →
-  unfolds in place from where you drew.
+- `/fresh/draw`: pick a third → draw (doodles leave) → name it in a sentence
+  ("this middle is called ___ by ___ **reveal →**") → it unfolds in place
+  from where you drew, then glides and shrinks into the creature's own page
+  (no "meet it" step). The creature page arrives already open (`startOpen`)
+  and says "you drew the middle" (`page.state.drawn`); its data is fetched
+  while the sheet unfolds. "reveal" over "save"/"unfold": it names the moment,
+  and it's what happens (saved, then revealed).
 - `/fresh/look`: creatures / tops / middles / bottoms, sheets set down askew.
 - Nav: `look`, then `draw` as the site's one call to action: a highlighter
   with a drawn pencil (`ui/pencil.svelte`) that scribbles on hover. No `?`
@@ -137,7 +142,10 @@ Pass 2 (done):
   back if it doesn't count; vertical scroll still works; a swipe is never
   also a tap; edge swipes are left to iOS.
 - **No stray scroll on phones:** heights use `svh`, not `vh` (vh is the
-  height with the address bar hidden).
+  height with the address bar hidden). No rubber-band either
+  (`overscroll-behavior: none` on /fresh): an app shell, and Safari's bounce
+  showed the plain colour behind the dotted pattern. The draw page's pick
+  square also fits the height (iPad landscape).
 - **Not done: pencil pressure.** canvas-paint renders a stroke at one width
   (its first point's size). Pressure needs variable-width rendering in
   canvas-paint, which also renders server thumbnails, so it would bump

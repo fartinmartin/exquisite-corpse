@@ -27,6 +27,8 @@
     back?: BackId;
     /** Turn the whole sheet over: top-over-bottom ("v") or side-to-side ("h"). */
     flip?: "h" | "v" | null;
+    /** Start already open, with no unfold (e.g. arriving from a reveal that just played). */
+    startOpen?: boolean;
   };
 
   let {
@@ -40,9 +42,11 @@
     progress,
     back = "plain",
     flip = null,
+    startOpen = false,
   }: Props = $props();
 
-  const opened = new SvelteSet<SectionType>();
+  // svelte-ignore state_referenced_locally
+  const opened = new SvelteSet<SectionType>(startOpen ? plan.order : []);
 
   const children = (parent: SectionType): Hinge[] => plan.hinges.filter((hinge) => hinge.parent === parent);
 

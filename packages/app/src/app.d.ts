@@ -10,6 +10,8 @@ declare global {
       another?: boolean;
       /** /fresh home, left via "another": the creature it was showing, so back returns to it. */
       pinned?: string;
+      /** /fresh/c/[id], arriving from the draw page: the third this visitor just drew. */
+      drawn?: "top" | "mid" | "bot";
     }
   }
 }

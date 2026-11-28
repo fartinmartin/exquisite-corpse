@@ -1,5 +1,6 @@
 <script lang="ts">
-  import { beforeNavigate } from "$app/navigation";
+  import { beforeNavigate, goto } from "$app/navigation";
+  import { getCorpse } from "../../gallery/corpse/[id]/corpse.remote";
   import type { SectionType } from "@ecc/firestore";
   import type { DrawingData } from "@ecc/lexicons";
   import { backFor } from "#lib/corpse/backs.ts";
@@ -73,6 +74,29 @@
    */
   let from = $state<{ width: number; offset: number } | null>(null);
   let settled = $state(false);
+
+  /*
+   * After the reveal: straight to the creature's own page, no "meet it" step.
+   * The unfolded sheet carries the view-transition name `creature`, so it
+   * glides (and zooms out) into its place on the creature page, which
+   * arrives already open (page.state.drawn). Its data is fetched while the
+   * sheet unfolds, held here so it's still cached when the page asks.
+   */
+  let arriving: ReturnType<typeof getCorpse> | null = null;
+  let stuck = $state(false);
+
+  function arrive() {
+    if (!corpseId || !section) return;
+    const id = corpseId;
+    const drawn = section;
+    setTimeout(async () => {
+      try {
+        await goto(`/fresh/c/${id}`, { state: { drawn } });
+      } catch {
+        stuck = true; // offer the link instead
+      }
+    }, 450);
+  }
 
   const dirty = $derived((step === "draw" || step === "sign") && !drawState.empty);
 
@@ -158,6 +182,7 @@
         siblings: { top: siblings.top?.id, mid: siblings.mid?.id, bot: siblings.bot?.id },
       });
       corpseId = result.corpseId;
+      arriving = getCorpse(result.corpseId);
       const live = sheet?.querySelector(".live");
       if (sheet && live) {
         const outer = sheet.getBoundingClientRect();
@@ -236,10 +261,7 @@
         plan={finished.plan}
         back={backFor(corpseId ?? "")}
         delay={150}
-        onunfolded={() => {
-          settled = true;
-          if (finished) finished.plan.tilt = Number(((Math.random() * 2 - 1) * 3).toFixed(2));
-        }}
+        onunfolded={arrive}
       />
     </div>
   {:else}
@@ -280,13 +302,13 @@
           placeholder={rememberedArtist}
           size={Math.max(8, (artist || rememberedArtist).length)}
         />
-        <button class="hl" style={highlight("unfold")} type="submit" disabled={saving}><Swap labels={["unfold", "unfolding…"]} active={saving ? 1 : 0} /> <Arrow /></button>
+        <button class="hl" style={highlight("reveal")} type="submit" disabled={saving}><Swap labels={["reveal", "revealing…"]} active={saving ? 1 : 0} /> <Arrow /></button>
       </form>
       <button class="squiggle mono-link" onclick={() => (step = "draw")}><Arrow back />keep drawing</button>
     {/if}
   {/if}
 
-  {#if step === "reveal" && corpseId}
+  {#if step === "reveal" && corpseId && stuck}
     <div class="below">
       <button class="squiggle mono-link" onclick={restart}>draw another</button>
       <a class="hl done" href={`/fresh/c/${corpseId}`} style={highlight("meet it")}>meet it <Arrow /></a>
@@ -320,6 +342,8 @@
 
   /* unfolded, the sheet is square: size it so the whole creature fits on screen */
   .unfolded {
+    /* the creature page's sheet has the same name: the reveal glides into it */
+    view-transition-name: creature;
     width: min(100%, 560px, calc(100svh - 280px));
     margin: 12px 0 28px; /* room for the tilt */
   }
@@ -333,7 +357,8 @@
   .pick {
     display: flex;
     flex-direction: column;
-    max-width: 520px;
+    /* square: fit the height too (iPad landscape), under the header, title and note */
+    width: min(100%, 520px, calc(100svh - 260px));
   }
 
   .pick button {

@@ -11,9 +11,11 @@
     corpse: CorpseWithSections;
     /** Face down, showing what's printed on the back. */
     turned?: boolean;
+    /** Already unfolded (arriving from the draw page's reveal): no unfold on arrival. */
+    startOpen?: boolean;
   };
 
-  let { corpse, turned = $bindable(false) }: Props = $props();
+  let { corpse, turned = $bindable(false), startOpen = false }: Props = $props();
 
   // Each creature arrives folded its own (physically possible) way, at its own angle.
   const plan = $derived(randomFold({ rand: prng(hash(corpse.id)) }));
@@ -28,7 +30,7 @@
 <div class="turnable">
   <button class="sheet" onclick={() => (turned = !turned)} aria-label={turned ? "turn it face up" : "turn it over"}>
     {#key corpse.id}
-      <Fold panels={corpse.panels} {plan} flip={turned ? "v" : null} back={turned ? "plain" : backFor(corpse.id)} />
+      <Fold panels={corpse.panels} {plan} {startOpen} flip={turned ? "v" : null} back={turned ? "plain" : backFor(corpse.id)} />
     {/key}
   </button>
 

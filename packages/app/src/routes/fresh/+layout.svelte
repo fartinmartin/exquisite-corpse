@@ -26,11 +26,15 @@
   onNavigate((navigation) => {
     if (!document.startViewTransition) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    if (!CREATURE_ROUTES.has(navigation.from?.route.id ?? "") || !CREATURE_ROUTES.has(navigation.to?.route.id ?? "")) return;
+    const from = navigation.from?.route.id ?? "";
+    const to = navigation.to?.route.id ?? "";
+    // the draw page's reveal glides into the creature page (same sheet, so no toss)
+    const settle = from === "/fresh/draw" && to === "/fresh/c/[id]";
+    if (!settle && (!CREATURE_ROUTES.has(from) || !CREATURE_ROUTES.has(to))) return;
     if (navigation.from?.url.href === navigation.to?.url.href) return;
 
     const back = navigation.type === "popstate" && navigation.delta < 0;
-    document.documentElement.dataset.toss = back ? "back" : "forward";
+    document.documentElement.dataset.toss = settle ? "settle" : back ? "back" : "forward";
     return new Promise((resolve) => {
       const transition = document.startViewTransition(async () => {
         resolve();
@@ -168,6 +172,12 @@
     line-height: 1.5;
   }
 
+  /* an app shell: no rubber-band past the ends (Safari would show the plain
+     colour behind the dotted pattern) */
+  :global(html:has(.fresh)) {
+    overscroll-behavior: none;
+  }
+
   /* a full-height column, so a page can sit in the middle of what's under the header */
   .fresh {
     position: relative;
@@ -188,6 +198,29 @@
 
   :global(html[data-toss]::view-transition-new(creature-meta)) {
     animation: 220ms ease-out 160ms both toss-fade-in;
+  }
+
+  /* the reveal settling into the creature page: the sheet glides and shrinks into place */
+  :global(html[data-toss="settle"]::view-transition-group(creature)) {
+    animation-duration: 700ms;
+    animation-timing-function: cubic-bezier(0.77, 0, 0.175, 1);
+  }
+  /* swap pictures quickly and opaquely: the new one is fully there at once and
+     the old one fades off on top, so the glide never shows a washed-out double */
+  :global(html[data-toss="settle"]::view-transition-old(creature)) {
+    animation: 150ms ease both toss-fade-out;
+  }
+  :global(html[data-toss="settle"]::view-transition-new(creature)) {
+    animation: none;
+  }
+  :global(html[data-toss="settle"]::view-transition-new(creature-meta)) {
+    animation: 300ms ease-out 450ms both toss-fade-in;
+  }
+  :global(html[data-toss="settle"]::view-transition-old(root)) {
+    animation: 250ms ease both toss-fade-out;
+  }
+  :global(html[data-toss="settle"]::view-transition-new(root)) {
+    animation: none;
   }
 
   :global(html[data-toss="forward"]::view-transition-old(creature)) {

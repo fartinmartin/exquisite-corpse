@@ -2,7 +2,7 @@
   import { goto, preloadCode, replaceState } from "$app/navigation";
   import { page } from "$app/state";
   import type { CorpseWithSections } from "@ecc/firestore";
-  import { TYPES } from "#lib/corpse/types.ts";
+  import { LABELS, TYPES } from "#lib/corpse/types.ts";
   import { getCorpse } from "../../gallery/corpse/[id]/corpse.remote";
   import { anotherCorpseId } from "../../home.remote";
   import Actions from "./actions.svelte";
@@ -23,6 +23,9 @@
    * the back button walks back through them.
    */
   const href = $derived(`/fresh/c/${corpse.id}`);
+
+  /** Arriving straight from the draw page: the third this visitor just drew. */
+  const drawn = $derived(page.state.drawn);
 
   let turned = $state(false);
   let dealing = $state(false);
@@ -101,11 +104,12 @@
 <main class="creature middle">
   <!-- swipe the sheet: left deals another, right goes back (when "another" brought you here) -->
   <div class="swipe-area" {@attach swipe({ left: another, right: page.state.another ? () => history.back() : undefined, follow: true })}>
-    <CreatureSheet {corpse} bind:turned />
+    <CreatureSheet {corpse} bind:turned startOpen={!!drawn} />
   </div>
 
   <div class="below">
     <h1>{corpse.title}</h1>
+    {#if drawn}<p class="mono drew">you drew the {LABELS[drawn]}</p>{/if}
     <Actions
       collection="corpses"
       id={corpse.id}
@@ -161,6 +165,10 @@
   .below :global(.actions) {
     margin-top: 6px;
     justify-content: center;
+  }
+
+  .drew {
+    margin-top: -4px;
   }
 
   .another {
